@@ -9,7 +9,8 @@ window.appState = {
   currentTimeframe: '1d',
   currentPeriod: '2y',
   radarTimeframe: '1d',
-  radarActiveCategory: 'all',
+  radarActiveCategory: 'featured',
+  radarCategoryCache: {},
   lookbackN: 10,
   retestM: 5,
   horizonX: 60,
@@ -115,14 +116,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   elements.btnRefreshData.addEventListener('click', () => {
     if (state.activeTab === 'tab-radar') {
-      loadRadarData(true);
+      loadRadarData(true, state.radarActiveCategory);
     } else {
       loadAnalysisData(true);
     }
   });
 
   elements.btnRadarRescan.addEventListener('click', () => {
-    loadRadarData(true);
+    loadRadarData(true, state.radarActiveCategory);
   });
 });
 
@@ -266,12 +267,13 @@ function setupRadarTimeframeButtons() {
       btn.classList.remove('bg-fintech-bg', 'text-gray-300');
 
       state.radarTimeframe = btn.getAttribute('data-tf');
-      loadRadarData(false);
+      state.radarCategoryCache = {}; // reset cache for new timeframe
+      loadRadarData(false, state.radarActiveCategory);
     });
   });
 }
 
-// UI: Radar Category Filter Pills (0ms Client-Side Reactivity)
+// UI: Radar Category Filter Pills (Instant Local Cache & On-Demand Fetching)
 function setupRadarCategoryPills() {
   const pills = document.querySelectorAll('#radar-category-pills .radar-cat-btn');
   pills.forEach(pill => {
@@ -283,10 +285,9 @@ function setupRadarCategoryPills() {
       pill.classList.add('bg-cyan-600/30', 'text-cyan-300', 'border-cyan-500/40', 'active-cat');
       pill.classList.remove('bg-fintech-surface', 'text-gray-400', 'border-fintech-border');
 
-      state.radarActiveCategory = pill.getAttribute('data-cat') || 'all';
-      if (state.lastRadarData) {
-        renderRadarTable(state.lastRadarData);
-      }
+      const selectedCat = pill.getAttribute('data-cat') || 'featured';
+      state.radarActiveCategory = selectedCat;
+      loadRadarData(false, selectedCat);
     });
   });
 }
@@ -400,15 +401,28 @@ function initTradingViewChart() {
   });
 }
 
-// API: Radar Data
-async function loadRadarData(forceRefresh = false) {
+// API: Radar Data (On-Demand & In-Memory Instant Cache)
+async function loadRadarData(forceRefresh = false, category = null) {
   const tf = state.radarTimeframe || '1d';
-  showLoading(`Varrendo cesta em tempo real (${tf.toUpperCase()})...`);
+  const cat = category || state.radarActiveCategory || 'featured';
+  const cacheKey = `${tf}_${cat}`;
+
+  // Instant render from client memory if already cached and not refreshing
+  if (!forceRefresh && state.radarCategoryCache && state.radarCategoryCache[cacheKey]) {
+    state.lastRadarData = state.radarCategoryCache[cacheKey];
+    renderRadarTable(state.lastRadarData);
+    return;
+  }
+
+  const catLabel = cat === 'featured' ? 'Destaques' : (cat === 'all' ? 'Todos os Ativos' : cat);
+  showLoading(`Varrendo ${catLabel} (${tf.toUpperCase()})...`);
   try {
-    const url = `/api/radar?interval=${tf}&horizon_x=60&refresh=${forceRefresh}`;
+    const url = `/api/radar?interval=${tf}&horizon_x=60&category=${encodeURIComponent(cat)}&refresh=${forceRefresh}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP error ${res.status}`);
     const data = await res.json();
+    if (!state.radarCategoryCache) state.radarCategoryCache = {};
+    state.radarCategoryCache[cacheKey] = data;
     state.lastRadarData = data;
     renderRadarTable(data);
   } catch (err) {
@@ -431,14 +445,14 @@ function renderRadarTable(items) {
     return;
   }
 
-  // Filter radar items by active direction and selected category
+  // Filter radar items by active direction and category
   const filtered = items.filter(it => {
     // Direction filter
     if (state.activeDirection !== 'BOTH' && (it.direction || 'BUY') !== state.activeDirection) {
       return false;
     }
-    // Category filter
-    if (state.radarActiveCategory && state.radarActiveCategory !== 'all') {
+    // Only apply client-side category filter if user selected a sub-category on loaded dataset
+    if (state.radarActiveCategory && state.radarActiveCategory !== 'all' && state.radarActiveCategory !== 'featured') {
       if (it.category !== state.radarActiveCategory) {
         return false;
       }

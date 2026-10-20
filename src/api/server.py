@@ -6,7 +6,9 @@ Fully supports BUY (Fundos), SELL (Topos), and BOTH operational directions.
 """
 
 import os
+import json
 import time
+from pathlib import Path
 from typing import List, Dict, Any, Optional
 from concurrent.futures import ThreadPoolExecutor
 
@@ -73,6 +75,43 @@ def _get_cache(key: str) -> Optional[Any]:
 
 def _set_cache(key: str, data: Any) -> None:
     _CACHE_DATA[key] = {"time": time.time(), "data": data}
+
+
+# Persistent Radar Disk Cache (2 hours TTL)
+RADAR_CACHE_DIR = Path(".cache") / "radar"
+RADAR_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+RADAR_DISK_CACHE_TTL_SECONDS = 7200  # 2 hours
+
+
+def _get_radar_disk_cache(cache_key: str) -> Optional[List[RadarItem]]:
+    safe_name = cache_key.replace(":", "_").replace("/", "_") + ".json"
+    cache_file = RADAR_CACHE_DIR / safe_name
+    if not cache_file.exists():
+        return None
+    try:
+        with open(cache_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        saved_time = data.get("timestamp", 0)
+        if time.time() - saved_time < RADAR_DISK_CACHE_TTL_SECONDS:
+            raw_items = data.get("items", [])
+            return [RadarItem(**item) for item in raw_items]
+    except Exception:
+        pass
+    return None
+
+
+def _set_radar_disk_cache(cache_key: str, items: List[RadarItem]) -> None:
+    safe_name = cache_key.replace(":", "_").replace("/", "_") + ".json"
+    cache_file = RADAR_CACHE_DIR / safe_name
+    try:
+        payload = {
+            "timestamp": time.time(),
+            "items": [item.model_dump() for item in items]
+        }
+        with open(cache_file, "w", encoding="utf-8") as f:
+            json.dump(payload, f)
+    except Exception:
+        pass
 
 
 def _get_group_id(sub_id: str) -> str:
@@ -451,6 +490,23 @@ TICKERS_CRYPTO = [
     'BTC-USD', 'ETH-USD', 'SOL-USD',
 ]
 
+TICKERS_FEATURED = [
+    ('PETR4.SA', 'Ações Brasil'),
+    ('VALE3.SA', 'Ações Brasil'),
+    ('ITUB4.SA', 'Ações Brasil'),
+    ('BBAS3.SA', 'Ações Brasil'),
+    ('HGLG11.SA', 'FIIs Brasil'),
+    ('MXRF11.SA', 'FIIs Brasil'),
+    ('AAPL', 'Ações EUA'),
+    ('NVDA', 'Ações EUA'),
+    ('MSFT', 'Ações EUA'),
+    ('TSLA', 'Ações EUA'),
+    ('CL=F', 'Commodities'),
+    ('GC=F', 'Commodities'),
+    ('EURUSD=X', 'Forex'),
+    ('BTC-USD', 'Criptomoedas'),
+]
+
 DEFAULT_SCANNER_BASKET = (
     [(t, "Ações Brasil") for t in TICKERS_BR_ACOES] +
     [(t, "FIIs Brasil") for t in TICKERS_FIIS] +
@@ -459,6 +515,29 @@ DEFAULT_SCANNER_BASKET = (
     [(t, "Forex") for t in TICKERS_FX] +
     [(t, "Criptomoedas") for t in TICKERS_CRYPTO]
 )
+
+
+def _normalize_category(cat: Optional[str]) -> str:
+    if not cat:
+        return "featured"
+    c = cat.lower().strip()
+    if "destaque" in c or "featured" in c:
+        return "featured"
+    if "fii" in c:
+        return "fiis"
+    if "brasil" in c or "br" in c or "acoes" in c or "ações" in c:
+        return "acoes_br"
+    if "eua" in c or "usa" in c:
+        return "usa"
+    if "commodit" in c:
+        return "commodities"
+    if "forex" in c or "fx" in c:
+        return "forex"
+    if "cripto" in c or "crypto" in c:
+        return "crypto"
+    if "all" in c or "todo" in c:
+        return "all"
+    return c
 
 
 def _scan_single_ticker(ticker: str, category: str, interval: str = "1d", horizon_x: int = 60) -> List[RadarItem]:
@@ -649,33 +728,43 @@ def _scan_single_ticker(ticker: str, category: str, interval: str = "1d", horizo
 def scan_radar(
     interval: str = Query("1d", description="Timeframe"),
     horizon_x: int = Query(60, description="Evaluation horizon"),
-    category: Optional[str] = Query(None, description="Category filter (acoes_br, fiis, usa, commodities, fx, crypto, all)"),
+    category: Optional[str] = Query("featured", description="Category filter (featured, acoes_br, fiis, usa, commodities, fx, crypto, all)"),
     refresh: bool = Query(False, description="Force fresh download"),
 ):
-    cat_key = (category or "all").lower()
-    cache_key = f"radar:{interval}:{horizon_x}:{cat_key}"
+    norm_cat = _normalize_category(category)
+    cache_key = f"radar:{interval}:{horizon_x}:{norm_cat}"
     if not refresh:
-        cached = _get_cache(cache_key)
-        if cached:
-            return cached
+        # 1. Check in-memory cache
+        cached_mem = _get_cache(cache_key)
+        if cached_mem:
+            return cached_mem
+        # 2. Check persistent disk cache (survives container restarts)
+        cached_disk = _get_radar_disk_cache(cache_key)
+        if cached_disk:
+            _set_cache(cache_key, cached_disk)
+            return cached_disk
 
-    basket = DEFAULT_SCANNER_BASKET
-    if category and cat_key != "all":
-        if "fii" in cat_key:
-            basket = [(t, "FIIs Brasil") for t in TICKERS_FIIS]
-        elif "br" in cat_key or "brasil" in cat_key or "acoes" in cat_key:
-            basket = [(t, "Ações Brasil") for t in TICKERS_BR_ACOES]
-        elif "eua" in cat_key or "usa" in cat_key:
-            basket = [(t, "Ações EUA") for t in TICKERS_USA]
-        elif "commodit" in cat_key:
-            basket = [(t, "Commodities") for t in TICKERS_COMMODITIES]
-        elif "forex" in cat_key or "fx" in cat_key:
-            basket = [(t, "Forex") for t in TICKERS_FX]
-        elif "cripto" in cat_key or "crypto" in cat_key:
-            basket = [(t, "Criptomoedas") for t in TICKERS_CRYPTO]
+    if norm_cat == "featured":
+        basket = TICKERS_FEATURED
+    elif norm_cat == "acoes_br":
+        basket = [(t, "Ações Brasil") for t in TICKERS_BR_ACOES]
+    elif norm_cat == "fiis":
+        basket = [(t, "FIIs Brasil") for t in TICKERS_FIIS]
+    elif norm_cat == "usa":
+        basket = [(t, "Ações EUA") for t in TICKERS_USA]
+    elif norm_cat == "commodities":
+        basket = [(t, "Commodities") for t in TICKERS_COMMODITIES]
+    elif norm_cat == "forex":
+        basket = [(t, "Forex") for t in TICKERS_FX]
+    elif norm_cat == "crypto":
+        basket = [(t, "Criptomoedas") for t in TICKERS_CRYPTO]
+    else:
+        basket = DEFAULT_SCANNER_BASKET
 
     all_opportunities: List[RadarItem] = []
-    with ThreadPoolExecutor(max_workers=20) as executor:
+    # Dynamic worker pool: 8-12 workers to prevent thread contention on small server tier
+    max_workers = min(12, max(1, len(basket)))
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = [
             executor.submit(_scan_single_ticker, ticker, cat, interval, horizon_x)
             for ticker, cat in basket
@@ -686,13 +775,16 @@ def scan_radar(
     priority_order = {"IDEAL": 0, "EXTENDED": 1, "LATE": 2}
     all_opportunities.sort(key=lambda x: (priority_order.get(x.timing_category, 3), x.distance_pct))
 
+    # Save to both memory and persistent disk cache
     _set_cache(cache_key, all_opportunities)
+    _set_radar_disk_cache(cache_key, all_opportunities)
     return all_opportunities
 
 
 @app.get("/api/tickers")
 def get_all_tickers():
     return {
+        "featured": [t[0] for t in TICKERS_FEATURED],
         "acoes_br": TICKERS_BR_ACOES,
         "fiis": TICKERS_FIIS,
         "usa": TICKERS_USA,
@@ -702,9 +794,6 @@ def get_all_tickers():
         "total": len(DEFAULT_SCANNER_BASKET),
         "all": [t[0] for t in DEFAULT_SCANNER_BASKET],
     }
-
-    _set_cache(cache_key, all_opportunities)
-    return all_opportunities
 
 
 @app.post("/api/simulate", response_model=SimulateResponse)

@@ -46,6 +46,30 @@ def test_api_radar():
     assert isinstance(data, list)
 
 
+def test_api_radar_categories():
+    # Test specific category scan
+    res = client.get("/api/radar?interval=1d&category=crypto")
+    assert res.status_code == 200
+    data = res.json()
+    assert isinstance(data, list)
+    for item in data:
+        assert item["category"] == "Criptomoedas"
+
+
+def test_api_tickers():
+    res = client.get("/api/tickers")
+    assert res.status_code == 200
+    data = res.json()
+    assert "featured" in data
+    assert "acoes_br" in data
+    assert "fiis" in data
+    assert "usa" in data
+    assert "commodities" in data
+    assert "forex" in data
+    assert "crypto" in data
+    assert data["total"] == 151
+
+
 def test_api_simulate():
     payload = {
         "ticker": "PETR4.SA",
