@@ -32,60 +32,67 @@
     }
   </script>
 </head>
-<body class="bg-fintech-bg text-gray-100 flex flex-col h-screen">
+<body class="bg-fintech-bg text-gray-100 flex flex-col min-h-screen lg:h-screen">
 
-  <!-- Top Institutional Header -->
-  <header class="bg-fintech-surface border-b border-fintech-border px-4 py-2 flex items-center justify-between shrink-0">
-    <div class="flex items-center space-x-3">
-      <div class="w-8 h-8 rounded bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-bold text-white shadow-lg">
-        ⚡
+  <!-- Top Institutional Header (Responsive Mobile & Desktop) -->
+  <header class="bg-fintech-surface border-b border-fintech-border px-3 py-2 lg:px-4 shrink-0 space-y-2 lg:space-y-0">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 lg:gap-4">
+      
+      <!-- Top Row Mobile: Brand & Refresh Action -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-7 h-7 sm:w-8 sm:h-8 rounded bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-bold text-white shadow-lg text-sm shrink-0">
+            ⚡
+          </div>
+          <div>
+            <h1 class="text-xs sm:text-sm font-bold tracking-wide text-white uppercase flex items-center gap-1.5 sm:gap-2">
+              <span>Market Engine</span>
+              <span class="text-[9px] sm:text-[10px] bg-fintech-cyan/20 text-fintech-cyan px-1.5 py-0.5 rounded font-mono border border-fintech-cyan/30">v4.0 60FPS</span>
+            </h1>
+            <p class="text-[10px] sm:text-xs text-gray-400 hidden sm:block">Terminal Quantitativo Bidirecional: Fundos & Topos</p>
+          </div>
+        </div>
+
+        <!-- Quick Status Badge & Refresh -->
+        <div class="flex items-center space-x-2 lg:order-last">
+          <div id="header-status-badge" class="hidden items-center gap-1 px-2 py-0.5 rounded text-[10px] sm:text-xs font-semibold font-mono">
+            <!-- Rendered dynamically -->
+          </div>
+          <button id="btn-refresh-data" class="bg-fintech-border hover:bg-gray-700 text-[11px] sm:text-xs text-gray-200 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded transition flex items-center gap-1 shrink-0">
+            <span>🔄</span> <span class="hidden sm:inline">Atualizar</span>
+          </button>
+        </div>
       </div>
-      <div>
-        <h1 class="text-sm font-bold tracking-wide text-white uppercase flex items-center gap-2">
-          Market Opportunity & Top/Bottom Engine
-          <span class="text-[10px] bg-fintech-cyan/20 text-fintech-cyan px-1.5 py-0.5 rounded font-mono border border-fintech-cyan/30">v4.0 60FPS</span>
-        </h1>
-        <p class="text-xs text-gray-400">Terminal Quantitativo Bidirecional: Fundos (Compra) & Topos (Venda)</p>
+
+      <!-- Direction Segmented Control (Top Nav) -->
+      <div class="flex items-center bg-fintech-bg border border-fintech-border rounded p-0.5 sm:p-1 space-x-1 w-full lg:w-auto justify-center" id="global-direction-selector">
+        <button class="dir-seg-btn active-both text-gray-300 flex-1 lg:flex-initial" data-dir="BOTH">
+          ⚡ Ambos
+        </button>
+        <button class="dir-seg-btn text-gray-400 flex-1 lg:flex-initial" data-dir="BUY">
+          🟢 Compra
+        </button>
+        <button class="dir-seg-btn text-gray-400 flex-1 lg:flex-initial" data-dir="SELL">
+          🔴 Venda
+        </button>
       </div>
-    </div>
 
-    <!-- Direction Segmented Control (Top Nav) -->
-    <div class="flex items-center bg-fintech-bg border border-fintech-border rounded p-1 space-x-1" id="global-direction-selector">
-      <button class="dir-seg-btn active-both text-gray-300" data-dir="BOTH">
-        ⚡ Compra e Venda
-      </button>
-      <button class="dir-seg-btn text-gray-400" data-dir="BUY">
-        🟢 Compra (Fundos)
-      </button>
-      <button class="dir-seg-btn text-gray-400" data-dir="SELL">
-        🔴 Venda (Topos)
-      </button>
-    </div>
+      <!-- 4 Main Navigation Tabs (Touch-scrollable on mobile) -->
+      <nav class="flex items-center space-x-1 overflow-x-auto no-scrollbar touch-scroll border-t border-fintech-border/40 pt-1 lg:border-t-0 lg:pt-0" id="main-nav-tabs">
+        <button class="nav-tab-btn active" data-tab="tab-radar">
+          <span>🌐</span> Radar
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-terminal">
+          <span>📈</span> Gráfico
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-simulator">
+          <span>💰</span> Simulador
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-playbook">
+          <span>📘</span> Playbook
+        </button>
+      </nav>
 
-    <!-- 4 Main Navigation Tabs -->
-    <nav class="flex items-center space-x-1" id="main-nav-tabs">
-      <button class="nav-tab-btn active" data-tab="tab-radar">
-        <span>🌐</span> Radar de Mercado
-      </button>
-      <button class="nav-tab-btn" data-tab="tab-terminal">
-        <span>📈</span> Terminal de Análise
-      </button>
-      <button class="nav-tab-btn" data-tab="tab-simulator">
-        <span>💰</span> Simulador
-      </button>
-      <button class="nav-tab-btn" data-tab="tab-playbook">
-        <span>📘</span> Playbook (48 Estratégias)
-      </button>
-    </nav>
-
-    <!-- Quick Status Badge & Refresh -->
-    <div class="flex items-center space-x-3">
-      <div id="header-status-badge" class="hidden items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold font-mono">
-        <!-- Rendered dynamically -->
-      </div>
-      <button id="btn-refresh-data" class="bg-fintech-border hover:bg-gray-700 text-xs text-gray-200 px-3 py-1.5 rounded transition flex items-center gap-1">
-        <span>🔄</span> Atualizar
-      </button>
     </div>
   </header>
 
@@ -101,62 +108,65 @@
     <!-- ========================================== -->
     <!-- TAB 1: RADAR DE MERCADO                   -->
     <!-- ========================================== -->
-    <section id="tab-radar" class="tab-view h-full p-4 overflow-y-auto">
-      <div class="max-w-7xl mx-auto space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <section id="tab-radar" class="tab-view h-full p-2.5 sm:p-4 overflow-y-auto">
+      <div class="max-w-7xl mx-auto space-y-3 sm:space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
           <div>
-            <h2 class="text-lg font-bold text-white flex items-center gap-2">
-              <span>🌐</span> Radar de Oportunidades & Semáforo de Timing
+            <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+              <span>🌐</span> Radar de Oportunidades & Timing
             </h2>
-            <p class="text-xs text-gray-400">Varredura multiativos em tempo real identificando fundos estatísticos (Compra) e topos/exaustão (Venda).</p>
+            <p class="text-[11px] sm:text-xs text-gray-400">Varredura multiativos identificando fundos estatísticos (Compra) e topos (Venda).</p>
           </div>
-          <div class="flex items-center space-x-2">
+          <div class="flex flex-wrap items-center gap-2">
             <!-- Timeframe selector for Radar -->
-            <div class="flex items-center space-x-1 bg-fintech-surface border border-fintech-border rounded p-1" id="radar-timeframe-buttons">
-              <span class="text-[11px] font-semibold text-gray-400 px-2 uppercase">Tempo Gráfico:</span>
-              <button class="radar-tf-btn px-2.5 py-1 text-xs rounded font-bold bg-fintech-cyan/20 text-fintech-cyan border border-fintech-cyan/40 active" data-tf="1d">Diário (1D)</button>
-              <button class="radar-tf-btn px-2.5 py-1 text-xs rounded text-gray-300 hover:text-white bg-fintech-bg" data-tf="1wk">Semanal (1S)</button>
-              <button class="radar-tf-btn px-2.5 py-1 text-xs rounded text-gray-300 hover:text-white bg-fintech-bg" data-tf="4h">4 Horas (4h)</button>
-              <button class="radar-tf-btn px-2.5 py-1 text-xs rounded text-gray-300 hover:text-white bg-fintech-bg" data-tf="1h">1 Hora (1h)</button>
+            <div class="flex items-center space-x-1 bg-fintech-surface border border-fintech-border rounded p-1 overflow-x-auto no-scrollbar touch-scroll" id="radar-timeframe-buttons">
+              <span class="text-[10px] sm:text-[11px] font-semibold text-gray-400 px-1.5 uppercase hidden xs:inline">Tempo:</span>
+              <button class="radar-tf-btn px-2 sm:px-2.5 py-1 text-xs rounded font-bold bg-fintech-cyan/20 text-fintech-cyan border border-fintech-cyan/40 active shrink-0" data-tf="1d">1D</button>
+              <button class="radar-tf-btn px-2 sm:px-2.5 py-1 text-xs rounded text-gray-300 hover:text-white bg-fintech-bg shrink-0" data-tf="1wk">1S</button>
+              <button class="radar-tf-btn px-2 sm:px-2.5 py-1 text-xs rounded text-gray-300 hover:text-white bg-fintech-bg shrink-0" data-tf="4h">4h</button>
+              <button class="radar-tf-btn px-2 sm:px-2.5 py-1 text-xs rounded text-gray-300 hover:text-white bg-fintech-bg shrink-0" data-tf="1h">1h</button>
             </div>
-            <button id="btn-radar-rescan" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-3 py-2 rounded shadow transition flex items-center gap-1.5 shrink-0">
-              <span>⚡</span> Atualizar Radar
+            <button id="btn-radar-rescan" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-3 py-1.5 sm:py-2 rounded shadow transition flex items-center gap-1.5 shrink-0">
+              <span>⚡</span> <span class="hidden xs:inline">Atualizar</span> Radar
             </button>
           </div>
         </div>
 
         <!-- Radar Asset Category Filter Pills -->
-        <div class="flex items-center gap-1.5 overflow-x-auto pb-1" id="radar-category-pills">
-          <button class="radar-cat-btn px-3 py-1 rounded text-xs font-semibold bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 active-cat" data-cat="featured">⭐ Destaques (14)</button>
-          <button class="radar-cat-btn px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border" data-cat="Ações Brasil">🇧🇷 Ações Brasil (30)</button>
-          <button class="radar-cat-btn px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border" data-cat="FIIs Brasil">🏢 FIIs Brasil (23)</button>
-          <button class="radar-cat-btn px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border" data-cat="Ações EUA">🇺🇸 Ações EUA (71)</button>
-          <button class="radar-cat-btn px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border" data-cat="Commodities">🌾 Commodities (14)</button>
-          <button class="radar-cat-btn px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border" data-cat="Forex">💱 Forex (10)</button>
-          <button class="radar-cat-btn px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border" data-cat="Criptomoedas">⚡ Cripto (3)</button>
-          <button class="radar-cat-btn px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border" data-cat="all">🌐 Todos (151)</button>
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar touch-scroll pb-1" id="radar-category-pills">
+          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 active-cat shrink-0" data-cat="featured">⭐ Destaques (14)</button>
+          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="Ações Brasil">🇧🇷 Ações Brasil (30)</button>
+          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="FIIs Brasil">🏢 FIIs Brasil (23)</button>
+          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="Ações EUA">🇺🇸 Ações EUA (71)</button>
+          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="Commodities">🌾 Commodities (14)</button>
+          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="Forex">💱 Forex (10)</button>
+          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="Criptomoedas">⚡ Cripto (3)</button>
+          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="all">🌐 Todos (151)</button>
         </div>
 
         <!-- Radar Opportunities Table -->
         <div class="card-surface overflow-hidden">
-          <div class="overflow-x-auto">
+          <div class="block sm:hidden text-[10px] text-gray-400 bg-fintech-bg/60 px-3 py-1 border-b border-fintech-border text-center font-mono">
+            ← Deslize para os lados para ver detalhes →
+          </div>
+          <div class="overflow-x-auto touch-scroll">
             <table class="w-full text-left text-xs text-gray-300">
-              <thead class="bg-fintech-bg/60 text-gray-400 font-semibold uppercase text-[11px] border-b border-fintech-border">
+              <thead class="bg-fintech-bg/60 text-gray-400 font-semibold uppercase text-[11px] border-b border-fintech-border whitespace-nowrap">
                 <tr>
-                  <th class="px-4 py-3">Ativo</th>
-                  <th class="px-4 py-3">Categoria</th>
-                  <th class="px-4 py-3">Direção</th>
-                  <th class="px-4 py-3">Preço Atual</th>
-                  <th class="px-4 py-3">Estratégia Confirmada</th>
-                  <th class="px-4 py-3">Status do Setup</th>
-                  <th class="px-4 py-3">Semáforo de Timing</th>
-                  <th class="px-4 py-3">Distância (%)</th>
-                  <th class="px-4 py-3">Preço Gatilho</th>
-                  <th class="px-4 py-3">Histórico (N / Win Rate)</th>
-                  <th class="px-4 py-3 text-right">Ação</th>
+                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Ativo</th>
+                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Categoria</th>
+                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Direção</th>
+                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Preço Atual</th>
+                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Estratégia Confirmada</th>
+                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Status do Setup</th>
+                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Semáforo de Timing</th>
+                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Distância (%)</th>
+                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Preço Gatilho</th>
+                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Histórico (N / Win Rate)</th>
+                  <th class="px-3 sm:px-4 py-2.5 sm:py-3 text-right">Ação</th>
                 </tr>
               </thead>
-              <tbody id="radar-table-body" class="divide-y divide-fintech-border">
+              <tbody id="radar-table-body" class="divide-y divide-fintech-border whitespace-nowrap">
                 <!-- Dynamically populated -->
               </tbody>
             </table>
@@ -168,9 +178,9 @@
     <!-- ========================================== -->
     <!-- TAB 2: TERMINAL DE ANÁLISE (TRADINGVIEW)   -->
     <!-- ========================================== -->
-    <section id="tab-terminal" class="tab-view hidden h-full flex flex-row">
+    <section id="tab-terminal" class="tab-view hidden h-full flex flex-col lg:flex-row">
       <!-- Left Sidebar: Asset Controls & 48 Granular Strategy Toggles -->
-      <aside class="w-80 bg-fintech-surface border-r border-fintech-border flex flex-col h-full shrink-0">
+      <aside class="w-full lg:w-80 bg-fintech-surface border-b lg:border-b-0 lg:border-r border-fintech-border flex flex-col shrink-0">
         <!-- Asset Parameters -->
         <div class="p-3 border-b border-fintech-border space-y-2.5">
           <div>
@@ -373,18 +383,28 @@
           </button>
         </div>
 
-        <!-- Strategy Granular Selector (48 Strategies) with 0ms Reactivity -->
-        <div class="p-2 border-b border-fintech-border flex items-center justify-between bg-fintech-bg/40">
-          <span class="text-[11px] font-bold text-gray-300 uppercase tracking-wider">Estratégias Ativas</span>
-          <div class="flex items-center space-x-1">
-            <button id="btn-select-all-global" class="text-[10px] text-cyan-400 hover:underline">Marcar</button>
-            <span class="text-gray-500 text-[10px]">|</span>
-            <button id="btn-deselect-all-global" class="text-[10px] text-gray-400 hover:underline">Desmarcar</button>
-          </div>
+        <!-- Mobile Toggle Button for Strategy Selector -->
+        <div class="lg:hidden p-2 border-b border-fintech-border bg-fintech-bg/60">
+          <button id="btn-toggle-strategies-mobile" type="button" class="w-full flex items-center justify-between px-3 py-2 bg-fintech-surface hover:bg-fintech-surface/80 border border-fintech-border rounded text-xs font-semibold text-cyan-300">
+            <span class="flex items-center gap-1.5"><span>⚙️</span> Filtro das 48 Estratégias</span>
+            <span id="strategies-mobile-chevron" class="text-gray-400 text-xs">▼ Toque para abrir</span>
+          </button>
         </div>
 
-        <!-- Accordions Container (Compra e Venda) -->
-        <div class="flex-1 overflow-y-auto p-2 space-y-2 text-xs" id="strategy-accordions-container">
+        <!-- Strategy Wrapper (collapsible on mobile, always visible on desktop) -->
+        <div id="strategies-wrapper-collapsible" class="hidden lg:flex flex-1 flex-col overflow-hidden max-h-72 lg:max-h-none">
+          <!-- Strategy Granular Selector (48 Strategies) with 0ms Reactivity -->
+          <div class="p-2 border-b border-fintech-border flex items-center justify-between bg-fintech-bg/40 shrink-0">
+            <span class="text-[11px] font-bold text-gray-300 uppercase tracking-wider">Estratégias Ativas</span>
+            <div class="flex items-center space-x-1">
+              <button id="btn-select-all-global" class="text-[10px] text-cyan-400 hover:underline">Marcar</button>
+              <span class="text-gray-500 text-[10px]">|</span>
+              <button id="btn-deselect-all-global" class="text-[10px] text-gray-400 hover:underline">Desmarcar</button>
+            </div>
+          </div>
+
+          <!-- Accordions Container (Compra e Venda) -->
+          <div class="flex-1 overflow-y-auto p-2 space-y-2 text-xs" id="strategy-accordions-container">
           <!-- Accordion 1: Proprietary Reversal BUY (4) -->
           <div class="border border-fintech-border rounded overflow-hidden strategy-group-wrapper" data-direction="BUY">
             <div class="accordion-header bg-fintech-bg px-2.5 py-1.5 flex items-center justify-between text-gray-200 font-semibold" data-accordion="acc-prop-buy">
@@ -553,74 +573,76 @@
             </div>
           </div>
         </div>
+        </div>
       </aside>
 
       <!-- Center & Right: 60fps Chart & Quantitative Panels -->
       <div class="flex-1 flex flex-col h-full overflow-y-auto">
         <!-- Timeframe Toolbar -->
-        <div class="bg-fintech-surface px-4 py-2 border-b border-fintech-border flex items-center justify-between shrink-0">
-          <div class="flex items-center space-x-1" id="timeframe-buttons">
-            <span class="text-[11px] font-bold text-gray-400 mr-2 uppercase">Tempo Gráfico:</span>
-            <button class="tf-btn px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white" data-tf="5m">5m</button>
-            <button class="tf-btn px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white" data-tf="15m">15m</button>
-            <button class="tf-btn px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white" data-tf="30m">30m</button>
-            <button class="tf-btn px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white" data-tf="1h">1h</button>
-            <button class="tf-btn px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white" data-tf="2h">2h</button>
-            <button class="tf-btn px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white" data-tf="4h">4h</button>
-            <button class="tf-btn px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white" data-tf="12h">12h</button>
-            <button class="tf-btn px-2.5 py-1 text-xs rounded bg-fintech-cyan/20 text-fintech-cyan border border-fintech-cyan/40 font-bold active" data-tf="1d">1D</button>
-            <button class="tf-btn px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white" data-tf="1wk">1S</button>
+        <div class="bg-fintech-surface px-3 sm:px-4 py-2 border-b border-fintech-border flex items-center justify-between shrink-0 gap-2">
+          <div class="flex items-center space-x-1 overflow-x-auto no-scrollbar touch-scroll py-0.5" id="timeframe-buttons">
+            <span class="text-[10px] sm:text-[11px] font-bold text-gray-400 mr-1 uppercase shrink-0">Tempo:</span>
+            <button class="tf-btn px-2 sm:px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white shrink-0" data-tf="5m">5m</button>
+            <button class="tf-btn px-2 sm:px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white shrink-0" data-tf="15m">15m</button>
+            <button class="tf-btn px-2 sm:px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white shrink-0" data-tf="30m">30m</button>
+            <button class="tf-btn px-2 sm:px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white shrink-0" data-tf="1h">1h</button>
+            <button class="tf-btn px-2 sm:px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white shrink-0" data-tf="2h">2h</button>
+            <button class="tf-btn px-2 sm:px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white shrink-0" data-tf="4h">4h</button>
+            <button class="tf-btn px-2 sm:px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white shrink-0" data-tf="12h">12h</button>
+            <button class="tf-btn px-2 sm:px-2.5 py-1 text-xs rounded bg-fintech-cyan/20 text-fintech-cyan border border-fintech-cyan/40 font-bold active shrink-0" data-tf="1d">1D</button>
+            <button class="tf-btn px-2 sm:px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white shrink-0" data-tf="1wk">1S</button>
           </div>
 
-          <div class="flex items-center space-x-2 text-xs">
-            <span class="text-gray-400 font-mono" id="active-marker-count">Marcadores visíveis: 0</span>
+          <div class="flex items-center space-x-2 text-xs shrink-0">
+            <span class="text-gray-400 font-mono text-[11px]" id="active-marker-count">Marcadores: 0</span>
           </div>
         </div>
 
         <!-- 60fps TradingView Chart Container -->
-        <div class="p-3">
-          <div class="card-surface p-2">
-            <div id="tv-chart-container" style="height: 480px; min-height: 480px; width: 100%; position: relative;"></div>
+        <div class="p-2 sm:p-3">
+          <div class="card-surface p-1.5 sm:p-2">
+            <div id="tv-chart-container" class="w-full relative"></div>
           </div>
         </div>
 
         <!-- Quantitative Plots: Efficiency Ranking & Scatter Plot -->
-        <div class="p-3 grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <div class="p-2 sm:p-3 grid grid-cols-1 lg:grid-cols-2 gap-3">
           <div class="card-surface p-3">
             <h3 class="text-xs font-bold text-gray-200 mb-2 flex items-center justify-between">
-              <span>🏆 Ranking de Eficiência (Win Rate com Range 118%)</span>
-              <span class="text-[10px] text-gray-400 font-mono">0ms Client-Side</span>
+              <span>🏆 Ranking de Eficiência</span>
+              <span class="text-[10px] text-gray-400 font-mono">Win Rate</span>
             </h3>
-            <div id="plot-ranking" style="height: 380px; min-height: 380px; width: 100%;"></div>
+            <div id="plot-ranking" class="w-full"></div>
           </div>
 
           <div class="card-surface p-3">
             <h3 class="text-xs font-bold text-gray-200 mb-2 flex items-center justify-between">
-              <span>🎯 Risco x Retorno (Scatter Quadrantes)</span>
+              <span>🎯 Risco x Retorno</span>
               <span class="text-[10px] text-gray-400 font-mono">Retorno vs. MAE</span>
             </h3>
-            <div id="plot-scatter" style="height: 380px; min-height: 380px; width: 100%;"></div>
+            <div id="plot-scatter" class="w-full"></div>
           </div>
         </div>
 
         <!-- Strategy Simulation Comparison & History of Executed Signals -->
-        <div class="p-3 space-y-3 pb-8">
+        <div class="p-2 sm:p-3 space-y-3 pb-8">
           <!-- Comparative Strategy Performance Table -->
-          <div class="card-surface p-3">
+          <div class="card-surface p-3 overflow-hidden">
             <div class="flex items-center justify-between mb-2">
               <div>
                 <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
-                  <span>💰</span> Simulação Comparativa por Estratégia (Aporte R$ 1.000/sinal)
+                  <span>💰</span> Simulação Comparativa por Estratégia
                 </h3>
-                <p class="text-[11px] text-gray-400">
-                  Simulação quantitativa com sobras de caixa reinvestidas para compras e eficiência de realização para vendas.
+                <p class="text-[10px] sm:text-[11px] text-gray-400">
+                  Aporte R$ 1.000/sinal com reinvestimento de sobras.
                 </p>
               </div>
               <div class="text-[10px] text-gray-400 font-mono">Base: R$ 1.000</div>
             </div>
-            <div class="overflow-x-auto max-h-64">
+            <div class="block sm:hidden text-[10px] text-gray-500 text-center py-0.5 font-mono">← Deslize horizontalmente →</div>
+            <div class="overflow-x-auto touch-scroll max-h-64">
               <table class="w-full text-left text-xs text-gray-300">
-                <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[10px] sticky top-0">
+                <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[10px] sticky top-0 whitespace-nowrap">
                   <tr>
                     <th class="px-3 py-2">Estratégia</th>
                     <th class="px-3 py-2">Direção</th>
@@ -635,7 +657,7 @@
                     <th class="px-3 py-2">Max Drawdown</th>
                   </tr>
                 </thead>
-                <tbody id="strategy-simulation-table-body" class="divide-y divide-fintech-border font-mono">
+                <tbody id="strategy-simulation-table-body" class="divide-y divide-fintech-border font-mono whitespace-nowrap">
                   <!-- Dynamically populated -->
                 </tbody>
               </table>
@@ -643,16 +665,17 @@
           </div>
 
           <!-- Chronological Executed Signals Table -->
-          <div class="card-surface p-3">
+          <div class="card-surface p-3 overflow-hidden">
             <div class="flex items-center justify-between mb-2">
               <h3 class="text-xs font-bold text-gray-200 flex items-center gap-1.5">
-                <span>📜</span> Histórico Detalhado de Sinais & Execuções
+                <span>📜</span> Histórico de Sinais & Execuções
               </h3>
-              <span class="text-[10px] text-gray-400 font-mono">Cronológico (mais recentes primeiro)</span>
+              <span class="text-[10px] text-gray-400 font-mono">Mais recentes</span>
             </div>
-            <div class="overflow-x-auto max-h-72">
+            <div class="block sm:hidden text-[10px] text-gray-500 text-center py-0.5 font-mono">← Deslize horizontalmente →</div>
+            <div class="overflow-x-auto touch-scroll max-h-72">
               <table class="w-full text-left text-xs text-gray-300">
-                <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[10px] sticky top-0">
+                <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[10px] sticky top-0 whitespace-nowrap">
                   <tr>
                     <th class="px-3 py-2">Estratégia</th>
                     <th class="px-3 py-2">Direção</th>
@@ -667,8 +690,12 @@
                     <th class="px-3 py-2">Status</th>
                   </tr>
                 </thead>
-                <tbody id="signals-table-body" class="divide-y divide-fintech-border">
+                <tbody id="signals-table-body" class="divide-y divide-fintech-border whitespace-nowrap font-mono text-[11px]">
                   <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
                 </tbody>
               </table>
             </div>
@@ -904,53 +931,54 @@
         </div>
 
         <!-- KPI Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-6 gap-3" id="sim-kpi-container">
-          <div class="card-surface p-3">
-            <div class="text-[11px] text-gray-400 font-semibold" id="sim-kpi-label-invested">Capital Inicial</div>
-            <div class="text-lg font-bold text-white font-mono" id="sim-kpi-invested">R$ 0,00</div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3" id="sim-kpi-container">
+          <div class="card-surface p-2.5 sm:p-3">
+            <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold" id="sim-kpi-label-invested">Capital Inicial</div>
+            <div class="text-base sm:text-lg font-bold text-white font-mono" id="sim-kpi-invested">R$ 0,00</div>
           </div>
-          <div class="card-surface p-3">
-            <div class="text-[11px] text-gray-400 font-semibold">Saldo Final Carteira</div>
-            <div class="text-lg font-bold text-fintech-green font-mono" id="sim-kpi-final">R$ 0,00</div>
+          <div class="card-surface p-2.5 sm:p-3">
+            <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Saldo Final Carteira</div>
+            <div class="text-base sm:text-lg font-bold text-fintech-green font-mono" id="sim-kpi-final">R$ 0,00</div>
           </div>
-          <div class="card-surface p-3">
-            <div class="text-[11px] text-gray-400 font-semibold">Lucro Líquido</div>
-            <div class="text-lg font-bold text-fintech-cyan font-mono" id="sim-kpi-profit">R$ 0,00</div>
+          <div class="card-surface p-2.5 sm:p-3">
+            <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Lucro Líquido</div>
+            <div class="text-base sm:text-lg font-bold text-fintech-cyan font-mono" id="sim-kpi-profit">R$ 0,00</div>
           </div>
-          <div class="card-surface p-3">
-            <div class="text-[11px] text-gray-400 font-semibold">Retorno Total (%)</div>
-            <div class="text-lg font-bold text-white font-mono" id="sim-kpi-return">0.0%</div>
+          <div class="card-surface p-2.5 sm:p-3">
+            <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Retorno Total (%)</div>
+            <div class="text-base sm:text-lg font-bold text-white font-mono" id="sim-kpi-return">0.0%</div>
           </div>
-          <div class="card-surface p-3">
-            <div class="text-[11px] text-gray-400 font-semibold" id="sim-kpi-label-aux">Win Rate / Acertos</div>
-            <div class="text-lg font-bold text-fintech-green font-mono" id="sim-kpi-winrate">0.0%</div>
+          <div class="card-surface p-2.5 sm:p-3">
+            <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold" id="sim-kpi-label-aux">Win Rate / Acertos</div>
+            <div class="text-base sm:text-lg font-bold text-fintech-green font-mono" id="sim-kpi-winrate">0.0%</div>
           </div>
-          <div class="card-surface p-3">
-            <div class="text-[11px] text-gray-400 font-semibold">Max Drawdown</div>
-            <div class="text-lg font-bold text-rose-400 font-mono" id="sim-kpi-drawdown">0.0%</div>
+          <div class="card-surface p-2.5 sm:p-3">
+            <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Max Drawdown</div>
+            <div class="text-base sm:text-lg font-bold text-rose-400 font-mono" id="sim-kpi-drawdown">0.0%</div>
           </div>
         </div>
 
         <!-- Simulation Curve Chart -->
-        <div class="card-surface p-4">
+        <div class="card-surface p-3 sm:p-4">
           <div class="flex items-center justify-between mb-2">
-            <h3 class="text-xs font-bold text-gray-200">📈 Curva de Patrimônio & Evolução de Capital</h3>
-            <span class="text-[10px] text-gray-400 font-mono" id="sim-curve-legend-info">Mark-to-market em tempo real</span>
+            <h3 class="text-xs font-bold text-gray-200">📈 Curva de Patrimônio & Evolução</h3>
+            <span class="text-[10px] text-gray-400 font-mono" id="sim-curve-legend-info">Tempo real</span>
           </div>
-          <div id="plot-simulation-curve" style="height: 400px;"></div>
+          <div id="plot-simulation-curve" class="w-full"></div>
         </div>
 
         <!-- Cycle Trades Detailed Log Table -->
-        <div class="card-surface p-4" id="sim-trades-card">
+        <div class="card-surface p-3 sm:p-4 overflow-hidden" id="sim-trades-card">
           <div class="flex items-center justify-between mb-2">
             <h3 class="text-xs font-bold text-gray-200 flex items-center gap-1.5">
-              <span>📋</span> Histórico de Trades Executados (Compra ➔ Venda)
+              <span>📋</span> Histórico de Trades Executados
             </h3>
             <span class="text-[10px] text-gray-400 font-mono" id="sim-trades-count-badge">0 trades</span>
           </div>
-          <div class="overflow-x-auto max-h-80">
+          <div class="block sm:hidden text-[10px] text-gray-500 text-center py-0.5 font-mono">← Deslize horizontalmente →</div>
+          <div class="overflow-x-auto touch-scroll max-h-80">
             <table class="w-full text-left text-xs text-gray-300">
-              <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[10px] sticky top-0">
+              <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[10px] sticky top-0 whitespace-nowrap">
                 <tr>
                   <th class="px-2.5 py-2 text-center">#</th>
                   <th class="px-2.5 py-2">Estratégia Compra</th>
@@ -965,7 +993,7 @@
                   <th class="px-2.5 py-2 text-center">Status</th>
                 </tr>
               </thead>
-              <tbody id="sim-trades-table-body" class="divide-y divide-fintech-border font-mono">
+              <tbody id="sim-trades-table-body" class="divide-y divide-fintech-border font-mono whitespace-nowrap text-[11px]">
                 <!-- Dynamically populated -->
               </tbody>
             </table>
@@ -977,13 +1005,13 @@
     <!-- ========================================== -->
     <!-- TAB 4: PLAYBOOK & GUIA EXECUTIVO           -->
     <!-- ========================================== -->
-    <section id="tab-playbook" class="tab-view hidden h-full p-4 overflow-y-auto">
-      <div class="max-w-5xl mx-auto space-y-6">
+    <section id="tab-playbook" class="tab-view hidden h-full p-3 sm:p-4 overflow-y-auto">
+      <div class="max-w-5xl mx-auto space-y-4 sm:space-y-6">
         <div>
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <span>📘</span> Playbook Institucional: Catálogo das 48 Estratégias
+          <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+            <span>📘</span> Playbook: Catálogo das 48 Estratégias
           </h2>
-          <p class="text-xs text-gray-400">Diretrizes quantitativas, lógica matemática de entrada e gestão de risco para compras em fundos e vendas em topos.</p>
+          <p class="text-xs text-gray-400">Diretrizes quantitativas, lógica matemática de entrada e gestão de risco para compras e vendas.</p>
         </div>
 
         <div class="card-surface p-4 space-y-4">

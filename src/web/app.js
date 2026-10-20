@@ -77,6 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupNavigationTabs();
   setupDirectionSelector();
   setupAccordions();
+  setupMobileStrategiesToggle();
   setupTimeframeButtons();
   setupRadarTimeframeButtons();
   setupRadarCategoryPills();
@@ -205,17 +206,38 @@ function switchTab(tabId) {
       loadAnalysisData();
     } else {
       setTimeout(() => {
+        resizeChartResponsive();
         if (state.chart) {
-          const container = document.getElementById('tv-chart-container');
-          if (container && container.clientWidth > 0) {
-            state.chart.applyOptions({ width: container.clientWidth, height: 480 });
-          }
           state.chart.timeScale().fitContent();
         }
         renderPlotlyRanking();
         renderPlotlyScatter();
       }, 60);
     }
+  } else if (tabId === 'tab-simulator') {
+    setTimeout(() => {
+      const p3 = document.getElementById('plot-simulation-curve');
+      if (p3 && window.Plotly) Plotly.Plots.resize(p3);
+    }, 60);
+  }
+}
+
+// UI: Mobile Strategies Toggle
+function setupMobileStrategiesToggle() {
+  const btn = document.getElementById('btn-toggle-strategies-mobile');
+  const wrapper = document.getElementById('strategies-wrapper-collapsible');
+  const chevron = document.getElementById('strategies-mobile-chevron');
+  if (btn && wrapper) {
+    btn.addEventListener('click', () => {
+      const isHidden = wrapper.classList.contains('hidden');
+      if (isHidden) {
+        wrapper.classList.remove('hidden');
+        if (chevron) chevron.textContent = '▲ Toque para fechar';
+      } else {
+        wrapper.classList.add('hidden');
+        if (chevron) chevron.textContent = '▼ Toque para abrir';
+      }
+    });
   }
 }
 
@@ -351,13 +373,25 @@ function setupGranularStrategyCheckboxes() {
   });
 }
 
+// Responsive Chart Resizer Helper
+function resizeChartResponsive() {
+  if (!state.chart) return;
+  const container = document.getElementById('tv-chart-container');
+  if (!container || container.clientWidth <= 0) return;
+  const isMobile = window.innerWidth < 768;
+  const w = container.clientWidth;
+  const h = isMobile ? 340 : 480;
+  state.chart.applyOptions({ width: w, height: h });
+}
+
 // Lightweight Charts 60fps TradingView Chart Engine
 function initTradingViewChart() {
   const container = document.getElementById('tv-chart-container');
   if (!container) return;
 
-  const width = container.clientWidth > 0 ? container.clientWidth : 900;
-  const height = 480;
+  const isMobile = window.innerWidth < 768;
+  const width = container.clientWidth > 0 ? container.clientWidth : Math.max(300, window.innerWidth - 32);
+  const height = isMobile ? 340 : 480;
 
   state.chart = LightweightCharts.createChart(container, {
     width: width,
@@ -394,11 +428,23 @@ function initTradingViewChart() {
   });
 
   window.addEventListener('resize', () => {
-    if (state.chart && container) {
-      const w = container.clientWidth > 0 ? container.clientWidth : 900;
-      state.chart.applyOptions({ width: w, height: 480 });
+    resizeChartResponsive();
+    if (window.Plotly) {
+      const p1 = document.getElementById('plot-ranking');
+      const p2 = document.getElementById('plot-scatter');
+      const p3 = document.getElementById('plot-simulation-curve');
+      if (p1) Plotly.Plots.resize(p1);
+      if (p2) Plotly.Plots.resize(p2);
+      if (p3) Plotly.Plots.resize(p3);
     }
   });
+
+  if (window.ResizeObserver && container) {
+    const ro = new ResizeObserver(() => {
+      resizeChartResponsive();
+    });
+    ro.observe(container);
+  }
 }
 
 // API: Radar Data (On-Demand & In-Memory Instant Cache)
