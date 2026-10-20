@@ -1,0 +1,94 @@
+import pytest
+from fastapi.testclient import TestClient
+from src.api.server import app
+
+client = TestClient(app)
+
+
+def test_api_health():
+    res = client.get("/api/health")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "ok"
+
+
+def test_api_strategies_catalog():
+    res = client.get("/api/strategies")
+    assert res.status_code == 200
+    data = res.json()
+    assert "proprietary" in data
+    assert "price_action" in data
+    assert "allocation" in data
+    assert "mql5" in data
+    assert len(data["mql5"]["strategies"]) == 14
+    total_strategies = sum(len(g["strategies"]) for g in data.values())
+    assert total_strategies == 48
+
+
+def test_api_analyze_synthetic(monkeypatch):
+    # Tests /api/analyze endpoint with standard parameters
+    res = client.get("/api/analyze?ticker=PETR4.SA&interval=1d&period=1y&lookback_n=10&retest_m=5&horizon_x=20")
+    assert res.status_code == 200
+    data = res.json()
+    assert "ticker" in data
+    assert data["ticker"] == "PETR4.SA"
+    assert "candles" in data
+    assert len(data["candles"]) > 0
+    assert "signals" in data
+    assert "summaries" in data
+    assert "current_state" in data
+
+
+def test_api_radar():
+    res = client.get("/api/radar?interval=1d&horizon_x=30")
+    assert res.status_code == 200
+    data = res.json()
+    assert isinstance(data, list)
+
+
+def test_api_simulate():
+    payload = {
+        "ticker": "PETR4.SA",
+        "interval": "1d",
+        "period": "1y",
+        "simulation_mode": "cycle_trade",
+        "buy_strategy": "t1_open",
+        "sell_strategy": "sell_t1_open",
+        "contribution_amount": 1000.0,
+        "lookback_n": 10,
+        "retest_m": 5,
+        "retest_tol": 0.005,
+    }
+    res = client.post("/api/simulate", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert "metrics" in data
+    assert "curve" in data
+    assert "trades" in data
+    assert data["metrics"]["total_invested"] >= 0
+
+
+def test_api_simulate_optimize():
+    payload = {
+        "ticker": "PETR4.SA",
+        "interval": "1d",
+        "period": "1y",
+        "initial_capital": 1000.0,
+        "min_trades": 2,
+    }
+    res = client.post("/api/simulate/optimize", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert "champion" in data
+    assert "top_combinations" in data
+    assert data["total_combinations_tested"] >= 0
+    if data["champion"]:
+        assert data["champion"]["rank"] == 1
+        assert "buy_sub_id" in data["champion"]
+        assert "sell_sub_id" in data["champion"]
+
+
+def test_root_serves_spa():
+    res = client.get("/")
+    assert res.status_code == 200
+    assert "Bottom Statistical Engine" in res.text

@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Market Opportunity & Top/Bottom Statistical Engine | 60fps Terminal</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- TradingView Lightweight Charts CDN -->
+  <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+  <!-- Plotly.js CDN -->
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            fintech: {
+              bg: '#0B0E14',
+              surface: '#151924',
+              border: '#262B38',
+              cyan: '#00F0FF',
+              green: '#00E676',
+              yellow: '#FFD600',
+              red: '#FF5252'
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-fintech-bg text-gray-100 flex flex-col h-screen">
+
+  <!-- Top Institutional Header -->
+  <header class="bg-fintech-surface border-b border-fintech-border px-4 py-2 flex items-center justify-between shrink-0">
+    <div class="flex items-center space-x-3">
+      <div class="w-8 h-8 rounded bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-bold text-white shadow-lg">
+        ⚡
+      </div>
+      <div>
+        <h1 class="text-sm font-bold tracking-wide text-white uppercase flex items-center gap-2">
+          Market Opportunity & Top/Bottom Engine
+          <span class="text-[10px] bg-fintech-cyan/20 text-fintech-cyan px-1.5 py-0.5 rounded font-mono border border-fintech-cyan/30">v4.0 60FPS</span>
+        </h1>
+        <p class="text-xs text-gray-400">Terminal Quantitativo Bidirecional: Fundos (Compra) & Topos (Venda)</p>
+      </div>
+    </div>
+
+    <!-- Direction Segmented Control (Top Nav) -->
+    <div class="flex items-center bg-fintech-bg border border-fintech-border rounded p-1 space-x-1" id="global-direction-selector">
+      <button class="dir-seg-btn active-both text-gray-300" data-dir="BOTH">
+        ⚡ Compra e Venda
+      </button>
+      <button class="dir-seg-btn text-gray-400" data-dir="BUY">
+        🟢 Compra (Fundos)
+      </button>
+      <button class="dir-seg-btn text-gray-400" data-dir="SELL">
+        🔴 Venda (Topos)
+      </button>
+    </div>
+
+    <!-- 4 Main Navigation Tabs -->
+    <nav class="flex items-center space-x-1" id="main-nav-tabs">
+      <button class="nav-tab-btn active" data-tab="tab-radar">
+        <span>🌐</span> Radar de Mercado
+      </button>
+      <button class="nav-tab-btn" data-tab="tab-terminal">
+        <span>📈</span> Terminal de Análise
+      </button>
+      <button class="nav-tab-btn" data-tab="tab-simulator">
+        <span>💰</span> Simulador
+      </button>
+      <button class="nav-tab-btn" data-tab="tab-playbook">
+        <span>📘</span> Playbook (48 Estratégias)
+      </button>
+    </nav>
+
+    <!-- Quick Status Badge & Refresh -->
+    <div class="flex items-center space-x-3">
+      <div id="header-status-badge" class="hidden items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold font-mono">
+        <!-- Rendered dynamically -->
+      </div>
+      <button id="btn-refresh-data" class="bg-fintech-border hover:bg-gray-700 text-xs text-gray-200 px-3 py-1.5 rounded transition flex items-center gap-1">
+        <span>🔄</span> Atualizar
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Area with Views -->
+  <main class="flex-1 overflow-y-auto relative">
+
+    <!-- Loading Spinner Overlay -->
+    <div id="loading-spinner" class="loading-overlay hidden">
+      <div class="w-12 h-12 border-4 border-fintech-cyan border-t-transparent rounded-full animate-spin"></div>
+      <span class="mt-3 text-sm text-fintech-cyan font-semibold tracking-wide" id="loading-text">Processando motores estatísticos bidirecionais...</span>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 1: RADAR DE MERCADO                   -->
+    <!-- ========================================== -->
+    <section id="tab-radar" class="tab-view h-full p-4 overflow-y-auto">
+      <div class="max-w-7xl mx-auto space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <span>🌐</span> Radar de Oportunidades & Semáforo de Timing
+            </h2>
+            <p class="text-xs text-gray-400">Varredura multiativos em tempo real identificando fundos estatísticos (Compra) e topos/exaustão (Venda).</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <!-- Timeframe selector for Radar -->
+            <div class="flex items-center space-x-1 bg-fintech-surface border border-fintech-border rounded p-1" id="radar-timeframe-buttons">
+              <span class="text-[11px] font-semibold text-gray-400 px-2 uppercase">Tempo Gráfico:</span>
+              <button class="radar-tf-btn px-2.5 py-1 text-xs rounded font-bold bg-fintech-cyan/20 text-fintech-cyan border border-fintech-cyan/40 active" data-tf="1d">Diário (1D)</button>
+              <button class="radar-tf-btn px-2.5 py-1 text-xs rounded text-gray-300 hover:text-white bg-fintech-bg" data-tf="1wk">Semanal (1S)</button>
+              <button class="radar-tf-btn px-2.5 py-1 text-xs rounded text-gray-300 hover:text-white bg-fintech-bg" data-tf="4h">4 Horas (4h)</button>
+              <button class="radar-tf-btn px-2.5 py-1 text-xs rounded text-gray-300 hover:text-white bg-fintech-bg" data-tf="1h">1 Hora (1h)</button>
+            </div>
+            <button id="btn-radar-rescan" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-3 py-2 rounded shadow transition flex items-center gap-1.5 shrink-0">
+              <span>⚡</span> Atualizar Radar
+            </button>
+          </div>
+        </div>
+
+        <!-- Radar Asset Category Filter Pills -->
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1" id="radar-category-pills">
+          <button class="radar-cat-btn px-3 py-1 rounded text-xs font-semibold bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 active-cat" data-cat="all">Todos os Ativos (151)</button>
+          <button class="radar-cat-btn px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border" data-cat="Ações Brasil">🇧🇷 Ações Brasil (30)</button>
+          <button class="radar-cat-btn px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border" data-cat="FIIs Brasil">🏢 FIIs Brasil (23)</button>
+          <button class="radar-cat-btn px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border" data-cat="Ações EUA">🇺🇸 Ações EUA (71)</button>
+          <button class="radar-cat-btn px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border" data-cat="Commodities">🌾 Commodities (14)</button>
+          <button class="radar-cat-btn px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border" data-cat="Forex">💱 Forex (10)</button>
+          <button class="radar-cat-btn px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border" data-cat="Criptomoedas">⚡ Cripto (3)</button>
+        </div>
+
+        <!-- Radar Opportunities Table -->
+        <div class="card-surface overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-gray-300">
+              <thead class="bg-fintech-bg/60 text-gray-400 font-semibold uppercase text-[11px] border-b border-fintech-border">
+                <tr>
+                  <th class="px-4 py-3">Ativo</th>
+                  <th class="px-4 py-3">Categoria</th>
+                  <th class="px-4 py-3">Direção</th>
+                  <th class="px-4 py-3">Preço Atual</th>
+                  <th class="px-4 py-3">Estratégia Confirmada</th>
+                  <th class="px-4 py-3">Status do Setup</th>
+                  <th class="px-4 py-3">Semáforo de Timing</th>
+                  <th class="px-4 py-3">Distância (%)</th>
+                  <th class="px-4 py-3">Preço Gatilho</th>
+                  <th class="px-4 py-3">Histórico (N / Win Rate)</th>
+                  <th class="px-4 py-3 text-right">Ação</th>
+                </tr>
+              </thead>
+              <tbody id="radar-table-body" class="divide-y divide-fintech-border">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: TERMINAL DE ANÁLISE (TRADINGVIEW)   -->
+    <!-- ========================================== -->
+    <section id="tab-terminal" class="tab-view hidden h-full flex flex-row">
+      <!-- Left Sidebar: Asset Controls & 48 Granular Strategy Toggles -->
+      <aside class="w-80 bg-fintech-surface border-r border-fintech-border flex flex-col h-full shrink-0">
+        <!-- Asset Parameters -->
+        <div class="p-3 border-b border-fintech-border space-y-2.5">
+          <div>
+            <label class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block mb-1">Selecionar Ativo</label>
+            <div class="flex items-center gap-1.5">
+              <input id="input-ticker" list="asset-datalist" type="text" value="PETR4.SA" placeholder="Digite ou selecione..." class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1 text-xs text-white font-mono focus:border-fintech-cyan focus:outline-none uppercase">
+              <datalist id="asset-datalist">
+                <!-- Ações Brasil (30) -->
+                <option value="PETR4.SA">PETR4.SA (Ações Brasil)</option>
+                <option value="VALE3.SA">VALE3.SA (Ações Brasil)</option>
+                <option value="ITUB4.SA">ITUB4.SA (Ações Brasil)</option>
+                <option value="BBDC4.SA">BBDC4.SA (Ações Brasil)</option>
+                <option value="BBAS3.SA">BBAS3.SA (Ações Brasil)</option>
+                <option value="ABEV3.SA">ABEV3.SA (Ações Brasil)</option>
+                <option value="WEGE3.SA">WEGE3.SA (Ações Brasil)</option>
+                <option value="RENT3.SA">RENT3.SA (Ações Brasil)</option>
+                <option value="EGIE3.SA">EGIE3.SA (Ações Brasil)</option>
+                <option value="PRIO3.SA">PRIO3.SA (Ações Brasil)</option>
+                <option value="BRSR6.SA">BRSR6.SA (Ações Brasil)</option>
+                <option value="KLBN4.SA">KLBN4.SA (Ações Brasil)</option>
+                <option value="CXSE3.SA">CXSE3.SA (Ações Brasil)</option>
+                <option value="BMGB4.SA">BMGB4.SA (Ações Brasil)</option>
+                <option value="BRKM5.SA">BRKM5.SA (Ações Brasil)</option>
+                <option value="TASA4.SA">TASA4.SA (Ações Brasil)</option>
+                <option value="PMAM3.SA">PMAM3.SA (Ações Brasil)</option>
+                <option value="CMIG4.SA">CMIG4.SA (Ações Brasil)</option>
+                <option value="CPFE3.SA">CPFE3.SA (Ações Brasil)</option>
+                <option value="POMO4.SA">POMO4.SA (Ações Brasil)</option>
+                <option value="TAEE11.SA">TAEE11.SA (Ações Brasil)</option>
+                <option value="BBSE3.SA">BBSE3.SA (Ações Brasil)</option>
+                <option value="SUZB3.SA">SUZB3.SA (Ações Brasil)</option>
+                <option value="GGBR4.SA">GGBR4.SA (Ações Brasil)</option>
+                <option value="CSNA3.SA">CSNA3.SA (Ações Brasil)</option>
+                <option value="USIM5.SA">USIM5.SA (Ações Brasil)</option>
+                <option value="VIVT3.SA">VIVT3.SA (Ações Brasil)</option>
+                <option value="TIMS3.SA">TIMS3.SA (Ações Brasil)</option>
+                <option value="HAPV3.SA">HAPV3.SA (Ações Brasil)</option>
+                <option value="LREN3.SA">LREN3.SA (Ações Brasil)</option>
+                <!-- FIIs Brasil (23) -->
+                <option value="HGLG11.SA">HGLG11.SA (FIIs Brasil)</option>
+                <option value="KNRI11.SA">KNRI11.SA (FIIs Brasil)</option>
+                <option value="MXRF11.SA">MXRF11.SA (FIIs Brasil)</option>
+                <option value="VISC11.SA">VISC11.SA (FIIs Brasil)</option>
+                <option value="BTLG11.SA">BTLG11.SA (FIIs Brasil)</option>
+                <option value="HGRE11.SA">HGRE11.SA (FIIs Brasil)</option>
+                <option value="KNIP11.SA">KNIP11.SA (FIIs Brasil)</option>
+                <option value="HSML11.SA">HSML11.SA (FIIs Brasil)</option>
+                <option value="GGRC11.SA">GGRC11.SA (FIIs Brasil)</option>
+                <option value="RBRR11.SA">RBRR11.SA (FIIs Brasil)</option>
+                <option value="RBVA11.SA">RBVA11.SA (FIIs Brasil)</option>
+                <option value="SNCI11.SA">SNCI11.SA (FIIs Brasil)</option>
+                <option value="TRXF11.SA">TRXF11.SA (FIIs Brasil)</option>
+                <option value="XPLG11.SA">XPLG11.SA (FIIs Brasil)</option>
+                <option value="CPTS11.SA">CPTS11.SA (FIIs Brasil)</option>
+                <option value="VGIR11.SA">VGIR11.SA (FIIs Brasil)</option>
+                <option value="VRTA11.SA">VRTA11.SA (FIIs Brasil)</option>
+                <option value="VINO11.SA">VINO11.SA (FIIs Brasil)</option>
+                <option value="RECR11.SA">RECR11.SA (FIIs Brasil)</option>
+                <option value="HFOF11.SA">HFOF11.SA (FIIs Brasil)</option>
+                <option value="BTAL11.SA">BTAL11.SA (FIIs Brasil)</option>
+                <option value="TGAR11.SA">TGAR11.SA (FIIs Brasil)</option>
+                <option value="ALZR11.SA">ALZR11.SA (FIIs Brasil)</option>
+                <!-- Ações EUA / REITs (71) -->
+                <option value="AAPL">AAPL (Ações EUA)</option>
+                <option value="MSFT">MSFT (Ações EUA)</option>
+                <option value="GOOGL">GOOGL (Ações EUA)</option>
+                <option value="AMZN">AMZN (Ações EUA)</option>
+                <option value="NVDA">NVDA (Ações EUA)</option>
+                <option value="META">META (Ações EUA)</option>
+                <option value="TSLA">TSLA (Ações EUA)</option>
+                <option value="BRK-B">BRK-B (Ações EUA)</option>
+                <option value="JPM">JPM (Ações EUA)</option>
+                <option value="V">V (Ações EUA)</option>
+                <option value="JNJ">JNJ (Ações EUA)</option>
+                <option value="WMT">WMT (Ações EUA)</option>
+                <option value="PG">PG (Ações EUA)</option>
+                <option value="MA">MA (Ações EUA)</option>
+                <option value="UNH">UNH (Ações EUA)</option>
+                <option value="HD">HD (Ações EUA)</option>
+                <option value="DIS">DIS (Ações EUA)</option>
+                <option value="ADBE">ADBE (Ações EUA)</option>
+                <option value="NFLX">NFLX (Ações EUA)</option>
+                <option value="CRM">CRM (Ações EUA)</option>
+                <option value="KO">KO (Ações EUA)</option>
+                <option value="AMD">AMD (Ações EUA)</option>
+                <option value="INTC">INTC (Ações EUA)</option>
+                <option value="CSCO">CSCO (Ações EUA)</option>
+                <option value="ABBV">ABBV (Ações EUA)</option>
+                <option value="CVX">CVX (Ações EUA)</option>
+                <option value="XOM">XOM (Ações EUA)</option>
+                <option value="PFE">PFE (Ações EUA)</option>
+                <option value="IBM">IBM (Ações EUA)</option>
+                <option value="MMM">MMM (Ações EUA)</option>
+                <option value="VZ">VZ (Ações EUA)</option>
+                <option value="T">T (Ações EUA)</option>
+                <option value="BA">BA (Ações EUA)</option>
+                <option value="CAT">CAT (Ações EUA)</option>
+                <option value="GE">GE (Ações EUA)</option>
+                <option value="GM">GM (Ações EUA)</option>
+                <option value="F">F (Ações EUA)</option>
+                <option value="UBER">UBER (Ações EUA)</option>
+                <option value="LYFT">LYFT (Ações EUA)</option>
+                <option value="TM">TM (Ações EUA)</option>
+                <option value="SNAP">SNAP (Ações EUA)</option>
+                <option value="PINS">PINS (Ações EUA)</option>
+                <option value="PYPL">PYPL (Ações EUA)</option>
+                <option value="SHOP">SHOP (Ações EUA)</option>
+                <option value="ZM">ZM (Ações EUA)</option>
+                <option value="DOCU">DOCU (Ações EUA)</option>
+                <option value="CRWD">CRWD (Ações EUA)</option>
+                <option value="NET">NET (Ações EUA)</option>
+                <option value="O">O (Ações EUA)</option>
+                <option value="SPG">SPG (Ações EUA)</option>
+                <option value="PLD">PLD (Ações EUA)</option>
+                <option value="AMT">AMT (Ações EUA)</option>
+                <option value="CCI">CCI (Ações EUA)</option>
+                <option value="EQIX">EQIX (Ações EUA)</option>
+                <option value="PSA">PSA (Ações EUA)</option>
+                <option value="DLR">DLR (Ações EUA)</option>
+                <option value="WELL">WELL (Ações EUA)</option>
+                <option value="AVB">AVB (Ações EUA)</option>
+                <option value="EQR">EQR (Ações EUA)</option>
+                <option value="BXP">BXP (Ações EUA)</option>
+                <option value="VTR">VTR (Ações EUA)</option>
+                <option value="ARE">ARE (Ações EUA)</option>
+                <option value="MAA">MAA (Ações EUA)</option>
+                <option value="UDR">UDR (Ações EUA)</option>
+                <option value="KIM">KIM (Ações EUA)</option>
+                <option value="REG">REG (Ações EUA)</option>
+                <option value="HST">HST (Ações EUA)</option>
+                <option value="FRT">FRT (Ações EUA)</option>
+                <option value="NNN">NNN (Ações EUA)</option>
+                <option value="WPC">WPC (Ações EUA)</option>
+                <option value="GLPI">GLPI (Ações EUA)</option>
+                <!-- Commodities (14) -->
+                <option value="GC=F">GC=F (Commodities)</option>
+                <option value="SI=F">SI=F (Commodities)</option>
+                <option value="CL=F">CL=F (Commodities)</option>
+                <option value="BZ=F">BZ=F (Commodities)</option>
+                <option value="HG=F">HG=F (Commodities)</option>
+                <option value="NG=F">NG=F (Commodities)</option>
+                <option value="ZC=F">ZC=F (Commodities)</option>
+                <option value="ZS=F">ZS=F (Commodities)</option>
+                <option value="ZW=F">ZW=F (Commodities)</option>
+                <option value="KC=F">KC=F (Commodities)</option>
+                <option value="CT=F">CT=F (Commodities)</option>
+                <option value="SB=F">SB=F (Commodities)</option>
+                <option value="LE=F">LE=F (Commodities)</option>
+                <option value="HE=F">HE=F (Commodities)</option>
+                <!-- Forex (10) -->
+                <option value="EURUSD=X">EURUSD=X (Forex)</option>
+                <option value="GBPUSD=X">GBPUSD=X (Forex)</option>
+                <option value="USDJPY=X">USDJPY=X (Forex)</option>
+                <option value="USDCHF=X">USDCHF=X (Forex)</option>
+                <option value="AUDUSD=X">AUDUSD=X (Forex)</option>
+                <option value="USDCAD=X">USDCAD=X (Forex)</option>
+                <option value="NZDUSD=X">NZDUSD=X (Forex)</option>
+                <option value="EURJPY=X">EURJPY=X (Forex)</option>
+                <option value="GBPJPY=X">GBPJPY=X (Forex)</option>
+                <option value="EURCHF=X">EURCHF=X (Forex)</option>
+                <!-- Criptomoedas (3) -->
+                <option value="BTC-USD">BTC-USD (Criptomoedas)</option>
+                <option value="ETH-USD">ETH-USD (Criptomoedas)</option>
+                <option value="SOL-USD">SOL-USD (Criptomoedas)</option>
+              </datalist>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <div class="flex-1">
+              <label class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block">Período</label>
+              <select id="select-period" class="w-full bg-fintech-bg border border-fintech-border rounded px-2 py-1 text-xs text-white focus:border-fintech-cyan focus:outline-none">
+                <option value="60d">60 Dias</option>
+                <option value="1y">1 Ano</option>
+                <option value="2y" selected>2 Anos</option>
+                <option value="5y">5 Anos</option>
+                <option value="max">Máximo</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Quantitative Parameters Popover / Row -->
+          <div class="grid grid-cols-3 gap-1.5 text-[11px]">
+            <div>
+              <label class="text-gray-400 block text-[10px]">Lookback N</label>
+              <input id="input-lookback-n" type="number" value="10" min="2" max="50" class="w-full bg-fintech-bg border border-fintech-border rounded px-1.5 py-0.5 text-xs text-white font-mono">
+            </div>
+            <div>
+              <label class="text-gray-400 block text-[10px]">Reteste M</label>
+              <input id="input-retest-m" type="number" value="5" min="1" max="20" class="w-full bg-fintech-bg border border-fintech-border rounded px-1.5 py-0.5 text-xs text-white font-mono">
+            </div>
+            <div>
+              <label class="text-gray-400 block text-[10px]">Horizonte X</label>
+              <input id="input-horizon-x" type="number" value="60" min="5" max="250" class="w-full bg-fintech-bg border border-fintech-border rounded px-1.5 py-0.5 text-xs text-white font-mono">
+            </div>
+          </div>
+
+          <button id="btn-load-analysis" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold py-1.5 rounded transition shadow flex items-center justify-center gap-1.5">
+            <span>⚡</span> Analisar Ativo
+          </button>
+        </div>
+
+        <!-- Strategy Granular Selector (48 Strategies) with 0ms Reactivity -->
+        <div class="p-2 border-b border-fintech-border flex items-center justify-between bg-fintech-bg/40">
+          <span class="text-[11px] font-bold text-gray-300 uppercase tracking-wider">Estratégias Ativas</span>
+          <div class="flex items-center space-x-1">
+            <button id="btn-select-all-global" class="text-[10px] text-cyan-400 hover:underline">Marcar</button>
+            <span class="text-gray-500 text-[10px]">|</span>
+            <button id="btn-deselect-all-global" class="text-[10px] text-gray-400 hover:underline">Desmarcar</button>
+          </div>
+        </div>
+
+        <!-- Accordions Container (Compra e Venda) -->
+        <div class="flex-1 overflow-y-auto p-2 space-y-2 text-xs" id="strategy-accordions-container">
+          <!-- Accordion 1: Proprietary Reversal BUY (4) -->
+          <div class="border border-fintech-border rounded overflow-hidden strategy-group-wrapper" data-direction="BUY">
+            <div class="accordion-header bg-fintech-bg px-2.5 py-1.5 flex items-center justify-between text-gray-200 font-semibold" data-accordion="acc-prop-buy">
+              <span class="flex items-center gap-1">🟢 Proprietária Compra (4)</span>
+              <span class="text-gray-400 text-xs">▼</span>
+            </div>
+            <div id="acc-prop-buy" class="p-2 space-y-1 bg-fintech-surface">
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
+                <input type="checkbox" class="strategy-cb" data-id="t1_open" data-dir="BUY" checked>
+                <span>Negação Anterior (Abertura)</span>
+              </label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
+                <input type="checkbox" class="strategy-cb" data-id="t1_retest" data-dir="BUY" checked>
+                <span>Negação Anterior (Reteste)</span>
+              </label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
+                <input type="checkbox" class="strategy-cb" data-id="t2_open" data-dir="BUY" checked>
+                <span>Negação N Barras (Abertura)</span>
+              </label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
+                <input type="checkbox" class="strategy-cb" data-id="t2_retest" data-dir="BUY" checked>
+                <span>Negação N Barras (Reteste)</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Accordion 2: Proprietary Reversal SELL (4) -->
+          <div class="border border-fintech-border rounded overflow-hidden strategy-group-wrapper" data-direction="SELL">
+            <div class="accordion-header bg-fintech-bg px-2.5 py-1.5 flex items-center justify-between text-gray-200 font-semibold" data-accordion="acc-prop-sell">
+              <span class="flex items-center gap-1">🔴 Proprietária Venda/Topo (4)</span>
+              <span class="text-gray-400 text-xs">▼</span>
+            </div>
+            <div id="acc-prop-sell" class="p-2 space-y-1 bg-fintech-surface">
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
+                <input type="checkbox" class="strategy-cb" data-id="sell_t1_open" data-dir="SELL" checked>
+                <span>Negação Máxima Anterior (Abertura)</span>
+              </label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
+                <input type="checkbox" class="strategy-cb" data-id="sell_t1_retest" data-dir="SELL" checked>
+                <span>Negação Máxima Anterior (Reteste)</span>
+              </label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
+                <input type="checkbox" class="strategy-cb" data-id="sell_t2_open" data-dir="SELL" checked>
+                <span>Negação Topo N Barras (Abertura)</span>
+              </label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
+                <input type="checkbox" class="strategy-cb" data-id="sell_t2_retest" data-dir="SELL" checked>
+                <span>Negação Topo N Barras (Reteste)</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Accordion 3: Price Action BUY (2) -->
+          <div class="border border-fintech-border rounded overflow-hidden strategy-group-wrapper" data-direction="BUY">
+            <div class="accordion-header bg-fintech-bg px-2.5 py-1.5 flex items-center justify-between text-gray-200 font-semibold" data-accordion="acc-pa-buy">
+              <span class="flex items-center gap-1">🟢 Price Action Fundo (2)</span>
+              <span class="text-gray-400 text-xs">▼</span>
+            </div>
+            <div id="acc-pa-buy" class="p-2 space-y-1 bg-fintech-surface">
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
+                <input type="checkbox" class="strategy-cb" data-id="double_bottom_bos" data-dir="BUY" checked>
+                <span>Fundo Duplo + BOS</span>
+              </label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
+                <input type="checkbox" class="strategy-cb" data-id="wyckoff_spring" data-dir="BUY" checked>
+                <span>Wyckoff Spring</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Accordion 4: Price Action SELL (2) -->
+          <div class="border border-fintech-border rounded overflow-hidden strategy-group-wrapper" data-direction="SELL">
+            <div class="accordion-header bg-fintech-bg px-2.5 py-1.5 flex items-center justify-between text-gray-200 font-semibold" data-accordion="acc-pa-sell">
+              <span class="flex items-center gap-1">🔴 Price Action Topo (2)</span>
+              <span class="text-gray-400 text-xs">▼</span>
+            </div>
+            <div id="acc-pa-sell" class="p-2 space-y-1 bg-fintech-surface">
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
+                <input type="checkbox" class="strategy-cb" data-id="sell_double_top_bos" data-dir="SELL" checked>
+                <span>Topo Duplo + BOS</span>
+              </label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
+                <input type="checkbox" class="strategy-cb" data-id="sell_wyckoff_upthrust" data-dir="SELL" checked>
+                <span>Wyckoff Upthrust (UTAD)</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Accordion 5: Alocação & Holder BUY (4) -->
+          <div class="border border-fintech-border rounded overflow-hidden strategy-group-wrapper" data-direction="BUY">
+            <div class="accordion-header bg-fintech-bg px-2.5 py-1.5 flex items-center justify-between text-gray-200 font-semibold" data-accordion="acc-alloc-buy">
+              <span class="flex items-center gap-1">🟢 Alocação Fundo (4)</span>
+              <span class="text-gray-400 text-xs">▼</span>
+            </div>
+            <div id="acc-alloc-buy" class="p-2 space-y-1 bg-fintech-surface">
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="dca_dynamic" data-dir="BUY" checked><span>DCA Dinâmico</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="value_proxy" data-dir="BUY" checked><span>Value Proxy</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="rebal_rf_rv" data-dir="BUY" checked><span>Rebal. RF x RV</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="rebal_relative_strength" data-dir="BUY" checked><span>Força Relativa Z</span></label>
+            </div>
+          </div>
+
+          <!-- Accordion 6: Alocação & Realização SELL (4) -->
+          <div class="border border-fintech-border rounded overflow-hidden strategy-group-wrapper" data-direction="SELL">
+            <div class="accordion-header bg-fintech-bg px-2.5 py-1.5 flex items-center justify-between text-gray-200 font-semibold" data-accordion="acc-alloc-sell">
+              <span class="flex items-center gap-1">🔴 Alocação Topo (4)</span>
+              <span class="text-gray-400 text-xs">▼</span>
+            </div>
+            <div id="acc-alloc-sell" class="p-2 space-y-1 bg-fintech-surface">
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="sell_overbought_stat" data-dir="SELL" checked><span>Excesso Estatístico</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="sell_rebal_rv_rf" data-dir="SELL" checked><span>Rebal. RV -> RF</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="sell_rebal_relative_strength" data-dir="SELL" checked><span>Exaustão Força Rel.</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="sell_value_proxy" data-dir="SELL" checked><span>Prêmio Valuation</span></label>
+            </div>
+          </div>
+
+          <!-- Accordion 7: Velas MQL5 BUY (14) -->
+          <div class="border border-fintech-border rounded overflow-hidden strategy-group-wrapper" data-direction="BUY">
+            <div class="accordion-header bg-fintech-bg px-2.5 py-1.5 flex items-center justify-between text-gray-200 font-semibold" data-accordion="acc-mql5-buy">
+              <span class="flex items-center gap-1">🟢 Velas de Fundo (14 MQL5)</span>
+              <span class="text-gray-400 text-xs">▼</span>
+            </div>
+            <div id="acc-mql5-buy" class="p-2 space-y-1 bg-fintech-surface">
+              <div class="grid grid-cols-1 gap-1 text-[11px]">
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="hammer" data-dir="BUY" checked><span>Martelo</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="inverted_hammer" data-dir="BUY" checked><span>Martelo Invertido</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bullish_engulfing" data-dir="BUY" checked><span>Engolfo de Alta</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="piercing_line" data-dir="BUY" checked><span>Piercing Line</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="morning_star" data-dir="BUY" checked><span>Estrela da Manhã</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bullish_harami" data-dir="BUY" checked><span>Harami de Alta</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_inside_up" data-dir="BUY" checked><span>Três Por Dentro</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_outside_up" data-dir="BUY" checked><span>Três Por Fora</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_white_soldiers" data-dir="BUY" checked><span>Três Soldados Brancos</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="tweezer_bottom" data-dir="BUY" checked><span>Pinça de Fundo</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="dragonfly_doji" data-dir="BUY" checked><span>Doji Libélula</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="abandoned_baby_bullish" data-dir="BUY" checked><span>Bebê Abandonado</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bullish_kicker" data-dir="BUY" checked><span>Chute de Alta</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="climactic_pinbar" data-dir="BUY" checked><span>Pinbar Clímax Volume</span></label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Accordion 8: Velas MQL5 SELL (14) -->
+          <div class="border border-fintech-border rounded overflow-hidden strategy-group-wrapper" data-direction="SELL">
+            <div class="accordion-header bg-fintech-bg px-2.5 py-1.5 flex items-center justify-between text-gray-200 font-semibold" data-accordion="acc-mql5-sell">
+              <span class="flex items-center gap-1">🔴 Velas de Topo (14 MQL5)</span>
+              <span class="text-gray-400 text-xs">▼</span>
+            </div>
+            <div id="acc-mql5-sell" class="p-2 space-y-1 bg-fintech-surface">
+              <div class="grid grid-cols-1 gap-1 text-[11px]">
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="shooting_star" data-dir="SELL" checked><span>Estrela Cadente</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="hanging_man" data-dir="SELL" checked><span>Enforcado</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bearish_engulfing" data-dir="SELL" checked><span>Engolfo de Baixa</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="dark_cloud_cover" data-dir="SELL" checked><span>Nuvem Negra</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="evening_star" data-dir="SELL" checked><span>Estrela da Tarde</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bearish_harami" data-dir="SELL" checked><span>Harami de Baixa</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_inside_down" data-dir="SELL" checked><span>Três Por Dentro Baixa</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_outside_down" data-dir="SELL" checked><span>Três Por Fora Baixa</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_black_crows" data-dir="SELL" checked><span>Três Corvos Negros</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="tweezer_top" data-dir="SELL" checked><span>Pinça de Topo</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="gravestone_doji" data-dir="SELL" checked><span>Doji Lápide</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="abandoned_baby_bearish" data-dir="SELL" checked><span>Bebê Abandonado Baixa</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bearish_kicker" data-dir="SELL" checked><span>Chute de Baixa</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="climactic_bearish_pinbar" data-dir="SELL" checked><span>Pinbar Clímax Topo</span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Center & Right: 60fps Chart & Quantitative Panels -->
+      <div class="flex-1 flex flex-col h-full overflow-y-auto">
+        <!-- Timeframe Toolbar -->
+        <div class="bg-fintech-surface px-4 py-2 border-b border-fintech-border flex items-center justify-between shrink-0">
+          <div class="flex items-center space-x-1" id="timeframe-buttons">
+            <span class="text-[11px] font-bold text-gray-400 mr-2 uppercase">Tempo Gráfico:</span>
+            <button class="tf-btn px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white" data-tf="5m">5m</button>
+            <button class="tf-btn px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white" data-tf="15m">15m</button>
+            <button class="tf-btn px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white" data-tf="30m">30m</button>
+            <button class="tf-btn px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white" data-tf="1h">1h</button>
+            <button class="tf-btn px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white" data-tf="2h">2h</button>
+            <button class="tf-btn px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white" data-tf="4h">4h</button>
+            <button class="tf-btn px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white" data-tf="12h">12h</button>
+            <button class="tf-btn px-2.5 py-1 text-xs rounded bg-fintech-cyan/20 text-fintech-cyan border border-fintech-cyan/40 font-bold active" data-tf="1d">1D</button>
+            <button class="tf-btn px-2.5 py-1 text-xs rounded bg-fintech-bg text-gray-300 hover:text-white" data-tf="1wk">1S</button>
+          </div>
+
+          <div class="flex items-center space-x-2 text-xs">
+            <span class="text-gray-400 font-mono" id="active-marker-count">Marcadores visíveis: 0</span>
+          </div>
+        </div>
+
+        <!-- 60fps TradingView Chart Container -->
+        <div class="p-3">
+          <div class="card-surface p-2">
+            <div id="tv-chart-container" style="height: 480px; min-height: 480px; width: 100%; position: relative;"></div>
+          </div>
+        </div>
+
+        <!-- Quantitative Plots: Efficiency Ranking & Scatter Plot -->
+        <div class="p-3 grid grid-cols-1 lg:grid-cols-2 gap-3">
+          <div class="card-surface p-3">
+            <h3 class="text-xs font-bold text-gray-200 mb-2 flex items-center justify-between">
+              <span>🏆 Ranking de Eficiência (Win Rate com Range 118%)</span>
+              <span class="text-[10px] text-gray-400 font-mono">0ms Client-Side</span>
+            </h3>
+            <div id="plot-ranking" style="height: 380px; min-height: 380px; width: 100%;"></div>
+          </div>
+
+          <div class="card-surface p-3">
+            <h3 class="text-xs font-bold text-gray-200 mb-2 flex items-center justify-between">
+              <span>🎯 Risco x Retorno (Scatter Quadrantes)</span>
+              <span class="text-[10px] text-gray-400 font-mono">Retorno vs. MAE</span>
+            </h3>
+            <div id="plot-scatter" style="height: 380px; min-height: 380px; width: 100%;"></div>
+          </div>
+        </div>
+
+        <!-- Strategy Simulation Comparison & History of Executed Signals -->
+        <div class="p-3 space-y-3 pb-8">
+          <!-- Comparative Strategy Performance Table -->
+          <div class="card-surface p-3">
+            <div class="flex items-center justify-between mb-2">
+              <div>
+                <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                  <span>💰</span> Simulação Comparativa por Estratégia (Aporte R$ 1.000/sinal)
+                </h3>
+                <p class="text-[11px] text-gray-400">
+                  Simulação quantitativa com sobras de caixa reinvestidas para compras e eficiência de realização para vendas.
+                </p>
+              </div>
+              <div class="text-[10px] text-gray-400 font-mono">Base: R$ 1.000</div>
+            </div>
+            <div class="overflow-x-auto max-h-64">
+              <table class="w-full text-left text-xs text-gray-300">
+                <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[10px] sticky top-0">
+                  <tr>
+                    <th class="px-3 py-2">Estratégia</th>
+                    <th class="px-3 py-2">Direção</th>
+                    <th class="px-3 py-2 text-center">Entradas</th>
+                    <th class="px-3 py-2">Total Operado</th>
+                    <th class="px-3 py-2 text-center">Ações / Cotas</th>
+                    <th class="px-3 py-2">Preço Médio</th>
+                    <th class="px-3 py-2">Caixa Sobra</th>
+                    <th class="px-3 py-2">Valor Atual</th>
+                    <th class="px-3 py-2">Lucro / Prejuízo</th>
+                    <th class="px-3 py-2">Retorno (%)</th>
+                    <th class="px-3 py-2">Max Drawdown</th>
+                  </tr>
+                </thead>
+                <tbody id="strategy-simulation-table-body" class="divide-y divide-fintech-border font-mono">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Chronological Executed Signals Table -->
+          <div class="card-surface p-3">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-xs font-bold text-gray-200 flex items-center gap-1.5">
+                <span>📜</span> Histórico Detalhado de Sinais & Execuções
+              </h3>
+              <span class="text-[10px] text-gray-400 font-mono">Cronológico (mais recentes primeiro)</span>
+            </div>
+            <div class="overflow-x-auto max-h-72">
+              <table class="w-full text-left text-xs text-gray-300">
+                <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[10px] sticky top-0">
+                  <tr>
+                    <th class="px-3 py-2">Estratégia</th>
+                    <th class="px-3 py-2">Direção</th>
+                    <th class="px-3 py-2">Data Sinal</th>
+                    <th class="px-3 py-2">Data Execução</th>
+                    <th class="px-3 py-2">Preço Execução</th>
+                    <th class="px-3 py-2 text-center">Qtd Cotas</th>
+                    <th class="px-3 py-2">Valor Operado</th>
+                    <th class="px-3 py-2">Sobra Caixa</th>
+                    <th class="px-3 py-2">Retorno Fwd (%)</th>
+                    <th class="px-3 py-2">MAE (%)</th>
+                    <th class="px-3 py-2">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="signals-table-body" class="divide-y divide-fintech-border">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: SIMULADOR FINANCEIRO & BACKTEST     -->
+    <!-- ========================================== -->
+    <section id="tab-simulator" class="tab-view hidden h-full p-4 overflow-y-auto">
+      <div class="max-w-7xl mx-auto space-y-4">
+        <div>
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <span>⚡</span> Simulador Quantitativo: Backtest de Trade (Compra ➔ Venda) & Acumulação
+          </h2>
+          <p class="text-xs text-gray-400">Teste estratégias comprando nos sinais de Fundo e encerrando no próximo Topo (Venda), ou simule aportes contínuos em cotas.</p>
+        </div>
+
+        <!-- Simulator Configuration Form -->
+        <div class="card-surface p-4 space-y-3 text-xs">
+          <!-- Row 1: Core Parameters -->
+          <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+            <div>
+              <label class="text-gray-400 font-semibold block mb-1">Ativo para Simulação</label>
+              <input id="sim-ticker" list="asset-datalist" type="text" value="PETR4.SA" placeholder="Digite ou selecione..." class="w-full bg-fintech-bg border border-fintech-border rounded px-3 py-1.5 text-white font-mono uppercase focus:border-fintech-cyan focus:outline-none">
+            </div>
+            <div>
+              <label class="text-gray-400 font-semibold block mb-1">Modo de Operação</label>
+              <select id="sim-mode" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-sans focus:border-fintech-cyan focus:outline-none">
+                <option value="cycle_trade" selected>⚡ Trade (Compra ➔ Venda)</option>
+                <option value="accumulation">💰 Acumulação (DCA Fundos)</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-gray-400 font-semibold block mb-1" id="sim-label-capital">Capital Inicial (R$)</label>
+              <input id="sim-contribution" type="number" value="1000" min="100" step="100" class="w-full bg-fintech-bg border border-fintech-border rounded px-3 py-1.5 text-white font-mono">
+            </div>
+            <div>
+              <label class="text-gray-400 font-semibold block mb-1">Data Início (Opcional)</label>
+              <input id="sim-start-date" type="date" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white">
+            </div>
+            <div>
+              <label class="text-gray-400 font-semibold block mb-1">Data Fim (Opcional)</label>
+              <input id="sim-end-date" type="date" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white">
+            </div>
+          </div>
+
+          <!-- Row 2: Strategy Selectors & Action Buttons -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-3 pt-2 border-t border-fintech-border/60">
+            <!-- Buy Strategy Dropdown -->
+            <div class="md:col-span-4">
+              <label class="text-emerald-400 font-semibold block mb-1 flex items-center gap-1">
+                <span>🟢</span> Estratégia de Compra (Entrada)
+              </label>
+              <select id="sim-buy-strategy" class="w-full bg-fintech-bg border border-emerald-500/40 rounded px-2.5 py-1.5 text-white font-sans focus:border-emerald-400 focus:outline-none">
+                <option value="ALL" selected>🟢 Todas as Compras (Portfólio / Qualquer Sinal)</option>
+                <optgroup label="Proprietárias de Fundo (Reversão Causal)">
+                  <option value="t1_open">Negação Barra Anterior (Abertura)</option>
+                  <option value="t1_retest">Negação Barra Anterior (Reteste)</option>
+                  <option value="t2_open">Negação Fundo N Barras (Abertura)</option>
+                  <option value="t2_retest">Negação Fundo N Barras (Reteste)</option>
+                </optgroup>
+                <optgroup label="Price Action Institucional">
+                  <option value="double_bottom_bos">Fundo Duplo + Quebra de Estrutura (BOS)</option>
+                  <option value="wyckoff_spring">Varredura de Liquidez (Wyckoff Spring)</option>
+                </optgroup>
+                <optgroup label="Alocação & Rebalanceamento">
+                  <option value="dca_dynamic">DCA Dinâmico (Sobrevendido RSI < 30)</option>
+                  <option value="value_proxy">Estiramento de Valuation (Mayer Multiple)</option>
+                  <option value="rebal_rf_rv">Rebalanceamento RF -> RV</option>
+                  <option value="rebal_relative_strength">Força Relativa vs. Benchmark</option>
+                </optgroup>
+                <optgroup label="Padrões de Velas (MQL5)">
+                  <option value="hammer">Martelo (Hammer)</option>
+                  <option value="inverted_hammer">Martelo Invertido</option>
+                  <option value="bullish_engulfing">Engolfo de Alta</option>
+                  <option value="piercing_line">Linha de Perfuração</option>
+                  <option value="morning_star">Estrela da Manhã</option>
+                  <option value="bullish_harami">Harami de Alta</option>
+                  <option value="three_inside_up">Três Por Dentro de Alta</option>
+                  <option value="three_outside_up">Três Por Fora de Alta</option>
+                  <option value="three_white_soldiers">Três Soldados Brancos</option>
+                  <option value="tweezer_bottom">Pinça de Fundo (Tweezer Bottom)</option>
+                  <option value="dragonfly_doji">Doji Libélula (Dragonfly)</option>
+                  <option value="abandoned_baby_bullish">Bebê Abandonado de Alta</option>
+                  <option value="bullish_kicker">Kicker de Alta</option>
+                  <option value="climactic_pinbar">Pinbar Climático de Exaustão</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <!-- Sell Strategy Dropdown -->
+            <div class="md:col-span-4">
+              <label class="text-rose-400 font-semibold block mb-1 flex items-center gap-1">
+                <span>🔴</span> Estratégia de Venda (Saída / Topo)
+              </label>
+              <select id="sim-sell-strategy" class="w-full bg-fintech-bg border border-rose-500/40 rounded px-2.5 py-1.5 text-white font-sans focus:border-rose-400 focus:outline-none">
+                <option value="ALL" selected>🔴 Todas as Vendas (Portfólio / Qualquer Sinal)</option>
+                <optgroup label="Proprietárias de Topo (Negação Causal)">
+                  <option value="sell_t1_open">Negação Máxima Anterior (Abertura)</option>
+                  <option value="sell_t1_retest">Negação Máxima Anterior (Reteste)</option>
+                  <option value="sell_t2_open">Negação Topo N Barras (Abertura)</option>
+                  <option value="sell_t2_retest">Negação Topo N Barras (Reteste)</option>
+                </optgroup>
+                <optgroup label="Price Action Institucional">
+                  <option value="sell_double_top_bos">Topo Duplo + Quebra Estrutura BOS</option>
+                  <option value="sell_wyckoff_upthrust">Varredura de Topo (Wyckoff Upthrust)</option>
+                </optgroup>
+                <optgroup label="Alocação & Realização">
+                  <option value="sell_overbought_stat">Excesso Estatístico (Sobrecomprado RSI > 70)</option>
+                  <option value="sell_rebal_rv_rf">Rebalanceamento RV -> Renda Fixa</option>
+                  <option value="sell_rebal_relative_strength">Exaustão de Força Relativa</option>
+                  <option value="sell_value_proxy">Prêmio Excessivo / Estiramento Valuation</option>
+                </optgroup>
+                <optgroup label="Padrões de Velas (MQL5)">
+                  <option value="shooting_star">Estrela Cadente (Shooting Star)</option>
+                  <option value="hanging_man">Enforcado (Hanging Man)</option>
+                  <option value="bearish_engulfing">Engolfo de Baixa</option>
+                  <option value="dark_cloud_cover">Nuvem Negra (Dark Cloud Cover)</option>
+                  <option value="evening_star">Estrela da Tarde (Evening Star)</option>
+                  <option value="bearish_harami">Harami de Baixa</option>
+                  <option value="three_inside_down">Três Por Dentro de Baixa</option>
+                  <option value="three_outside_down">Três Por Fora de Baixa</option>
+                  <option value="three_black_crows">Três Corvos Negros</option>
+                  <option value="tweezer_top">Pinça de Topo (Tweezer Top)</option>
+                  <option value="gravestone_doji">Doji Lápide (Gravestone)</option>
+                  <option value="abandoned_baby_bearish">Bebê Abandonado de Baixa</option>
+                  <option value="bearish_kicker">Kicker de Baixa</option>
+                  <option value="climactic_bearish_pinbar">Pinbar Climático de Topo</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <!-- Run Button -->
+            <div class="md:col-span-2 flex items-end">
+              <button id="btn-run-simulation" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2 rounded transition flex items-center justify-center gap-1.5 shadow">
+                <span>▶️</span> Simular
+              </button>
+            </div>
+
+            <!-- Optimize Button -->
+            <div class="md:col-span-2 flex items-end">
+              <button id="btn-optimize-combinations" class="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-semibold py-2 rounded transition flex items-center justify-center gap-1.5 shadow">
+                <span>🏆</span> Mais Lucrativa
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Champion Combination Banner & Top Combinations Ranking Card (Dynamically Populated) -->
+        <div id="sim-optimizer-container" class="space-y-3 hidden">
+          <!-- Champion Highlight Card -->
+          <div class="bg-gradient-to-r from-amber-950/60 via-fintech-surface to-cyan-950/40 border border-amber-500/50 rounded-lg p-4 shadow-lg">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded bg-amber-500 text-black font-extrabold text-[10px] tracking-wider uppercase flex items-center gap-1">
+                    <span>🏆</span> Combinação Mais Lucrativa (Campeã)
+                  </span>
+                  <span class="text-xs text-gray-400" id="opt-champ-tested-count">Testadas centenas de combinações</span>
+                </div>
+                <div class="text-base font-bold text-white flex flex-wrap items-center gap-2 pt-1">
+                  <span class="text-emerald-400 font-semibold" id="opt-champ-buy-label">Varredura de Liquidez (Wyckoff Spring)</span>
+                  <span class="text-gray-400">➔</span>
+                  <span class="text-rose-400 font-semibold" id="opt-champ-sell-label">Doji Lápide (Gravestone)</span>
+                </div>
+              </div>
+
+              <!-- Quick Action to Apply Champion -->
+              <div class="flex items-center gap-3">
+                <button id="btn-apply-champion" class="bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs px-4 py-2 rounded shadow transition flex items-center gap-1.5">
+                  <span>⚡</span> Aplicar e Simular
+                </button>
+              </div>
+            </div>
+
+            <!-- Champion KPIs Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mt-3 pt-3 border-t border-fintech-border/50 text-xs">
+              <div class="bg-fintech-bg/60 p-2 rounded border border-fintech-border">
+                <span class="text-gray-400 text-[10px] block">Retorno Total Acumulado</span>
+                <span class="text-base font-bold text-emerald-400 font-mono" id="opt-champ-ret">+0.0%</span>
+              </div>
+              <div class="bg-fintech-bg/60 p-2 rounded border border-fintech-border">
+                <span class="text-gray-400 text-[10px] block">Lucro Líquido (R$)</span>
+                <span class="text-base font-bold text-cyan-300 font-mono" id="opt-champ-pnl">R$ 0,00</span>
+              </div>
+              <div class="bg-fintech-bg/60 p-2 rounded border border-fintech-border">
+                <span class="text-gray-400 text-[10px] block">Taxa de Acerto (Win Rate)</span>
+                <span class="text-base font-bold text-white font-mono" id="opt-champ-winrate">0.0%</span>
+              </div>
+              <div class="bg-fintech-bg/60 p-2 rounded border border-fintech-border">
+                <span class="text-gray-400 text-[10px] block">Total de Trades</span>
+                <span class="text-base font-bold text-amber-300 font-mono" id="opt-champ-trades">0 trades</span>
+              </div>
+              <div class="bg-fintech-bg/60 p-2 rounded border border-fintech-border">
+                <span class="text-gray-400 text-[10px] block">Max Drawdown</span>
+                <span class="text-base font-bold text-rose-400 font-mono" id="opt-champ-drawdown">0.0%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top Combinations Ranking Table Card -->
+          <div class="card-surface p-4">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+                <span>📊</span> Ranking das Top 15 Combinações Mais Lucrativas
+              </h3>
+              <span class="text-[10px] text-gray-400 font-mono">Ordenado por Retorno Total (%)</span>
+            </div>
+            <div class="overflow-x-auto max-h-72">
+              <table class="w-full text-left text-xs text-gray-300">
+                <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[10px] sticky top-0">
+                  <tr>
+                    <th class="px-2.5 py-2 text-center">Rank</th>
+                    <th class="px-2.5 py-2">Estratégia de Compra (Entrada)</th>
+                    <th class="px-2.5 py-2">Estratégia de Venda (Saída)</th>
+                    <th class="px-2.5 py-2 text-center">Trades</th>
+                    <th class="px-2.5 py-2 text-center font-mono">Win Rate</th>
+                    <th class="px-2.5 py-2 font-mono">Retorno (%)</th>
+                    <th class="px-2.5 py-2 font-mono">Lucro Líquido</th>
+                    <th class="px-2.5 py-2 font-mono text-center">Max Drawdown</th>
+                    <th class="px-2.5 py-2 text-center">Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="sim-top-combos-table-body" class="divide-y divide-fintech-border font-mono text-[11px]">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-6 gap-3" id="sim-kpi-container">
+          <div class="card-surface p-3">
+            <div class="text-[11px] text-gray-400 font-semibold" id="sim-kpi-label-invested">Capital Inicial</div>
+            <div class="text-lg font-bold text-white font-mono" id="sim-kpi-invested">R$ 0,00</div>
+          </div>
+          <div class="card-surface p-3">
+            <div class="text-[11px] text-gray-400 font-semibold">Saldo Final Carteira</div>
+            <div class="text-lg font-bold text-fintech-green font-mono" id="sim-kpi-final">R$ 0,00</div>
+          </div>
+          <div class="card-surface p-3">
+            <div class="text-[11px] text-gray-400 font-semibold">Lucro Líquido</div>
+            <div class="text-lg font-bold text-fintech-cyan font-mono" id="sim-kpi-profit">R$ 0,00</div>
+          </div>
+          <div class="card-surface p-3">
+            <div class="text-[11px] text-gray-400 font-semibold">Retorno Total (%)</div>
+            <div class="text-lg font-bold text-white font-mono" id="sim-kpi-return">0.0%</div>
+          </div>
+          <div class="card-surface p-3">
+            <div class="text-[11px] text-gray-400 font-semibold" id="sim-kpi-label-aux">Win Rate / Acertos</div>
+            <div class="text-lg font-bold text-fintech-green font-mono" id="sim-kpi-winrate">0.0%</div>
+          </div>
+          <div class="card-surface p-3">
+            <div class="text-[11px] text-gray-400 font-semibold">Max Drawdown</div>
+            <div class="text-lg font-bold text-rose-400 font-mono" id="sim-kpi-drawdown">0.0%</div>
+          </div>
+        </div>
+
+        <!-- Simulation Curve Chart -->
+        <div class="card-surface p-4">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-xs font-bold text-gray-200">📈 Curva de Patrimônio & Evolução de Capital</h3>
+            <span class="text-[10px] text-gray-400 font-mono" id="sim-curve-legend-info">Mark-to-market em tempo real</span>
+          </div>
+          <div id="plot-simulation-curve" style="height: 400px;"></div>
+        </div>
+
+        <!-- Cycle Trades Detailed Log Table -->
+        <div class="card-surface p-4" id="sim-trades-card">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-xs font-bold text-gray-200 flex items-center gap-1.5">
+              <span>📋</span> Histórico de Trades Executados (Compra ➔ Venda)
+            </h3>
+            <span class="text-[10px] text-gray-400 font-mono" id="sim-trades-count-badge">0 trades</span>
+          </div>
+          <div class="overflow-x-auto max-h-80">
+            <table class="w-full text-left text-xs text-gray-300">
+              <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[10px] sticky top-0">
+                <tr>
+                  <th class="px-2.5 py-2 text-center">#</th>
+                  <th class="px-2.5 py-2">Estratégia Compra</th>
+                  <th class="px-2.5 py-2 font-mono">Data Compra</th>
+                  <th class="px-2.5 py-2 font-mono">Preço Compra</th>
+                  <th class="px-2.5 py-2">Estratégia Venda</th>
+                  <th class="px-2.5 py-2 font-mono">Data Venda</th>
+                  <th class="px-2.5 py-2 font-mono">Preço Venda</th>
+                  <th class="px-2.5 py-2 text-center font-mono">Duração</th>
+                  <th class="px-2.5 py-2 font-mono">Retorno (%)</th>
+                  <th class="px-2.5 py-2 font-mono">Resultado (R$)</th>
+                  <th class="px-2.5 py-2 text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody id="sim-trades-table-body" class="divide-y divide-fintech-border font-mono">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 4: PLAYBOOK & GUIA EXECUTIVO           -->
+    <!-- ========================================== -->
+    <section id="tab-playbook" class="tab-view hidden h-full p-4 overflow-y-auto">
+      <div class="max-w-5xl mx-auto space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <span>📘</span> Playbook Institucional: Catálogo das 48 Estratégias
+          </h2>
+          <p class="text-xs text-gray-400">Diretrizes quantitativas, lógica matemática de entrada e gestão de risco para compras em fundos e vendas em topos.</p>
+        </div>
+
+        <div class="card-surface p-4 space-y-4">
+          <h3 class="text-sm font-bold text-fintech-cyan flex items-center gap-2 border-b border-fintech-border pb-2">
+            <span>⚡</span> Grupo 1: Estratégias Proprietárias de Rompimento e Negação (2x2 Compra & Venda)
+          </h3>
+          <p class="text-xs text-gray-300 leading-relaxed">
+            Monitora rompimentos de suporte ou resistência e executa na reversão com confirmação de fechamento (Zero Look-Ahead Bias).
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div class="bg-fintech-bg p-3 rounded border border-fintech-border">
+              <span class="font-bold text-fintech-green block mb-1">🟢 Compra (Negação de Fundo):</span>
+              Violação da mínima de T-1 ou mínima de N barras, fechando de volta acima. Execução na Abertura de T+1 ou no reteste.
+            </div>
+            <div class="bg-fintech-bg p-3 rounded border border-fintech-border">
+              <span class="font-bold text-fintech-red block mb-1">🔴 Venda (Negação de Topo):</span>
+              Violação da máxima de T-1 ou máxima de N barras, fechando de volta abaixo. Execução na Abertura de T+1 ou no reteste.
+            </div>
+          </div>
+        </div>
+
+        <div class="card-surface p-4 space-y-4">
+          <h3 class="text-sm font-bold text-amber-400 flex items-center gap-2 border-b border-fintech-border pb-2">
+            <span>🏛️</span> Grupo 2: Price Action Institucional (BOS & Wyckoff)
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div class="bg-fintech-bg p-3 rounded border border-fintech-border space-y-1.5">
+              <span class="font-bold text-white block">Fundo Duplo / Topo Duplo + BOS:</span>
+              <p class="text-gray-300">
+                Padrões de reversão estrutural com confirmação de rompimento do neckline intermediário (Break of Structure).
+              </p>
+            </div>
+            <div class="bg-fintech-bg p-3 rounded border border-fintech-border space-y-1.5">
+              <span class="font-bold text-white block">Wyckoff Spring & Upthrust (UTAD):</span>
+              <p class="text-gray-300">
+                Varredura de liquidez com rompimento falso de suporte (Spring) ou de resistência (Upthrust) com volume acima da média.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-surface p-4 space-y-4">
+          <h3 class="text-sm font-bold text-blue-400 flex items-center gap-2 border-b border-fintech-border pb-2">
+            <span>📊</span> Grupo 3: Alocação Quantitativa & Rebalanceamento
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div class="bg-fintech-bg p-3 rounded border border-fintech-border space-y-1">
+              <span class="font-bold text-white block">DCA Dinâmico / Excesso Estatístico:</span>
+              <p class="text-gray-300">Aumenta compras quando o preço cai além de 2 desvios padrão da SMA(200) ou RSI < 30. Sinaliza venda/realização parcial quando sobe além de 2 desvios padrão ou RSI > 70.</p>
+            </div>
+            <div class="bg-fintech-bg p-3 rounded border border-fintech-border space-y-1">
+              <span class="font-bold text-white block">Rebalanceamento de Carteira:</span>
+              <p class="text-gray-300">Rebalanceia peso da carteira entre Renda Fixa e Renda Variável ao exceder a tolerância (+/- 5%), comprando na baixa e realizando no topo.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-surface p-4 space-y-4">
+          <h3 class="text-sm font-bold text-fintech-green flex items-center gap-2 border-b border-fintech-border pb-2">
+            <span>🕯️</span> Grupo 4: 28 Padrões Clássicos de Velas (MQL5 Vectorized)
+          </h3>
+          <p class="text-xs text-gray-300 leading-relaxed">
+            14 padrões de velas de fundo filtrados por tendência de baixa prévia (<code class="text-cyan-400">Close < SMA(20)</code>) e 14 padrões de velas de topo filtrados por tendência de alta prévia (<code class="text-cyan-400">Close > SMA(20)</code>), com execução estrita em Open[t+1].
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>

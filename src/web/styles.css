@@ -1,0 +1,174 @@
+/* FinTech Dark Styling and Custom CSS for Market Opportunity & Top/Bottom Statistical Engine Web Terminal */
+
+:root {
+  --bg-primary: #0B0E14;
+  --bg-surface: #151924;
+  --bg-surface-hover: #1c2230;
+  --border-color: #262B38;
+  --accent-cyan: #00F0FF;
+  --accent-cyan-hover: #00c8d6;
+  --accent-green: #00E676;
+  --accent-yellow: #FFD600;
+  --accent-red: #FF5252;
+  --text-main: #F0F4F8;
+  --text-muted: #8B98A5;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: #262B38;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3B4252;
+}
+
+/* Tabular Numbers */
+.font-mono, td, th, .tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-family: "JetBrains Mono", "SF Mono", Consolas, Menlo, monospace;
+}
+
+/* Glassmorphism & Cards */
+.card-surface {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+}
+
+/* Nav Tabs */
+.nav-tab-btn {
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-tab-btn:hover {
+  color: var(--text-main);
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.nav-tab-btn.active {
+  color: var(--accent-cyan);
+  border-bottom-color: var(--accent-cyan);
+  background-color: rgba(0, 240, 255, 0.05);
+}
+
+/* Direction Segmented Control */
+.dir-seg-btn {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 0.25rem;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.dir-seg-btn.active-buy {
+  background-color: rgba(0, 230, 118, 0.2);
+  color: #00E676;
+  border-color: rgba(0, 230, 118, 0.4);
+}
+
+.dir-seg-btn.active-sell {
+  background-color: rgba(255, 82, 82, 0.2);
+  color: #FF5252;
+  border-color: rgba(255, 82, 82, 0.4);
+}
+
+.dir-seg-btn.active-both {
+  background-color: rgba(0, 240, 255, 0.2);
+  color: #00F0FF;
+  border-color: rgba(0, 240, 255, 0.4);
+}
+
+/* Timing Status Badges */
+.badge-ideal {
+  background-color: rgba(0, 230, 118, 0.15);
+  color: #00E676;
+  border: 1px solid rgba(0, 230, 118, 0.3);
+}
+
+.badge-extended {
+  background-color: rgba(255, 214, 0, 0.15);
+  color: #FFD600;
+  border: 1px solid rgba(255, 214, 0, 0.3);
+}
+
+.badge-late {
+  background-color: rgba(255, 82, 82, 0.15);
+  color: #FF5252;
+  border: 1px solid rgba(255, 82, 82, 0.3);
+}
+
+/* Accordion Styling */
+.accordion-header {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s ease;
+}
+
+.accordion-header:hover {
+  background-color: var(--bg-surface-hover);
+}
+
+/* Switch & Checkbox styling */
+input[type="checkbox"] {
+  accent-color: var(--accent-cyan);
+  cursor: pointer;
+}
+
+/* Lightweight charts container */
+#tv-chart-container {
+  width: 100%;
+  height: 480px;
+  min-height: 480px;
+  position: relative;
+}
+
+/* Plotly charts containers */
+#plot-ranking,
+#plot-scatter {
+  width: 100%;
+  height: 380px;
+  min-height: 380px;
+  position: relative;
+}
+
+/* Loading overlay */
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(11, 14, 20, 0.85);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  transition: opacity 0.2s ease;
+}
