@@ -36,9 +36,9 @@ description: "Task list for feature 007: Multi-Buy Cycle Trade, Light Theme & En
 ### Testes & Implementação da História 1
 
 - [X] T003 [US1] Criar teste unitário em `tests/unit/test_accumulation.py` (`test_simulate_cycle_trade_multi_buy`) cobrindo 3 compras consecutivas e 1 venda, validando cotas acumuladas, preço médio ponderado e PnL consolidado.
-- [ ] T004 [US1] Implementar a máquina de estados de múltiplas compras em `simulate_cycle_trade` dentro de `src/evaluator/accumulation_simulator.py`, permitindo compras subsequentes quando `in_pos == True`, calculando `average_buy_price = total_invested / total_shares`.
-- [ ] T005 [US1] Implementar a liquidação unificada de todas as cotas acumuladas no primeiro sinal de venda confirmado (`SELL`) em `src/evaluator/accumulation_simulator.py`, calculando retorno sobre o preço médio ponderado e marcando o ciclo como `"FECHADO"`.
-- [ ] T006 [US1] Tratar ciclo que permanece aberto na última barra do histórico em `src/evaluator/accumulation_simulator.py`, marcando como `"ABERTO"` e computando valor a mercado flutuante com base em `Close[-1]`.
+- [X] T004 [US1] Implementar a máquina de estados de múltiplas compras em `simulate_cycle_trade` dentro de `src/evaluator/accumulation_simulator.py`, permitindo compras subsequentes quando `in_pos == True`, calculando `average_buy_price = total_invested / total_shares`.
+- [X] T005 [US1] Implementar a liquidação unificada de todas as cotas acumuladas no primeiro sinal de venda confirmado (`SELL`) em `src/evaluator/accumulation_simulator.py`, calculando retorno sobre o preço médio ponderado e marcando o ciclo como `"FECHADO"`.
+- [X] T006 [US1] Tratar ciclo que permanece aberto na última barra do histórico em `src/evaluator/accumulation_simulator.py`, marcando como `"ABERTO"` e computando valor a mercado flutuante com base em `Close[-1]`.
 - [ ] T007 [US1] Integrar o parâmetro `contribution_amount` e o parsing das múltiplas compras no endpoint `/api/simulate` em `src/api/app.py`.
 
 ---

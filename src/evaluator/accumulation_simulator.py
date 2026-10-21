@@ -112,15 +112,17 @@ def simulate_cycle_trade(
     series: OHLCVSeries,
     signals: List[SignalRecord],
     initial_capital: float = 1000.0,
+    contribution_amount: Optional[float] = None,
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,
     strategy_labels_map: Optional[Dict[str, str]] = None,
 ) -> CycleSimulationResult:
     """
-    Executes a complete Cycle/Swing Trade simulation:
-    - Enters LONG on a BUY signal when FLAT.
-    - Exits LONG on the next chronological SELL signal when IN POSITION.
-    - Compounds capital from trade to trade.
+    Executes a complete Cycle/Swing Trade simulation with Multi-Buy support:
+    - Enters LONG on a BUY signal.
+    - If already in position, any subsequent confirmed BUY signal accumulates shares
+      (adding contribution_amount or initial_capital to total invested and recalculating weighted average price).
+    - Exits LONG completely on the next chronological SELL signal, liquidating 100% of accumulated shares.
     - Marks any trailing open trade as ABERTO evaluated at Close[-1].
     - Constructs continuous bar-by-bar mark-to-market equity curve and calculates drawdown.
     """
@@ -184,9 +186,12 @@ def simulate_cycle_trade(
     trades: List[TradeRecord] = []
     trade_counter = 0
 
+    cumulative_invested = float(initial_capital)
+    subsequent_contribution = float(contribution_amount) if contribution_amount is not None and contribution_amount > 0 else float(initial_capital)
+
     n_timeline = len(timeline_idx)
     timeline_equity = np.zeros(n_timeline, dtype=np.float64)
-    timeline_invested = np.full(n_timeline, initial_capital, dtype=np.float64)
+    timeline_invested = np.zeros(n_timeline, dtype=np.float64)
 
     for i, orig_bar in enumerate(timeline_idx):
         sigs = signals_by_bar.get(orig_bar, [])
@@ -194,15 +199,18 @@ def simulate_cycle_trade(
 
         # 1. If currently in position, check for SELL signals executing at this bar
         if in_pos and open_trade is not None:
-            sells = [s for s in sigs if s.direction == "SELL" and orig_bar > open_trade.buy_bar_index]
+            # Must strictly execute after the last buy entry bar
+            last_buy_bar = open_trade.buy_entries[-1].bar_index if open_trade.buy_entries else open_trade.buy_bar_index
+            sells = [s for s in sigs if s.direction == "SELL" and orig_bar > last_buy_bar]
             if sells:
                 sell_sig = sells[0]
                 p_sell = float(sell_sig.execution_price)
                 if p_sell > 0:
                     exit_cap = shares * p_sell
-                    ret_pct = ((p_sell - open_trade.buy_price) / open_trade.buy_price) * 100.0
-                    pnl = exit_cap - open_trade.entry_capital
-                    cash = exit_cap
+                    avg_p = open_trade.average_buy_price if open_trade.average_buy_price > 0 else open_trade.buy_price
+                    ret_pct = ((p_sell - avg_p) / avg_p) * 100.0
+                    pnl = exit_cap - open_trade.total_invested
+                    cash += exit_cap
 
                     open_trade.sell_strategy_sub_id = sell_sig.strategy_sub_id
                     open_trade.sell_strategy_label = labels_map.get(sell_sig.strategy_sub_id, sell_sig.strategy_sub_id)
@@ -220,18 +228,33 @@ def simulate_cycle_trade(
                     shares = 0.0
                     in_pos = False
 
-        # 2. If not in position, check for BUY signals executing at this bar
-        if not in_pos and cash > 0:
-            buys = [s for s in sigs if s.direction == "BUY"]
-            if buys:
-                buy_sig = buys[0]
+        # 2. Check for BUY signals executing at this bar
+        buys = [s for s in sigs if s.direction == "BUY"]
+        if buys:
+            for buy_sig in buys:
                 p_buy = float(buy_sig.execution_price)
-                if p_buy > 0:
+                if p_buy <= 0:
+                    continue
+
+                if not in_pos:
+                    # Initial buy starting a new cycle: use current compounded cash if available, else initial_capital
                     trade_counter += 1
-                    entry_cap = cash
-                    shares = cash / p_buy
+                    entry_cap = cash if cash > 0 else float(initial_capital)
+                    new_shares = entry_cap / p_buy
+                    shares = new_shares
                     cash = 0.0
                     in_pos = True
+
+                    first_entry = BuyEntryRecord(
+                        entry_id=1,
+                        date=bar_date_str,
+                        bar_index=int(orig_bar),
+                        price=round(p_buy, 2),
+                        shares=round(new_shares, 4),
+                        capital=round(entry_cap, 2),
+                        strategy_sub_id=buy_sig.strategy_sub_id,
+                        strategy_label=labels_map.get(buy_sig.strategy_sub_id, buy_sig.strategy_sub_id),
+                    )
 
                     open_trade = TradeRecord(
                         trade_id=int(trade_counter),
@@ -243,19 +266,55 @@ def simulate_cycle_trade(
                         shares=round(shares, 4),
                         entry_capital=round(entry_cap, 2),
                         status="ABERTO",
+                        buy_entries=[first_entry],
+                        num_entries=1,
+                        average_buy_price=round(p_buy, 4),
+                        total_invested=round(entry_cap, 2),
+                        total_shares=round(shares, 4),
                     )
+                else:
+                    # Subsequent buy accumulating into active cycle
+                    add_cap = subsequent_contribution
+                    new_shares = add_cap / p_buy
+                    shares += new_shares
+                    cumulative_invested += add_cap
+                    cash = max(0.0, cash - add_cap)
+
+                    sub_entry = BuyEntryRecord(
+                        entry_id=len(open_trade.buy_entries) + 1 if open_trade.buy_entries else 2,
+                        date=bar_date_str,
+                        bar_index=int(orig_bar),
+                        price=round(p_buy, 2),
+                        shares=round(new_shares, 4),
+                        capital=round(add_cap, 2),
+                        strategy_sub_id=buy_sig.strategy_sub_id,
+                        strategy_label=labels_map.get(buy_sig.strategy_sub_id, buy_sig.strategy_sub_id),
+                    )
+
+                    if open_trade.buy_entries is None:
+                        open_trade.buy_entries = []
+                    open_trade.buy_entries.append(sub_entry)
+                    open_trade.num_entries = len(open_trade.buy_entries)
+                    open_trade.total_shares = round(shares, 4)
+                    open_trade.shares = round(shares, 4)
+                    open_trade.total_invested = round(open_trade.total_invested + add_cap, 2)
+                    open_trade.entry_capital = open_trade.total_invested
+                    open_trade.average_buy_price = round(open_trade.total_invested / open_trade.total_shares, 4)
+                    open_trade.buy_price = open_trade.average_buy_price
 
         # 3. Mark-to-market equity at bar i
         c_price = float(close_sliced[i])
         cur_eq = cash + (shares * c_price)
         timeline_equity[i] = cur_eq
+        timeline_invested[i] = cumulative_invested
 
     # 4. Handle still open trade at end of timeline
     last_close = float(series.close[timeline_idx[-1]])
     if in_pos and open_trade is not None:
         cur_val = shares * last_close
-        ret_pct = ((last_close - open_trade.buy_price) / open_trade.buy_price) * 100.0
-        pnl = cur_val - open_trade.entry_capital
+        avg_p = open_trade.average_buy_price if open_trade.average_buy_price > 0 else open_trade.buy_price
+        ret_pct = ((last_close - avg_p) / avg_p) * 100.0
+        pnl = cur_val - open_trade.total_invested
 
         open_trade.sell_strategy_sub_id = None
         open_trade.sell_strategy_label = "Posição Aberta a Mercado"
