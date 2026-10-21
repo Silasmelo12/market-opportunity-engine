@@ -58,14 +58,14 @@
 
 **Independent Test**: `pytest tests/test_radar_pagination.py`; abrir o radar 2x — a segunda abertura retorna `cached: true` em ≤ 1s.
 
-- [ ] T019 [P] [US4] Testes em `tests/test_radar_pagination.py` (TestClient, `_scan_single_ticker` mockado): envelope `RadarPage`, ≤ page_size ativos, página fora do range → `items` vazio, filtro de direção/estratégias, `REDIS_URL` inválida → 200
-- [ ] T020 [US4] Criar `src/api/cache.py` com a classe `DailyCache` (`get(key)`, `set(key, value, ttl=93600)`, `backend` = "redis"|"disk"); Redis via `REDIS_URL` com `socket_timeout=0.5`; qualquer exceção → fallback memória+disco em `.cache/radar`
-- [ ] T021 [US4] Adicionar o modelo `RadarPage` em `src/api/schemas.py` conforme data-model.md
-- [ ] T022 [US4] Envolver `_scan_single_ticker` em `src/api/server.py` com o cache por ticker, chave `radar:v6:{interval}:{horizon}:{ticker}:{last_bar_date}`
-- [ ] T023 [US4] Refatorar `GET /api/radar` em `src/api/server.py` com params `page`, `page_size`, `direction`, `strategies`: fatiar a cesta, escanear só a página (ThreadPool), filtrar, ordenar por timing e retornar `RadarPage` (contracts/radar-api.md)
-- [ ] T024 [US4] Adicionar `cache_backend` em `GET /api/health` em `src/api/server.py`
-- [ ] T025 [US4] Pré-aquecer em background thread no startup a categoria `featured` (página 1) em `src/api/server.py`
-- [ ] T026 [US4] Consumir `RadarPage` em `src/web/app.js` (ler `items`, enviar `page/page_size/direction/strategies`) e adicionar controles Anterior/Próxima + "Página X de Y" em `src/web/index.html`; mostrar "Nenhuma oportunidade encontrada" e ocultar a paginação quando vazio
+- [X] T019 [P] [US4] Testes em `tests/test_radar_pagination.py` (TestClient, `_scan_single_ticker` mockado): envelope `RadarPage`, ≤ page_size ativos, página fora do range → `items` vazio, filtro de direção/estratégias, `REDIS_URL` inválida → 200
+- [X] T020 [US4] Criar `src/api/cache.py` com a classe `DailyCache` (`get(key)`, `set(key, value, ttl=93600)`, `backend` = "redis"|"disk"); Redis via `REDIS_URL` com `socket_timeout=0.5`; qualquer exceção → fallback memória+disco em `.cache/radar`
+- [X] T021 [US4] Adicionar o modelo `RadarPage` em `src/api/schemas.py` conforme data-model.md
+- [X] T022 [US4] Envolver `_scan_single_ticker` em `src/api/server.py` com o cache por ticker, chave `radar:v6:{interval}:{horizon}:{ticker}:{last_bar_date}`
+- [X] T023 [US4] Refatorar `GET /api/radar` em `src/api/server.py` com params `page`, `page_size`, `direction`, `strategies`: fatiar a cesta, escanear só a página (ThreadPool), filtrar, ordenar por timing e retornar `RadarPage` (contracts/radar-api.md)
+- [X] T024 [US4] Adicionar `cache_backend` em `GET /api/health` em `src/api/server.py`
+- [X] T025 [US4] Pré-aquecer em background thread no startup a categoria `featured` (página 1) em `src/api/server.py`
+- [X] T026 [US4] Consumir `RadarPage` em `src/web/app.js` (ler `items`, enviar `page/page_size/direction/strategies`) e adicionar controles Anterior/Próxima + "Página X de Y" em `src/web/index.html`; mostrar "Nenhuma oportunidade encontrada" e ocultar a paginação quando vazio
 
 ---
 

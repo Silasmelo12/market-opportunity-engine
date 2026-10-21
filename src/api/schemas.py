@@ -128,6 +128,17 @@ class RadarItem(BaseModel):
     advice_text: str
 
 
+class RadarPage(BaseModel):
+    items: List[RadarItem]
+    page: int
+    page_size: int
+    total_assets: int
+    total_pages: int
+    direction: str = "BUY"
+    strategies: List[str] = []
+    cached: bool = False
+
+
 # 3. Models for /api/simulate
 
 class SimulateRequest(BaseModel):

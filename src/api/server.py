@@ -28,6 +28,7 @@ from ..evaluator import (
     optimize_strategy_pairs,
 )
 from ..ui.theme import STRATEGY_LABELS_PT, get_friendly_label, get_asset_name, ASSET_NAMES_PT
+from .cache import daily_cache
 from .schemas import (
     sanitize_val,
     AnalyzeResponse,
@@ -37,6 +38,7 @@ from .schemas import (
     StrategySummaryItem,
     TimingStatusModel,
     RadarItem,
+    RadarPage,
     SimulateRequest,
     SimulateResponse,
     AccumulationPoint,
@@ -60,6 +62,23 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.on_event("startup")
+def _prewarm_featured_radar():
+    """Background pre-warm for featured basket page 1 to ensure instant UI loading."""
+    import threading
+    def _worker():
+        try:
+            # Prewarm featured basket
+            for ticker, cat in TICKERS_FEATURED[:20]:
+                _scan_single_ticker(ticker, cat, interval="1d", horizon_x=60, refresh=False)
+        except Exception:
+            pass
+
+    t = threading.Thread(target=_worker, daemon=True)
+    t.start()
+
 
 # In-memory TTL Cache
 _CACHE_DATA: Dict[str, Dict[str, Any]] = {}
@@ -129,7 +148,11 @@ def _get_group_id(sub_id: str) -> str:
 
 @app.get("/api/health")
 def health_check():
-    return {"status": "ok", "version": "4.0.0"}
+    return {
+        "status": "ok",
+        "version": "4.0.0",
+        "cache_backend": daily_cache.backend,
+    }
 
 
 @app.get("/api/strategies")
@@ -576,7 +599,7 @@ def _normalize_category(cat: Optional[str]) -> str:
     return c
 
 
-def _scan_single_ticker(ticker: str, category: str, interval: str = "1d", horizon_x: int = 60) -> List[RadarItem]:
+def _scan_single_ticker(ticker: str, category: str, interval: str = "1d", horizon_x: int = 60, refresh: bool = False) -> List[RadarItem]:
     items: List[RadarItem] = []
     try:
         series = DataLoader.load_asset_data(ticker=ticker, interval=interval, period="2y", use_cache=True)
@@ -585,6 +608,14 @@ def _scan_single_ticker(ticker: str, category: str, interval: str = "1d", horizo
 
     if series.length < 20:
         return items
+
+    last_ts = int(series.timestamps[-1]) if len(series.timestamps) > 0 else 0
+    cache_key = f"radar:v6:{interval}:{horizon_x}:{ticker}:{last_ts}"
+
+    if not refresh:
+        cached_items = daily_cache.get(cache_key)
+        if cached_items is not None:
+            return [RadarItem(**it) for it in cached_items]
 
     current_price = float(series.close[-1])
     catalog = StrategyCatalog(lookback_n=10, retest_window_m=5, tolerance_pct=0.005)
@@ -761,28 +792,26 @@ def _scan_single_ticker(ticker: str, category: str, interval: str = "1d", horizo
             )
 
     items = buy_items + sell_items
+    # Store ticker scan in daily cache
+    try:
+        daily_cache.set(cache_key, [item.model_dump() for item in items])
+    except Exception:
+        pass
     return items
 
 
-@app.get("/api/radar", response_model=List[RadarItem])
+@app.get("/api/radar", response_model=RadarPage)
 def scan_radar(
     interval: str = Query("1d", description="Timeframe"),
     horizon_x: int = Query(60, description="Evaluation horizon"),
     category: Optional[str] = Query("featured", description="Category filter (featured, acoes_br, fiis, usa, commodities, fx, crypto, all)"),
     refresh: bool = Query(False, description="Force fresh download"),
+    page: int = Query(1, ge=1, description="Page number (1-based)"),
+    page_size: int = Query(20, ge=1, le=100, description="Page size"),
+    direction: str = Query("BUY", description="Direction filter: BUY | SELL | BOTH"),
+    strategies: str = Query("", description="CSV of strategy_sub_id filters. Empty means all."),
 ):
     norm_cat = _normalize_category(category)
-    cache_key = f"radar:{interval}:{horizon_x}:{norm_cat}"
-    if not refresh:
-        # 1. Check in-memory cache
-        cached_mem = _get_cache(cache_key)
-        if cached_mem:
-            return cached_mem
-        # 2. Check persistent disk cache (survives container restarts)
-        cached_disk = _get_radar_disk_cache(cache_key)
-        if cached_disk:
-            _set_cache(cache_key, cached_disk)
-            return cached_disk
 
     if norm_cat == "featured":
         basket = TICKERS_FEATURED
@@ -801,23 +830,64 @@ def scan_radar(
     else:
         basket = DEFAULT_SCANNER_BASKET
 
-    all_opportunities: List[RadarItem] = []
-    # Dynamic worker pool: 8-12 workers to prevent thread contention on small server tier
-    max_workers = min(12, max(1, len(basket)))
+    total_assets = len(basket)
+    total_pages = max(1, (total_assets + page_size - 1) // page_size)
+
+    # If requested page is beyond total_pages, return empty page immediately
+    if page > total_pages:
+        return RadarPage(
+            items=[],
+            page=page,
+            page_size=page_size,
+            total_assets=total_assets,
+            total_pages=total_pages,
+            direction=direction,
+            strategies=[s.strip() for s in strategies.split(",") if s.strip()],
+            cached=False,
+        )
+
+    # Slice only the tickers belonging to this page (prevents computing entire universe!)
+    start_idx = (page - 1) * page_size
+    end_idx = min(start_idx + page_size, total_assets)
+    page_basket = basket[start_idx:end_idx]
+
+    # Parse strategy filters
+    strat_filter_list = [s.strip() for s in strategies.split(",") if s.strip()]
+    strat_filter_set = set(strat_filter_list) if strat_filter_list else None
+
+    # Scan the sliced basket in parallel
+    page_opportunities: List[RadarItem] = []
+    max_workers = min(12, max(1, len(page_basket)))
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = [
-            executor.submit(_scan_single_ticker, ticker, cat, interval, horizon_x)
-            for ticker, cat in basket
+            executor.submit(_scan_single_ticker, ticker, cat, interval, horizon_x, refresh)
+            for ticker, cat in page_basket
         ]
         for f in futures:
-            all_opportunities.extend(f.result())
+            page_opportunities.extend(f.result())
+
+    # Direction and Strategy filtering
+    filtered_items: List[RadarItem] = []
+    for item in page_opportunities:
+        if direction.upper() != "BOTH" and item.direction.upper() != direction.upper():
+            continue
+        if strat_filter_set and item.strategy_sub_id not in strat_filter_set:
+            continue
+        filtered_items.append(item)
 
     priority_order = {"IDEAL": 0, "EXTENDED": 1, "LATE": 2}
-    all_opportunities.sort(key=lambda x: (priority_order.get(x.timing_category, 3), x.distance_pct))
+    filtered_items.sort(key=lambda x: (priority_order.get(x.timing_category, 3), x.distance_pct))
 
-    # Save to both memory and persistent disk cache
-    _set_cache(cache_key, all_opportunities)
-    _set_radar_disk_cache(cache_key, all_opportunities)
+    return RadarPage(
+        items=filtered_items,
+        page=page,
+        page_size=page_size,
+        total_assets=total_assets,
+        total_pages=total_pages,
+        direction=direction,
+        strategies=strat_filter_list,
+        cached=(daily_cache.backend != "none"),
+    )
     return all_opportunities
 
 

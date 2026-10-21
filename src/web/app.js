@@ -11,11 +11,16 @@ window.appState = {
   radarTimeframe: '1d',
   radarActiveCategory: 'featured',
   radarCategoryCache: {},
+  radarPage: 1,
+  radarPageSize: 20,
+  radarTotalPages: 1,
+  radarTotalAssets: 0,
+  radarStrategies: new Set(),
   lookbackN: 10,
   retestM: 5,
   horizonX: 60,
   activeTab: 'tab-radar',
-  activeDirection: 'BOTH', // 'BOTH' (default) | 'BUY' | 'SELL'
+  activeDirection: 'BUY', // 'BUY' (default as per spec) | 'SELL' | 'BOTH'
   analysisData: null,
   activeStrategies: new Set([]), // Start completely unchecked by default
   chart: null,
@@ -316,6 +321,25 @@ document.addEventListener('DOMContentLoaded', () => {
   elements.btnRadarRescan.addEventListener('click', () => {
     loadRadarData(true, state.radarActiveCategory);
   });
+
+  const btnRadarPrev = document.getElementById('btn-radar-prev');
+  const btnRadarNext = document.getElementById('btn-radar-next');
+  if (btnRadarPrev) {
+    btnRadarPrev.addEventListener('click', () => {
+      if (state.radarPage > 1) {
+        state.radarPage -= 1;
+        loadRadarData(false, state.radarActiveCategory);
+      }
+    });
+  }
+  if (btnRadarNext) {
+    btnRadarNext.addEventListener('click', () => {
+      if (state.radarPage < state.radarTotalPages) {
+        state.radarPage += 1;
+        loadRadarData(false, state.radarActiveCategory);
+      }
+    });
+  }
 });
 
 // UI: Direction Selector (Compra, Venda, Ambos)
@@ -663,30 +687,35 @@ function initTradingViewChart() {
   }
 }
 
-// API: Radar Data (On-Demand & In-Memory Instant Cache)
+// API: Radar Data (Paged, Cached, with Server/Client direction and strategy filtering)
 async function loadRadarData(forceRefresh = false, category = null) {
   const tf = state.radarTimeframe || '1d';
   const cat = category || state.radarActiveCategory || 'featured';
-  const cacheKey = `${tf}_${cat}`;
+  const page = state.radarPage || 1;
+  const pageSize = state.radarPageSize || 20;
+  const dir = state.activeDirection || 'BUY';
+  const stratCsv = state.radarStrategies ? Array.from(state.radarStrategies).join(',') : '';
 
-  // Instant render from client memory if already cached and not refreshing
+  const cacheKey = `${tf}_${cat}_p${page}_${dir}_${stratCsv}`;
+
   if (!forceRefresh && state.radarCategoryCache && state.radarCategoryCache[cacheKey]) {
-    state.lastRadarData = state.radarCategoryCache[cacheKey];
-    renderRadarTable(state.lastRadarData);
+    const cachedPage = state.radarCategoryCache[cacheKey];
+    state.lastRadarPage = cachedPage;
+    renderRadarTable(cachedPage);
     return;
   }
 
   const catLabel = cat === 'featured' ? 'Destaques' : (cat === 'all' ? 'Todos os Ativos' : cat);
-  showLoading(`Varrendo ${catLabel} (${tf.toUpperCase()})...`);
+  showLoading(`Varrendo ${catLabel} - Página ${page} (${tf.toUpperCase()})...`);
   try {
-    const url = `/api/radar?interval=${tf}&horizon_x=60&category=${encodeURIComponent(cat)}&refresh=${forceRefresh}`;
+    const url = `/api/radar?interval=${tf}&horizon_x=60&category=${encodeURIComponent(cat)}&refresh=${forceRefresh}&page=${page}&page_size=${pageSize}&direction=${encodeURIComponent(dir)}&strategies=${encodeURIComponent(stratCsv)}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-    const data = await res.json();
+    const pageData = await res.json();
     if (!state.radarCategoryCache) state.radarCategoryCache = {};
-    state.radarCategoryCache[cacheKey] = data;
-    state.lastRadarData = data;
-    renderRadarTable(data);
+    state.radarCategoryCache[cacheKey] = pageData;
+    state.lastRadarPage = pageData;
+    renderRadarTable(pageData);
   } catch (err) {
     console.error('Erro ao carregar radar:', err);
   } finally {
@@ -694,7 +723,35 @@ async function loadRadarData(forceRefresh = false, category = null) {
   }
 }
 
-function renderRadarTable(items) {
+function updateRadarPagination(pageData) {
+  const pagContainer = document.getElementById('radar-pagination-container');
+  const pagInfo = document.getElementById('radar-pagination-info');
+  const btnPrev = document.getElementById('btn-radar-prev');
+  const btnNext = document.getElementById('btn-radar-next');
+  if (!pagInfo || !btnPrev || !btnNext) return;
+
+  state.radarPage = pageData.page;
+  state.radarTotalPages = pageData.total_pages;
+  state.radarTotalAssets = pageData.total_assets;
+
+  pagInfo.textContent = `Página ${pageData.page} de ${pageData.total_pages} (${pageData.total_assets} ativos no universo)`;
+  btnPrev.disabled = (pageData.page <= 1);
+  btnNext.disabled = (pageData.page >= pageData.total_pages);
+
+  if (pagContainer) {
+    if (!pageData.items || pageData.items.length === 0) {
+      pagContainer.classList.add('hidden');
+    } else {
+      pagContainer.classList.remove('hidden');
+    }
+  }
+}
+
+function renderRadarTable(pageOrItems) {
+  const items = Array.isArray(pageOrItems) ? pageOrItems : (pageOrItems ? pageOrItems.items : []);
+  if (pageOrItems && pageOrItems.total_pages !== undefined) {
+    updateRadarPagination(pageOrItems);
+  }
   elements.radarTableBody.innerHTML = '';
   if (!items || items.length === 0) {
     elements.radarTableBody.innerHTML = `

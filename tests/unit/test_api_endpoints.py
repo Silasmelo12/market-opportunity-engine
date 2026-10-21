@@ -43,7 +43,8 @@ def test_api_radar():
     res = client.get("/api/radar?interval=1d&horizon_x=30")
     assert res.status_code == 200
     data = res.json()
-    assert isinstance(data, list)
+    assert "items" in data
+    assert isinstance(data["items"], list)
 
 
 def test_api_radar_categories():
@@ -51,8 +52,9 @@ def test_api_radar_categories():
     res = client.get("/api/radar?interval=1d&category=crypto")
     assert res.status_code == 200
     data = res.json()
-    assert isinstance(data, list)
-    for item in data:
+    assert "items" in data
+    assert isinstance(data["items"], list)
+    for item in data["items"]:
         assert item["category"] == "Criptomoedas"
 
 
@@ -130,8 +132,9 @@ def test_asset_names_and_radar_items():
     res = client.get("/api/radar?interval=1d&category=crypto")
     assert res.status_code == 200
     data = res.json()
-    assert len(data) > 0
-    for item in data:
+    assert "items" in data
+    assert len(data["items"]) > 0
+    for item in data["items"]:
         assert "asset_name" in item
         assert item["asset_name"] is not None
         assert len(item["asset_name"]) > 0
