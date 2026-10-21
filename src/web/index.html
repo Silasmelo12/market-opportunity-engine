@@ -998,31 +998,35 @@
           </div>
         </div>
 
-        <!-- KPI Cards -->
+        <!-- Institutional KPI Cards -->
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3" id="sim-kpi-container">
           <div class="card-surface p-2.5 sm:p-3">
-            <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold" id="sim-kpi-label-invested">Capital Inicial</div>
+            <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold" id="sim-kpi-label-invested">Capital Investido</div>
             <div class="text-base sm:text-lg font-bold text-white font-mono" id="sim-kpi-invested">R$ 0,00</div>
           </div>
           <div class="card-surface p-2.5 sm:p-3">
-            <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Saldo Final Carteira</div>
+            <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Patrimônio Final</div>
             <div class="text-base sm:text-lg font-bold text-fintech-green font-mono" id="sim-kpi-final">R$ 0,00</div>
           </div>
           <div class="card-surface p-2.5 sm:p-3">
-            <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Lucro Líquido</div>
-            <div class="text-base sm:text-lg font-bold text-fintech-cyan font-mono" id="sim-kpi-profit">R$ 0,00</div>
+            <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Retorno Estratégia</div>
+            <div class="text-base sm:text-lg font-bold text-fintech-cyan font-mono" id="sim-kpi-return">0.0%</div>
+            <div class="text-[9px] text-gray-400 font-mono" id="sim-kpi-bnh-sub">B&H: 0.0%</div>
           </div>
           <div class="card-surface p-2.5 sm:p-3">
-            <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Retorno Total (%)</div>
-            <div class="text-base sm:text-lg font-bold text-white font-mono" id="sim-kpi-return">0.0%</div>
+            <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Fator de Lucro</div>
+            <div class="text-base sm:text-lg font-bold text-amber-400 font-mono" id="sim-kpi-profit-factor">0.00</div>
+            <div class="text-[9px] text-gray-400 font-mono" id="sim-kpi-profit-sub">Lucro: R$ 0,00</div>
           </div>
           <div class="card-surface p-2.5 sm:p-3">
-            <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold" id="sim-kpi-label-aux">Win Rate / Acertos</div>
-            <div class="text-base sm:text-lg font-bold text-fintech-green font-mono" id="sim-kpi-winrate">0.0%</div>
+            <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold" id="sim-kpi-label-aux">Taxa de Acerto (Win Rate)</div>
+            <div class="text-base sm:text-lg font-bold text-emerald-400 font-mono" id="sim-kpi-winrate">0.0%</div>
+            <div class="text-[9px] text-gray-400 font-mono" id="sim-kpi-trades-sub">0 trades</div>
           </div>
           <div class="card-surface p-2.5 sm:p-3">
-            <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Max Drawdown</div>
+            <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Drawdown Máximo</div>
             <div class="text-base sm:text-lg font-bold text-rose-400 font-mono" id="sim-kpi-drawdown">0.0%</div>
+            <div class="text-[9px] text-gray-400 font-mono" id="sim-kpi-avg-entries-sub">Média compras: 1.0</div>
           </div>
         </div>
 
@@ -1050,8 +1054,9 @@
                 <tr>
                   <th class="px-2.5 py-2 text-center">#</th>
                   <th class="px-2.5 py-2">Estratégia Compra</th>
-                  <th class="px-2.5 py-2 font-mono">Data Compra</th>
-                  <th class="px-2.5 py-2 font-mono">Preço Compra</th>
+                  <th class="px-2.5 py-2 text-center font-mono">Compras</th>
+                  <th class="px-2.5 py-2 font-mono">Data 1ª Compra</th>
+                  <th class="px-2.5 py-2 font-mono">Preço Médio</th>
                   <th class="px-2.5 py-2">Estratégia Venda</th>
                   <th class="px-2.5 py-2 font-mono">Data Venda</th>
                   <th class="px-2.5 py-2 font-mono">Preço Venda</th>

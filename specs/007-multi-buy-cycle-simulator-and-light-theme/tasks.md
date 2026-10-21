@@ -66,7 +66,7 @@ description: "Task list for feature 007: Multi-Buy Cycle Trade, Light Theme & En
 ### Implementação da História 3
 
 - [X] T011 [US3] Implementar o cálculo de métricas institucionais estendidas (`profit_factor`, `max_drawdown_pct`, `win_rate_pct`, `avg_entries_per_cycle`, `buy_and_hold_return_pct`) em `src/evaluator/accumulation_simulator.py`.
-- [ ] T012 [P] [US3] Redesenhar o layout do cabeçalho de resultados do simulador em `src/web/index.html`, criando cards KPI profissionais (Retorno Estratégia vs. Buy & Hold, Win Rate, Profit Factor, Drawdown Máximo, Preço Médio vs. Saída).
+- [X] T012 [P] [US3] Redesenhar o layout do cabeçalho de resultados do simulador em `src/web/index.html`, criando cards KPI profissionais (Retorno Estratégia vs. Buy & Hold, Win Rate, Profit Factor, Drawdown Máximo, Preço Médio vs. Saída).
 - [ ] T013 [US3] Atualizar a função de renderização do simulador em `src/web/app.js` para preencher os novos cards KPI institucionais e colorir comparativos com cores semânticas (verde/vermelho).
 - [ ] T014 [US3] Redesenhar a tabela de histórico de trades do simulador em `src/web/app.js` e `src/web/index.html`, incluindo badges de status ("FECHADO - LUCRO", "FECHADO - PREJUÍZO", "EM ABERTO"), preço médio de compra, quantidade de aportes no ciclo e visualizador de sub-entradas.
 
