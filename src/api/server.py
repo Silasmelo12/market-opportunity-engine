@@ -974,10 +974,12 @@ def simulate_accumulation_endpoint(req: SimulateRequest):
                     signals = [s for s in all_signals if s.strategy_sub_id in (selected_set | auto_sell_ids)]
 
         init_cap = req.initial_capital if req.initial_capital > 0 else req.contribution_amount
+        contrib_amount = req.contribution_amount if req.contribution_amount is not None else init_cap
         cycle_res = simulate_cycle_trade(
             series=series,
             signals=signals,
             initial_capital=init_cap,
+            contribution_amount=contrib_amount,
             start_date=req.start_date,
             end_date=req.end_date,
             strategy_labels_map=STRATEGY_LABELS_PT,
@@ -1000,6 +1002,20 @@ def simulate_accumulation_endpoint(req: SimulateRequest):
 
         trades_list = []
         for t in cycle_res.trades:
+            sub_entries_list = []
+            if t.buy_entries:
+                for be in t.buy_entries:
+                    sub_entries_list.append({
+                        "entry_id": be.entry_id,
+                        "date": be.date,
+                        "bar_index": be.bar_index,
+                        "price": be.price,
+                        "shares": be.shares,
+                        "capital": be.capital,
+                        "strategy_sub_id": be.strategy_sub_id,
+                        "strategy_label": be.strategy_label,
+                    })
+
             trades_list.append({
                 "trade_id": t.trade_id,
                 "buy_strategy": t.buy_strategy_label,
@@ -1017,6 +1033,11 @@ def simulate_accumulation_endpoint(req: SimulateRequest):
                 "entry_capital": t.entry_capital,
                 "exit_capital": t.exit_capital,
                 "status": t.status,
+                "num_entries": t.num_entries,
+                "average_buy_price": t.average_buy_price,
+                "total_invested": t.total_invested,
+                "total_shares": t.total_shares,
+                "buy_entries": sub_entries_list,
             })
 
         alpha_vs_bnh = cycle_res.return_on_capital_pct - cycle_res.buy_and_hold_return_pct
