@@ -239,9 +239,13 @@ def simulate_cycle_trade(
                     continue
 
                 if not in_pos:
-                    # Initial buy starting a new cycle: use current compounded cash if available, else initial_capital
+                    # Initial buy starting a new cycle:
+                    # Uses available cash (compounding capital), or injects initial_capital if starting flat
                     trade_counter += 1
                     entry_cap = cash if cash > 0 else float(initial_capital)
+                    if cash == 0.0:
+                        cumulative_invested += entry_cap
+
                     new_shares = entry_cap / p_buy
                     shares = new_shares
                     cash = 0.0
@@ -275,12 +279,21 @@ def simulate_cycle_trade(
                         total_shares=round(shares, 4),
                     )
                 else:
-                    # Subsequent buy accumulating into active cycle
+                    # Subsequent buy accumulating into active cycle:
+                    # Prefer debiting from cash if available. Only add to cumulative_invested if cash cannot cover.
                     add_cap = subsequent_contribution
+                    if cash >= add_cap:
+                        cash -= add_cap
+                    elif cash > 0:
+                        deficit = add_cap - cash
+                        cumulative_invested += deficit
+                        cash = 0.0
+                    else:
+                        cumulative_invested += add_cap
+                        cash = 0.0
+
                     new_shares = add_cap / p_buy
                     shares += new_shares
-                    cumulative_invested += add_cap
-                    cash = max(0.0, cash - add_cap)
 
                     sub_entry = BuyEntryRecord(
                         entry_id=len(open_trade.buy_entries) + 1 if open_trade.buy_entries else 2,
@@ -331,18 +344,8 @@ def simulate_cycle_trade(
         trades.append(open_trade)
 
     # 5. Compute summary metrics with exact K-buys generic capital accounting
-    # Base capital: if contributions are cumulative without compounding (reinvesting cash),
-    # total capital is initial_capital + all subsequent buy contributions across cycles.
-    # Otherwise, it's the peak capital deployed from the investor's balance.
-    final_eq = float(timeline_equity[-1]) if len(timeline_equity) > 0 else initial_capital
-    base_capital = float(initial_capital)
-    
-    # If the user performed additional contributions within cycles, base capital includes them
-    total_added_contributions = sum(
-        sum(be.capital for be in (t.buy_entries[1:] if t.buy_entries and len(t.buy_entries) > 1 else []))
-        for t in trades
-    )
-    total_invested_capital = base_capital + total_added_contributions
+    final_eq = float(timeline_equity[-1]) if len(timeline_equity) > 0 else cumulative_invested
+    total_invested_capital = float(cumulative_invested)
 
     net_profit = final_eq - total_invested_capital
     tot_ret_pct = ((final_eq / total_invested_capital) - 1.0) * 100.0 if total_invested_capital > 0 else 0.0
