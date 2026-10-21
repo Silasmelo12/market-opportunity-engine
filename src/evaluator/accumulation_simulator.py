@@ -119,6 +119,7 @@ def simulate_cycle_trade(
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,
     strategy_labels_map: Optional[Dict[str, str]] = None,
+    cycle_entry_mode: str = "multi_buy",
 ) -> CycleSimulationResult:
     """
     Executes a complete Cycle/Swing Trade simulation with Multi-Buy support:
@@ -280,6 +281,10 @@ def simulate_cycle_trade(
                         total_shares=round(shares, 4),
                     )
                 else:
+                    # In single_buy mode, ignore any subsequent buys while already in position
+                    if cycle_entry_mode == "single_buy":
+                        continue
+
                     # Subsequent buy accumulating into active cycle:
                     # Prefer debiting from cash if available. Only add to cumulative_invested if cash cannot cover.
                     add_cap = subsequent_contribution

@@ -38,7 +38,7 @@ description: "Tasks for feature 010: Correção do Radar, Seletor de Modelo de C
 **Independent Test**: Simular o mesmo ativo nos dois modos e verificar que em `single_buy` compras subsequentes no ciclo são ignoradas e o capital investido é estático, enquanto em `multi_buy` compras subsequentes adicionam cotas e recalculam o preço médio.
 
 - [X] T006 [US2] Criar teste unitário em `tests/unit/test_accumulation.py` (`test_simulate_cycle_trade_single_buy_vs_multi_buy`) validando que no modo `single_buy` compras subsequentes no mesmo ciclo são ignoradas e o capital investido permanece inalterado.
-- [ ] T007 [US2] Implementar suporte a `cycle_entry_mode` (`"multi_buy"` vs `"single_buy"`) em `simulate_cycle_trade` dentro de `src/evaluator/accumulation_simulator.py`.
+- [X] T007 [US2] Implementar suporte a `cycle_entry_mode` (`"multi_buy"` vs `"single_buy"`) em `simulate_cycle_trade` dentro de `src/evaluator/accumulation_simulator.py`.
 - [ ] T008 [US2] Adicionar o seletor visual de modelo de entrada (`sim-cycle-mode`) no painel do Simulador em `src/web/index.html` com as opções "Compra Única (1x por Ciclo)" e "Acumulação Multi-Buy (Nx por Ciclo)".
 
 ---

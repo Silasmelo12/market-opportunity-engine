@@ -983,6 +983,7 @@ def simulate_accumulation_endpoint(req: SimulateRequest):
             start_date=req.start_date,
             end_date=req.end_date,
             strategy_labels_map=STRATEGY_LABELS_PT,
+            cycle_entry_mode=req.cycle_entry_mode,
         )
 
         curve_points: List[AccumulationPoint] = []
