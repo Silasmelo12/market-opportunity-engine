@@ -391,8 +391,20 @@ function setupDirectionSelector() {
 
       // 0ms instant client-side update
       applyClientSideFiltering();
-      if (state.activeTab === 'tab-radar' && state.lastRadarData) {
-        renderRadarTable(state.lastRadarData);
+
+      // Synchronize Radar Direction and re-fetch from server
+      state.radarPage = 1;
+      if (state.radarStrategies) {
+        state.radarStrategies.clear();
+      }
+      if (typeof updateRadarStratBadge === 'function') {
+        updateRadarStratBadge();
+      }
+      if (typeof renderRadarStratMenu === 'function') {
+        renderRadarStratMenu();
+      }
+      if (state.activeTab === 'tab-radar') {
+        loadRadarData(false);
       }
     });
   });
@@ -521,6 +533,10 @@ function switchTab(tabId) {
         renderPlotlyRanking();
         renderPlotlyScatter();
       }, 60);
+    }
+  } else if (tabId === 'tab-radar') {
+    if (!state.lastRadarPage || (state.lastRadarPage.direction && state.lastRadarPage.direction !== state.activeDirection)) {
+      loadRadarData(false);
     }
   } else if (tabId === 'tab-simulator') {
     setTimeout(() => {
