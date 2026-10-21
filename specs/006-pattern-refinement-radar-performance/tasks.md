@@ -106,9 +106,9 @@
 
 ## Phase 9: Polish
 
-- [ ] T041 Rodar a suíte completa `pytest -q` e corrigir regressões
-- [ ] T042 [P] Executar a validação manual do `quickstart.md` e medir SC-003/004
-- [ ] T043 [P] Atualizar `README.md` (novas estratégias, Redis, paginação)
+- [X] T041 Rodar a suíte completa `pytest -q` e corrigir regressões
+- [X] T042 [P] Executar a validação manual do `quickstart.md` e medir SC-003/004
+- [X] T043 [P] Atualizar `README.md` (novas estratégias, Redis, paginação)
 
 ---
 

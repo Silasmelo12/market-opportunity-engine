@@ -17,44 +17,37 @@ Aplicação 100% Python via **Streamlit** (Single-Repo), com dados do **Yahoo Fi
 
 ### 2. Rodar a Aplicação Web
 ```bash
-streamlit run src/app.py
+python run_server.py
 ```
-Acesse no navegador: `http://localhost:8501`.
-
-### 3. Rodar a Suíte de Testes Unitários e Integração
-```bash
-python -m pytest -v
-```
+Acesse no navegador: `http://localhost:8000`.
 
 ---
 
 ## 🏛️ Princípios & Arquitetura
 
-O projeto é regido pela [Constituição v1.0.0](.specify/memory/constitution.md) e implementa 4 módulos desacoplados:
+O projeto é regido pela [Constituição v2.0.0](.specify/memory/constitution.md) (FastAPI backend + Web SPA frontend) e implementa:
 
 1. **`src/data_loader/`**:
    - Ingestão via `yfinance` para 5 classes de ativos: Ações EUA (`AAPL`), Ações B3 (`PETR4.SA`), FIIs (`HGLG11.SA`), Criptomoedas (`BTC-USD`) e Commodities (`CL=F`).
    - Normalização para arrays NumPy 1D contíguos (`open`, `high`, `low`, `close`, `volume`).
    - Cálculo automático de **Dividend Yield Rolling 12m**.
-   - Camada de cache persistente em disco em `.cache/data/{ticker}_{interval}.parquet`.
+   - Sanitização de nomes de ativos (remoção de sufixos `S.A.`, `S/A`, `SA`).
+   - Cache persistente diário e opcional em Redis (`REDIS_URL`).
 
 2. **`src/strategies/`**:
-   - **Estratégia Proprietária de Negação de Rompimento (2x2)**: Máquina de estados $O(N)$ em NumPy puro rastreando as 4 combinações:
-     - `t1_open`: Rompimento da barra anterior (`t-1`) + Compra na Abertura (`Open t+1`).
-     - `t1_retest`: Rompimento da barra anterior (`t-1`) + Compra no Reteste (janela sequencial de $M$ barras com ciclo único e tratamento de gap de baixa).
-     - `t2_open`: Rompimento de Mínima de Fundo de $N$ barras + Compra na Abertura (`Open t+1`).
-     - `t2_retest`: Rompimento de Mínima de Fundo de $N$ barras + Compra no Reteste ($M$ barras).
-     - Sobrescrita dinâmica da linha em rompimentos sucessivos antes da negação.
-     - Captura do estado atual (`get_current_state()`) indicando a linha ativa aguardando negação ou reteste.
-   - **8 Padrões Clássicos de Velas MQL5 (Artigo 101 - CCandlePattern)**:
-     - Martelo, Engolfo de Alta, Linha Perfurante, Estrela da Manhã, Harami de Alta, Três Por Dentro, Três Por Fora e Três Soldados Brancos com `AvgBody = SMA(abs(Close - Open), 12)` e filtro de baixa `Close < SMA(20)`.
-   - **6 Estratégias Clássicas**:
-     - DCA Dinâmico (Desvio de 2 StdDev ou RSI 14 < 30).
-     - Rebalanceamento RF vs. RV (banda de tolerância de 5% de drawdown).
-     - Força Relativa vs. Benchmark (Z-Score de 60 períodos $\le -2.0$).
-     - Value Proxy com Fallback Quantitativo (DY Rolling $\ge$ P80 + SMA200 ou Mayer Multiple $\le$ P15).
-     - Price Action Fundo Duplo com falha de continuação + BOS.
-     - Wyckoff Spring (sweep de suporte com rejeição e volume acima da média de 20).
+   - **Estratégias Proprietárias (4 variantes Compra + 4 variantes Venda)**.
+   - **Padrões de Velas MQL5 (14 Compra + 14 Venda)**.
+   - **Estratégias Clássicas e Institucionais (Total de 50 estratégias)**:
+     - Fundo Duplo + BOS (Refinado com filtros de tendência SMA50, anti-máxima de 60 barras, RSI e profundidade).
+     - Topo Duplo + BOS (Refinado com filtros de tendência SMA50, anti-mínima de 60 barras, RSI e profundidade).
+     - Fundo Duplo Invertido (Venda - lógica empírica original).
+     - Topo Duplo Invertido (Compra - lógica empírica original).
+     - Wyckoff Spring e Wyckoff Upthrust (UTAD).
+     - DCA Dinâmico, Rebalanceamento de Carteira e Value Proxy.
+
+3. **`src/api/` e `src/web/`**:
+   - **FastAPI REST API**: endpoints `/api/health`, `/api/strategies`, `/api/analyze`, `/api/radar` (paginado por ativo, com cache diário e fallback), `/api/simulate`.
+   - **Terminal Web**: TradingView Lightweight Charts com botões de zoom in (+), zoom out (-) e reset, alternância de direção Compra / Venda / Ambos, e filtros dinâmicos de estratégia no Radar.
 
 3. **`src/evaluator/`**:
    - Avaliação prospectiva em $X$ barras pós-compra (20, 60, 120, 252).
