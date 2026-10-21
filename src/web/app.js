@@ -1648,14 +1648,25 @@ function setupSimulationTab() {
 
 async function runSimulation() {
   const mode = (elements.simMode && elements.simMode.value) || 'cycle_trade';
-  showLoading(mode === 'cycle_trade' ? 'Executando backtest de trade (Compra ->Venda)...' : 'Executando simulação de acumulação financeira...');
+  showLoading(mode === 'cycle_trade' ? 'Executando backtest de trade (Compra -> Venda)...' : 'Executando simulação de acumulação financeira...');
   try {
     const tickerInput = resolveTicker((elements.simTicker && elements.simTicker.value.trim().toUpperCase()) || state.currentTicker);
     const capitalVal = parseFloat(document.getElementById('sim-contribution').value) || 1000;
+    const simIntervalEl = document.getElementById('sim-interval');
+    const selectedInterval = (simIntervalEl && simIntervalEl.value) || state.currentTimeframe || '1d';
+
+    // Intraday intervals (5m, 15m) in yfinance require periods <= 60d
+    let simPeriod = state.currentPeriod;
+    if (selectedInterval === '5m') {
+      simPeriod = '60d';
+    } else if (selectedInterval === '15m' || selectedInterval === '60m') {
+      simPeriod = '60d';
+    }
+
     const payload = {
       ticker: tickerInput,
-      interval: state.currentTimeframe,
-      period: state.currentPeriod,
+      interval: selectedInterval,
+      period: simPeriod,
       simulation_mode: mode,
       contribution_amount: capitalVal,
       initial_capital: capitalVal,

@@ -34,7 +34,7 @@ description: "Tasks for feature 008: Matemática Multi-Buy Genérica, Tema Claro
 **Goal**: Adicionar suporte a tempos gráficos intradiários (`5m`, `15m`, `60m`) no simulador e na análise técnica.
 
 - [X] T006 [US3] Adicionar seletor de tempo gráfico (`interval`: 5m, 15m, 60m, 1d) no formulário do simulador em `src/web/index.html`.
-- [ ] T007 [US3] Atualizar `src/web/app.js` para enviar o `interval` selecionado nas requisições do simulador e tratar dinamicamente períodos compatíveis com dados intradiários (ex.: `5d`, `1mo` para 5m).
+- [X] T007 [US3] Atualizar `src/web/app.js` para enviar o `interval` selecionado nas requisições do simulador e tratar dinamicamente períodos compatíveis com dados intradiários (ex.: `5d`, `1mo` para 5m).
 - [ ] T008 [US3] Validar e garantir tratamento no backend em `src/api/server.py` para carregamento e simulação causal de dados intradiários (`5m`).
 
 ---
