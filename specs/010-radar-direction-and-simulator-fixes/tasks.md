@@ -14,7 +14,7 @@ description: "Tasks for feature 010: Correção do Radar, Seletor de Modelo de C
 
 **Purpose**: Estruturas de dados e contratos compartilhados para suporte a modelo de ciclo configurável
 
-- [ ] T001 [P] Atualizar schemas Pydantic em `src/api/schemas.py` adicionando o campo `cycle_entry_mode` (`"multi_buy"` | `"single_buy"`, padrão `"multi_buy"`) em `SimulateRequest` e `OptimizeCombinationsRequest`.
+- [X] T001 [P] Atualizar schemas Pydantic em `src/api/schemas.py` adicionando o campo `cycle_entry_mode` (`"multi_buy"` | `"single_buy"`, padrão `"multi_buy"`) em `SimulateRequest` e `OptimizeCombinationsRequest`.
 - [ ] T002 [P] Atualizar a dataclass `StrategyPairRankItem` em `src/evaluator/accumulation_simulator.py` adicionando o campo `cycle_entry_mode: str = "multi_buy"`.
 
 ---

@@ -146,6 +146,7 @@ class SimulateRequest(BaseModel):
     interval: str = "1d"
     period: str = "2y"
     simulation_mode: str = "cycle_trade"  # "cycle_trade" | "accumulation"
+    cycle_entry_mode: str = "multi_buy"   # "multi_buy" | "single_buy"
     contribution_amount: float = 1000.0   # Serves as contribution in accumulation, or per-signal contribution in multi-buy cycle_trade
     initial_capital: float = 1000.0
     buy_strategy: Optional[str] = None    # Specific buy strategy or "ALL"
@@ -253,6 +254,7 @@ class StrategyPairRankItemModel(BaseModel):
     max_drawdown_pct: float
     has_open_trade: bool
     final_equity: float
+    cycle_entry_mode: str = "multi_buy"
 
 
 class OptimizeCombinationsRequest(BaseModel):
@@ -261,6 +263,7 @@ class OptimizeCombinationsRequest(BaseModel):
     period: str = "2y"
     initial_capital: float = 1000.0
     min_trades: int = 2
+    cycle_entry_mode: str = "multi_buy"   # "multi_buy" | "single_buy"
     start_date: Optional[str] = None
     end_date: Optional[str] = None
     lookback_n: int = 10
