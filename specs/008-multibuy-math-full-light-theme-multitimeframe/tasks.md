@@ -41,5 +41,5 @@ description: "Tasks for feature 008: Matemática Multi-Buy Genérica, Tema Claro
 
 ## Phase 4: Validação & Polish
 
-- [ ] T009 Executar suíte completa de testes (`pytest tests/unit/ -v`) garantindo regressão zero e aprovação de todos os testes.
+- [X] T009 Executar suíte completa de testes (`pytest tests/unit/ -v`) garantindo regressão zero e aprovação de todos os testes.
 - [ ] T010 Atualizar o `README.md` destacando a matemática genérica multi-buy e o suporte completo a múltiplos tempos gráficos intradiários.
