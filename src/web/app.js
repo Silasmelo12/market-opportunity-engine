@@ -277,6 +277,7 @@ function formatPrice(price, ticker = null, category = null) {
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
   setupNavigationTabs();
   setupDirectionSelector();
   setupAccordions();
@@ -395,6 +396,88 @@ function setupDirectionSelector() {
       }
     });
   });
+}
+
+// Theme Toggle & Synchronization Helper
+function initTheme() {
+  const savedTheme = localStorage.getItem('terminal_theme') || 'dark';
+  applyTheme(savedTheme, false);
+
+  const btnToggle = document.getElementById('btn-theme-toggle');
+  if (btnToggle) {
+    btnToggle.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next, true);
+    });
+  }
+}
+
+function applyTheme(theme, updateCharts = true) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('terminal_theme', theme);
+
+  const icon = document.getElementById('theme-toggle-icon');
+  const text = document.getElementById('theme-toggle-text');
+  if (icon && text) {
+    if (theme === 'light') {
+      icon.textContent = '☀️';
+      text.textContent = 'Claro';
+    } else {
+      icon.textContent = '🌙';
+      text.textContent = 'Escuro';
+    }
+  }
+
+  if (updateCharts) {
+    updateChartsTheme(theme);
+  }
+}
+
+function updateChartsTheme(theme) {
+  const isLight = theme === 'light';
+  const bgColor = isLight ? '#FFFFFF' : '#0B0E14';
+  const textColor = isLight ? '#334155' : '#8B98A5';
+  const gridColor = isLight ? 'rgba(226, 232, 240, 0.8)' : 'rgba(38, 43, 56, 0.5)';
+  const borderColor = isLight ? '#E2E8F0' : '#262B38';
+
+  if (state.chart) {
+    state.chart.applyOptions({
+      layout: {
+        background: { color: bgColor },
+        textColor: textColor,
+      },
+      grid: {
+        vertLines: { color: gridColor },
+        horzLines: { color: gridColor },
+      },
+      rightPriceScale: {
+        borderColor: borderColor,
+      },
+      timeScale: {
+        borderColor: borderColor,
+      },
+    });
+  }
+
+  // Update Plotly charts if present
+  if (window.Plotly) {
+    const plotlyLayoutUpdate = {
+      paper_bgcolor: bgColor,
+      plot_bgcolor: bgColor,
+      'font.color': textColor,
+      'xaxis.gridcolor': gridColor,
+      'yaxis.gridcolor': gridColor,
+      'xaxis.linecolor': borderColor,
+      'yaxis.linecolor': borderColor,
+    };
+    ['plot-ranking', 'plot-scatter', 'plot-simulation-curve'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.data) {
+        Plotly.relayout(el, plotlyLayoutUpdate).catch(() => {});
+      }
+    });
+  }
 }
 
 // UI: Navigation Tabs
@@ -646,26 +729,33 @@ function initTradingViewChart() {
   const width = container.clientWidth >0 ? container.clientWidth : Math.max(300, window.innerWidth - 32);
   const height = isMobile ? 340 : 480;
 
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+  const isLight = currentTheme === 'light';
+  const bgColor = isLight ? '#FFFFFF' : '#0B0E14';
+  const textColor = isLight ? '#334155' : '#8B98A5';
+  const gridColor = isLight ? 'rgba(226, 232, 240, 0.8)' : 'rgba(38, 43, 56, 0.5)';
+  const borderColor = isLight ? '#E2E8F0' : '#262B38';
+
   state.chart = LightweightCharts.createChart(container, {
     width: width,
     height: height,
     layout: {
-      background: { color: '#0B0E14' },
-      textColor: '#8B98A5',
+      background: { color: bgColor },
+      textColor: textColor,
     },
     grid: {
-      vertLines: { color: 'rgba(38, 43, 56, 0.5)' },
-      horzLines: { color: 'rgba(38, 43, 56, 0.5)' },
+      vertLines: { color: gridColor },
+      horzLines: { color: gridColor },
     },
     crosshair: {
       mode: LightweightCharts.CrosshairMode.Normal,
     },
     rightPriceScale: {
-      borderColor: '#262B38',
+      borderColor: borderColor,
       scaleMargins: { top: 0.1, bottom: 0.2 },
     },
     timeScale: {
-      borderColor: '#262B38',
+      borderColor: borderColor,
       timeVisible: true,
       secondsVisible: false,
     },
