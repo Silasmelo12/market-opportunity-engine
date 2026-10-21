@@ -51,7 +51,7 @@ description: "Task list for feature 007: Multi-Buy Cycle Trade, Light Theme & En
 
 ### Implementação da História 2
 
-- [ ] T008 [P] [US2] Adicionar variáveis de tema claro (`data-theme="light"`) e botão seletor de tema (ícone Sol/Lua) no cabeçalho em `src/web/index.html`.
+- [X] T008 [P] [US2] Adicionar variáveis de tema claro (`data-theme="light"`) e botão seletor de tema (ícone Sol/Lua) no cabeçalho em `src/web/index.html`.
 - [ ] T009 [US2] Implementar script de detecção inicial e alternância de tema no `src/web/app.js`, salvando e recuperando o estado via `localStorage.getItem('terminal_theme')`.
 - [ ] T010 [US2] Implementar função de atualização de estilo do TradingView Lightweight Charts (`applyOptions`) e gráficos Plotly (`Plotly.relayout`) no `src/web/app.js` ao alternar entre Claro e Escuro.
 

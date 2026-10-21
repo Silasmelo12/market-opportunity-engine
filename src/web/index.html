@@ -51,13 +51,17 @@
           </div>
         </div>
 
-        <!-- Quick Status Badge & Refresh -->
+        <!-- Quick Status Badge, Theme Toggle & Refresh -->
         <div class="flex items-center space-x-2 lg:order-last">
           <div id="header-status-badge" class="hidden items-center gap-1 px-2 py-0.5 rounded text-[10px] sm:text-xs font-semibold font-mono">
             <!-- Rendered dynamically -->
           </div>
+          <button id="btn-theme-toggle" title="Alternar Tema Claro / Escuro" class="bg-fintech-border hover:bg-gray-700 text-[11px] sm:text-xs text-gray-200 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded transition flex items-center gap-1.5 shrink-0 cursor-pointer">
+            <span id="theme-toggle-icon">🌙</span>
+            <span id="theme-toggle-text" class="hidden sm:inline">Escuro</span>
+          </button>
           <button id="btn-refresh-data" class="bg-fintech-border hover:bg-gray-700 text-[11px] sm:text-xs text-gray-200 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded transition flex items-center gap-1 shrink-0">
-            <span></span> <span class="hidden sm:inline">Atualizar</span>
+            <span>🔄</span> <span class="hidden sm:inline">Atualizar</span>
           </button>
         </div>
       </div>

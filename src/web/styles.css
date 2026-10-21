@@ -14,6 +14,65 @@
   --text-muted: #8B98A5;
 }
 
+[data-theme="light"] {
+  --bg-primary: #F8FAFC;
+  --bg-surface: #FFFFFF;
+  --bg-surface-hover: #F1F5F9;
+  --border-color: #E2E8F0;
+  --accent-cyan: #0284C7;
+  --accent-cyan-hover: #0369A1;
+  --accent-green: #10B981;
+  --accent-yellow: #F59E0B;
+  --accent-red: #EF4444;
+  --text-main: #0F172A;
+  --text-muted: #64748B;
+}
+
+[data-theme="light"] .bg-fintech-bg {
+  background-color: #F8FAFC !important;
+}
+
+[data-theme="light"] .bg-fintech-surface {
+  background-color: #FFFFFF !important;
+}
+
+[data-theme="light"] .border-fintech-border {
+  border-color: #E2E8F0 !important;
+}
+
+[data-theme="light"] .text-gray-100 {
+  color: #0F172A !important;
+}
+
+[data-theme="light"] .text-gray-200 {
+  color: #1E293B !important;
+}
+
+[data-theme="light"] .text-gray-300 {
+  color: #334155 !important;
+}
+
+[data-theme="light"] .text-gray-400 {
+  color: #64748B !important;
+}
+
+[data-theme="light"] .text-white {
+  color: #0F172A !important;
+}
+
+[data-theme="light"] input,
+[data-theme="light"] select {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border-color: #CBD5E1 !important;
+}
+
+[data-theme="light"] .card-surface {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
+}
+
 body {
   background-color: var(--bg-primary);
   color: var(--text-main);
