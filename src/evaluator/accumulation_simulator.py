@@ -108,6 +108,7 @@ class StrategyPairRankItem:
     max_drawdown_pct: float
     has_open_trade: bool
     final_equity: float
+    cycle_entry_mode: str = "multi_buy"
 
 
 def simulate_cycle_trade(
