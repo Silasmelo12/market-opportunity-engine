@@ -15,7 +15,7 @@ description: "Tasks for feature 008: Matemática Multi-Buy Genérica, Tema Claro
 **Goal**: Corrigir a matemática do simulador para que o capital investido reflita fielmente todos os aportes monetários de cada compra e o retorno percentual reflita a rentabilidade real sobre o dinheiro desembolsado.
 
 - [X] T001 [US1] Escrever teste unitário em `tests/unit/test_accumulation.py` validando o cálculo genérico de $K$ compras (ex.: 3 compras de R$ 1.000 com preços 10, 8, 6 e venda a 10 gerando exatamente R$ 3.000 investidos, preço médio R$ 7,66 e retorno +30,5%).
-- [ ] T002 [US1] Atualizar `simulate_cycle_trade` em `src/evaluator/accumulation_simulator.py` para calcular o Capital Total Investido como a soma real de todos os aportes realizados nas $K$ compras de todos os ciclos, corrigindo o cálculo de `return_on_capital_pct = (net_profit / total_invested) * 100`.
+- [X] T002 [US1] Atualizar `simulate_cycle_trade` em `src/evaluator/accumulation_simulator.py` para calcular o Capital Total Investido como a soma real de todos os aportes realizados nas $K$ compras de todos os ciclos, corrigindo o cálculo de `return_on_capital_pct = (net_profit / total_invested) * 100`.
 - [ ] T003 [US1] Atualizar o endpoint `/api/simulate` em `src/api/server.py` e o preenchimento no frontend em `src/web/app.js` para garantir consistência entre Capital Investido, PnL e Retorno da Estratégia.
 
 ---

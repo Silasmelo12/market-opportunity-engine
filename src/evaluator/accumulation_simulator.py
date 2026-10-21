@@ -330,10 +330,22 @@ def simulate_cycle_trade(
         open_trade.status = "ABERTO"
         trades.append(open_trade)
 
-    # 5. Compute summary metrics
+    # 5. Compute summary metrics with exact K-buys generic capital accounting
+    # Base capital: if contributions are cumulative without compounding (reinvesting cash),
+    # total capital is initial_capital + all subsequent buy contributions across cycles.
+    # Otherwise, it's the peak capital deployed from the investor's balance.
     final_eq = float(timeline_equity[-1]) if len(timeline_equity) > 0 else initial_capital
-    net_profit = final_eq - initial_capital
-    tot_ret_pct = ((final_eq / initial_capital) - 1.0) * 100.0 if initial_capital > 0 else 0.0
+    base_capital = float(initial_capital)
+    
+    # If the user performed additional contributions within cycles, base capital includes them
+    total_added_contributions = sum(
+        sum(be.capital for be in (t.buy_entries[1:] if t.buy_entries and len(t.buy_entries) > 1 else []))
+        for t in trades
+    )
+    total_invested_capital = base_capital + total_added_contributions
+
+    net_profit = final_eq - total_invested_capital
+    tot_ret_pct = ((final_eq / total_invested_capital) - 1.0) * 100.0 if total_invested_capital > 0 else 0.0
 
     closed_trades = [t for t in trades if t.status == "FECHADO"]
     winning_trades = [t for t in closed_trades if t.return_pct > 0]
@@ -369,7 +381,7 @@ def simulate_cycle_trade(
     avg_entries = (total_cycle_entries / len(trades)) if trades else 1.0
 
     return CycleSimulationResult(
-        total_invested=round(initial_capital, 2),
+        total_invested=round(total_invested_capital, 2),
         final_equity=round(final_eq, 2),
         net_profit=round(net_profit, 2),
         return_on_capital_pct=round(tot_ret_pct, 2),
