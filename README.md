@@ -7,7 +7,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![TradingView](https://img.shields.io/badge/Lightweight_Charts-TradingView-131722?style=for-the-badge&logo=tradingview&logoColor=white)](https://tradingview.github.io/lightweight-charts/)
 [![Redis](https://img.shields.io/badge/Redis-Cache-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
-[![Pytest](https://img.shields.io/badge/Tests-48%20Passed-449C44?style=for-the-badge&logo=pytest&logoColor=white)](https://pytest.org/)
+[![Pytest](https://img.shields.io/badge/Tests-49%20Passed-449C44?style=for-the-badge&logo=pytest&logoColor=white)](https://pytest.org/)
 [![Theme: Dark/Light](https://img.shields.io/badge/Theme-Dark%20%7C%20Light-0284C7?style=for-the-badge)](https://github.com/)
 [![Timeframes](https://img.shields.io/badge/Timeframes-5m%20%7C%2015m%20%7C%2060m%20%7C%201d-8B5CF6?style=for-the-badge)](https://github.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
@@ -44,10 +44,14 @@ O sistema integra:
 
 ## 🚀 Novas Funcionalidades (v2.1)
 
-### 1. Simulador com Múltiplas Entradas por Ciclo (Multi-Buy Accumulation)
+### 1. Simulador com Múltiplas Entradas por Ciclo (Multi-Buy Accumulation) & Reinvestimento de Fluxo de Caixa
 - No modo **Trade (Compra -> Venda)**, a ocorrência de novos sinais de compra enquanto uma posição está aberta não é mais descartada.
 - O motor executa uma nova compra em cada sinal confirmado, alocando capital adicional, acumulando cotas e recalculando com rigor o **Preço Médio Ponderado**:
   $$\text{Preço Médio} = \frac{\sum (Q_i \times P_i)}{\sum Q_i}$$
+- **Contabilidade Realista de Fluxo de Caixa e Reinvestimento**:
+  - Quando um sinal de venda (`SELL`) liquida a posição, 100% do montante apurado (capital inicial + lucros/prejuízos) retorna integralmente para a carteira líquida (`cash`).
+  - As compras de ciclos subsequentes utilizam prioritariamente o saldo em caixa disponível antes de computar novo aporte de capital externo do bolso do investidor.
+  - O **Capital Investido** e o **Retorno Global (%)** expressam com exatidão matemática o capital real desembolsado e a rentabilidade acumulada, eliminando distorções de alavancagem artificial.
 - No primeiro sinal confirmado de venda (`SELL`), 100% das cotas acumuladas são liquidadas no preço causal da barra, apurando o retorno consolidado do ciclo completo.
 - A tabela de histórico detalha cada ciclo com status semântico (`LUCRO`, `PREJUÍZO`, `EM ABERTO`) e exibe todas as sub-entradas com data, preço individual e quantidade de cotas.
 
@@ -191,7 +195,7 @@ pytest -v
 ```
 
 ```text
-======================= 47 passed in 4.55s =======================
+======================= 49 passed in 4.80s =======================
 ```
 
 ---

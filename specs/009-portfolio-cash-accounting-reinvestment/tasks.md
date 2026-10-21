@@ -24,4 +24,4 @@ description: "Tasks for feature 009: Fluxo de Caixa Realista e Reinvestimento de
 ## Phase 2: Validação & Documentação
 
 - [X] T005 Executar a suíte de testes unitários (`pytest tests/unit/ -v`) comprovando 100% de aprovação e regressão zero.
-- [ ] T006 Atualizar o `README.md` documentando a modelagem realista de fluxo de caixa e reinvestimento automático de vendas.
+- [X] T006 Atualizar o `README.md` documentando a modelagem realista de fluxo de caixa e reinvestimento automático de vendas.
