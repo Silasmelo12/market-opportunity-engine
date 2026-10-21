@@ -17,7 +17,7 @@ description: "Tasks for feature 009: Fluxo de Caixa Realista e Reinvestimento de
 - [X] T001 [US1] Criar teste unitário em `tests/unit/test_accumulation.py` (`test_simulate_cycle_trade_cash_reinvestment`) validando que os lucros e principal de uma venda anterior são reutilizados em compras subsequentes sem aumentar o capital investido do bolso.
 - [X] T002 [US1] Implementar o gerenciamento de `cash` e `cumulative_external_invested` em `simulate_cycle_trade` dentro de `src/evaluator/accumulation_simulator.py`, debitando compras prioritariamente de `cash` e creditando vendas integralmente em `cash`.
 - [X] T003 [US1] Atualizar o cálculo de retorno global da estratégia e a série temporal `timeline_invested` em `src/evaluator/accumulation_simulator.py` para refletir o capital externo desembolsado.
-- [ ] T004 [US1] Sincronizar o preenchimento de métricas e curvas no frontend em `src/web/app.js` para garantir clareza no capital investido do bolso versus patrimônio líquido.
+- [X] T004 [US1] Sincronizar o preenchimento de métricas e curvas no frontend em `src/web/app.js` para garantir clareza no capital investido do bolso versus patrimônio líquido.
 
 ---
 
