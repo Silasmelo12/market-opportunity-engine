@@ -219,3 +219,57 @@ def test_optimize_strategy_pairs_finds_champion():
     assert champ.total_return_pct == pytest.approx(50.0)
     assert champ.closed_trades == 2
     assert len(top_list) >= 2
+
+
+def test_simulate_cycle_trade_multi_buy():
+    """
+    US1 Test:
+    Verifies that when multiple BUY signals occur before a SELL signal:
+    1. Every buy signal executes and adds shares.
+    2. Capital and shares accumulate, updating weighted average price.
+    3. The subsequent SELL signal liquidates all accumulated shares in one unified exit.
+    
+    Setup:
+    - Bar 1: Buy 1 at P=10.0, capital = 1000.0 -> 100 shares (invested: 1000.0)
+    - Bar 2: Buy 2 at P=12.5, capital = 500.0  -> 40 shares  (total shares: 140, total invested: 1500.0)
+    - Bar 3: Buy 3 at P=10.0, capital = 500.0  -> 50 shares  (total shares: 190, total invested: 2000.0)
+      Average price = 2000 / 190 = ~10.5263
+    - Bar 4: Sell at P=15.0
+      Gross exit capital = 190 * 15.0 = 2850.0
+      Net Profit = 2850.0 - 2000.0 = 850.0
+      Return % = (15.0 - 10.5263) / 10.5263 * 100 = 42.5%
+    """
+    series = make_test_series([10.0, 10.0, 12.5, 10.0, 15.0])
+    signals = [
+        SignalRecord("prop_reversal", "buy_1", 0, 1, 10.0, None, "BUY"),
+        SignalRecord("prop_reversal", "buy_2", 1, 2, 12.5, None, "BUY"),
+        SignalRecord("prop_reversal", "buy_3", 2, 3, 10.0, None, "BUY"),
+        SignalRecord("prop_reversal", "sell_1", 3, 4, 15.0, None, "SELL"),
+    ]
+
+    res = simulate_cycle_trade(
+        series,
+        signals,
+        initial_capital=1000.0,
+        contribution_amount=500.0,
+    )
+
+    assert res.total_trades_count == 1
+    assert res.closed_trades_count == 1
+    assert len(res.trades) == 1
+    trade = res.trades[0]
+
+    assert trade.status == "FECHADO"
+    assert trade.num_entries == 3
+    assert trade.total_shares == pytest.approx(190.0)
+    assert trade.total_invested == pytest.approx(2000.0)
+    assert trade.average_buy_price == pytest.approx(10.5263, abs=0.01)
+    assert trade.sell_price == pytest.approx(15.0)
+    assert trade.exit_capital == pytest.approx(2850.0)
+    assert trade.profit_loss == pytest.approx(850.0)
+    assert trade.return_pct == pytest.approx(42.5, abs=0.1)
+    assert len(trade.buy_entries) == 3
+    assert trade.buy_entries[0].price == 10.0
+    assert trade.buy_entries[1].price == 12.5
+    assert trade.buy_entries[2].price == 10.0
+
