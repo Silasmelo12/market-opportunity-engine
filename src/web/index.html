@@ -64,16 +64,16 @@
         </div>
       </div>
 
-      <!-- Direction Segmented Control (Top Nav) -->
+      <!-- Direction Segmented Control (Compra, Venda, Ambos) -->
       <div class="flex items-center bg-fintech-bg border border-fintech-border rounded p-0.5 sm:p-1 space-x-1 w-full lg:w-auto justify-center" id="global-direction-selector">
-        <button class="dir-seg-btn active-both text-gray-300 flex-1 lg:flex-initial" data-dir="BOTH">
-           Ambos
-        </button>
-        <button class="dir-seg-btn text-gray-400 flex-1 lg:flex-initial" data-dir="BUY">
-           Compra
+        <button class="dir-seg-btn active-buy text-emerald-400 font-bold flex-1 lg:flex-initial" data-dir="BUY">
+          Compra
         </button>
         <button class="dir-seg-btn text-gray-400 flex-1 lg:flex-initial" data-dir="SELL">
-           Venda
+          Venda
+        </button>
+        <button class="dir-seg-btn text-gray-400 flex-1 lg:flex-initial" data-dir="BOTH">
+          Ambos
         </button>
       </div>
 
@@ -126,6 +126,25 @@
               <button class="radar-tf-btn px-2 sm:px-2.5 py-1 text-xs rounded text-gray-300 hover:text-white bg-fintech-bg shrink-0" data-tf="4h">4h</button>
               <button class="radar-tf-btn px-2 sm:px-2.5 py-1 text-xs rounded text-gray-300 hover:text-white bg-fintech-bg shrink-0" data-tf="1h">1h</button>
             </div>
+
+            <!-- Radar Strategy Multi-Select Dropdown (Starts all unchecked) -->
+            <div class="relative" id="radar-strategy-dropdown-wrapper">
+              <button id="btn-radar-strat-toggle" class="bg-fintech-surface hover:bg-fintech-surface-hover text-gray-300 hover:text-white text-xs px-2.5 py-1.5 sm:py-2 rounded border border-fintech-border flex items-center gap-1.5 shrink-0">
+                <span>Filtro de Estratégias</span>
+                <span id="radar-strat-badge" class="bg-fintech-cyan/20 text-fintech-cyan text-[10px] px-1 rounded font-mono hidden">0</span>
+                <span class="text-[9px] text-gray-400">▼</span>
+              </button>
+              <div id="radar-strat-menu" class="absolute left-0 mt-1 w-64 bg-fintech-surface border border-fintech-border rounded shadow-xl z-50 p-2 hidden max-h-60 overflow-y-auto text-xs space-y-1">
+                <div class="text-[10px] text-gray-400 border-b border-fintech-border pb-1 mb-1 flex justify-between items-center">
+                  <span>Todas desmarcadas = Todas ativas</span>
+                  <button id="btn-clear-radar-strat" class="text-fintech-cyan hover:underline text-[10px]">Limpar</button>
+                </div>
+                <div id="radar-strat-checkbox-container" class="space-y-1">
+                  <!-- Populated dynamically based on catalog and active direction -->
+                </div>
+              </div>
+            </div>
+
             <button id="btn-radar-rescan" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-3 py-1.5 sm:py-2 rounded shadow transition flex items-center gap-1.5 shrink-0">
               <span></span> <span class="hidden xs:inline">Atualizar</span>Radar
             </button>

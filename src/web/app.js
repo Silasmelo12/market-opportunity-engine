@@ -274,6 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupTimeframeButtons();
   setupRadarTimeframeButtons();
   setupRadarCategoryPills();
+  setupRadarStrategyFilter();
   setupGranularStrategyCheckboxes();
   initTradingViewChart();
   setupSimulationTab();
@@ -867,8 +868,8 @@ function renderRadarTable(pageOrItems) {
 
       // If user opened a specific strategy from radar, ensure it's selected and active
       if (strat) {
-        if (dir && (dir === 'BUY' || dir === 'SELL') && state.activeDirection !== 'BOTH' && state.activeDirection !== dir) {
-          state.activeDirection = 'BOTH';
+        if (dir && (dir === 'BUY' || dir === 'SELL') && state.activeDirection !== dir) {
+          state.activeDirection = dir;
           document.querySelectorAll('.direction-btn').forEach(b => {
             const bDir = b.getAttribute('data-direction');
             if (bDir === 'BOTH') {
@@ -1771,4 +1772,110 @@ function showLoading(msg = 'Carregando...') {
 
 function hideLoading() {
   elements.loadingOverlay.classList.add('hidden');
+}
+
+// UI: Radar Strategy Multi-Select Dropdown Filter
+async function setupRadarStrategyFilter() {
+  const toggleBtn = document.getElementById('btn-radar-strat-toggle');
+  const menu = document.getElementById('radar-strat-menu');
+  const container = document.getElementById('radar-strat-checkbox-container');
+  const badge = document.getElementById('radar-strat-badge');
+  const clearBtn = document.getElementById('btn-clear-radar-strat');
+  if (!toggleBtn || !menu || !container) return;
+
+  toggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    menu.classList.toggle('hidden');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!menu.contains(e.target) && !toggleBtn.contains(e.target)) {
+      menu.classList.add('hidden');
+    }
+  });
+
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      state.radarStrategies.clear();
+      updateRadarStratCheckboxes();
+      state.radarPage = 1;
+      loadRadarData(false, state.radarActiveCategory);
+    });
+  }
+
+  // Fetch strategy catalog from server
+  try {
+    const res = await fetch('/api/strategies');
+    if (!res.ok) return;
+    const catData = await res.json();
+    window._strategyCatalog = catData;
+    renderRadarStratMenu();
+  } catch (err) {
+    console.error('Error fetching strategies catalog for radar filter:', err);
+  }
+}
+
+function renderRadarStratMenu() {
+  const container = document.getElementById('radar-strat-checkbox-container');
+  if (!container || !window._strategyCatalog) return;
+  container.innerHTML = '';
+
+  const activeDir = state.activeDirection || 'BUY';
+
+  // Flatten strategies matching direction
+  const strats = [];
+  Object.values(window._strategyCatalog).forEach(grp => {
+    if (activeDir !== 'BOTH' && grp.direction !== activeDir) return;
+    (grp.strategies || []).forEach(st => {
+      strats.push(st);
+    });
+  });
+
+  if (strats.length === 0) {
+    container.innerHTML = '<div class="text-gray-500 py-1">Nenhuma estratégia disponível.</div>';
+    return;
+  }
+
+  strats.forEach(st => {
+    const label = document.createElement('label');
+    label.className = 'flex items-center space-x-2 cursor-pointer hover:text-white text-gray-300 py-0.5';
+    const isChecked = state.radarStrategies.has(st.id);
+    label.innerHTML = `
+      <input type="checkbox" class="radar-strat-cb rounded bg-fintech-bg border-fintech-border text-fintech-cyan" data-id="${st.id}" ${isChecked ? 'checked' : ''}>
+      <span class="truncate">${st.label}</span>
+    `;
+    const cb = label.querySelector('input');
+    cb.addEventListener('change', () => {
+      if (cb.checked) {
+        state.radarStrategies.add(st.id);
+      } else {
+        state.radarStrategies.delete(st.id);
+      }
+      updateRadarStratBadge();
+      state.radarPage = 1;
+      loadRadarData(false, state.radarActiveCategory);
+    });
+    container.appendChild(label);
+  });
+  updateRadarStratBadge();
+}
+
+function updateRadarStratBadge() {
+  const badge = document.getElementById('radar-strat-badge');
+  if (!badge) return;
+  const count = state.radarStrategies.size;
+  if (count > 0) {
+    badge.textContent = count;
+    badge.classList.remove('hidden');
+  } else {
+    badge.classList.add('hidden');
+  }
+}
+
+function updateRadarStratCheckboxes() {
+  document.querySelectorAll('.radar-strat-cb').forEach(cb => {
+    const id = cb.getAttribute('data-id');
+    cb.checked = state.radarStrategies.has(id);
+  });
+  updateRadarStratBadge();
 }

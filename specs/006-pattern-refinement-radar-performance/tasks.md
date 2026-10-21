@@ -85,10 +85,10 @@
 
 **Independent Test**: abrir o app → modo Compra ativo, ordem Compra|Venda|Ambos, filtro todo desmarcado.
 
-- [ ] T032 [US5] Reordenar os botões de direção para Compra, Venda, Ambos em `src/web/index.html`
-- [ ] T033 [US5] Definir `state.activeDirection = 'BUY'` como inicial e remover o reset para `'BOTH'` (≈ app.js:812) em `src/web/app.js`
-- [ ] T034 [US5] Adicionar o dropdown multi-checkbox "Estratégias" no cabeçalho do radar em `src/web/index.html`
-- [ ] T035 [US5] Popular o filtro a partir de `/api/strategies` filtrando pela direção ativa, estado inicial vazio (= todas), reenviar `strategies` CSV e voltar à página 1 ao mudar; ignorar marcações de outra direção em `src/web/app.js`
+- [X] T032 [US5] Reordenar os botões de direção para Compra, Venda, Ambos em `src/web/index.html`
+- [X] T033 [US5] Definir `state.activeDirection = 'BUY'` como inicial e remover o reset para `'BOTH'` (≈ app.js:812) em `src/web/app.js`
+- [X] T034 [US5] Adicionar o dropdown multi-checkbox "Estratégias" no cabeçalho do radar em `src/web/index.html`
+- [X] T035 [US5] Popular o filtro a partir de `/api/strategies` filtrando pela direção ativa, estado inicial vazio (= todas), reenviar `strategies` CSV e voltar à página 1 ao mudar; ignorar marcações de outra direção em `src/web/app.js`
 
 ---
 
