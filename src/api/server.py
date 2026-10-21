@@ -184,6 +184,7 @@ def get_strategy_catalog():
             "direction": "BUY",
             "strategies": [
                 {"id": "price_action_double_bottom_bos", "label": STRATEGY_LABELS_PT["price_action_double_bottom_bos"], "direction": "BUY"},
+                {"id": "buy_double_top_inverted", "label": STRATEGY_LABELS_PT["buy_double_top_inverted"], "direction": "BUY"},
                 {"id": "price_action_wyckoff_spring", "label": STRATEGY_LABELS_PT["price_action_wyckoff_spring"], "direction": "BUY"},
             ],
         },
@@ -192,6 +193,7 @@ def get_strategy_catalog():
             "direction": "SELL",
             "strategies": [
                 {"id": "sell_double_top_bos", "label": STRATEGY_LABELS_PT["sell_double_top_bos"], "direction": "SELL"},
+                {"id": "sell_double_bottom_inverted", "label": STRATEGY_LABELS_PT["sell_double_bottom_inverted"], "direction": "SELL"},
                 {"id": "sell_wyckoff_upthrust", "label": STRATEGY_LABELS_PT["sell_wyckoff_upthrust"], "direction": "SELL"},
             ],
         },

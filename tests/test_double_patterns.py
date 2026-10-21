@@ -177,3 +177,53 @@ class TestDoubleTopRefined:
             assert signals_trunc[0].signal_bar_index == t
             assert signals_trunc[0].strategy_sub_id == "sell_double_top_bos"
 
+
+
+class TestInvertedDoubleStrategies:
+    """US3 - Inverted Double Pattern Strategies."""
+
+    def test_sell_double_bottom_inverted_matches_raw(self):
+        engine = ClassicStrategiesEngine()
+        # Use series where raw double bottom triggers
+        series = create_vertical_rally_double_bottom(120)
+        raw_signals = _detect_double_bottom_raw(series.open, series.high, series.low, series.close)
+        assert len(raw_signals) >= 1
+
+        inv_signals = engine.run_sell_double_bottom_inverted(series)
+        assert len(inv_signals) == len(raw_signals)
+        for sig, (raw_t, b1, b2, neck) in zip(inv_signals, raw_signals):
+            assert sig.signal_bar_index == raw_t
+            assert sig.direction == "SELL"
+            assert sig.strategy_id == "sell_double_bottom_inverted"
+            assert sig.strategy_sub_id == "sell_double_bottom_inverted"
+            assert sig.reference_line_price == neck
+
+    def test_buy_double_top_inverted_matches_raw(self):
+        engine = ClassicStrategiesEngine()
+        # Create a series with raw double top
+        n_bars = 120
+        prices = np.full(n_bars, 80.0)
+        high = prices + 0.5
+        low = prices - 0.5
+        open_p = prices.copy()
+        close_p = prices.copy()
+        high[55] = 85.0
+        low[56:72] = 82.0
+        low[65] = 81.0
+        high[72] = 84.8
+        close_p[:80] = 83.0
+        close_p[79] = 81.2
+        close_p[80] = 80.5
+        low[80] = 80.0
+        series = make_series(open_p, high, low, close_p)
+        raw_signals = _detect_double_top_raw(series.open, series.high, series.low, series.close)
+        assert len(raw_signals) >= 1
+
+        inv_signals = engine.run_buy_double_top_inverted(series)
+        assert len(inv_signals) == len(raw_signals)
+        for sig, (raw_t, t1, t2, neck) in zip(inv_signals, raw_signals):
+            assert sig.signal_bar_index == raw_t
+            assert sig.direction == "BUY"
+            assert sig.strategy_id == "buy_double_top_inverted"
+            assert sig.strategy_sub_id == "buy_double_top_inverted"
+            assert sig.reference_line_price == neck

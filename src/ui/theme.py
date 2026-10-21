@@ -19,6 +19,7 @@ STRATEGY_LABELS_PT: Dict[str, str] = {
     "value_proxy": "Desconto Fundamentalista (Value Proxy)",
     "price_action_double_bottom_bos": "Fundo Duplo + BOS (Refinado)",
     "double_bottom_bos": "Fundo Duplo + BOS (Refinado)",
+    "buy_double_top_inverted": "Topo Duplo Invertido (Compra)",
     "price_action_wyckoff_spring": "Varredura de Liquidez (Wyckoff Spring)",
     "wyckoff_spring": "Varredura de Liquidez (Wyckoff Spring)",
     # MQL5 Bullish Candlestick Patterns
@@ -47,6 +48,7 @@ STRATEGY_LABELS_PT: Dict[str, str] = {
     "sell_rebal_relative_strength": "Exaustão de Força Relativa",
     "sell_value_proxy": "Prêmio Excessivo / Estiramento Valuation",
     "sell_double_top_bos": "Topo Duplo + BOS (Refinado)",
+    "sell_double_bottom_inverted": "Fundo Duplo Invertido (Venda)",
     "sell_wyckoff_upthrust": "Varredura de Topo (Wyckoff Upthrust / UTAD)",
     # MQL5 Bearish Candlestick Patterns (SELL)
     "shooting_star": "Vela Topo: Estrela Cadente (Shooting Star)",

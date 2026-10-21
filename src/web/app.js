@@ -562,6 +562,8 @@ const STRATEGY_ALIASES = {
   'double_bottom_bos': ['price_action_double_bottom_bos', 'double_bottom_bos'],
   'sell_wyckoff_upthrust': ['sell_wyckoff_upthrust', 'wyckoff_upthrust'],
   'sell_double_top_bos': ['sell_double_top_bos', 'double_top_bos'],
+  'buy_double_top_inverted': ['buy_double_top_inverted'],
+  'sell_double_bottom_inverted': ['sell_double_bottom_inverted'],
 };
 
 function isStrategyActive(subId, sigDirection = null) {

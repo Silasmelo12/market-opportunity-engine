@@ -73,11 +73,11 @@
 
 **Independent Test**: as datas dos sinais das invertidas == as datas do `_detect_*_raw` (SC-006).
 
-- [ ] T027 [P] [US3] Testes em `tests/test_double_patterns.py`: datas de `sell_double_bottom_inverted` == `_detect_double_bottom_raw`, com direction SELL; idem `buy_double_top_inverted`/BUY; validar os 5 campos do contrato
-- [ ] T028 [US3] Implementar `run_sell_double_bottom_inverted` (SELL, label "Fundo Duplo Invertido (Venda)") em `src/strategies/classic_engines.py`, usando o helper raw
-- [ ] T029 [US3] Implementar `run_buy_double_top_inverted` (BUY, label "Topo Duplo Invertido (Compra)") em `src/strategies/classic_engines.py`
-- [ ] T030 [US3] Registrar as duas no `STRATEGY_IDS` e no dispatcher `run_all` de `ClassicStrategiesEngine` em `src/strategies/classic_engines.py`
-- [ ] T031 [US3] Expor no catálogo `/api/strategies`, nos labels do radar/analyze em `src/api/server.py` e nas opções do simulador em `src/web/index.html`/`src/web/app.js`
+- [X] T027 [P] [US3] Testes em `tests/test_double_patterns.py`: datas de `sell_double_bottom_inverted` == `_detect_double_bottom_raw`, com direction SELL; idem `buy_double_top_inverted`/BUY; validar os 5 campos do contrato
+- [X] T028 [US3] Implementar `run_sell_double_bottom_inverted` (SELL, label "Fundo Duplo Invertido (Venda)") em `src/strategies/classic_engines.py`, usando o helper raw
+- [X] T029 [US3] Implementar `run_buy_double_top_inverted` (BUY, label "Topo Duplo Invertido (Compra)") em `src/strategies/classic_engines.py`
+- [X] T030 [US3] Registrar as duas no `STRATEGY_IDS` e no dispatcher `run_all` de `ClassicStrategiesEngine` em `src/strategies/classic_engines.py`
+- [X] T031 [US3] Expor no catálogo `/api/strategies`, nos labels do radar/analyze em `src/api/server.py` e nas opções do simulador em `src/web/index.html`/`src/web/app.js`
 
 ---
 

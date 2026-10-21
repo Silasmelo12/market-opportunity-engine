@@ -22,7 +22,7 @@ def test_api_strategies_catalog():
     assert "mql5" in data
     assert len(data["mql5"]["strategies"]) == 14
     total_strategies = sum(len(g["strategies"]) for g in data.values())
-    assert total_strategies == 48
+    assert total_strategies == 50  # 48 previously + 2 inverted double strategies
 
 
 def test_api_analyze_synthetic(monkeypatch):

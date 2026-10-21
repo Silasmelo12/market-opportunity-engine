@@ -239,6 +239,7 @@ class ClassicStrategiesEngine:
         "value_proxy",
         "price_action_double_bottom_bos",
         "price_action_wyckoff_spring",
+        "buy_double_top_inverted",
     )
 
     SELL_STRATEGIES = (
@@ -248,6 +249,7 @@ class ClassicStrategiesEngine:
         "sell_value_proxy",
         "sell_double_top_bos",
         "sell_wyckoff_upthrust",
+        "sell_double_bottom_inverted",
     )
 
     STRATEGIES = BUY_STRATEGIES + SELL_STRATEGIES
@@ -552,6 +554,33 @@ class ClassicStrategiesEngine:
             mask=mask,
             strategy_id="price_action_double_bottom_bos",
             strategy_sub_id="double_bottom_bos",
+            direction="BUY",
+            ref_prices=necklines,
+        )
+
+    def run_buy_double_top_inverted(self, series: OHLCVSeries) -> List[SignalRecord]:
+        """
+        Original Double Top logic converted into a BUY strategy (Empirically marks oversold pullbacks/springs).
+        Generates BUY signal at the exact bars where raw double top triggered.
+        """
+        c = series.close
+        l = series.low
+        h = series.high
+        o = series.open
+        n = len(c)
+        mask = np.zeros(n, dtype=bool)
+        necklines = np.full(n, np.nan, dtype=np.float64)
+
+        raw_signals = _detect_double_top_raw(o, h, l, c)
+        for t, t1_idx, t2_idx, neckline in raw_signals:
+            mask[t] = True
+            necklines[t] = neckline
+
+        return self._emit_from_mask(
+            series=series,
+            mask=mask,
+            strategy_id="buy_double_top_inverted",
+            strategy_sub_id="buy_double_top_inverted",
             direction="BUY",
             ref_prices=necklines,
         )
@@ -893,6 +922,33 @@ class ClassicStrategiesEngine:
             ref_prices=res_high,
         )
 
+    def run_sell_double_bottom_inverted(self, series: OHLCVSeries) -> List[SignalRecord]:
+        """
+        Original Double Bottom logic converted into a SELL strategy (Empirically marks overbought rallies/exhaustion).
+        Generates SELL signal at the exact bars where raw double bottom triggered.
+        """
+        c = series.close
+        l = series.low
+        h = series.high
+        o = series.open
+        n = len(c)
+        mask = np.zeros(n, dtype=bool)
+        necklines = np.full(n, np.nan, dtype=np.float64)
+
+        raw_signals = _detect_double_bottom_raw(o, h, l, c)
+        for t, b1_idx, b2_idx, neckline in raw_signals:
+            mask[t] = True
+            necklines[t] = neckline
+
+        return self._emit_from_mask(
+            series=series,
+            mask=mask,
+            strategy_id="sell_double_bottom_inverted",
+            strategy_sub_id="sell_double_bottom_inverted",
+            direction="SELL",
+            ref_prices=necklines,
+        )
+
     def generate_signals(
         self,
         series: OHLCVSeries,
@@ -915,6 +971,7 @@ class ClassicStrategiesEngine:
             ("value_proxy", lambda: self.run_value_proxy(series)),
             ("price_action_double_bottom_bos", lambda: self.run_double_bottom_bos(series)),
             ("price_action_wyckoff_spring", lambda: self.run_wyckoff_spring(series)),
+            ("buy_double_top_inverted", lambda: self.run_buy_double_top_inverted(series)),
         ]
 
         sell_runners = [
@@ -924,6 +981,7 @@ class ClassicStrategiesEngine:
             ("sell_value_proxy", lambda: self.run_sell_value_proxy(series)),
             ("sell_double_top_bos", lambda: self.run_sell_double_top_bos(series)),
             ("sell_wyckoff_upthrust", lambda: self.run_sell_wyckoff_upthrust(series)),
+            ("sell_double_bottom_inverted", lambda: self.run_sell_double_bottom_inverted(series)),
         ]
 
         active_runners = []

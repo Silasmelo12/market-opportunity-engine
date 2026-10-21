@@ -481,16 +481,20 @@
             </div>
           </div>
 
-          <!-- Accordion 3: Price Action BUY (2) -->
+          <!-- Accordion 3: Price Action BUY (3) -->
           <div class="border border-fintech-border rounded overflow-hidden strategy-group-wrapper" data-direction="BUY">
             <div class="accordion-header bg-fintech-bg px-2.5 py-1.5 flex items-center justify-between text-gray-200 font-semibold" data-accordion="acc-pa-buy">
-              <span class="flex items-center gap-1">Price Action Fundo (2)</span>
+              <span class="flex items-center gap-1">Price Action Fundo (3)</span>
               <span class="text-gray-400 text-xs"></span>
             </div>
             <div id="acc-pa-buy" class="p-2 space-y-1 bg-fintech-surface">
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
                 <input type="checkbox" class="strategy-cb" data-id="double_bottom_bos" data-dir="BUY">
-                <span>Fundo Duplo + BOS</span>
+                <span>Fundo Duplo + BOS (Refinado)</span>
+              </label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
+                <input type="checkbox" class="strategy-cb" data-id="buy_double_top_inverted" data-dir="BUY">
+                <span>Topo Duplo Invertido (Compra)</span>
               </label>
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
                 <input type="checkbox" class="strategy-cb" data-id="wyckoff_spring" data-dir="BUY">
@@ -499,16 +503,20 @@
             </div>
           </div>
 
-          <!-- Accordion 4: Price Action SELL (2) -->
+          <!-- Accordion 4: Price Action SELL (3) -->
           <div class="border border-fintech-border rounded overflow-hidden strategy-group-wrapper" data-direction="SELL">
             <div class="accordion-header bg-fintech-bg px-2.5 py-1.5 flex items-center justify-between text-gray-200 font-semibold" data-accordion="acc-pa-sell">
-              <span class="flex items-center gap-1">Price Action Topo (2)</span>
+              <span class="flex items-center gap-1">Price Action Topo (3)</span>
               <span class="text-gray-400 text-xs"></span>
             </div>
             <div id="acc-pa-sell" class="p-2 space-y-1 bg-fintech-surface">
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
                 <input type="checkbox" class="strategy-cb" data-id="sell_double_top_bos" data-dir="SELL">
-                <span>Topo Duplo + BOS</span>
+                <span>Topo Duplo + BOS (Refinado)</span>
+              </label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
+                <input type="checkbox" class="strategy-cb" data-id="sell_double_bottom_inverted" data-dir="SELL">
+                <span>Fundo Duplo Invertido (Venda)</span>
               </label>
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
                 <input type="checkbox" class="strategy-cb" data-id="sell_wyckoff_upthrust" data-dir="SELL">
@@ -786,7 +794,8 @@
                   <option value="t2_retest">Negação Fundo N Barras (Reteste)</option>
                 </optgroup>
                 <optgroup label="Price Action Institucional">
-                  <option value="double_bottom_bos">Fundo Duplo + Quebra de Estrutura (BOS)</option>
+                  <option value="double_bottom_bos">Fundo Duplo + BOS (Refinado)</option>
+                  <option value="buy_double_top_inverted">Topo Duplo Invertido (Compra)</option>
                   <option value="wyckoff_spring">Varredura de Liquidez (Wyckoff Spring)</option>
                 </optgroup>
                 <optgroup label="Alocação & Rebalanceamento">
@@ -828,7 +837,8 @@
                   <option value="sell_t2_retest">Negação Topo N Barras (Reteste)</option>
                 </optgroup>
                 <optgroup label="Price Action Institucional">
-                  <option value="sell_double_top_bos">Topo Duplo + Quebra Estrutura BOS</option>
+                  <option value="sell_double_top_bos">Topo Duplo + BOS (Refinado)</option>
+                  <option value="sell_double_bottom_inverted">Fundo Duplo Invertido (Venda)</option>
                   <option value="sell_wyckoff_upthrust">Varredura de Topo (Wyckoff Upthrust)</option>
                 </optgroup>
                 <optgroup label="Alocação & Realização">
