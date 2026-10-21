@@ -26,7 +26,7 @@ description: "Tasks for feature 010: Correção do Radar, Seletor de Modelo de C
 **Independent Test**: Clicar em "Venda" na aba Radar e verificar que a tabela exibe oportunidades de venda/topo com os badges de timing corretos e que o menu de estratégias lista apenas filtros de venda.
 
 - [X] T003 [US1] Corrigir `setupDirectionSelector` em `src/web/app.js` para atualizar `state.activeDirection`, resetar `state.radarPage = 1` e disparar `loadRadarData(false)` para requisitar os dados da direção ativa ao servidor.
-- [ ] T004 [US1] Atualizar `renderRadarStratMenu` em `src/web/app.js` ao alternar direção no radar para sincronizar os checkboxes de estratégia com a direção ativa (`BUY`, `SELL`, `BOTH`).
+- [X] T004 [US1] Atualizar `renderRadarStratMenu` em `src/web/app.js` ao alternar direção no radar para sincronizar os checkboxes de estratégia com a direção ativa (`BUY`, `SELL`, `BOTH`).
 - [ ] T005 [P] [US1] Adicionar teste unitário de endpoint em `tests/unit/test_api_endpoints.py` validando que `/api/radar` com `direction=SELL` e `direction=BOTH` retorna itens com as direções correspondentes.
 
 ---
