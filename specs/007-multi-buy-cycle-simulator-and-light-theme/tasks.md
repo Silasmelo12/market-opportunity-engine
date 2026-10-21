@@ -23,7 +23,7 @@ description: "Task list for feature 007: Multi-Buy Cycle Trade, Light Theme & En
 **Purpose**: Preparar modelos e contratos de dados para acomodar múltiplas compras por ciclo e métricas institucionais estendidas.
 
 - [X] T001 Definir dataclass `BuyEntryRecord` e atualizar dataclass `TradeRecord` em `src/evaluator/accumulation_simulator.py` com campos `buy_entries`, `num_entries`, `average_buy_price`, `total_invested` e `total_shares`.
-- [ ] T002 Atualizar schemas Pydantic em `src/api/schemas.py` (`SimulateRequest`, `SimulationMetricSummary`, `TradeRecordSchema`) incluindo `contribution_amount`, `profit_factor`, `win_rate_pct`, `buy_and_hold_return_pct`, `avg_entries_per_cycle` e lista `buy_entries`.
+- [X] T002 Atualizar schemas Pydantic em `src/api/schemas.py` (`SimulateRequest`, `SimulationMetricSummary`, `TradeRecordSchema`) incluindo `contribution_amount`, `profit_factor`, `win_rate_pct`, `buy_and_hold_return_pct`, `avg_entries_per_cycle` e lista `buy_entries`.
 
 ---
 

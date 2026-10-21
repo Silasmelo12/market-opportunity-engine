@@ -146,7 +146,7 @@ class SimulateRequest(BaseModel):
     interval: str = "1d"
     period: str = "2y"
     simulation_mode: str = "cycle_trade"  # "cycle_trade" | "accumulation"
-    contribution_amount: float = 1000.0   # Serves as contribution in accumulation, or initial_capital in cycle_trade
+    contribution_amount: float = 1000.0   # Serves as contribution in accumulation, or per-signal contribution in multi-buy cycle_trade
     initial_capital: float = 1000.0
     buy_strategy: Optional[str] = None    # Specific buy strategy or "ALL"
     sell_strategy: Optional[str] = None   # Specific sell strategy or "ALL"
@@ -165,6 +165,43 @@ class AccumulationPoint(BaseModel):
     shares: float
     close_price: float
     cash_inflow: float
+
+
+class BuyEntrySchema(BaseModel):
+    entry_id: int
+    date: str
+    bar_index: int
+    price: float
+    shares: float
+    capital: float
+    strategy_sub_id: str
+    strategy_label: str
+
+
+class TradeRecordSchema(BaseModel):
+    trade_id: int
+    buy_strategy_sub_id: str
+    buy_strategy_label: str
+    buy_date: str
+    buy_price: float
+    buy_bar_index: int
+    sell_strategy_sub_id: Optional[str] = None
+    sell_strategy_label: Optional[str] = None
+    sell_date: Optional[str] = None
+    sell_price: Optional[float] = None
+    sell_bar_index: Optional[int] = None
+    return_pct: float = 0.0
+    profit_loss: float = 0.0
+    duration_bars: int = 0
+    shares: float = 0.0
+    entry_capital: float = 0.0
+    exit_capital: float = 0.0
+    status: str = "FECHADO"
+    num_entries: int = 1
+    average_buy_price: float = 0.0
+    total_invested: float = 0.0
+    total_shares: float = 0.0
+    buy_entries: Optional[List[BuyEntrySchema]] = None
 
 
 class SimulationMetricSummary(BaseModel):
@@ -188,6 +225,8 @@ class SimulationMetricSummary(BaseModel):
     avg_trade_return_pct: Optional[float] = None
     avg_trade_bars: Optional[float] = None
     buy_and_hold_return_pct: Optional[float] = None
+    profit_factor: Optional[float] = None
+    avg_entries_per_cycle: Optional[float] = None
 
 
 class SimulateResponse(BaseModel):
