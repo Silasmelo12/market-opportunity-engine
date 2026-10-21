@@ -647,51 +647,15 @@ class ClassicStrategiesEngine:
         c = series.close
         l = series.low
         h = series.high
+        o = series.open
         n = len(c)
         mask = np.zeros(n, dtype=bool)
         necklines = np.full(n, np.nan, dtype=np.float64)
 
-        if n < 15:
-            return []
-
-        window = 40
-        cooldown_until = -1
-
-        for t in range(15, n):
-            if t <= cooldown_until:
-                continue
-
-            start_idx = max(0, t - window)
-            sub_lows = l[start_idx:t]
-            sub_highs = h[start_idx:t]
-            m = len(sub_highs)
-            if m < 10:
-                continue
-
-            mid_split = m // 2
-            t1_rel = int(np.argmax(sub_highs[:mid_split]))
-            t1_high = sub_highs[t1_rel]
-
-            second_start = max(mid_split, t1_rel + 3)
-            if second_start >= m - 1:
-                continue
-
-            t2_rel = second_start + int(np.argmax(sub_highs[second_start:]))
-            t2_high = sub_highs[t2_rel]
-
-            if t2_rel <= t1_rel + 2:
-                continue
-
-            neckline = float(np.min(sub_lows[t1_rel + 1 : t2_rel]))
-            if t1_high <= 0:
-                continue
-            rel_diff = (t2_high - t1_high) / t1_high
-            is_valid_double_top = (-0.02 <= rel_diff <= 0.03) and (neckline < t1_high * 0.985)
-
-            if is_valid_double_top and (c[t - 1] >= neckline) and (c[t] < neckline):
-                mask[t] = True
-                necklines[t] = neckline
-                cooldown_until = t + 10
+        raw_signals = _detect_double_top_raw(o, h, l, c)
+        for t, t1_idx, t2_idx, neckline in raw_signals:
+            mask[t] = True
+            necklines[t] = neckline
 
         return self._emit_from_mask(
             series=series,
