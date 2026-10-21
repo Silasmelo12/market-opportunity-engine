@@ -49,7 +49,7 @@ description: "Tasks for feature 010: Correção do Radar, Seletor de Modelo de C
 
 **Independent Test**: Configurar tempo gráfico (ex: 5m) e modo de ciclo (1x ou Multi-Buy), clicar em "Mais Lucrativa", verificar o card campeão e clicar em "Aplicar e Simular", comprovando que os KPIs principais e o histórico de trades resultam em métricas idênticas.
 
-- [ ] T009 [US3] Atualizar `optimize_strategy_pairs` em `src/evaluator/accumulation_simulator.py` para receber `cycle_entry_mode` e avaliar o ranking sob o modelo de ciclo selecionado (1x ou Multi-Buy).
+- [X] T009 [US3] Atualizar `optimize_strategy_pairs` em `src/evaluator/accumulation_simulator.py` para receber `cycle_entry_mode` e avaliar o ranking sob o modelo de ciclo selecionado (1x ou Multi-Buy).
 - [ ] T010 [US3] Atualizar o endpoint `/api/simulate/optimize` em `src/api/server.py` para repassar `cycle_entry_mode` e limitar o período a `"60d"` para intervalos intraday (`5m`, `15m`, `60m`).
 - [ ] T011 [US3] Atualizar `runOptimizer()` e o botão de aplicação da campeã em `src/web/app.js` para ler `sim-interval`, limitar período em intraday, repassar `sim-cycle-mode` e garantir que o botão "Aplicar e Simular" execute com os mesmos parâmetros exatos.
 

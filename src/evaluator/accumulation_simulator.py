@@ -517,6 +517,7 @@ def optimize_strategy_pairs(
     end_date: Optional[str] = None,
     strategy_labels_map: Optional[Dict[str, str]] = None,
     top_n: int = 15,
+    cycle_entry_mode: str = "multi_buy",
 ) -> Tuple[Optional[StrategyPairRankItem], List[StrategyPairRankItem]]:
     """
     Scans all pairs of (Buy Strategy, Sell Strategy) that produce trades.
@@ -555,9 +556,12 @@ def optimize_strategy_pairs(
     def _eval_pair(b_sigs: List[SignalRecord], s_sigs: List[SignalRecord], req_min_trades: int):
         merged = sorted(b_sigs + s_sigs, key=lambda x: (x.execution_bar_index, 0 if x.direction == "BUY" else 1))
         cash = float(initial_capital)
+        cum_invested = float(initial_capital)
         entry_p = 0.0
         entry_bar = -1
         in_pos = False
+        shares = 0.0
+        trade_invested = 0.0
         closed_trades = 0
         wins = 0
         peak = float(initial_capital)
@@ -567,8 +571,17 @@ def optimize_strategy_pairs(
             bar = s.execution_bar_index
             p = float(s.execution_price)
             if in_pos and s.direction == "SELL" and bar > entry_bar and p > 0:
-                ret = (p - entry_p) / entry_p
-                cash = cash * (1.0 + ret)
+                if cycle_entry_mode == "single_buy":
+                    ret = (p - entry_p) / entry_p
+                    cash = cash * (1.0 + ret)
+                else:
+                    exit_cap = shares * p
+                    pnl = exit_cap - trade_invested
+                    ret = pnl / trade_invested if trade_invested > 0 else 0.0
+                    cash += exit_cap
+                    shares = 0.0
+                    trade_invested = 0.0
+
                 closed_trades += 1
                 if ret > 0:
                     wins += 1
@@ -578,21 +591,53 @@ def optimize_strategy_pairs(
                 if dd < max_dd:
                     max_dd = dd
                 in_pos = False
-            elif not in_pos and s.direction == "BUY" and p > 0:
-                entry_p = p
-                entry_bar = bar
-                in_pos = True
 
-        if in_pos and entry_p > 0:
-            ret = (last_close - entry_p) / entry_p
-            equity = cash * (1.0 + ret)
+            elif s.direction == "BUY" and p > 0:
+                if not in_pos:
+                    entry_p = p
+                    entry_bar = bar
+                    in_pos = True
+                    if cycle_entry_mode == "single_buy":
+                        pass
+                    else:
+                        entry_cap = cash if cash > 0 else float(initial_capital)
+                        if cash == 0.0:
+                            cum_invested += entry_cap
+                        shares = entry_cap / p
+                        trade_invested = entry_cap
+                        cash = 0.0
+                elif cycle_entry_mode == "multi_buy":
+                    # Accumulate into position
+                    add_cap = float(initial_capital)
+                    if cash >= add_cap:
+                        cash -= add_cap
+                    elif cash > 0:
+                        deficit = add_cap - cash
+                        cum_invested += deficit
+                        cash = 0.0
+                    else:
+                        cum_invested += add_cap
+                        cash = 0.0
+                    shares += add_cap / p
+                    trade_invested += add_cap
+
+        if in_pos:
+            if cycle_entry_mode == "single_buy":
+                if entry_p > 0:
+                    ret = (last_close - entry_p) / entry_p
+                    equity = cash * (1.0 + ret)
+                else:
+                    equity = cash
+            else:
+                equity = cash + (shares * last_close)
         else:
             equity = cash
 
         if closed_trades < req_min_trades:
             return None
 
-        tot_ret_pct = ((equity / initial_capital) - 1.0) * 100.0
+        tot_invested_denom = float(initial_capital) if cycle_entry_mode == "single_buy" else cum_invested
+        tot_ret_pct = ((equity / tot_invested_denom) - 1.0) * 100.0 if tot_invested_denom > 0 else 0.0
         win_rate = (wins / closed_trades * 100.0) if closed_trades > 0 else 0.0
 
         return {
@@ -601,7 +646,7 @@ def optimize_strategy_pairs(
             "has_open_trade": in_pos,
             "win_rate_pct": round(win_rate, 1),
             "total_return_pct": round(tot_ret_pct, 1),
-            "net_profit": round(equity - initial_capital, 2),
+            "net_profit": round(equity - tot_invested_denom, 2),
             "final_equity": round(equity, 2),
             "max_drawdown_pct": round(max_dd, 1),
         }
@@ -641,6 +686,7 @@ def optimize_strategy_pairs(
                 max_drawdown_pct=r["max_drawdown_pct"],
                 has_open_trade=r["has_open_trade"],
                 final_equity=r["final_equity"],
+                cycle_entry_mode=cycle_entry_mode,
             )
         )
 
