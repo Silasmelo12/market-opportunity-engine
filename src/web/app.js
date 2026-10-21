@@ -1875,30 +1875,46 @@ function renderSimulationTradesTable(trades, mode) {
     tr.className = 'hover:bg-fintech-surface-hover';
 
     if (mode === 'cycle_trade') {
-      const isWin = (t.return_pct || 0) >0;
-      const retClass = isWin ? 'text-emerald-400' : ((t.return_pct || 0) < 0 ? 'text-rose-400' : 'text-gray-300');
+      const isWin = (t.return_pct || 0) > 0;
+      const isLoss = (t.return_pct || 0) < 0;
+      const retClass = isWin ? 'text-emerald-400' : (isLoss ? 'text-rose-400' : 'text-gray-300');
       const pnlClass = (t.profit_loss || 0) >= 0 ? 'text-emerald-400' : 'text-rose-400';
       const isOpen = (t.status === 'ABERTO');
+      const numBuys = t.num_entries || (t.buy_entries ? t.buy_entries.length : 1);
+      const avgPrice = t.average_buy_price || t.buy_price || 0;
+
+      let statusBadge = '';
+      if (isOpen) {
+        statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40">EM ABERTO</span>';
+      } else if (isWin) {
+        statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">LUCRO</span>';
+      } else {
+        statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40">PREJUÍZO</span>';
+      }
 
       tr.innerHTML = `
         <td class="px-2.5 py-2 text-center text-gray-400 font-bold">${t.trade_id || '-'}</td>
         <td class="px-2.5 py-2 text-cyan-300 font-medium font-sans">${t.buy_strategy || '-'}</td>
+        <td class="px-2.5 py-2 text-center font-bold ${numBuys > 1 ? 'text-amber-400' : 'text-gray-300'}">
+          <span class="px-1.5 py-0.5 rounded ${numBuys > 1 ? 'bg-amber-500/20 border border-amber-500/40' : 'bg-gray-800'} text-[10px]">
+            ${numBuys}x
+          </span>
+        </td>
         <td class="px-2.5 py-2 text-gray-300">${t.buy_date || '-'}</td>
-        <td class="px-2.5 py-2 text-white font-semibold">R$ ${(t.buy_price || 0).toFixed(2)}</td>
+        <td class="px-2.5 py-2 text-white font-semibold">R$ ${avgPrice.toFixed(2)}</td>
         <td class="px-2.5 py-2 text-rose-300 font-medium font-sans">${t.sell_strategy || '-'}</td>
         <td class="px-2.5 py-2 text-gray-300">${t.sell_date || '-'}</td>
         <td class="px-2.5 py-2 text-white font-semibold">${t.sell_price ? 'R$ ' + t.sell_price.toFixed(2) : '-'}</td>
         <td class="px-2.5 py-2 text-center text-gray-300">${t.duration_bars != null ? t.duration_bars + 'b' : '-'}</td>
         <td class="px-2.5 py-2 font-bold ${retClass}">${(t.return_pct || 0) >= 0 ? '+' : ''}${(t.return_pct || 0).toFixed(1)}%</td>
         <td class="px-2.5 py-2 font-bold ${pnlClass}">${(t.profit_loss || 0) >= 0 ? '+' : ''}R$ ${(t.profit_loss || 0).toFixed(2)}</td>
-        <td class="px-2.5 py-2 text-center">
-          <span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${isOpen ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' : 'bg-gray-700/50 text-gray-300'}">${t.status || 'FECHADO'}</span>
-        </td>
+        <td class="px-2.5 py-2 text-center">${statusBadge}</td>
       `;
     } else {
       tr.innerHTML = `
         <td class="px-2.5 py-2 text-center text-gray-400">-</td>
         <td class="px-2.5 py-2 text-cyan-300 font-medium font-sans">${t.strategy || '-'}</td>
+        <td class="px-2.5 py-2 text-center text-gray-300 font-bold">1x</td>
         <td class="px-2.5 py-2 text-gray-300">${t.date || '-'}</td>
         <td class="px-2.5 py-2 text-white font-semibold">R$ ${(t.execution_price || 0).toFixed(2)}</td>
         <td class="px-2.5 py-2 text-gray-500">-</td>
@@ -1912,6 +1928,28 @@ function renderSimulationTradesTable(trades, mode) {
     }
 
     tbody.appendChild(tr);
+
+    // If multi-buy entries exist, append collapsible/informative sub-row
+    if (mode === 'cycle_trade' && t.buy_entries && t.buy_entries.length > 1) {
+      const subTr = document.createElement('tr');
+      subTr.className = 'bg-fintech-surface/40 text-[10px] text-gray-400';
+      const entriesDetail = t.buy_entries.map(be => `
+        <span class="inline-flex items-center gap-1 bg-fintech-bg px-2 py-0.5 rounded border border-fintech-border/60">
+          <span class="text-cyan-400 font-bold">#${be.entry_id}</span>
+          <span>${be.date}: R$ ${be.price.toFixed(2)} (${be.shares.toFixed(1)} cotas)</span>
+        </span>
+      `).join(' ');
+
+      subTr.innerHTML = `
+        <td colspan="12" class="px-4 py-1.5 font-mono">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-amber-400 font-semibold font-sans">↳ Sub-entradas acumuladas:</span>
+            ${entriesDetail}
+          </div>
+        </td>
+      `;
+      tbody.appendChild(subTr);
+    }
   });
 }
 
