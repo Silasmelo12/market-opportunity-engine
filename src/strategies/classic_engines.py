@@ -759,11 +759,20 @@ class ClassicStrategiesEngine:
             extra_meta={"valuation_mode": mode_used},
         )
 
-    def run_sell_double_top_bos(self, series: OHLCVSeries) -> List[SignalRecord]:
+    def run_sell_double_top_bos(
+        self,
+        series: OHLCVSeries,
+        params: Optional[DoublePatternParams] = None,
+    ) -> List[SignalRecord]:
         """
-        5. Topo Duplo + Quebra de Estrutura Bearish BOS (SELL):
-        Detects two tops in a resistance zone confirmed by a close below intermediate trough (Neckline / BOS).
+        Refined Topo Duplo + Quebra de Estrutura Bearish BOS (SELL):
+        Applies strict causal filters (mirror of double bottom):
+        1. Trend context: T1 and T2 must be above SMA(50) OR preceded by a rally of >= 6% from prior low.
+        2. Relative position filter: Discard if Close[t] <= min(Low[t-60:t]) (cannot be 2-month low).
+        3. RSI filter: RSI(14) must have visited > 55 during T1/T2, and breakdown Close[t] RSI >= 40.
+        4. Prior depth: Minimum rally of >= 6% prior to T1 in depth_window (40 bars).
         """
+        p = params or DoublePatternParams()
         c = series.close
         l = series.low
         h = series.high
@@ -772,8 +781,59 @@ class ClassicStrategiesEngine:
         mask = np.zeros(n, dtype=bool)
         necklines = np.full(n, np.nan, dtype=np.float64)
 
+        if n < max(p.trend_sma_period, p.relative_window):
+            return []
+
+        # Vectorized indicators (strictly causal)
+        sma50 = _sma(c, p.trend_sma_period)
+        roll_min_60 = _rolling_min_prev(l, p.relative_window)
+        rsi14 = compute_rsi(c, p.rsi_period)
+
         raw_signals = _detect_double_top_raw(o, h, l, c)
         for t, t1_idx, t2_idx, neckline in raw_signals:
+            if t < p.relative_window or np.isnan(roll_min_60[t]) or np.isnan(sma50[t]):
+                continue
+
+            t1_high = h[t1_idx]
+            t2_high = h[t2_idx]
+
+            # 1 & 4. Trend context & Depth before T1
+            depth_start = max(0, t1_idx - p.depth_window)
+            if depth_start >= t1_idx:
+                prior_min_low = l[t1_idx]
+            else:
+                prior_min_low = float(np.min(l[depth_start:t1_idx]))
+
+            prior_rally_pct = (t1_high - prior_min_low) / prior_min_low if prior_min_low > 0 else 0.0
+
+            # Trend context: Above SMA(50) at tops OR prior rally >= prior_move_pct (6%)
+            sma_t1 = sma50[t1_idx]
+            sma_t2 = sma50[t2_idx]
+            above_sma = (not np.isnan(sma_t1) and c[t1_idx] > sma_t1) and (not np.isnan(sma_t2) and c[t2_idx] > sma_t2)
+            has_trend_rally = above_sma or (prior_rally_pct >= p.prior_move_pct)
+
+            if not has_trend_rally:
+                continue
+
+            # Minimum depth filter: Must have rallied at least prior_move_pct before T1
+            if prior_rally_pct < p.prior_move_pct:
+                continue
+
+            # 2. Relative position filter: Discard if Close[t] <= min(Low[t-60:t])
+            if c[t] <= roll_min_60[t]:
+                continue
+
+            # 3. RSI Anti-exhaustion filter
+            # RSI during top formation (t1_idx to t2_idx inclusive) must have visited > rsi_top_threshold
+            top_rsi_max = float(np.max(rsi14[t1_idx : t2_idx + 1]))
+            if np.isnan(top_rsi_max) or top_rsi_max <= p.rsi_top_threshold:
+                continue
+
+            # Breakdown bar RSI must not be oversold (>= rsi_top_break_limit)
+            if np.isnan(rsi14[t]) or rsi14[t] < p.rsi_top_break_limit:
+                continue
+
+            # All filters satisfied
             mask[t] = True
             necklines[t] = neckline
 

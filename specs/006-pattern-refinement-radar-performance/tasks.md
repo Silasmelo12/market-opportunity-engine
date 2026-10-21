@@ -46,11 +46,11 @@
 **Independent Test**: `pytest tests/test_double_patterns.py -k top`
 
 - [X] T013 [P] [US2] Testes espelhados do T007 para o topo em `tests/test_double_patterns.py` (queda vertical → 0; `c[t] <= min(Low[t-60:t])` → descartado; RSI máximo ≤ 55 ou RSI[t] < 40 → descartado; válido → 1; anti-look-ahead)
-- [ ] T014 [US2] Implementar filtro de tendência (FR-006) em `run_sell_double_top_bos` em `src/strategies/classic_engines.py`
-- [ ] T015 [US2] Implementar filtro de posição relativa (FR-007) em `run_sell_double_top_bos`
-- [ ] T016 [US2] Implementar filtro de RSI (FR-008: max RSI em T1/T2 > 55, RSI[t] ≥ 40) em `run_sell_double_top_bos`
-- [ ] T017 [US2] Implementar alta prévia mínima (FR-009) e descarte por histórico insuficiente em `run_sell_double_top_bos`
-- [ ] T018 [US2] Atualizar a descrição no catálogo em `src/api/server.py` e no guia em `src/web/index.html`
+- [X] T014 [US2] Implementar filtro de tendência (FR-006) em `run_sell_double_top_bos` em `src/strategies/classic_engines.py`
+- [X] T015 [US2] Implementar filtro de posição relativa (FR-007) em `run_sell_double_top_bos`
+- [X] T016 [US2] Implementar filtro de RSI (FR-008: max RSI em T1/T2 > 55, RSI[t] ≥ 40) em `run_sell_double_top_bos`
+- [X] T017 [US2] Implementar alta prévia mínima (FR-009) e descarte por histórico insuficiente em `run_sell_double_top_bos`
+- [X] T018 [US2] Atualizar a descrição no catálogo em `src/api/server.py` e no guia em `src/web/index.html`
 
 ---
 

@@ -46,7 +46,7 @@ STRATEGY_LABELS_PT: Dict[str, str] = {
     "sell_rebal_rv_rf": "Rebalanceamento Variável ->Renda Fixa",
     "sell_rebal_relative_strength": "Exaustão de Força Relativa",
     "sell_value_proxy": "Prêmio Excessivo / Estiramento Valuation",
-    "sell_double_top_bos": "Topo Duplo + Quebra de Estrutura (BOS)",
+    "sell_double_top_bos": "Topo Duplo + BOS (Refinado)",
     "sell_wyckoff_upthrust": "Varredura de Topo (Wyckoff Upthrust / UTAD)",
     # MQL5 Bearish Candlestick Patterns (SELL)
     "shooting_star": "Vela Topo: Estrela Cadente (Shooting Star)",
