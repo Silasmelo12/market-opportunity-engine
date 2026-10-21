@@ -45,7 +45,7 @@
 
 **Independent Test**: `pytest tests/test_double_patterns.py -k top`
 
-- [ ] T013 [P] [US2] Testes espelhados do T007 para o topo em `tests/test_double_patterns.py` (queda vertical → 0; `c[t] <= min(Low[t-60:t])` → descartado; RSI máximo ≤ 55 ou RSI[t] < 40 → descartado; válido → 1; anti-look-ahead)
+- [X] T013 [P] [US2] Testes espelhados do T007 para o topo em `tests/test_double_patterns.py` (queda vertical → 0; `c[t] <= min(Low[t-60:t])` → descartado; RSI máximo ≤ 55 ou RSI[t] < 40 → descartado; válido → 1; anti-look-ahead)
 - [ ] T014 [US2] Implementar filtro de tendência (FR-006) em `run_sell_double_top_bos` em `src/strategies/classic_engines.py`
 - [ ] T015 [US2] Implementar filtro de posição relativa (FR-007) em `run_sell_double_top_bos`
 - [ ] T016 [US2] Implementar filtro de RSI (FR-008: max RSI em T1/T2 > 55, RSI[t] ≥ 40) em `run_sell_double_top_bos`

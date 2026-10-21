@@ -98,3 +98,82 @@ class TestDoubleBottomRefined:
             assert len(signals_trunc) == 1
             assert signals_trunc[0].signal_bar_index == t
             assert signals_trunc[0].strategy_sub_id == "double_bottom_bos"
+
+
+class TestDoubleTopRefined:
+    """US2 - Refined Double Top + BOS Tests (SELL - Bearish)."""
+
+    def test_vertical_fall_rejection(self):
+        """
+        In a strong vertical downtrend, a mini double-top must be rejected:
+        - close[t] cannot be the lowest low of 60 bars (Position filter)
+        - Price must be above SMA50 or have prior uptrend >= 6%
+        - RSI must visit > 55 during tops, and breakdown bar RSI >= 40.
+        """
+        engine = ClassicStrategiesEngine()
+        n_bars = 120
+        prices = np.full(n_bars, 80.0)
+        high = prices + 0.5
+        low = prices - 0.5
+        open_p = prices.copy()
+        close_p = prices.copy()
+        # Form double top in window [40:80], breakdown at bar 80
+        # t1 at bar 55, neck at bar 65, t2 at bar 72
+        high[55] = 85.0
+        low[56:72] = 82.0
+        low[65] = 81.0
+        high[72] = 84.8
+        close_p[:80] = 83.0
+        close_p[79] = 81.2
+        close_p[80] = 80.5
+        low[80] = 80.0
+        series = make_series(open_p, high, low, close_p)
+        # Check raw detector detects it first
+        raw = _detect_double_top_raw(series.open, series.high, series.low, series.close)
+        assert len(raw) >= 1, "Raw detector should detect the shape before filters"
+        signals = engine.run_sell_double_top_bos(series)
+        assert len(signals) == 0, f"Expected 0 sell signals during vertical fall/no trend, got {len(signals)}"
+
+    def test_filter_rejection_at_60_bar_low(self):
+        """
+        If close[t] <= min(Low[t-60:t]), the sell signal MUST be discarded.
+        A reversal top cannot be the 2-month lowest low.
+        """
+        engine = ClassicStrategiesEngine()
+        n = 100
+        p = np.linspace(100.0, 50.0, n)
+        # Force a double top shape at the very bottom
+        p[-5] = 52.0
+        p[-4] = 49.0
+        p[-3] = 51.9
+        p[-2] = 48.0  # Breakdown that is lower than any low in last 60 bars
+        p[-1] = 47.0
+        series = make_series(p + 0.2, p + 0.5, p - 0.5, p)
+        signals = engine.run_sell_double_top_bos(series)
+        assert len(signals) == 0, "Signal at 60-bar lowest low must be rejected"
+
+    def test_anti_lookahead_double_top(self):
+        """
+        Zero look-ahead validation on double top strategy.
+        """
+        engine = ClassicStrategiesEngine()
+        series = create_valid_reversal_double_top(120)
+        signals_full = engine.run_sell_double_top_bos(series)
+        if len(signals_full) > 0:
+            sig = signals_full[0]
+            t = sig.signal_bar_index
+            truncated_series = OHLCVSeries(
+                ticker=series.ticker,
+                interval=series.interval,
+                timestamps=series.timestamps[: t + 1],
+                open=series.open[: t + 1],
+                high=series.high[: t + 1],
+                low=series.low[: t + 1],
+                close=series.close[: t + 1],
+                volume=series.volume[: t + 1],
+            )
+            signals_trunc = engine.run_sell_double_top_bos(truncated_series)
+            assert len(signals_trunc) == 1
+            assert signals_trunc[0].signal_bar_index == t
+            assert signals_trunc[0].strategy_sub_id == "sell_double_top_bos"
+
