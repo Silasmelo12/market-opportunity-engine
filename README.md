@@ -7,14 +7,16 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![TradingView](https://img.shields.io/badge/Lightweight_Charts-TradingView-131722?style=for-the-badge&logo=tradingview&logoColor=white)](https://tradingview.github.io/lightweight-charts/)
 [![Redis](https://img.shields.io/badge/Redis-Cache-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
-[![Pytest](https://img.shields.io/badge/Tests-61%20Passed-449C44?style=for-the-badge&logo=pytest&logoColor=white)](https://pytest.org/)
+[![Pytest](https://img.shields.io/badge/Tests-47%20Passed-449C44?style=for-the-badge&logo=pytest&logoColor=white)](https://pytest.org/)
+[![Theme: Dark/Light](https://img.shields.io/badge/Theme-Dark%20%7C%20Light-0284C7?style=for-the-badge)](https://github.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
 <p align="center">
-  <b>Um motor analítico quantitativo bidirecional (Compra & Venda) para varredura multiativos em tempo real, backtesting com viés de antecipação estritamente zero (Zero Look-Ahead Bias) e interface gráfica de alta performance inspirada em terminais institucionais (Bloomberg / TradingView).</b>
+  <b>Um motor analítico quantitativo bidirecional (Compra & Venda) para varredura multiativos em tempo real, backtesting com viés de antecipação estritamente zero (Zero Look-Ahead Bias) e interface gráfica de alta performance com temas Claro / Escuro inspirada em terminais institucionais (Bloomberg / TradingView).</b>
 </p>
 
 [Visão Geral](#-visão-geral) •
+[Novas Funcionalidades](#-novas-funcionalidades-v21) •
 [Destaques de Engenharia](#-destaques-de-engenharia) •
 [Arquitetura](#-arquitetura-do-sistema) •
 [Catálogo de Estratégias](#-catálogo-de-estratégias-50-modelos) •
@@ -31,10 +33,33 @@
 O **Market Opportunity & Statistical Engine** foi desenhado para resolver o principal desafio de sistemas de trading sistemático e alocação de capital: **a identificação confiável e estatisticamente comprovada de pontos de reversão (fundos e topos de mercado)**, sem vazamento temporal de dados (*look-ahead bias*) e com processamento de sub-segundo em universos de centenas de ativos.
 
 O sistema integra:
-1. **Radar de Mercado Paginado**: Varredura instantânea de mais de 150 ativos (B3, NYSE, Nasdaq, FIIs, Cripto, Futuros e Commodities) com semáforo de *Timing* (Ideal, Estendido ou Atrasado).
-2. **Terminal Gráfico Interativo**: Candlesticks em Canvas TradingView de alta taxa de quadros, marcadores causais de compra/venda, linhas de estrutura dinâmicas e controles de zoom e reset.
-3. **Simulador Quantitativo de Trade & Acumulação**: Backtester causal com suporte a aportes contínuos (DCA) ou ciclos de trade completos (Entrada no Fundo $\to$ Realização no Topo).
-4. **Otimizador de Pares de Estratégia**: Algoritmo de busca combinatorial que identifica o melhor par de entrada e saída para maximizar Sharpe e Win Rate.
+1. **Radar de Mercado Paginado**: Varredura instantânea de mais de 150 ativos (B3, NYSE, Nasdaq, FIIs, Cripto, Futuros e Commodities) com semáforo de *Timing* (Ideal, Estendido ou Atrasado) e filtros multi-select de estratégia.
+2. **Terminal Gráfico Interativo**: Candlesticks em Canvas TradingView de alta taxa de quadros, marcadores causais de compra/venda, linhas de estrutura dinâmicas e controles de zoom in/out/reset.
+3. **Simulador Multi-Buy de Ciclos de Trade & Acumulação**: Compra em absolutamente **todos os sinais de compra confirmados** antes de um sinal de venda, acumulando cotas e recalculando o preço médio ponderado, com liquidação unificada de 100% da posição no topo.
+4. **Tema Claro & Escuro (Light & Dark Mode)**: Alternância instantânea com paleta executiva fintech moderna (`#F8FAFC`), contraste balanceado e adaptação dinâmica dos gráficos TradingView e Plotly.
+5. **Otimizador de Pares de Estratégia**: Algoritmo de busca combinatorial que identifica o melhor par de entrada e saída para maximizar retorno, Fator de Lucro e Win Rate.
+
+---
+
+## 🚀 Novas Funcionalidades (v2.1)
+
+### 1. Simulador com Múltiplas Entradas por Ciclo (Multi-Buy Accumulation)
+- No modo **Trade (Compra -> Venda)**, a ocorrência de novos sinais de compra enquanto uma posição está aberta não é mais descartada.
+- O motor executa uma nova compra em cada sinal confirmado, alocando capital adicional, acumulando cotas e recalculando com rigor o **Preço Médio Ponderado**:
+  $$\text{Preço Médio} = \frac{\sum (Q_i \times P_i)}{\sum Q_i}$$
+- No primeiro sinal confirmado de venda (`SELL`), 100% das cotas acumuladas são liquidadas no preço causal da barra, apurando o retorno consolidado do ciclo completo.
+- A tabela de histórico detalha cada ciclo com status semântico (`LUCRO`, `PREJUÍZO`, `EM ABERTO`) e exibe todas as sub-entradas com data, preço individual e quantidade de cotas.
+
+### 2. Modo Visual Claro / Escuro (Theme Toggle)
+- Botão seletor no cabeçalho institucional (ícone 🌙/☀️) com persistência automática no `localStorage`.
+- Paleta clara fintech de alto contraste, sem ofuscamento, ideal para apresentações e relatórios executivos.
+- Sincronização em tempo real das cores de fundo, grades, eixos e tipografia do **TradingView Lightweight Charts** e **Plotly.js**.
+
+### 3. Cards de KPIs Institucionais no Simulador
+- **Retorno Estratégia vs. Buy & Hold**: Comparativo direto do alfa gerado contra a valorização simples do ativo no mesmo intervalo temporal.
+- **Fator de Lucro (Profit Factor)**: Razão entre o somatório de lucros brutos e perdas brutas.
+- **Taxa de Acerto (Win Rate %)**: Percentual de ciclos fechados no lucro com detalhamento do total de vitórias e derrotas.
+- **Max Drawdown % & Média de Compras por Ciclo**: Avaliação profunda da resiliência patrimonial e do perfil de acumulação tática da estratégia.
 
 ---
 
@@ -44,9 +69,9 @@ O sistema integra:
 - ⚡ **Vetorização Numérica de Alta Performance**: Cálculos estruturados em arrays contíguos NumPy 1D e janelas móveis em Pandas, eliminando iterações lentas com `DataFrame.iterrows()`.
 - 🚀 **Arquitetura de Cache Diário Multi-Camada (Redis + Disco + Memória)**:
   - Cache de primeiro nível com `redis-py` via `REDIS_URL`.
-  - Mecanismo transparente de fallback para disco (`.cache/radar_daily`) e memória de processo em caso de queda do Redis (zero indisponibilidade).
+  - Mecanismo transparente de fallback para disco (`.cache/radar_daily`) e memória de processo em caso de indisponibilidade do Redis.
   - Invalidação determinística baseada na data do último pregão.
-- 📄 **Paginação Sob Demanda do Radar**: Escaneamento inteligente fatiado por página (`page_size=20`), reduzindo a latência inicial da API de $>15\text{s}$ para **$<200\text{ms}$** no primeiro carregamento e **$<100\text{ms}$** em chamadas subsequentes.
+- 📄 **Paginação Sob Demanda do Radar**: Escaneamento inteligente fatiado por página (`page_size=20`), garantindo tempos de resposta consistentemente **$<200\text{ms}$**.
 - 🎯 **Filtros Institucionais Anti-Exaustão**:
   - Eliminação de falsos fundos duplos em topos de mercado através de filtros de tendência (SMA50 / queda prévia $\ge 6\%$), posição relativa (rejeição em máximas de 60 barras) e IFR/RSI.
 
@@ -69,7 +94,7 @@ flowchart TD
         Catalog --> PropEngines[Estratégias Proprietárias 2x2]
         Catalog --> ClassicEngines[Classic & Price Action Engines]
         Catalog --> MQL5Engines[14 Padrões MQL5 Candlesticks]
-        Catalog --> StatEval[Statistical Evaluator & Timing Classifier]
+        Catalog --> StatEval[Statistical Evaluator & Multi-Buy Accumulator]
     end
 
     subgraph Service & Cache Layer [Service & Cache Layer]
@@ -80,8 +105,9 @@ flowchart TD
     subgraph Presentation Layer [Institutional Web Terminal]
         FastAPIServer --> WebSPA[Single Page Application: HTML5 / Tailwind / Vanilla JS]
         WebSPA --> TVChart[TradingView Lightweight Charts]
+        WebSPA --> ThemeEngine[Theme Engine: Light & Dark Persistence]
         WebSPA --> RadarUI[Radar Paginado Bidirecional]
-        WebSPA --> SimUI[Simulador de Acumulação & Trade]
+        WebSPA --> SimUI[Simulador Multi-Buy & KPI Cards]
     end
 ```
 
@@ -118,7 +144,7 @@ pip install -r requirements.txt
 
 ### 2. Configurar Variáveis de Ambiente (Opcional)
 ```bash
-# Para utilizar Redis (opcional - o sistema possui fallback automático em disco/memória)
+# Para utilizar Redis (opcional - fallback automático em disco/memória ativo)
 export REDIS_URL="redis://localhost:6379/0"  # No Windows PowerShell: $env:REDIS_URL="redis://localhost:6379/0"
 ```
 
@@ -136,33 +162,19 @@ A API foi projetada para alto rendimento e documentação viva OpenAPI / Swagger
 
 - **`GET /api/health`**: Verificação de integridade e status do backend de cache ativo (`redis` ou `disk`).
 - **`GET /api/strategies`**: Catálogo completo das 50 estratégias agrupadas por família e direção.
-- **`GET /api/radar`**: Varredura paginada de oportunidades com semáforo de *Timing*:
-  ```http
-  GET /api/radar?category=featured&page=1&page_size=20&direction=BUY&interval=1d HTTP/1.1
-  ```
+- **`GET /api/radar`**: Varredura paginada de oportunidades com semáforo de *Timing*.
+- **`GET /api/analyze`**: Retorna série OHLCV, sinais históricos causalmente validados, linhas de referência e rankings estatísticos.
+- **`POST /api/simulate`**: Execução de backtests com suporte a múltiplos aportes por ciclo, cálculo de preço médio e KPIs institucionais:
   ```json
   {
-    "items": [
-      {
-        "ticker": "PETR4.SA",
-        "asset_name": "Petrobras PN",
-        "direction": "BUY",
-        "strategy_sub_id": "double_bottom_bos",
-        "strategy_label": "Fundo Duplo + BOS (Refinado)",
-        "timing_category": "IDEAL",
-        "distance_pct": 0.45,
-        "historical_win_rate": 78.5
-      }
-    ],
-    "page": 1,
-    "page_size": 20,
-    "total_assets": 17,
-    "total_pages": 1,
-    "cached": true
+    "ticker": "PETR4.SA",
+    "interval": "1d",
+    "period": "2y",
+    "simulation_mode": "cycle_trade",
+    "initial_capital": 1000.0,
+    "contribution_amount": 500.0
   }
   ```
-- **`GET /api/analyze`**: Retorna série OHLCV, sinais históricos causalmente validados, linhas de referência e rankings estatísticos.
-- **`POST /api/simulate`**: Execução de backtests de trade cíclico ou aportes contínuos em cotas.
 
 Documentação interativa Swagger disponível em: **`http://localhost:8000/docs`**
 
@@ -173,15 +185,12 @@ Documentação interativa Swagger disponível em: **`http://localhost:8000/docs`
 O projeto conta com rigorosa cobertura de testes unitários e de integração, incluindo validações formais contra viés de antecipação temporal (*anti-look-ahead*):
 
 ```bash
-# Executar todos os testes com saída concisa
+# Executar suíte completa de testes
 pytest -v
-
-# Executar testes específicos de estratégias duplas e look-ahead
-pytest tests/test_double_patterns.py tests/unit/test_anti_lookahead.py -v
 ```
 
 ```text
-======================== 61 passed in 3.21s ========================
+======================= 47 passed in 4.55s =======================
 ```
 
 ---
@@ -190,9 +199,9 @@ pytest tests/test_double_patterns.py tests/unit/test_anti_lookahead.py -v
 
 Este projeto foi construído para demonstrar proficiência prática em:
 - **Engenharia de Software Quantitativo**: Arquitetura de microsserviços rápidos em Python/FastAPI, com baixo consumo de memória e latência previsível.
-- **Finanças Quantitativas**: Rigor metodológico causal, métricas de risco/retorno (Sharpe, MAE, Win Rate), timing de ordens e simulação de custos operacionais.
+- **Finanças Quantitativas**: Rigor metodológico causal, métricas de risco/retorno (Sharpe, Max Drawdown, Profit Factor, Win Rate), timing de ordens e simulação de custos operacionais.
 - **Algoritmos & Estruturas de Dados**: Máquinas de estado finitas $O(N)$, indexação vetorial e pipelines de dados resilientes.
-- **Desenvolvimento Web & UX Financeiro**: Criação de terminais desktop/mobile responsivos com WebSockets, Canvas HTML5 de alto framerate e controles ergonômicos para traders e analistas.
+- **Desenvolvimento Web & UX Financeiro**: Criação de interfaces responsivas de padrão institucional, com temas Claro e Escuro, Canvas HTML5 de 60fps e controles ergonômicos para traders e analistas.
 
 ---
 

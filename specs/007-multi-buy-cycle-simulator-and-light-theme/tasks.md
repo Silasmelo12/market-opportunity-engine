@@ -77,7 +77,7 @@ description: "Task list for feature 007: Multi-Buy Cycle Trade, Light Theme & En
 **Purpose**: Validação end-to-end com a suíte de testes do projeto e criação de um README de padrão internacional para o GitHub.
 
 - [X] T015 Executar suíte completa de testes (`pytest tests/unit/ -v`) garantindo regressão zero em todas as estratégias e novos testes de acúmulo passando.
-- [ ] T016 Atualizar e enriquecer o `README.md` do repositório com visual profissional, badges de qualidade, arquitetura FastAPI + SPA, demonstração do simulador multi-buy, modo claro/escuro e instruções claras de execução para recrutadores e avaliadores.
+- [X] T016 Atualizar e enriquecer o `README.md` do repositório com visual profissional, badges de qualidade, arquitetura FastAPI + SPA, demonstração do simulador multi-buy, modo claro/escuro e instruções claras de execução para recrutadores e avaliadores.
 
 ---
 
