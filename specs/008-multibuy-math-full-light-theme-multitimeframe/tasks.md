@@ -24,8 +24,8 @@ description: "Tasks for feature 008: Matemática Multi-Buy Genérica, Tema Claro
 
 **Goal**: Garantir que o Tema Claro estilize uniformemente todo o sistema (cabeçalho, barra lateral, cards, tabelas, modais, acordions e inputs), eliminando qualquer elemento preto residual.
 
-- [ ] T004 [P] [US2] Estender regras de CSS em `src/web/styles.css` sob o seletor `[data-theme="light"]` cobrindo todas as classes do Tailwind usadas na aplicação (`bg-fintech-surface`, `bg-fintech-bg`, `bg-gray-800`, `bg-gray-900`, `border-gray-700`, `text-gray-300`, tabelas, inputs e badges).
-- [ ] T005 [US2] Harmonizar badges semânticos e contrastes no `src/web/index.html` e `src/web/app.js` para que elementos de lucro (verde), prejuízo (vermelho) e status fiquem perfeitamente nítidos no tema claro.
+- [X] T004 [P] [US2] Estender regras de CSS em `src/web/styles.css` sob o seletor `[data-theme="light"]` cobrindo todas as classes do Tailwind usadas na aplicação (`bg-fintech-surface`, `bg-fintech-bg`, `bg-gray-800`, `bg-gray-900`, `border-gray-700`, `text-gray-300`, tabelas, inputs e badges).
+- [X] T005 [US2] Harmonizar badges semânticos e contrastes no `src/web/index.html` e `src/web/app.js` para que elementos de lucro (verde), prejuízo (vermelho) e status fiquem perfeitamente nítidos no tema claro.
 
 ---
 

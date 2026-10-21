@@ -28,15 +28,29 @@
   --text-muted: #64748B;
 }
 
-[data-theme="light"] .bg-fintech-bg {
+[data-theme="light"] .bg-fintech-bg,
+[data-theme="light"] .bg-gray-900,
+[data-theme="light"] .bg-black {
   background-color: #F8FAFC !important;
 }
 
-[data-theme="light"] .bg-fintech-surface {
+[data-theme="light"] .bg-fintech-surface,
+[data-theme="light"] .bg-gray-800,
+[data-theme="light"] .bg-gray-850,
+[data-theme="light"] header,
+[data-theme="light"] aside {
   background-color: #FFFFFF !important;
 }
 
-[data-theme="light"] .border-fintech-border {
+[data-theme="light"] .hover\:bg-fintech-surface-hover:hover,
+[data-theme="light"] .hover\:bg-gray-700:hover,
+[data-theme="light"] .hover\:bg-gray-800:hover {
+  background-color: #F1F5F9 !important;
+}
+
+[data-theme="light"] .border-fintech-border,
+[data-theme="light"] .border-gray-800,
+[data-theme="light"] .border-gray-700 {
   border-color: #E2E8F0 !important;
 }
 
@@ -61,7 +75,8 @@
 }
 
 [data-theme="light"] input,
-[data-theme="light"] select {
+[data-theme="light"] select,
+[data-theme="light"] textarea {
   background-color: #FFFFFF !important;
   color: #0F172A !important;
   border-color: #CBD5E1 !important;
@@ -71,6 +86,35 @@
   background-color: #FFFFFF !important;
   border-color: #E2E8F0 !important;
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
+}
+
+[data-theme="light"] .bg-gray-700\/50,
+[data-theme="light"] .bg-gray-800\/50 {
+  background-color: #E2E8F0 !important;
+  color: #334155 !important;
+}
+
+[data-theme="light"] th {
+  background-color: #F8FAFC !important;
+  color: #475569 !important;
+}
+
+[data-theme="light"] tr.bg-fintech-surface\/40 {
+  background-color: #F1F5F9 !important;
+}
+
+[data-theme="light"] #global-direction-selector {
+  background-color: #F1F5F9 !important;
+  border-color: #E2E8F0 !important;
+}
+
+[data-theme="light"] .nav-tab-btn {
+  color: #64748B !important;
+}
+
+[data-theme="light"] .nav-tab-btn.active {
+  color: #0284C7 !important;
+  border-bottom-color: #0284C7 !important;
 }
 
 body {
