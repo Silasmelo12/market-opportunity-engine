@@ -72,6 +72,185 @@ const elements = {
   strategySimTableBody: document.getElementById('strategy-simulation-table-body'),
 };
 
+// Institutional Portuguese Asset Names Mapping
+const ASSET_NAMES = {
+  // Commodities
+  'GC=F': 'Ouro Futuro',
+  'SI=F': 'Prata Futuro',
+  'CL=F': 'Petróleo WTI',
+  'BZ=F': 'Petróleo Brent',
+  'HG=F': 'Cobre Futuro',
+  'NG=F': 'Gás Natural',
+  'ZC=F': 'Milho Futuro',
+  'ZS=F': 'Soja Futura',
+  'ZW=F': 'Trigo Futuro',
+  'KC=F': 'Café Arábica',
+  'CT=F': 'Algodão Futuro',
+  'SB=F': 'Açúcar Futuro',
+  'LE=F': 'Boi Gordo Futuro',
+  'HE=F': 'Suínos Futuro',
+  // Forex
+  'EURUSD=X': 'EUR/USD',
+  'GBPUSD=X': 'GBP/USD',
+  'USDJPY=X': 'USD/JPY',
+  'USDCHF=X': 'USD/CHF',
+  'AUDUSD=X': 'AUD/USD',
+  'USDCAD=X': 'USD/CAD',
+  'NZDUSD=X': 'NZD/USD',
+  'EURJPY=X': 'EUR/JPY',
+  'GBPJPY=X': 'GBP/JPY',
+  'EURCHF=X': 'EUR/CHF',
+  // Criptomoedas
+  'BTC-USD': 'Bitcoin',
+  'ETH-USD': 'Ethereum',
+  'SOL-USD': 'Solana',
+  // Ações Brasil
+  'PETR4.SA': 'Petrobras PN',
+  'VALE3.SA': 'Vale ON',
+  'ITUB4.SA': 'Itaú Unibanco PN',
+  'BBDC4.SA': 'Bradesco PN',
+  'BBAS3.SA': 'Banco do Brasil ON',
+  'ABEV3.SA': 'Ambev ON',
+  'WEGE3.SA': 'WEG ON',
+  'RENT3.SA': 'Localiza ON',
+  'EGIE3.SA': 'Engie Brasil ON',
+  'PRIO3.SA': 'PRIO ON',
+  'BRSR6.SA': 'Banrisul PNB',
+  'KLBN4.SA': 'Klabin PN',
+  'CXSE3.SA': 'Caixa Seguridade ON',
+  'BMGB4.SA': 'Banco BMG PN',
+  'BRKM5.SA': 'Braskem PNA',
+  'TASA4.SA': 'Taurus Armas PN',
+  'PMAM3.SA': 'Paranapanema ON',
+  'CMIG4.SA': 'Cemig PN',
+  'CPFE3.SA': 'CPFL Energia ON',
+  'POMO4.SA': 'Marcopolo PN',
+  'TAEE11.SA': 'Taesa Unit',
+  'BBSE3.SA': 'BB Seguridade ON',
+  'SUZB3.SA': 'Suzano ON',
+  'GGBR4.SA': 'Gerdau PN',
+  'CSNA3.SA': 'Siderúrgica Nacional ON',
+  // FIIs Brasil
+  'HGLG11.SA': 'CSHG Logística',
+  'KNRI11.SA': 'Kinea Renda Imob.',
+  'MXRF11.SA': 'Maxi Renda',
+  'VISC11.SA': 'Vinci Shopping',
+  'BTLG11.SA': 'BTG Logística',
+  'HGRE11.SA': 'CSHG Real Estate',
+  'KNIP11.SA': 'Kinea Índices',
+  'HSML11.SA': 'HSI Malls',
+  'GGRC11.SA': 'GGR Covepi',
+  'RBRR11.SA': 'RBR Rendimento',
+  'RBVA11.SA': 'Rio Bravo Renda',
+  'SNCI11.SA': 'Suno Recebíveis',
+  'TRXF11.SA': 'TRX Real Estate',
+  'XPLG11.SA': 'XP Log',
+  'CPTS11.SA': 'Capitânia Securities',
+  'VGIR11.SA': 'Valora RE',
+  'VRTA11.SA': 'Fator Verita',
+  'VINO11.SA': 'Vinci Offices',
+  'RECR11.SA': 'REC Renda Imob.',
+  'HFOF11.SA': 'Hedge FOF',
+  'BTAL11.SA': 'BTG Agro Logística',
+  // Ações EUA
+  'AAPL': 'Apple',
+  'MSFT': 'Microsoft',
+  'GOOGL': 'Google (Alphabet)',
+  'AMZN': 'Amazon',
+  'NVDA': 'Nvidia',
+  'META': 'Meta Platforms',
+  'TSLA': 'Tesla',
+  'BRK-B': 'Berkshire Hathaway',
+  'JPM': 'JPMorgan Chase',
+  'V': 'Visa',
+  'JNJ': 'Johnson & Johnson',
+  'WMT': 'Walmart',
+  'PG': 'Procter & Gamble',
+  'MA': 'Mastercard',
+  'UNH': 'UnitedHealth',
+  'HD': 'Home Depot',
+  'DIS': 'Disney',
+  'ADBE': 'Adobe',
+  'NFLX': 'Netflix',
+  'CRM': 'Salesforce',
+  'KO': 'Coca-Cola',
+  'AMD': 'AMD',
+  'INTC': 'Intel',
+  'CSCO': 'Cisco',
+  'ABBV': 'AbbVie',
+  'CVX': 'Chevron',
+  'XOM': 'Exxon Mobil',
+  'PFE': 'Pfizer',
+  'IBM': 'IBM',
+  'MMM': '3M',
+  'VZ': 'Verizon',
+  'T': 'AT&T',
+  'BA': 'Boeing',
+  'CAT': 'Caterpillar',
+  'GE': 'General Electric',
+  'GM': 'General Motors',
+  'F': 'Ford',
+  'UBER': 'Uber',
+  'LYFT': 'Lyft',
+  'TM': 'Toyota',
+  'SNAP': 'Snap',
+  'PINS': 'Pinterest',
+  'PYPL': 'PayPal',
+  'SHOP': 'Shopify',
+  'ZM': 'Zoom',
+  'DOCU': 'DocuSign',
+  'CRWD': 'CrowdStrike',
+  'NET': 'Cloudflare',
+  'O': 'Realty Income',
+  'SPG': 'Simon Property',
+  'PLD': 'Prologis',
+  'AMT': 'American Tower',
+  'CCI': 'Crown Castle',
+  'EQIX': 'Equinix',
+  'PSA': 'Public Storage',
+  'DLR': 'Digital Realty',
+  'WELL': 'Welltower',
+  'AVB': 'AvalonBay',
+  'EQR': 'Equity Residential',
+  'BXP': 'Boston Properties',
+  'VTR': 'Ventas',
+  'ARE': 'Alexandria RE',
+  'MAA': 'Mid-America Apt.',
+  'UDR': 'UDR Inc.',
+  'KIM': 'Kimco Realty',
+  'REG': 'Regency Centers',
+  'HST': 'Host Hotels',
+  'FRT': 'Federal Realty',
+  'NNN': 'NNN REIT',
+  'WPC': 'W. P. Carey',
+  'GLPI': 'Gaming and Leisure',
+};
+
+function getAssetName(ticker) {
+  if (!ticker) return '';
+  return ASSET_NAMES[ticker.toUpperCase()] || ticker;
+}
+
+function formatPrice(price, ticker = null, category = null) {
+  if (price === null || price === undefined || isNaN(price)) return '-';
+  const num = Number(price);
+  const t = (ticker || state.currentTicker || '').toUpperCase();
+  const c = (category || '').toLowerCase();
+
+  const isForex = t.endsWith('=X') || c.includes('forex') || c.includes('fx');
+  const isUS = (!t.endsWith('.SA') && !t.endsWith('=F') && !isForex && !c.includes('brasil') && !c.includes('fii'));
+  const isCommodity = t.endsWith('=F') || c.includes('commodit');
+  const isCrypto = t.includes('BTC') || t.includes('ETH') || t.includes('SOL') || c.includes('cripto') || c.includes('crypto');
+
+  if (isForex) {
+    return num.toFixed(4);
+  } else if (isUS || isCommodity || isCrypto) {
+    return `$ ${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  } else {
+    return `R$ ${num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+}
+
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
   setupNavigationTabs();
@@ -229,13 +408,15 @@ function setupMobileStrategiesToggle() {
   const chevron = document.getElementById('strategies-mobile-chevron');
   if (btn && wrapper) {
     btn.addEventListener('click', () => {
-      const isHidden = wrapper.classList.contains('hidden');
-      if (isHidden) {
+      const isClosed = wrapper.classList.contains('hidden') || !wrapper.classList.contains('mobile-open');
+      if (isClosed) {
         wrapper.classList.remove('hidden');
-        if (chevron) chevron.textContent = '▲ Toque para fechar';
+        wrapper.classList.add('mobile-open');
+        if (chevron) chevron.textContent = ' Toque para fechar';
       } else {
         wrapper.classList.add('hidden');
-        if (chevron) chevron.textContent = '▼ Toque para abrir';
+        wrapper.classList.remove('mobile-open');
+        if (chevron) chevron.textContent = ' Toque para abrir';
       }
     });
   }
@@ -251,11 +432,35 @@ function setupAccordions() {
         content.classList.toggle('hidden');
         const arrow = header.querySelector('span:last-child');
         if (arrow) {
-          arrow.textContent = content.classList.contains('hidden') ? '▶' : '▼';
+          arrow.textContent = content.classList.contains('hidden') ? '' : '';
         }
       }
     });
   });
+
+  const btnToggleAll = document.getElementById('btn-toggle-all-accordions');
+  if (btnToggleAll) {
+    let allExpanded = true;
+    btnToggleAll.addEventListener('click', (e) => {
+      e.preventDefault();
+      allExpanded = !allExpanded;
+      document.querySelectorAll('.accordion-header').forEach(header => {
+        const targetId = header.getAttribute('data-accordion');
+        const content = document.getElementById(targetId);
+        const arrow = header.querySelector('span:last-child');
+        if (content) {
+          if (allExpanded) {
+            content.classList.remove('hidden');
+            if (arrow) arrow.textContent = '';
+          } else {
+            content.classList.add('hidden');
+            if (arrow) arrow.textContent = '';
+          }
+        }
+      });
+      btnToggleAll.textContent = allExpanded ? 'Recolher' : 'Expandir';
+    });
+  }
 }
 
 // UI: Timeframe Buttons
@@ -331,7 +536,7 @@ function isStrategyActive(subId, sigDirection = null) {
   if (state.activeStrategies.has(subId)) return true;
   const aliases = STRATEGY_ALIASES[subId];
   if (aliases) {
-    return aliases.some(a => state.activeStrategies.has(a));
+    return aliases.some(a =>state.activeStrategies.has(a));
   }
   return false;
 }
@@ -344,9 +549,9 @@ function setupGranularStrategyCheckboxes() {
       const id = cb.getAttribute('data-id');
       const aliases = STRATEGY_ALIASES[id] || [id];
       if (cb.checked) {
-        aliases.forEach(a => state.activeStrategies.add(a));
+        aliases.forEach(a =>state.activeStrategies.add(a));
       } else {
-        aliases.forEach(a => state.activeStrategies.delete(a));
+        aliases.forEach(a =>state.activeStrategies.delete(a));
       }
       applyClientSideFiltering();
     });
@@ -357,7 +562,7 @@ function setupGranularStrategyCheckboxes() {
       cb.checked = true;
       const id = cb.getAttribute('data-id');
       const aliases = STRATEGY_ALIASES[id] || [id];
-      aliases.forEach(a => state.activeStrategies.add(a));
+      aliases.forEach(a =>state.activeStrategies.add(a));
     });
     applyClientSideFiltering();
   });
@@ -367,7 +572,7 @@ function setupGranularStrategyCheckboxes() {
       cb.checked = false;
       const id = cb.getAttribute('data-id');
       const aliases = STRATEGY_ALIASES[id] || [id];
-      aliases.forEach(a => state.activeStrategies.delete(a));
+      aliases.forEach(a =>state.activeStrategies.delete(a));
     });
     applyClientSideFiltering();
   });
@@ -390,7 +595,7 @@ function initTradingViewChart() {
   if (!container) return;
 
   const isMobile = window.innerWidth < 768;
-  const width = container.clientWidth > 0 ? container.clientWidth : Math.max(300, window.innerWidth - 32);
+  const width = container.clientWidth >0 ? container.clientWidth : Math.max(300, window.innerWidth - 32);
   const height = isMobile ? 340 : 480;
 
   state.chart = LightweightCharts.createChart(container, {
@@ -530,11 +735,21 @@ function renderRadarTable(items) {
       ? '<span class="text-xs px-2 py-0.5 rounded font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">COMPRA</span>'
       : '<span class="text-xs px-2 py-0.5 rounded font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">VENDA</span>';
 
+    const friendlyName = item.asset_name || getAssetName(item.ticker);
+
     tr.innerHTML = `
-      <td class="px-4 py-3 font-bold text-white font-mono">${item.ticker}</td>
+      <td class="px-4 py-3">
+        <button class="text-left group btn-open-ticker focus:outline-none cursor-pointer" data-ticker="${item.ticker}" data-strategy="${item.strategy_sub_id}" data-direction="${item.direction}">
+          <div class="font-bold text-cyan-400 group-hover:text-cyan-200 group-hover:underline flex items-center gap-1.5 transition">
+            <span>${friendlyName}</span>
+            <span class="text-xs text-cyan-500/70 group-hover:text-cyan-300"></span>
+          </div>
+          <div class="text-[11px] text-gray-500 font-mono tracking-wide">${item.ticker}</div>
+        </button>
+      </td>
       <td class="px-4 py-3 text-gray-400">${item.category}</td>
       <td class="px-4 py-3">${dirBadge}</td>
-      <td class="px-4 py-3 font-mono font-semibold">R$ ${item.current_price.toFixed(2)}</td>
+      <td class="px-4 py-3 font-mono font-semibold">${formatPrice(item.current_price, item.ticker, item.category)}</td>
       <td class="px-4 py-3 ${isBuy ? 'text-emerald-300' : 'text-rose-300'} font-medium">${item.strategy_label}</td>
       <td class="px-4 py-3 font-mono text-gray-300">${item.status_signal}</td>
       <td class="px-4 py-3">
@@ -545,10 +760,10 @@ function renderRadarTable(items) {
       <td class="px-4 py-3 font-mono font-bold ${item.distance_pct >= 0 ? 'text-amber-400' : 'text-cyan-400'}">
         ${item.distance_pct >= 0 ? '+' : ''}${item.distance_pct.toFixed(1)}%
       </td>
-      <td class="px-4 py-3 font-mono text-gray-400">R$ ${item.recommended_price.toFixed(2)}</td>
+      <td class="px-4 py-3 font-mono text-gray-400">${formatPrice(item.recommended_price, item.ticker, item.category)}</td>
       <td class="px-4 py-3 font-mono text-gray-400">${item.historical_n} entradas (${item.historical_win_rate.toFixed(1)}%)</td>
       <td class="px-4 py-3 text-right">
-        <button class="bg-cyan-600/30 hover:bg-cyan-600 text-cyan-300 hover:text-white px-2.5 py-1 rounded text-xs font-semibold transition btn-open-ticker" data-ticker="${item.ticker}">
+        <button class="bg-cyan-600/30 hover:bg-cyan-600 text-cyan-300 hover:text-white px-2.5 py-1 rounded text-xs font-semibold transition btn-open-ticker cursor-pointer" data-ticker="${item.ticker}" data-strategy="${item.strategy_sub_id}" data-direction="${item.direction}">
           Abrir Gráfico →
         </button>
       </td>
@@ -559,6 +774,9 @@ function renderRadarTable(items) {
   document.querySelectorAll('.btn-open-ticker').forEach(btn => {
     btn.addEventListener('click', () => {
       const ticker = btn.getAttribute('data-ticker');
+      const strat = btn.getAttribute('data-strategy');
+      const dir = btn.getAttribute('data-direction');
+
       state.currentTicker = ticker;
       elements.inputTicker.value = ticker;
       if (elements.simTicker) elements.simTicker.value = ticker;
@@ -574,6 +792,26 @@ function renderRadarTable(items) {
             b.classList.add('bg-fintech-bg', 'text-gray-300');
           }
         });
+      }
+
+      // If user opened a specific strategy from radar, ensure it's selected and active
+      if (strat) {
+        if (dir && (dir === 'BUY' || dir === 'SELL') && state.activeDirection !== 'BOTH' && state.activeDirection !== dir) {
+          state.activeDirection = 'BOTH';
+          document.querySelectorAll('.direction-btn').forEach(b => {
+            const bDir = b.getAttribute('data-direction');
+            if (bDir === 'BOTH') {
+              b.classList.add('active', 'border-fintech-cyan', 'text-fintech-cyan');
+            } else {
+              b.classList.remove('active', 'border-fintech-cyan', 'text-fintech-cyan');
+            }
+          });
+        }
+        state.activeStrategies.add(strat);
+        const aliases = STRATEGY_ALIASES[strat] || [];
+        aliases.forEach(a =>state.activeStrategies.add(a));
+        const cb = document.querySelector(`.strategy-cb[data-id="${strat}"]`);
+        if (cb) cb.checked = true;
       }
 
       switchTab('tab-terminal');
@@ -662,6 +900,10 @@ async function loadAnalysisData(forceRefresh = false) {
       }
     }
 
+    const assetTitleEl = document.getElementById('active-asset-title');
+    if (assetTitleEl) {
+      assetTitleEl.textContent = `${state.currentTicker} • ${getAssetName(state.currentTicker)}`;
+    }
     updateHeaderTimingBadge(state.analysisData.timing_status);
     applyClientSideFiltering();
 
@@ -743,7 +985,7 @@ function applyClientSideFiltering() {
   }
 
   // 3. Update Markers (BUY: belowBar/arrowUp/#00E676; SELL: aboveBar/arrowDown/#FF5252)
-  if (state.candleSeries && state.analysisData && state.analysisData.candles && filteredSignals.length > 0) {
+  if (state.candleSeries && state.analysisData && state.analysisData.candles && filteredSignals.length >0) {
     const mappedMarkers = [];
     filteredSignals.forEach(sig => {
       const idx = sig.execution_bar_index;
@@ -752,12 +994,21 @@ function applyClientSideFiltering() {
         const finalTime = (!isNaN(cTime) && !isNaN(parseFloat(cTime)) && typeof cTime !== 'boolean') ? parseInt(cTime, 10) : String(cTime).trim();
         if (finalTime) {
           const isBuy = (sig.direction === 'BUY');
+          const isPending = (sig.is_open && idx === state.analysisData.candles.length - 1);
+          let cleanLabel = (sig.strategy_label || sig.strategy_sub_id)
+            .replace('Vela: ', '')
+            .replace('Vela Topo: ', '')
+            .replace('Price Action: ', '')
+            .replace('Estratégia ', '');
+          if (cleanLabel.length >15) cleanLabel = cleanLabel.slice(0, 15);
+          if (isPending) cleanLabel = ` ${cleanLabel}`;
+
           mappedMarkers.push({
             time: finalTime,
             position: isBuy ? 'belowBar' : 'aboveBar',
-            color: isBuy ? '#00E676' : '#FF5252',
+            color: isPending ? '#00E676' : (isBuy ? '#00E676' : '#FF5252'),
             shape: isBuy ? 'arrowUp' : 'arrowDown',
-            text: sig.strategy_sub_id.replace('price_action_', '').replace('sell_', '').slice(0, 10)
+            text: cleanLabel
           });
         }
       }
@@ -808,8 +1059,8 @@ function renderPlotlyRanking(summaries = null) {
     }
 
     const sorted = [...dataList].sort((a, b) => (b.win_rate || 0) - (a.win_rate || 0));
-    const labels = sorted.map(s => s.strategy_label || s.strategy_sub_id);
-    const winRates = sorted.map(s => Number(s.win_rate) || 0);
+    const labels = sorted.map(s =>s.strategy_label || s.strategy_sub_id);
+    const winRates = sorted.map(s =>Number(s.win_rate) || 0);
     const texts = sorted.map(s => `${(Number(s.win_rate) || 0).toFixed(1)}% (${s.executed_buys || s.total_signals || 0} operadas)`);
     const colors = sorted.map(s => (s.direction === 'SELL' ? '#FF5252' : '#00E676'));
 
@@ -860,14 +1111,14 @@ function renderPlotlyScatter(summaries = null) {
       return;
     }
 
-    const returns = dataList.map(s => Number(s.mean_forward_return) || 0);
-    const maes = dataList.map(s => Number(s.mean_mae) || 0);
-    const labels = dataList.map(s => s.strategy_label || s.strategy_sub_id);
+    const returns = dataList.map(s =>Number(s.mean_forward_return) || 0);
+    const maes = dataList.map(s =>Number(s.mean_mae) || 0);
+    const labels = dataList.map(s =>s.strategy_label || s.strategy_sub_id);
     const colors = dataList.map(s => (s.direction === 'SELL' ? '#FF5252' : '#00E676'));
-    const sizes = dataList.map(s => Math.min(28, Math.max(10, (s.executed_buys || s.total_signals || 1) * 2)));
+    const sizes = dataList.map(s =>Math.min(28, Math.max(10, (s.executed_buys || s.total_signals || 1) * 2)));
 
-    const meanRet = returns.length > 0 ? (returns.reduce((a, b) => a + b, 0) / returns.length) : 0;
-    const meanMae = maes.length > 0 ? (maes.reduce((a, b) => a + b, 0) / maes.length) : 0;
+    const meanRet = returns.length >0 ? (returns.reduce((a, b) =>a + b, 0) / returns.length) : 0;
+    const meanMae = maes.length >0 ? (maes.reduce((a, b) =>a + b, 0) / maes.length) : 0;
 
     const minMae = Math.min(...maes, -5.0);
     const maxMae = Math.max(...maes, 0.0);
@@ -884,7 +1135,7 @@ function renderPlotlyScatter(summaries = null) {
       x: maes,
       y: returns,
       mode: 'markers+text',
-      text: labels.map(l => l.length > 15 ? l.slice(0, 14) + '…' : l),
+      text: labels.map(l =>l.length >15 ? l.slice(0, 14) + '…' : l),
       textposition: 'top center',
       marker: {
         size: sizes,
@@ -931,7 +1182,7 @@ function renderPlotlyScatter(summaries = null) {
           y: yRange[1] * 0.9,
           xref: 'x',
           yref: 'y',
-          text: '★ Alta Assimetria',
+          text: ' Alta Assimetria',
           showarrow: false,
           font: { color: 'rgba(0, 230, 118, 0.7)', size: 10 }
         }
@@ -967,7 +1218,7 @@ function renderStrategySimulationTable(signals, summaries) {
   const simResults = [];
 
   Object.keys(grouped).forEach(subId => {
-    const stratSigs = [...grouped[subId]].sort((a, b) => a.execution_bar_index - b.execution_bar_index);
+    const stratSigs = [...grouped[subId]].sort((a, b) =>a.execution_bar_index - b.execution_bar_index);
     const label = stratSigs[0].strategy_label || subId;
     const isBuy = (stratSigs[0].direction === 'BUY');
 
@@ -1000,16 +1251,16 @@ function renderStrategySimulationTable(signals, summaries) {
     let peak = -Infinity;
     let maxDrawdown = 0;
     equityTimeline.forEach(eq => {
-      if (eq > peak) peak = eq;
-      if (peak > 0) {
+      if (eq >peak) peak = eq;
+      if (peak >0) {
         const dd = ((eq - peak) / peak) * 100.0;
         if (dd < maxDrawdown) maxDrawdown = dd;
       }
     });
 
     const netProfit = finalEquity - totalAportado;
-    const retPct = totalAportado > 0 ? ((finalEquity / totalAportado) - 1.0) * 100.0 : 0.0;
-    const avgPrice = totalShares > 0 ? (totalSpent / totalShares) : 0.0;
+    const retPct = totalAportado >0 ? ((finalEquity / totalAportado) - 1.0) * 100.0 : 0.0;
+    const avgPrice = totalShares >0 ? (totalSpent / totalShares) : 0.0;
 
     simResults.push({
       subId,
@@ -1027,7 +1278,7 @@ function renderStrategySimulationTable(signals, summaries) {
     });
   });
 
-  simResults.sort((a, b) => b.retPct - a.retPct);
+  simResults.sort((a, b) =>b.retPct - a.retPct);
 
   simResults.forEach(res => {
     const tr = document.createElement('tr');
@@ -1064,7 +1315,7 @@ function renderSignalsTable(signals) {
     return;
   }
 
-  const sortedChronological = [...signals].sort((a, b) => a.execution_bar_index - b.execution_bar_index);
+  const sortedChronological = [...signals].sort((a, b) =>a.execution_bar_index - b.execution_bar_index);
   const strategyCashPool = {};
   const enrichedSignals = [];
 
@@ -1077,7 +1328,7 @@ function renderSignalsTable(signals) {
     let shares = 0;
     let boughtVal = 0;
 
-    if (pExec > 0) {
+    if (pExec >0) {
       const avail = baseAporte + strategyCashPool[subId];
       shares = Math.floor(avail / pExec);
       boughtVal = shares * pExec;
@@ -1104,13 +1355,13 @@ function renderSignalsTable(signals) {
       <td class="px-3 py-2"><span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${isBuy ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">${sig.direction}</span></td>
       <td class="px-3 py-2 font-mono text-gray-400">${sig.signal_date}</td>
       <td class="px-3 py-2 font-mono text-white">${sig.execution_date}</td>
-      <td class="px-3 py-2 font-mono font-semibold">R$ ${sig.execution_price.toFixed(2)}</td>
+      <td class="px-3 py-2 font-mono font-semibold">${formatPrice(sig.execution_price, state.currentTicker)}</td>
       <td class="px-3 py-2 font-mono text-center font-bold text-amber-300">${sig.sharesBought} cotas</td>
-      <td class="px-3 py-2 font-mono text-white">R$ ${sig.boughtVal.toFixed(2)}</td>
-      <td class="px-3 py-2 font-mono text-gray-400">R$ ${sig.cashRemaining.toFixed(2)}</td>
-      <td class="px-3 py-2 font-mono font-bold ${retClass}">${sig.forward_return_pct !== null ? (sig.forward_return_pct >= 0 ? '+' : '') + sig.forward_return_pct.toFixed(1) + '%' : 'Em Aberto'}</td>
-      <td class="px-3 py-2 font-mono text-rose-400">${sig.mae_pct !== null ? sig.mae_pct.toFixed(1) + '%' : '-'}</td>
-      <td class="px-3 py-2 font-mono text-[10px]">${sig.is_open ? '<span class="text-amber-400">ABERTO</span>' : '<span class="text-gray-400">CONCLUÍDO</span>'}</td>
+      <td class="px-3 py-2 font-mono text-white">${formatPrice(sig.boughtVal, state.currentTicker)}</td>
+      <td class="px-3 py-2 font-mono text-gray-400">${formatPrice(sig.cashRemaining, state.currentTicker)}</td>
+      <td class="px-3 py-2 font-mono font-bold ${retClass}">${sig.forward_return_pct !== null && sig.forward_return_pct !== undefined ? (sig.forward_return_pct >= 0 ? '+' : '') + sig.forward_return_pct.toFixed(1) + '%' : (sig.is_open ? 'Pendente' : '-')}</td>
+      <td class="px-3 py-2 font-mono text-rose-400">${sig.mae_pct !== null && sig.mae_pct !== undefined ? sig.mae_pct.toFixed(1) + '%' : '-'}</td>
+      <td class="px-3 py-2 font-mono text-[10px]">${sig.is_open ? '<span class="text-amber-400 font-bold">ABERTO / PENDENTE</span>' : '<span class="text-gray-400">CONCLUÍDO</span>'}</td>
     `;
     elements.signalsTableBody.appendChild(tr);
   });
@@ -1171,7 +1422,7 @@ function setupSimulationTab() {
 
 async function runSimulation() {
   const mode = (elements.simMode && elements.simMode.value) || 'cycle_trade';
-  showLoading(mode === 'cycle_trade' ? 'Executando backtest de trade (Compra ➔ Venda)...' : 'Executando simulação de acumulação financeira...');
+  showLoading(mode === 'cycle_trade' ? 'Executando backtest de trade (Compra ->Venda)...' : 'Executando simulação de acumulação financeira...');
   try {
     const tickerInput = (elements.simTicker && elements.simTicker.value.trim().toUpperCase()) || state.currentTicker;
     const capitalVal = parseFloat(document.getElementById('sim-contribution').value) || 1000;
@@ -1311,7 +1562,7 @@ function renderTopCombinationsTable(combos) {
     const tr = document.createElement('tr');
     tr.className = 'hover:bg-fintech-surface-hover';
 
-    const rankBadge = item.rank === 1 ? '🥇 1º' : (item.rank === 2 ? '🥈 2º' : (item.rank === 3 ? '🥉 3º' : `#${item.rank}`));
+    const rankBadge = item.rank === 1 ? ' 1º' : (item.rank === 2 ? ' 2º' : (item.rank === 3 ? ' 3º' : `#${item.rank}`));
     const retClass = item.total_return_pct >= 0 ? 'text-emerald-400' : 'text-rose-400';
     const pnlClass = item.net_profit >= 0 ? 'text-emerald-400' : 'text-rose-400';
 
@@ -1327,14 +1578,14 @@ function renderTopCombinationsTable(combos) {
       <td class="px-2.5 py-2 text-center">
         <button class="btn-test-combo bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-[10px] px-2.5 py-1 rounded transition shadow"
           data-buy="${item.buy_sub_id}" data-sell="${item.sell_sub_id}">
-          ⚡ Testar
+           Testar
         </button>
       </td>
     `;
     elements.simTopCombosTableBody.appendChild(tr);
   });
 
-  // Attach click listeners to "⚡ Testar" buttons
+  // Attach click listeners to " Testar" buttons
   elements.simTopCombosTableBody.querySelectorAll('.btn-test-combo').forEach(btn => {
     btn.addEventListener('click', () => {
       const buyId = btn.getAttribute('data-buy');
@@ -1365,7 +1616,7 @@ function renderSimulationTradesTable(trades, mode) {
     tr.className = 'hover:bg-fintech-surface-hover';
 
     if (mode === 'cycle_trade') {
-      const isWin = (t.return_pct || 0) > 0;
+      const isWin = (t.return_pct || 0) >0;
       const retClass = isWin ? 'text-emerald-400' : ((t.return_pct || 0) < 0 ? 'text-rose-400' : 'text-gray-300');
       const pnlClass = (t.profit_loss || 0) >= 0 ? 'text-emerald-400' : 'text-rose-400';
       const isOpen = (t.status === 'ABERTO');
@@ -1408,9 +1659,9 @@ function renderSimulationTradesTable(trades, mode) {
 function renderSimulationCurve(curve) {
   if (!curve || curve.length === 0) return;
 
-  const dates = curve.map(c => c.date);
-  const invested = curve.map(c => c.total_invested);
-  const portfolio = curve.map(c => c.portfolio_value);
+  const dates = curve.map(c =>c.date);
+  const invested = curve.map(c =>c.total_invested);
+  const portfolio = curve.map(c =>c.portfolio_value);
 
   const tracePortfolio = {
     x: dates,

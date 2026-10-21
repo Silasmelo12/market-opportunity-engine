@@ -1,10 +1,10 @@
 """
 Market Opportunity & Bottom Statistical Engine - Main Streamlit Application (Feature 002).
 Institutional UX/UI with 4 Core Tabs:
-  1. 🌐 Radar de Mercado & Oportunidades
-  2. 📈 Terminal de Análise & Gráficos
-  3. 💰 Simulador de Patrimônio & Aportes
-  4. 📘 Guia de Estratégias & Playbook
+  1.  Radar de Mercado & Oportunidades
+  2.  Terminal de Análise & Gráficos
+  3.  Simulador de Patrimônio & Aportes
+  4.  Guia de Estratégias & Playbook
 """
 
 import sys
@@ -20,7 +20,7 @@ import numpy as np
 
 st.set_page_config(
     page_title="Market Opportunity & Bottom Statistical Engine",
-    page_icon="📈",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -65,10 +65,10 @@ def main():
 
     # 3. 4 Top Navigation Tabs
     tab_titles = [
-        "🌐 Radar de Mercado & Oportunidades",
-        "📈 Terminal de Análise & Gráficos",
-        "💰 Simulador de Patrimônio & Aportes",
-        "📘 Guia de Estratégias & Playbook",
+        " Radar de Mercado & Oportunidades",
+        " Terminal de Análise & Gráficos",
+        " Simulador de Patrimônio & Aportes",
+        " Guia de Estratégias & Playbook",
     ]
 
     active_tab = st.tabs(tab_titles)

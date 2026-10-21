@@ -29,17 +29,17 @@ def classify_timing_status(
     mean_forward_return: Optional[float] = None,
     is_awaiting_retest: bool = False,
     direction: str = "BUY",
-) -> TimingStatus:
+) ->TimingStatus:
     """
     Classifies entry timing based on price distance from recommended entry:
     For BUY:
       - IDEAL: awaiting retest touch OR current_price <= recommended_price * 1.015 (up to +1.5%)
       - EXTENDED: +1.5% < distance <= +4.0%
-      - LATE: distance > +4.0% OR consumed > 30% of strategy mean forward return
+      - LATE: distance > +4.0% OR consumed >30% of strategy mean forward return
     For SELL:
       - IDEAL: awaiting retest touch OR current_price >= recommended_price * 0.985 (up to -1.5% from top)
       - EXTENDED: -4.0% <= distance < -1.5% (fell between 1.5% and 4.0% from top)
-      - LATE: distance < -4.0% (fell > 4% from top, already dumped)
+      - LATE: distance < -4.0% (fell >4% from top, already dumped)
     """
     strat_name = strategy_label or strategy_sub_id
     is_buy = (direction == "BUY")
@@ -47,7 +47,7 @@ def classify_timing_status(
     if recommended_price <= 0 or current_price <= 0:
         return TimingStatus(
             status_category="IDEAL",
-            status_label="🟢 ZONA IDEAL" if not is_buy else "🟢 ZONA IDEAL / DESCONTO",
+            status_label=" ZONA IDEAL" if not is_buy else " ZONA IDEAL / DESCONTO",
             distance_pct=0.0,
             recommended_price=recommended_price,
             current_price=current_price,
@@ -63,7 +63,7 @@ def classify_timing_status(
         # BUY Logic
         if is_awaiting_retest or dist_pct <= 1.5:
             category = "IDEAL"
-            label = "🟢 ZONA IDEAL / DESCONTO"
+            label = " ZONA IDEAL / DESCONTO"
             if dist_pct < 0:
                 advice = f"Preço com {abs(dist_pct):.1f}% de desconto sobre a entrada recomendada."
             elif is_awaiting_retest:
@@ -71,25 +71,25 @@ def classify_timing_status(
             else:
                 advice = f"Dentro da janela ideal de execução (+{dist_pct:.1f}%)."
         elif 1.5 < dist_pct <= 4.0:
-            if mean_forward_return and mean_forward_return > 0 and (dist_pct > 0.30 * mean_forward_return):
+            if mean_forward_return and mean_forward_return >0 and (dist_pct >0.30 * mean_forward_return):
                 category = "LATE"
-                label = "🔴 ATRASADO (BONDE ANDOU)"
+                label = " ATRASADO (BONDE ANDOU)"
                 advice = f"Já consumiu {dist_pct:.1f}% do retorno médio esperado ({mean_forward_return:.1f}%). Risco/retorno desfavorável."
             else:
                 category = "EXTENDED"
-                label = "🟡 ESTENDIDO (CAUTELA)"
+                label = " ESTENDIDO (CAUTELA)"
                 advice = f"Preço subiu +{dist_pct:.1f}% acima da entrada. Recomenda-se aguardar um recuo (pullback)."
         else:
             category = "LATE"
-            label = "🔴 ATRASADO (BONDE ANDOU)"
+            label = " ATRASADO (BONDE ANDOU)"
             advice = f"Preço estendido (+{dist_pct:.1f}% acima do ponto de compra). Aguarde novo ciclo/suporte."
     else:
         # SELL Logic
         # dist_pct = (Current - P_exec)/P_exec * 100. If current is 99 and P_exec is 100, dist_pct is -1.0%.
         if is_awaiting_retest or dist_pct >= -1.5:
             category = "IDEAL"
-            label = "🟢 ZONA IDEAL (TOPO)"
-            if dist_pct > 0:
+            label = " ZONA IDEAL (TOPO)"
+            if dist_pct >0:
                 advice = f"Preço ainda acima da ativação (+{dist_pct:.1f}%). Excelente oportunidade no topo."
             elif is_awaiting_retest:
                 advice = "Aguardando toque na linha de resistência no reteste."
@@ -97,11 +97,11 @@ def classify_timing_status(
                 advice = f"Dentro da janela ideal de venda no topo ({dist_pct:.1f}%)."
         elif -4.0 <= dist_pct < -1.5:
             category = "EXTENDED"
-            label = "🟡 ESTENDIDO (TOPO RECUOU)"
+            label = " ESTENDIDO (TOPO RECUOU)"
             advice = f"Preço já caiu {abs(dist_pct):.1f}% abaixo da máxima recomendada. Aguardar repique se possível."
         else:
             category = "LATE"
-            label = "🔴 ATRASADO (PREÇO DERRETEU)"
+            label = " ATRASADO (PREÇO DERRETEU)"
             advice = f"Preço já despencou {abs(dist_pct):.1f}% abaixo do topo. Risco/retorno de venda desfavorável."
 
     return TimingStatus(

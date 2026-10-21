@@ -18,11 +18,11 @@ from .theme import STRATEGY_LABELS_PT, get_friendly_label
 def render_simulator_fragment(
     series: OHLCVSeries,
     signals: List[SignalRecord],
-) -> None:
+) ->None:
     """
     Reactive simulation fragment. Parameter adjustments re-execute only this block.
     """
-    st.markdown("### 💰 Simulador de Patrimônio & Aportes Periódicos")
+    st.markdown("###  Simulador de Patrimônio & Aportes Periódicos")
     st.caption("Simulação realista de compras fracionárias: 'Se eu tivesse aportado R$ X a cada sinal de compra, quanto eu teria hoje?'")
 
     if not signals:
@@ -51,8 +51,8 @@ def render_simulator_fragment(
             max_value=max_date,
         )
 
-    start_d = str(date_range[0]) if isinstance(date_range, (tuple, list)) and len(date_range) > 0 else None
-    end_d = str(date_range[1]) if isinstance(date_range, (tuple, list)) and len(date_range) > 1 else None
+    start_d = str(date_range[0]) if isinstance(date_range, (tuple, list)) and len(date_range) >0 else None
+    end_d = str(date_range[1]) if isinstance(date_range, (tuple, list)) and len(date_range) >1 else None
 
     # Run vectorized accumulation simulation
     sim_results = simulate_accumulation(

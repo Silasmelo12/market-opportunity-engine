@@ -116,3 +116,22 @@ def test_root_serves_spa():
     res = client.get("/")
     assert res.status_code == 200
     assert "Bottom Statistical Engine" in res.text
+
+
+def test_asset_names_and_radar_items():
+    from src.ui.theme import get_asset_name
+    assert get_asset_name("GC=F") == "Ouro Futuro"
+    assert get_asset_name("CL=F") == "Petróleo WTI"
+    assert get_asset_name("EURUSD=X") == "EUR/USD"
+    assert get_asset_name("BTC-USD") == "Bitcoin"
+    assert get_asset_name("PETR4.SA") == "Petrobras PN"
+
+    # Test /api/radar includes asset_name
+    res = client.get("/api/radar?interval=1d&category=crypto")
+    assert res.status_code == 200
+    data = res.json()
+    assert len(data) > 0
+    for item in data:
+        assert "asset_name" in item
+        assert item["asset_name"] is not None
+        assert len(item["asset_name"]) > 0

@@ -18,7 +18,7 @@ from ..strategies.base import StrategyStatsSummary
 from .theme import get_friendly_label
 
 
-def render_stats_panels(summaries: List[StrategyStatsSummary], horizon_x: int) -> None:
+def render_stats_panels(summaries: List[StrategyStatsSummary], horizon_x: int) ->None:
     """
     Renders Efficiency Ranking, Risk x Return Scatter Plot, and Full Metrics Table.
     """
@@ -63,7 +63,7 @@ def render_stats_panels(summaries: List[StrategyStatsSummary], horizon_x: int) -
 
         # Normalize efficiency score color using 90th percentile clip
         scores = df_sorted["Score Eficiência"].to_numpy()
-        p90 = float(np.percentile(scores, 90)) if len(scores) > 1 and np.percentile(scores, 90) > 0 else 1.0
+        p90 = float(np.percentile(scores, 90)) if len(scores) >1 and np.percentile(scores, 90) >0 else 1.0
         df_sorted["clipped_score"] = np.clip(scores, 0.0, max(p90, 0.1))
 
         fig_bar = px.bar(
@@ -133,7 +133,7 @@ def render_stats_panels(summaries: List[StrategyStatsSummary], horizon_x: int) -
         fig_scatter.add_annotation(
             xref="paper", yref="paper",
             x=0.98, y=0.98,
-            text="⭐ Quadrante de Ouro (Alto Retorno & Baixo Calor)",
+            text=" Quadrante de Ouro (Alto Retorno & Baixo Calor)",
             showarrow=False,
             font=dict(size=10, color="#FFD600"),
             align="right"

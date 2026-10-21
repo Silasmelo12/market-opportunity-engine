@@ -11,7 +11,7 @@ import streamlit as st
 from ..data_loader import DataLoader
 from ..strategies import StrategyCatalog
 from ..evaluator import evaluate_all_strategies, classify_timing_status
-from .theme import get_friendly_label
+from .theme import get_friendly_label, get_asset_name
 
 DEFAULT_RADAR_BASKET = [
     ("PETR4.SA", "Ações Brasil"),
@@ -25,11 +25,11 @@ DEFAULT_RADAR_BASKET = [
 ]
 
 
-def render_radar_tab(interval: str = "1d", horizon_x: int = 60) -> None:
+def render_radar_tab(interval: str = "1d", horizon_x: int = 60) ->None:
     """
     Renders Aba 1: Radar de Mercado & Scanner de Oportunidades.
     """
-    st.markdown("### 🌐 Radar de Mercado & Oportunidades")
+    st.markdown("###  Radar de Mercado & Oportunidades")
     st.caption("Varredura em tempo real da carteira monitorada identificando onde estão as melhores assimetrias de compra hoje.")
 
     # Controls row
@@ -44,7 +44,7 @@ def render_radar_tab(interval: str = "1d", horizon_x: int = 60) -> None:
     with col_refresh:
         st.write("")
         st.write("")
-        refresh_btn = st.button("🔄 Atualizar Scanner", use_container_width=True)
+        refresh_btn = st.button(" Atualizar Scanner", use_container_width=True)
 
     if not selected_basket:
         st.info("Selecione pelo menos um ativo para varredura no Radar.")
@@ -96,7 +96,7 @@ def render_radar_tab(interval: str = "1d", horizon_x: int = 60) -> None:
                 )
                 opportunities.append(
                     {
-                        "Ativo": ticker,
+                        "Ativo": f"{get_asset_name(ticker)} ({ticker})",
                         "Estratégia": get_friendly_label(sub_id),
                         "strategy_sub_id": sub_id,
                         "Status do Sinal": "Formado na Barra",
@@ -127,7 +127,7 @@ def render_radar_tab(interval: str = "1d", horizon_x: int = 60) -> None:
                 )
                 opportunities.append(
                     {
-                        "Ativo": ticker,
+                        "Ativo": f"{get_asset_name(ticker)} ({ticker})",
                         "Estratégia": get_friendly_label(sub_id),
                         "strategy_sub_id": sub_id,
                         "Status do Sinal": f"Reteste ({st_info.get('retest_bars_remaining')}b rest.)",
@@ -158,7 +158,7 @@ def render_radar_tab(interval: str = "1d", horizon_x: int = 60) -> None:
                 )
                 opportunities.append(
                     {
-                        "Ativo": ticker,
+                        "Ativo": f"{get_asset_name(ticker)} ({ticker})",
                         "Estratégia": get_friendly_label(sub_id),
                         "strategy_sub_id": sub_id,
                         "Status do Sinal": f"Comprado há {series.length - 1 - recent_sig.execution_bar_index}b",
@@ -189,9 +189,9 @@ def render_radar_tab(interval: str = "1d", horizon_x: int = 60) -> None:
     n_late = len(df_opp[df_opp["timing_category"] == "LATE"])
 
     c1.metric("Oportunidades Mapeadas", len(df_opp))
-    c2.metric("🟢 Zona Ideal de Entrada", n_ideal)
-    c3.metric("🟡 Estendido (Cautela)", n_extended)
-    c4.metric("🔴 Atrasado (Bonde Andou)", n_late)
+    c2.metric(" Zona Ideal de Entrada", n_ideal)
+    c3.metric(" Estendido (Cautela)", n_extended)
+    c4.metric(" Atrasado (Bonde Andou)", n_late)
 
     st.markdown("#### Tabela de Oportunidades Ativas & Semáforo de Timing")
 
@@ -232,7 +232,7 @@ def render_radar_tab(interval: str = "1d", horizon_x: int = 60) -> None:
     with col_action:
         st.write("")
         st.write("")
-        if st.button("📈 Ir para o Terminal", use_container_width=True):
+        if st.button(" Ir para o Terminal", use_container_width=True):
             st.session_state["selected_ticker"] = target_asset
             st.session_state["active_tab_index"] = 1
             st.rerun()

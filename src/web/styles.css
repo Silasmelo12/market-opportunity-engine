@@ -233,3 +233,57 @@ input[type="checkbox"] {
   z-index: 50;
   transition: opacity 0.2s ease;
 }
+
+/* ========================================================= */
+/* Strategy Filter Mobile & Desktop Scrolling               */
+/* ========================================================= */
+
+#strategies-wrapper-collapsible {
+  display: none;
+}
+
+/* Desktop: Always flex column occupying the full left sidebar */
+@media (min-width: 1024px) {
+  #strategies-wrapper-collapsible {
+    display: flex !important;
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: hidden !important;
+  }
+}
+
+/* Mobile: Displayed when toggled open with touch scroll */
+#strategies-wrapper-collapsible.mobile-open {
+  display: flex !important;
+  flex-direction: column !important;
+  max-height: 65vh !important;
+  min-height: 260px !important;
+  overflow: hidden !important;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
+}
+
+/* Accordions container: Smooth touch scrolling on mobile and desktop */
+#strategy-accordions-container {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: contain !important;
+  touch-action: pan-y !important;
+  padding: 0.5rem;
+}
+
+#strategy-accordions-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+#strategy-accordions-container::-webkit-scrollbar-thumb {
+  background: #3B4252;
+  border-radius: 3px;
+}
+
+#strategy-accordions-container::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-cyan);
+}

@@ -91,6 +91,20 @@ def clean_and_normalize_df(df: pd.DataFrame, ticker: str, interval: str) -> OHLC
     close_arr = df["close"].to_numpy(dtype=np.float64)
     volume_arr = df["volume"].to_numpy(dtype=np.float64)
 
+    # Normalize Forex daily/weekly candles:
+    # Yahoo Finance records open ~= close (zero/tiny body) for daily Forex pairs (e.g. EURUSD=X),
+    # producing artificial dash candles. In continuous 24h forex markets, the daily open is the previous close.
+    is_fx = ticker.endswith("=X") or "=X" in ticker.upper() or "/USD" in ticker.upper()
+    if is_fx and interval.lower() in ("1d", "1wk") and len(close_arr) > 1:
+        body_diff = np.abs(close_arr - open_arr)
+        rng = np.maximum(high_arr - low_arr, 1e-9)
+        if np.nanmedian(body_diff / rng) < 0.08:
+            new_open = open_arr.copy()
+            new_open[1:] = close_arr[:-1]
+            open_arr = new_open
+            high_arr = np.maximum(high_arr, open_arr)
+            low_arr = np.minimum(low_arr, open_arr)
+
     # Dividends handling
     if "dividends" in df.columns:
         div_arr = df["dividends"].fillna(0.0).to_numpy(dtype=np.float64)

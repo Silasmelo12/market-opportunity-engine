@@ -12,10 +12,10 @@ PLAYBOOK_ENTRIES = {
             "title": "Negação Barra Anterior (Entrada Abertura)",
             "sub_id": "t1_open",
             "concept": "Monitora o fechamento abaixo da mínima da barra imediatamente anterior (t-1). Quando o preço fecha novamente acima desse nível, confirma a rejeição da baixa e compra no Open seguinte.",
-            "formula": "Rompimento: Close[t] < Low[t-1] -> Linha = Low[t-1]. Negação: Close[t] > Linha. Compra: Open[t+1].",
+            "formula": "Rompimento: Close[t] < Low[t-1] ->Linha = Low[t-1]. Negação: Close[t] >Linha. Compra: Open[t+1].",
             "psychology": "A quebra da mínima atrai vendedores apressados (venda de rompimento) e aciona stops de compradores. O fechamento imediato acima da linha aprisiona os vendedores (short trap), provocando cobertura compulsiva.",
             "profile": "Alta Frequência • Indicada para ativos de alta volatilidade e swing trades curtos.",
-            "timing_rule": "Compre imediatamente no Open[t+1]. Se o preço abrir em gap de alta > 1.5%, aguarde reteste.",
+            "timing_rule": "Compre imediatamente no Open[t+1]. Se o preço abrir em gap de alta >1.5%, aguarde reteste.",
         },
         {
             "title": "Negação Barra Anterior (Entrada Reteste)",
@@ -30,10 +30,10 @@ PLAYBOOK_ENTRIES = {
             "title": "Negação de Fundo N Barras (Entrada Abertura)",
             "sub_id": "t2_open",
             "concept": "Monitora o rompimento de um suporte estrutural relevante (mínima dos últimos N períodos, ex: 10 barras). Ao recuperar o suporte com fechamento acima, executa no Open seguinte.",
-            "formula": "Rompimento: Close[t] < min(Low[t-N:t]). Negação: Close[t] > Linha. Compra: Open[t+1].",
+            "formula": "Rompimento: Close[t] < min(Low[t-N:t]). Negação: Close[t] >Linha. Compra: Open[t+1].",
             "psychology": "Rompimento de fundo estrutural aciona liquidações maciças e ordens de stop institucionais. A recuperação rápida indica absorção institucional de liquidez.",
             "profile": "Perfil Holder / Acumulação • Sinais de alta relevância técnica em fundos de mercado.",
-            "timing_rule": "Compre na abertura seguinte. Se o movimento já estendeu > 2.0%, prefira a variante de reteste.",
+            "timing_rule": "Compre na abertura seguinte. Se o movimento já estendeu >2.0%, prefira a variante de reteste.",
         },
         {
             "title": "Negação de Fundo N Barras (Entrada Reteste)",
@@ -50,7 +50,7 @@ PLAYBOOK_ENTRIES = {
             "title": "Fundo Duplo + Quebra de Estrutura (BOS)",
             "sub_id": "double_bottom_bos",
             "concept": "Formação clássica de W em zona de suporte, onde o segundo fundo não renova mínimas e há fechamento acima do topo intermediário (Neckline).",
-            "formula": "Dois fundos em [t-40..t] com tolerância de -3% a +2%, seguidos de Close[t] > Neckline.",
+            "formula": "Dois fundos em [t-40..t] com tolerância de -3% a +2%, seguidos de Close[t] >Neckline.",
             "psychology": "Exaustão da força vendedora e reversão formal da estrutura de pivôs de baixa para pivôs de alta.",
             "profile": "Alta Confiabilidade • Reversões estruturais de tendência.",
             "timing_rule": "Compre no rompimento do topo intermediário. Cuidado com falsos rompimentos se o volume for fraco.",
@@ -59,7 +59,7 @@ PLAYBOOK_ENTRIES = {
             "title": "Varredura de Liquidez (Wyckoff Spring)",
             "sub_id": "wyckoff_spring",
             "concept": "Perfuração temporária da mínima de suporte com forte rejeição na mesma barra e volume expressivo (Sweep de Liquidez).",
-            "formula": "Low[t] < min(Low[t-N:t]), Close[t] > min(Low[t-N:t]) e Volume[t] > SMA(Volume, 20).",
+            "formula": "Low[t] < min(Low[t-N:t]), Close[t] >min(Low[t-N:t]) e Volume[t] >SMA(Volume, 20).",
             "psychology": "Grandes players 'pescam' liquidez abaixo do suporte para encher seus livros sem empurrar o preço para cima.",
             "profile": "Agilidade e Reversão Rápida • Excelente em criptomoedas e ações líquidas.",
             "timing_rule": "Entrada obrigatória no Open seguinte à vela de rejeição com volume.",
@@ -108,11 +108,11 @@ PLAYBOOK_ENTRIES = {
 }
 
 
-def render_guide_tab() -> None:
+def render_guide_tab() ->None:
     """
     Renders Aba 4: Guia de Estratégias & Playbook Institucional.
     """
-    st.markdown("### 📘 Guia de Estratégias & Playbook Operacional")
+    st.markdown("###  Guia de Estratégias & Playbook Operacional")
     st.caption("Enciclopédia quantitativa detalhando o racional matemático, psicologia de fundo e melhores práticas para cada uma das estratégias do sistema.")
 
     category_choice = st.radio(
@@ -124,12 +124,12 @@ def render_guide_tab() -> None:
     entries = PLAYBOOK_ENTRIES.get(category_choice, [])
 
     for item in entries:
-        with st.expander(f"📌 {item['title']}", expanded=True):
+        with st.expander(f" {item['title']}", expanded=True):
             col_left, col_right = st.columns([3, 2])
             with col_left:
                 st.markdown(f"**Conceito Simples:** {item['concept']}")
                 st.code(item['formula'], language="text")
-                st.markdown(f"**🧠 Psicologia por trás do Fundo:** {item['psychology']}")
+                st.markdown(f"** Psicologia por trás do Fundo:** {item['psychology']}")
             with col_right:
-                st.info(f"**🎯 Perfil Ideal:** {item['profile']}")
-                st.warning(f"**⏱️ Como Não Comprar Atrasado:** {item['timing_rule']}")
+                st.info(f"** Perfil Ideal:** {item['profile']}")
+                st.warning(f"** Como Não Comprar Atrasado:** {item['timing_rule']}")

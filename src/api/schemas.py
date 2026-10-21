@@ -112,6 +112,7 @@ class AnalyzeResponse(BaseModel):
 
 class RadarItem(BaseModel):
     ticker: str
+    asset_name: Optional[str] = None
     category: str
     current_price: float
     strategy_sub_id: str

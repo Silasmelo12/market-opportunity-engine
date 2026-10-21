@@ -27,7 +27,7 @@ from ..evaluator import (
     simulate_cycle_trade,
     optimize_strategy_pairs,
 )
-from ..ui.theme import STRATEGY_LABELS_PT, get_friendly_label
+from ..ui.theme import STRATEGY_LABELS_PT, get_friendly_label, get_asset_name, ASSET_NAMES_PT
 from .schemas import (
     sanitize_val,
     AnalyzeResponse,
@@ -272,12 +272,17 @@ def analyze_asset(
     prop_state = results["prop_current_state"]
     pending = results["pending_signals"]
 
-    # Calculate summaries
+    # Calculate summaries (including pending strategies so they appear in metrics/ranking)
+    pending_sub_ids = [
+        (p.get("strategy_id", "mql5_candles"), p.get("strategy_sub_id"), p.get("direction", "BUY"))
+        for p in pending if p.get("strategy_sub_id")
+    ]
     summaries_raw = evaluate_all_strategies(
         series=series,
         signals=signals,
         horizon_bars=horizon_x,
         total_signals_by_sub_id=results["total_signals_by_sub_id"],
+        include_empty_sub_ids=pending_sub_ids,
     )
 
     # Format dates
@@ -338,6 +343,34 @@ def analyze_asset(
                 is_open=bool(meta.get("is_open", False)),
                 forward_return_pct=float(meta.get("forward_return_pct")) if meta.get("forward_return_pct") is not None else None,
                 mae_pct=float(meta.get("mae_pct")) if meta.get("mae_pct") is not None else None,
+            )
+        )
+
+    # Append pending signals formed on the final bar so they appear as active markers and in the signals list
+    for p in pending:
+        sub_id = p.get("strategy_sub_id", "")
+        strat_id = p.get("strategy_id", "mql5_candles")
+        d_dir = p.get("direction", "BUY")
+        s_idx = p.get("signal_bar_index", series.length - 1)
+        ref_p = p.get("reference_line_price")
+        sig_date = date_strs[s_idx] if s_idx < len(date_strs) else ""
+        exec_price = float(ref_p if ref_p is not None else series.close[-1])
+        signal_items.append(
+            SignalItem(
+                strategy_id=strat_id,
+                strategy_sub_id=sub_id,
+                strategy_label=get_friendly_label(sub_id),
+                group_id=_get_group_id(sub_id),
+                direction=d_dir,
+                signal_date=sig_date,
+                execution_date=f"{sig_date} (Pendente)",
+                signal_bar_index=s_idx,
+                execution_bar_index=s_idx,
+                execution_price=exec_price,
+                reference_line_price=float(ref_p) if ref_p is not None else None,
+                is_open=True,
+                forward_return_pct=None,
+                mae_pct=None,
             )
         )
 
@@ -588,6 +621,7 @@ def _scan_single_ticker(ticker: str, category: str, interval: str = "1d", horizo
             )
             item = RadarItem(
                 ticker=ticker,
+                asset_name=get_asset_name(ticker),
                 category=category,
                 current_price=current_price,
                 strategy_sub_id=sub_id,
@@ -625,6 +659,7 @@ def _scan_single_ticker(ticker: str, category: str, interval: str = "1d", horizo
             )
             item = RadarItem(
                 ticker=ticker,
+                asset_name=get_asset_name(ticker),
                 category=category,
                 current_price=current_price,
                 strategy_sub_id=sub_id,
@@ -666,6 +701,7 @@ def _scan_single_ticker(ticker: str, category: str, interval: str = "1d", horizo
             buy_items.append(
                 RadarItem(
                     ticker=ticker,
+                    asset_name=get_asset_name(ticker),
                     category=category,
                     current_price=current_price,
                     strategy_sub_id=sub_id,
@@ -704,6 +740,7 @@ def _scan_single_ticker(ticker: str, category: str, interval: str = "1d", horizo
             sell_items.append(
                 RadarItem(
                     ticker=ticker,
+                    asset_name=get_asset_name(ticker),
                     category=category,
                     current_price=current_price,
                     strategy_sub_id=sub_id,
