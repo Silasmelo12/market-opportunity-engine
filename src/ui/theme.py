@@ -17,8 +17,8 @@ STRATEGY_LABELS_PT: Dict[str, str] = {
     "rebal_rf_rv": "Rebalanceamento Renda Fixa x Variável",
     "rebal_relative_strength": "Rebalanceamento de Força Relativa (Z-Score)",
     "value_proxy": "Desconto Fundamentalista (Value Proxy)",
-    "price_action_double_bottom_bos": "Fundo Duplo + Quebra de Estrutura (BOS)",
-    "double_bottom_bos": "Fundo Duplo + Quebra de Estrutura (BOS)",
+    "price_action_double_bottom_bos": "Fundo Duplo + BOS (Refinado)",
+    "double_bottom_bos": "Fundo Duplo + BOS (Refinado)",
     "price_action_wyckoff_spring": "Varredura de Liquidez (Wyckoff Spring)",
     "wyckoff_spring": "Varredura de Liquidez (Wyckoff Spring)",
     # MQL5 Bullish Candlestick Patterns
