@@ -273,3 +273,50 @@ def test_simulate_cycle_trade_multi_buy():
     assert trade.buy_entries[1].price == 12.5
     assert trade.buy_entries[2].price == 10.0
 
+
+def test_simulate_cycle_trade_k_buys_exact_math():
+    """
+    T001 Test:
+    Verifies generic math for K buys where:
+    - Buy 1: 10.0, capital = 1000.0 -> 100 shares
+    - Buy 2: 8.0, capital = 1000.0 -> 125 shares
+    - Buy 3: 6.0, capital = 1000.0 -> 166.6667 shares
+    Total Invested = 3000.0
+    Total Shares = 391.6667
+    Average Price = 3000 / 391.6667 = 7.65957
+    Sell at 10.0:
+    Exit Capital = 391.6667 * 10 = 3916.67
+    Net Profit = 3916.67 - 3000 = 916.67
+    Return % = (10 - 7.65957) / 7.65957 * 100 = +30.55%
+    """
+    series = make_test_series([10.0, 10.0, 8.0, 6.0, 10.0])
+    signals = [
+        SignalRecord("prop_reversal", "b1", 0, 1, 10.0, None, "BUY"),
+        SignalRecord("prop_reversal", "b2", 1, 2, 8.0, None, "BUY"),
+        SignalRecord("prop_reversal", "b3", 2, 3, 6.0, None, "BUY"),
+        SignalRecord("prop_reversal", "s1", 3, 4, 10.0, None, "SELL"),
+    ]
+
+    res = simulate_cycle_trade(
+        series,
+        signals,
+        initial_capital=1000.0,
+        contribution_amount=1000.0,
+    )
+
+    assert res.total_trades_count == 1
+    assert res.closed_trades_count == 1
+    trade = res.trades[0]
+    assert trade.num_entries == 3
+    assert trade.total_invested == pytest.approx(3000.0)
+    assert trade.total_shares == pytest.approx(391.6667, abs=0.01)
+    assert trade.average_buy_price == pytest.approx(7.66, abs=0.02)
+    assert trade.return_pct == pytest.approx(30.55, abs=0.1)
+    assert trade.profit_loss == pytest.approx(916.67, abs=0.5)
+
+    # Global KPI summary check
+    assert res.total_invested == pytest.approx(3000.0)
+    assert res.net_profit == pytest.approx(916.67, abs=0.5)
+    assert res.return_on_capital_pct == pytest.approx(30.55, abs=0.1)
+
+
