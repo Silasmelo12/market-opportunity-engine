@@ -21,7 +21,7 @@
 
 ## Phase 2: Foundational (bloqueia US1–US3)
 
-- [ ] T003 Extrair a detecção atual do fundo duplo de `run_double_bottom_bos` para helper `_detect_double_bottom_raw(o,h,l,c) -> List[(t, b1_idx, b2_idx, neckline)]` em `src/strategies/classic_engines.py`, sem mudar comportamento
+- [X] T003 Extrair a detecção atual do fundo duplo de `run_double_bottom_bos` para helper `_detect_double_bottom_raw(o,h,l,c) -> List[(t, b1_idx, b2_idx, neckline)]` em `src/strategies/classic_engines.py`, sem mudar comportamento
 - [ ] T004 Extrair a detecção atual do topo duplo de `run_sell_double_top_bos` para helper `_detect_double_top_raw(...)` em `src/strategies/classic_engines.py`, sem mudar comportamento
 - [ ] T005 Adicionar helpers vetorizados de contexto em `src/strategies/classic_engines.py`: `_sma(c, n)`, `_rolling_max_prev(h, n)` e `_rolling_min_prev(l, n)` (janela excluindo t, via `pd.Series.rolling(n).max().shift(1)`), e dataclass `DoublePatternParams` com defaults do data-model.md
 - [ ] T006 [P] Criar fixture de dados sintéticos OHLCV (alta vertical, queda real + fundo duplo, topo após alta) em `tests/fixtures_double_patterns.py`
