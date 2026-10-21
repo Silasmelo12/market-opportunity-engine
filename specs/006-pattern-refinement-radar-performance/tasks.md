@@ -33,10 +33,10 @@
 **Independent Test**: `pytest tests/test_double_patterns.py -k bottom` — nenhum sinal na máxima de 60 barras, acima da SMA50 sem queda, ou com RSI fora dos limites.
 
 - [X] T007 [P] [US1] Testes em `tests/test_double_patterns.py`: (a) alta vertical → 0 sinais; (b) `close[t] >= max(High[t-60:t])` → descartado; (c) RSI dos fundos ≥ 45 ou RSI[t] > 60 → descartado; (d) cenário válido → 1 sinal; (e) anti-look-ahead: truncar a série em t dá o mesmo resultado
-- [ ] T008 [US1] Implementar filtro de tendência (FR-001: B1 e B2 abaixo da SMA50 OU queda ≥ 6% da máxima recente) em `run_double_bottom_bos` em `src/strategies/classic_engines.py`
-- [ ] T009 [US1] Implementar filtro de posição relativa (FR-002: descartar se `c[t] >= _rolling_max_prev(h,60)[t]`) em `run_double_bottom_bos`
-- [ ] T010 [US1] Implementar filtro de RSI (FR-003: min RSI em B1/B2 < 45 e RSI[t] ≤ 60, usando `compute_rsi`) em `run_double_bottom_bos`
-- [ ] T011 [US1] Implementar profundidade mínima (FR-004: queda ≥ 6% da máxima nas 40 barras antes de B1) e descarte quando o histórico é insuficiente/NaN em `run_double_bottom_bos`
+- [X] T008 [US1] Implementar filtro de tendência (FR-001: B1 e B2 abaixo da SMA50 OU queda ≥ 6% da máxima recente) em `run_double_bottom_bos` em `src/strategies/classic_engines.py`
+- [X] T009 [US1] Implementar filtro de posição relativa (FR-002: descartar se `c[t] >= _rolling_max_prev(h,60)[t]`) em `run_double_bottom_bos`
+- [X] T010 [US1] Implementar filtro de RSI (FR-003: min RSI em B1/B2 < 45 e RSI[t] ≤ 60, usando `compute_rsi`) em `run_double_bottom_bos`
+- [X] T011 [US1] Implementar profundidade mínima (FR-004: queda ≥ 6% da máxima nas 40 barras antes de B1) e descarte quando o histórico é insuficiente/NaN em `run_double_bottom_bos`
 - [ ] T012 [US1] Atualizar a descrição da estratégia no catálogo `/api/strategies` em `src/api/server.py` e no guia em `src/web/index.html`
 
 ---

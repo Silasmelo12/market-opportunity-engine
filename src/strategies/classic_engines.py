@@ -468,7 +468,20 @@ class ClassicStrategiesEngine:
             extra_meta={"valuation_mode": mode_used},
         )
 
-    def run_double_bottom_bos(self, series: OHLCVSeries) -> List[SignalRecord]:
+    def run_double_bottom_bos(
+        self,
+        series: OHLCVSeries,
+        params: Optional[DoublePatternParams] = None,
+    ) -> List[SignalRecord]:
+        """
+        Refined Double Bottom + Break of Structure (BOS) - BUY:
+        Applies strict causal filters:
+        1. Trend context: B1 and B2 must be below SMA(50) OR preceded by a drop of >= 6% from prior high.
+        2. Relative position filter: Discard if Close[t] >= max(High[t-60:t]) (prevents buying at 2-month tops).
+        3. RSI filter: RSI(14) must have visited < 45 during B1/B2, and breakout Close[t] RSI <= 60.
+        4. Prior depth: Minimum drop of >= 6% prior to B1 in depth_window (40 bars).
+        """
+        p = params or DoublePatternParams()
         c = series.close
         l = series.low
         h = series.high
@@ -477,8 +490,60 @@ class ClassicStrategiesEngine:
         mask = np.zeros(n, dtype=bool)
         necklines = np.full(n, np.nan, dtype=np.float64)
 
+        if n < max(p.trend_sma_period, p.relative_window):
+            return []
+
+        # Vectorized indicators (strictly causal)
+        sma50 = _sma(c, p.trend_sma_period)
+        roll_max_60 = _rolling_max_prev(h, p.relative_window)
+        rsi14 = compute_rsi(c, p.rsi_period)
+
         raw_signals = _detect_double_bottom_raw(o, h, l, c)
         for t, b1_idx, b2_idx, neckline in raw_signals:
+            # Must have enough history for relative window and SMA
+            if t < p.relative_window or np.isnan(roll_max_60[t]) or np.isnan(sma50[t]):
+                continue
+
+            b1_low = l[b1_idx]
+            b2_low = l[b2_idx]
+
+            # 1 & 4. Trend context & Depth before B1
+            depth_start = max(0, b1_idx - p.depth_window)
+            if depth_start >= b1_idx:
+                prior_max_high = h[b1_idx]
+            else:
+                prior_max_high = float(np.max(h[depth_start:b1_idx]))
+
+            prior_drop_pct = (prior_max_high - b1_low) / prior_max_high if prior_max_high > 0 else 0.0
+
+            # Trend context: Below SMA(50) at bottoms OR prior drop >= prior_move_pct (6%)
+            sma_b1 = sma50[b1_idx]
+            sma_b2 = sma50[b2_idx]
+            below_sma = (not np.isnan(sma_b1) and c[b1_idx] < sma_b1) and (not np.isnan(sma_b2) and c[b2_idx] < sma_b2)
+            has_trend_drop = below_sma or (prior_drop_pct >= p.prior_move_pct)
+
+            if not has_trend_drop:
+                continue
+
+            # Minimum depth filter: Must have dropped at least prior_move_pct before B1
+            if prior_drop_pct < p.prior_move_pct:
+                continue
+
+            # 2. Relative position filter: Discard if Close[t] >= max(High[t-60:t])
+            if c[t] >= roll_max_60[t]:
+                continue
+
+            # 3. RSI Anti-exhaustion filter
+            # RSI during bottom formation (b1_idx to b2_idx inclusive) must have visited < rsi_bottom_threshold
+            bottom_rsi_min = float(np.min(rsi14[b1_idx : b2_idx + 1]))
+            if np.isnan(bottom_rsi_min) or bottom_rsi_min >= p.rsi_bottom_threshold:
+                continue
+
+            # Breakout bar RSI must not be overbought (<= rsi_bottom_break_limit)
+            if np.isnan(rsi14[t]) or rsi14[t] > p.rsi_bottom_break_limit:
+                continue
+
+            # All filters satisfied
             mask[t] = True
             necklines[t] = neckline
 
