@@ -785,7 +785,7 @@
         <!-- Simulator Configuration Form -->
         <div class="card-surface p-4 space-y-3 text-xs">
           <!-- Row 1: Core Parameters & Timeframe -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3">
             <div>
               <label class="text-gray-400 font-semibold block mb-1">Ativo para Simulação</label>
               <input id="sim-ticker" list="asset-datalist" type="text" value="PETR4.SA" placeholder="Digite ou selecione..." class="w-full bg-fintech-bg border border-fintech-border rounded px-3 py-1.5 text-white font-mono uppercase focus:border-fintech-cyan focus:outline-none">
@@ -805,6 +805,13 @@
               <select id="sim-mode" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-sans focus:border-fintech-cyan focus:outline-none">
                 <option value="cycle_trade" selected>Trade (Compra -> Venda)</option>
                 <option value="accumulation">Acumulação (DCA Fundos)</option>
+              </select>
+            </div>
+            <div id="sim-cycle-mode-container">
+              <label class="text-gray-400 font-semibold block mb-1">Entradas no Ciclo</label>
+              <select id="sim-cycle-mode" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-sans focus:border-fintech-cyan focus:outline-none">
+                <option value="multi_buy" selected>Acumulação Multi-Buy (Nx)</option>
+                <option value="single_buy">Compra Única (1x)</option>
               </select>
             </div>
             <div>

@@ -1632,12 +1632,16 @@ function setupSimulationTab() {
       const lblAux = document.getElementById('sim-kpi-label-aux');
       const legendInfo = document.getElementById('sim-curve-legend-info');
 
+      const cycleContainer = document.getElementById('sim-cycle-mode-container');
+
       if (mode === 'cycle_trade') {
+        if (cycleContainer) cycleContainer.classList.remove('hidden');
         if (lblCap) lblCap.textContent = 'Capital Inicial (R$)';
         if (lblInv) lblInv.textContent = 'Capital Inicial';
         if (lblAux) lblAux.textContent = 'Win Rate / Acertos';
         if (legendInfo) legendInfo.textContent = 'Evolução de Saldo em Caixa + Posição a Mercado';
       } else {
+        if (cycleContainer) cycleContainer.classList.add('hidden');
         if (lblCap) lblCap.textContent = 'Aporte por Sinal (R$)';
         if (lblInv) lblInv.textContent = 'Total Aportado';
         if (lblAux) lblAux.textContent = 'Alfa vs. DCA Passivo';
@@ -1679,11 +1683,15 @@ async function runSimulation() {
       simPeriod = '60d';
     }
 
+    const cycleModeEl = document.getElementById('sim-cycle-mode');
+    const selectedCycleMode = (cycleModeEl && cycleModeEl.value) || 'multi_buy';
+
     const payload = {
       ticker: tickerInput,
       interval: selectedInterval,
       period: simPeriod,
       simulation_mode: mode,
+      cycle_entry_mode: selectedCycleMode,
       contribution_amount: capitalVal,
       initial_capital: capitalVal,
       buy_strategy: (elements.simBuyStrategy && elements.simBuyStrategy.value) || "ALL",
