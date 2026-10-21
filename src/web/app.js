@@ -1660,6 +1660,10 @@ function setupSimulationTab() {
       if (state.lastChampion) {
         if (elements.simBuyStrategy) elements.simBuyStrategy.value = state.lastChampion.buy_sub_id;
         if (elements.simSellStrategy) elements.simSellStrategy.value = state.lastChampion.sell_sub_id;
+        const cycleModeEl = document.getElementById('sim-cycle-mode');
+        if (cycleModeEl && state.lastChampion.cycle_entry_mode) {
+          cycleModeEl.value = state.lastChampion.cycle_entry_mode;
+        }
         runSimulation();
       }
     });
@@ -1792,10 +1796,22 @@ async function runOptimizer() {
   try {
     const tickerInput = resolveTicker((elements.simTicker && elements.simTicker.value.trim().toUpperCase()) || state.currentTicker);
     const capitalVal = parseFloat(document.getElementById('sim-contribution').value) || 1000;
+    const simIntervalEl = document.getElementById('sim-interval');
+    const selectedInterval = (simIntervalEl && simIntervalEl.value) || state.currentTimeframe || '1d';
+
+    let simPeriod = state.currentPeriod;
+    if (selectedInterval === '5m' || selectedInterval === '15m' || selectedInterval === '60m') {
+      simPeriod = '60d';
+    }
+
+    const cycleModeEl = document.getElementById('sim-cycle-mode');
+    const selectedCycleMode = (cycleModeEl && cycleModeEl.value) || 'multi_buy';
+
     const payload = {
       ticker: tickerInput,
-      interval: state.currentTimeframe,
-      period: state.currentPeriod,
+      interval: selectedInterval,
+      period: simPeriod,
+      cycle_entry_mode: selectedCycleMode,
       initial_capital: capitalVal,
       min_trades: 2,
       start_date: document.getElementById('sim-start-date').value || null,
@@ -1820,6 +1836,10 @@ async function runOptimizer() {
       const c = data.champion;
       const countEl = document.getElementById('opt-champ-tested-count');
       if (countEl) countEl.textContent = `${data.total_combinations_tested} combinações válidas rankeadas`;
+      const modeBadge = document.getElementById('opt-champ-mode-badge');
+      if (modeBadge) {
+        modeBadge.textContent = c.cycle_entry_mode === 'single_buy' ? 'Compra Única (1x)' : 'Multi-Buy (Nx)';
+      }
       document.getElementById('opt-champ-buy-label').textContent = c.buy_label;
       document.getElementById('opt-champ-sell-label').textContent = c.sell_label;
       document.getElementById('opt-champ-ret').textContent = `${c.total_return_pct >= 0 ? '+' : ''}${c.total_return_pct.toFixed(1)}%`;
