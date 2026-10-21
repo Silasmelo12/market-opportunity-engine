@@ -1679,34 +1679,67 @@ async function runSimulation() {
     const data = await res.json();
 
     const m = data.metrics;
+    const isCycle = (mode === 'cycle_trade');
+
+    // 1. Capital Investido & Patrimônio Final
     document.getElementById('sim-kpi-invested').textContent = `R$ ${m.total_invested.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
     document.getElementById('sim-kpi-final').textContent = `R$ ${m.final_portfolio_value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-    
-    const profitEl = document.getElementById('sim-kpi-profit');
-    profitEl.textContent = `${m.total_profit_loss >= 0 ? '+' : ''}R$ ${m.total_profit_loss.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-    profitEl.className = `text-lg font-bold font-mono ${m.total_profit_loss >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
 
+    // 2. Retorno Estratégia vs Buy & Hold
     const retEl = document.getElementById('sim-kpi-return');
-    retEl.textContent = `${m.total_return_pct >= 0 ? '+' : ''}${m.total_return_pct.toFixed(1)}%`;
-    retEl.className = `text-lg font-bold font-mono ${m.total_return_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+    if (retEl) {
+      retEl.textContent = `${m.total_return_pct >= 0 ? '+' : ''}${m.total_return_pct.toFixed(1)}%`;
+      retEl.className = `text-base sm:text-lg font-bold font-mono ${m.total_return_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+    }
+    const bnhSub = document.getElementById('sim-kpi-bnh-sub');
+    if (bnhSub) {
+      const bnh = m.buy_and_hold_return_pct != null ? m.buy_and_hold_return_pct.toFixed(1) : '0.0';
+      const bnhDiff = (m.total_return_pct - (m.buy_and_hold_return_pct || 0)).toFixed(1);
+      bnhSub.textContent = `B&H: ${bnh}% (Alpha: ${bnhDiff >= 0 ? '+' : ''}${bnhDiff}%)`;
+    }
 
+    // 3. Fator de Lucro & Lucro Líquido
+    const pfEl = document.getElementById('sim-kpi-profit-factor');
+    if (pfEl) {
+      const pf = m.profit_factor != null ? (m.profit_factor >= 999 ? '∞' : m.profit_factor.toFixed(2)) : '0.00';
+      pfEl.textContent = pf;
+      pfEl.className = `text-base sm:text-lg font-bold font-mono ${parseFloat(pf) >= 1.5 || pf === '∞' ? 'text-amber-400' : (parseFloat(pf) >= 1.0 ? 'text-gray-200' : 'text-rose-400')}`;
+    }
+    const profitSub = document.getElementById('sim-kpi-profit-sub');
+    if (profitSub) {
+      profitSub.textContent = `PnL: ${m.total_profit_loss >= 0 ? '+' : ''}R$ ${m.total_profit_loss.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+    }
+
+    // 4. Win Rate / Acertos
     const auxEl = document.getElementById('sim-kpi-winrate');
+    const tradesSub = document.getElementById('sim-kpi-trades-sub');
     if (auxEl) {
-      if (mode === 'cycle_trade') {
+      if (isCycle) {
         const wr = (m.win_rate_pct != null) ? m.win_rate_pct.toFixed(1) : '0.0';
         const wins = m.winning_trades_count || 0;
         const total = (m.winning_trades_count || 0) + (m.losing_trades_count || 0);
-        auxEl.textContent = `${wr}% (${wins}/${total})`;
-        auxEl.className = `text-lg font-bold font-mono ${parseFloat(wr) >= 50 ? 'text-emerald-400' : 'text-amber-400'}`;
+        auxEl.textContent = `${wr}%`;
+        auxEl.className = `text-base sm:text-lg font-bold font-mono ${parseFloat(wr) >= 50 ? 'text-emerald-400' : 'text-amber-400'}`;
+        if (tradesSub) tradesSub.textContent = `${wins}W / ${m.losing_trades_count || 0}L (${m.total_trades_count || 0} ciclos)`;
       } else {
         auxEl.textContent = `${m.alpha_vs_dca_pct >= 0 ? '+' : ''}${m.alpha_vs_dca_pct.toFixed(1)}%`;
-        auxEl.className = `text-lg font-bold font-mono ${m.alpha_vs_dca_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+        auxEl.className = `text-base sm:text-lg font-bold font-mono ${m.alpha_vs_dca_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+        if (tradesSub) tradesSub.textContent = `Aportes: ${m.total_trades_count || 0}`;
       }
     }
 
+    // 5. Drawdown Máximo & Média de Compras
     const ddEl = document.getElementById('sim-kpi-drawdown');
     if (ddEl) {
       ddEl.textContent = `${(m.max_drawdown_pct || 0).toFixed(1)}%`;
+    }
+    const avgEntriesSub = document.getElementById('sim-kpi-avg-entries-sub');
+    if (avgEntriesSub) {
+      if (isCycle && m.avg_entries_per_cycle != null) {
+        avgEntriesSub.textContent = `Média compras/ciclo: ${m.avg_entries_per_cycle.toFixed(1)}`;
+      } else {
+        avgEntriesSub.textContent = `Duração média: ${(m.avg_trade_bars || 0).toFixed(0)}b`;
+      }
     }
 
     renderSimulationCurve(data.curve);
