@@ -46,6 +46,25 @@ def _parse_period_days(period_str: str) -> Optional[int]:
     return None
 
 
+TICKER_ALIASES = {
+    "WIN": "^BVSP",
+    "WIN=F": "^BVSP",
+    "WINFUT": "^BVSP",
+    "MINIINDICE": "^BVSP",
+    "IBOV": "^BVSP",
+    "WDO": "USDBRL=X",
+    "WDO=F": "USDBRL=X",
+    "WDOFUT": "USDBRL=X",
+    "MINIDOLAR": "USDBRL=X",
+    "DOLAR": "USDBRL=X",
+    "USDBRL": "USDBRL=X",
+    "XAUUSD": "GC=F",
+    "XAUUSD=X": "GC=F",
+    "GOLD": "GC=F",
+    "OURO": "GC=F",
+}
+
+
 class DataLoader:
     """
     Manages loading, caching, and multi-timeframe fetching of financial asset series.
@@ -72,6 +91,8 @@ class DataLoader:
         Caches locally in Parquet, slices dynamically by the requested period,
         and returns an immutable OHLCVSeries.
         """
+        clean_key = ticker.strip().upper().replace(" ", "").replace("/", "")
+        ticker = TICKER_ALIASES.get(clean_key, ticker.strip().upper())
         CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
         inter_lower = interval.lower()

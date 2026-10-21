@@ -67,7 +67,7 @@ def test_api_tickers():
     assert "commodities" in data
     assert "forex" in data
     assert "crypto" in data
-    assert data["total"] == 151
+    assert data["total"] == 153
 
 
 def test_api_simulate():
@@ -120,8 +120,8 @@ def test_root_serves_spa():
 
 def test_asset_names_and_radar_items():
     from src.ui.theme import get_asset_name
-    assert get_asset_name("GC=F") == "Ouro Futuro"
-    assert get_asset_name("CL=F") == "Petróleo WTI"
+    assert get_asset_name("GC=F") == "Gold (Ouro / XAUUSD)"
+    assert get_asset_name("CL=F") == "Crude Oil WTI (Petróleo)"
     assert get_asset_name("EURUSD=X") == "EUR/USD"
     assert get_asset_name("BTC-USD") == "Bitcoin"
     assert get_asset_name("PETR4.SA") == "Petrobras PN"

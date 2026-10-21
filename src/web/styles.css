@@ -242,7 +242,7 @@ input[type="checkbox"] {
   display: none;
 }
 
-/* Desktop: Always flex column occupying the full left sidebar */
+/* Desktop: Always flex column occupying the full left sidebar with internal scroll */
 @media (min-width: 1024px) {
   #strategies-wrapper-collapsible {
     display: flex !important;
@@ -251,28 +251,37 @@ input[type="checkbox"] {
     max-height: none !important;
     overflow: hidden !important;
   }
+
+  #strategy-accordions-container {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    padding: 0.5rem;
+  }
 }
 
-/* Mobile: Displayed when toggled open with touch scroll */
-#strategies-wrapper-collapsible.mobile-open {
-  display: flex !important;
-  flex-direction: column !important;
-  max-height: 65vh !important;
-  min-height: 260px !important;
-  overflow: hidden !important;
-  border-bottom: 1px solid var(--border-color);
-  background-color: var(--bg-surface);
-}
+/* Mobile: Expands naturally in document flow to avoid nested scroll locks */
+@media (max-width: 1023px) {
+  #strategies-wrapper-collapsible.mobile-open {
+    display: flex !important;
+    flex-direction: column !important;
+    max-height: none !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-surface);
+  }
 
-/* Accordions container: Smooth touch scrolling on mobile and desktop */
-#strategy-accordions-container {
-  flex: 1 1 0% !important;
-  min-height: 0 !important;
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch !important;
-  overscroll-behavior: contain !important;
-  touch-action: pan-y !important;
-  padding: 0.5rem;
+  #strategy-accordions-container {
+    overflow: visible !important;
+    max-height: none !important;
+    height: auto !important;
+    flex: none !important;
+    overscroll-behavior: auto !important;
+    touch-action: pan-y !important;
+    padding: 0.5rem;
+  }
 }
 
 #strategy-accordions-container::-webkit-scrollbar {

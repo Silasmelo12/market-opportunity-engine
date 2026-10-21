@@ -135,13 +135,13 @@
         <!-- Radar Asset Category Filter Pills -->
         <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar touch-scroll pb-1" id="radar-category-pills">
           <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 active-cat shrink-0" data-cat="featured">Destaques (14)</button>
-          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="Ações Brasil">Ações Brasil (30)</button>
+          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="Ações Brasil">Ações Brasil (31)</button>
           <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="FIIs Brasil">FIIs Brasil (23)</button>
           <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="Ações EUA">Ações EUA (71)</button>
           <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="Commodities">Commodities (14)</button>
-          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="Forex">Forex (10)</button>
+          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="Forex">Forex (11)</button>
           <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="Criptomoedas">Cripto (3)</button>
-          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="all">Todos (151)</button>
+          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="all">Todos (153)</button>
         </div>
 
         <!-- Radar Opportunities Table -->
@@ -315,21 +315,27 @@
                 <option value="NNN">NNN (Ações EUA)</option>
                 <option value="WPC">WPC (Ações EUA)</option>
                 <option value="GLPI">GLPI (Ações EUA)</option>
-                <!-- Commodities (14) -->
-                <option value="GC=F">Ouro Futuro (GC=F)</option>
-                <option value="SI=F">Prata Futuro (SI=F)</option>
-                <option value="CL=F">Petróleo WTI (CL=F)</option>
-                <option value="BZ=F">Petróleo Brent (BZ=F)</option>
-                <option value="HG=F">Cobre Futuro (HG=F)</option>
-                <option value="NG=F">Gás Natural (NG=F)</option>
-                <option value="ZC=F">Milho Futuro (ZC=F)</option>
-                <option value="ZS=F">Soja Futura (ZS=F)</option>
-                <option value="ZW=F">Trigo Futuro (ZW=F)</option>
-                <option value="KC=F">Café Arábica (KC=F)</option>
-                <option value="CT=F">Algodão Futuro (CT=F)</option>
-                <option value="SB=F">Açúcar Futuro (SB=F)</option>
-                <option value="LE=F">Boi Gordo Futuro (LE=F)</option>
-                <option value="HE=F">Suínos Futuro (HE=F)</option>
+                <!-- Futuros & Mini Contratos B3 -->
+                <option value="^BVSP">Mini Índice / Ibovespa (WIN / ^BVSP)</option>
+                <option value="WIN">Mini Índice (WIN)</option>
+                <option value="USDBRL=X">Mini Dólar (WDO / USDBRL)</option>
+                <option value="WDO">Mini Dólar (WDO)</option>
+                <option value="GC=F">Gold / Ouro (XAUUSD / GC=F)</option>
+                <option value="XAUUSD">Gold / Ouro (XAUUSD)</option>
+                <!-- Commodities Globais -->
+                <option value="SI=F">Silver / Prata (SI=F)</option>
+                <option value="CL=F">Crude Oil WTI / Petróleo (CL=F)</option>
+                <option value="BZ=F">Brent Oil / Petróleo Brent (BZ=F)</option>
+                <option value="HG=F">Copper / Cobre (HG=F)</option>
+                <option value="NG=F">Natural Gas / Gás Natural (NG=F)</option>
+                <option value="ZC=F">Corn / Milho (ZC=F)</option>
+                <option value="ZS=F">Soybeans / Soja (ZS=F)</option>
+                <option value="ZW=F">Wheat / Trigo (ZW=F)</option>
+                <option value="KC=F">Coffee / Café (KC=F)</option>
+                <option value="CT=F">Cotton / Algodão (CT=F)</option>
+                <option value="SB=F">Sugar / Açúcar (SB=F)</option>
+                <option value="LE=F">Live Cattle / Boi Gordo (LE=F)</option>
+                <option value="HE=F">Lean Hogs / Suínos (HE=F)</option>
                 <!-- Forex (10) -->
                 <option value="EURUSD=X">EUR/USD - Euro / Dólar (EURUSD=X)</option>
                 <option value="GBPUSD=X">GBP/USD - Libra / Dólar (GBPUSD=X)</option>
@@ -408,7 +414,7 @@
           </div>
 
           <!-- Accordions Container (Compra e Venda) -->
-          <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain touch-scroll p-2 space-y-2 text-xs" id="strategy-accordions-container">
+          <div class="flex-1 min-h-0 lg:overflow-y-auto p-2 space-y-2 text-xs" id="strategy-accordions-container">
           <!-- Accordion 1: Proprietary Reversal BUY (4) -->
           <div class="border border-fintech-border rounded overflow-hidden strategy-group-wrapper" data-direction="BUY">
             <div class="accordion-header bg-fintech-bg px-2.5 py-1.5 flex items-center justify-between text-gray-200 font-semibold" data-accordion="acc-prop-buy">
@@ -417,19 +423,19 @@
             </div>
             <div id="acc-prop-buy" class="p-2 space-y-1 bg-fintech-surface">
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
-                <input type="checkbox" class="strategy-cb" data-id="t1_open" data-dir="BUY" checked>
+                <input type="checkbox" class="strategy-cb" data-id="t1_open" data-dir="BUY">
                 <span>Negação Anterior (Abertura)</span>
               </label>
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
-                <input type="checkbox" class="strategy-cb" data-id="t1_retest" data-dir="BUY" checked>
+                <input type="checkbox" class="strategy-cb" data-id="t1_retest" data-dir="BUY">
                 <span>Negação Anterior (Reteste)</span>
               </label>
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
-                <input type="checkbox" class="strategy-cb" data-id="t2_open" data-dir="BUY" checked>
+                <input type="checkbox" class="strategy-cb" data-id="t2_open" data-dir="BUY">
                 <span>Negação N Barras (Abertura)</span>
               </label>
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
-                <input type="checkbox" class="strategy-cb" data-id="t2_retest" data-dir="BUY" checked>
+                <input type="checkbox" class="strategy-cb" data-id="t2_retest" data-dir="BUY">
                 <span>Negação N Barras (Reteste)</span>
               </label>
             </div>
@@ -443,19 +449,19 @@
             </div>
             <div id="acc-prop-sell" class="p-2 space-y-1 bg-fintech-surface">
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
-                <input type="checkbox" class="strategy-cb" data-id="sell_t1_open" data-dir="SELL" checked>
+                <input type="checkbox" class="strategy-cb" data-id="sell_t1_open" data-dir="SELL">
                 <span>Negação Máxima Anterior (Abertura)</span>
               </label>
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
-                <input type="checkbox" class="strategy-cb" data-id="sell_t1_retest" data-dir="SELL" checked>
+                <input type="checkbox" class="strategy-cb" data-id="sell_t1_retest" data-dir="SELL">
                 <span>Negação Máxima Anterior (Reteste)</span>
               </label>
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
-                <input type="checkbox" class="strategy-cb" data-id="sell_t2_open" data-dir="SELL" checked>
+                <input type="checkbox" class="strategy-cb" data-id="sell_t2_open" data-dir="SELL">
                 <span>Negação Topo N Barras (Abertura)</span>
               </label>
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
-                <input type="checkbox" class="strategy-cb" data-id="sell_t2_retest" data-dir="SELL" checked>
+                <input type="checkbox" class="strategy-cb" data-id="sell_t2_retest" data-dir="SELL">
                 <span>Negação Topo N Barras (Reteste)</span>
               </label>
             </div>
@@ -469,11 +475,11 @@
             </div>
             <div id="acc-pa-buy" class="p-2 space-y-1 bg-fintech-surface">
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
-                <input type="checkbox" class="strategy-cb" data-id="double_bottom_bos" data-dir="BUY" checked>
+                <input type="checkbox" class="strategy-cb" data-id="double_bottom_bos" data-dir="BUY">
                 <span>Fundo Duplo + BOS</span>
               </label>
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
-                <input type="checkbox" class="strategy-cb" data-id="wyckoff_spring" data-dir="BUY" checked>
+                <input type="checkbox" class="strategy-cb" data-id="wyckoff_spring" data-dir="BUY">
                 <span>Wyckoff Spring</span>
               </label>
             </div>
@@ -487,11 +493,11 @@
             </div>
             <div id="acc-pa-sell" class="p-2 space-y-1 bg-fintech-surface">
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
-                <input type="checkbox" class="strategy-cb" data-id="sell_double_top_bos" data-dir="SELL" checked>
+                <input type="checkbox" class="strategy-cb" data-id="sell_double_top_bos" data-dir="SELL">
                 <span>Topo Duplo + BOS</span>
               </label>
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
-                <input type="checkbox" class="strategy-cb" data-id="sell_wyckoff_upthrust" data-dir="SELL" checked>
+                <input type="checkbox" class="strategy-cb" data-id="sell_wyckoff_upthrust" data-dir="SELL">
                 <span>Wyckoff Upthrust (UTAD)</span>
               </label>
             </div>
@@ -504,10 +510,10 @@
               <span class="text-gray-400 text-xs"></span>
             </div>
             <div id="acc-alloc-buy" class="p-2 space-y-1 bg-fintech-surface">
-              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="dca_dynamic" data-dir="BUY" checked><span>DCA Dinâmico</span></label>
-              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="value_proxy" data-dir="BUY" checked><span>Value Proxy</span></label>
-              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="rebal_rf_rv" data-dir="BUY" checked><span>Rebal. RF x RV</span></label>
-              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="rebal_relative_strength" data-dir="BUY" checked><span>Força Relativa Z</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="dca_dynamic" data-dir="BUY"><span>DCA Dinâmico</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="value_proxy" data-dir="BUY"><span>Value Proxy</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="rebal_rf_rv" data-dir="BUY"><span>Rebal. RF x RV</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="rebal_relative_strength" data-dir="BUY"><span>Força Relativa Z</span></label>
             </div>
           </div>
 
@@ -518,10 +524,10 @@
               <span class="text-gray-400 text-xs"></span>
             </div>
             <div id="acc-alloc-sell" class="p-2 space-y-1 bg-fintech-surface">
-              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="sell_overbought_stat" data-dir="SELL" checked><span>Excesso Estatístico</span></label>
-              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="sell_rebal_rv_rf" data-dir="SELL" checked><span>Rebal. RV ->RF</span></label>
-              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="sell_rebal_relative_strength" data-dir="SELL" checked><span>Exaustão Força Rel.</span></label>
-              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="sell_value_proxy" data-dir="SELL" checked><span>Prêmio Valuation</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="sell_overbought_stat" data-dir="SELL"><span>Excesso Estatístico</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="sell_rebal_rv_rf" data-dir="SELL"><span>Rebal. RV ->RF</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="sell_rebal_relative_strength" data-dir="SELL"><span>Exaustão Força Rel.</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="sell_value_proxy" data-dir="SELL"><span>Prêmio Valuation</span></label>
             </div>
           </div>
 
@@ -533,20 +539,20 @@
             </div>
             <div id="acc-mql5-buy" class="p-2 space-y-1 bg-fintech-surface">
               <div class="grid grid-cols-1 gap-1 text-[11px]">
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="hammer" data-dir="BUY" checked><span>Martelo</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="inverted_hammer" data-dir="BUY" checked><span>Martelo Invertido</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bullish_engulfing" data-dir="BUY" checked><span>Engolfo de Alta</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="piercing_line" data-dir="BUY" checked><span>Piercing Line</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="morning_star" data-dir="BUY" checked><span>Estrela da Manhã</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bullish_harami" data-dir="BUY" checked><span>Harami de Alta</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_inside_up" data-dir="BUY" checked><span>Três Por Dentro</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_outside_up" data-dir="BUY" checked><span>Três Por Fora</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_white_soldiers" data-dir="BUY" checked><span>Três Soldados Brancos</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="tweezer_bottom" data-dir="BUY" checked><span>Pinça de Fundo</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="dragonfly_doji" data-dir="BUY" checked><span>Doji Libélula</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="abandoned_baby_bullish" data-dir="BUY" checked><span>Bebê Abandonado</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bullish_kicker" data-dir="BUY" checked><span>Chute de Alta</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="climactic_pinbar" data-dir="BUY" checked><span>Pinbar Clímax Volume</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="hammer" data-dir="BUY"><span>Martelo</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="inverted_hammer" data-dir="BUY"><span>Martelo Invertido</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bullish_engulfing" data-dir="BUY"><span>Engolfo de Alta</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="piercing_line" data-dir="BUY"><span>Piercing Line</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="morning_star" data-dir="BUY"><span>Estrela da Manhã</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bullish_harami" data-dir="BUY"><span>Harami de Alta</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_inside_up" data-dir="BUY"><span>Três Por Dentro</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_outside_up" data-dir="BUY"><span>Três Por Fora</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_white_soldiers" data-dir="BUY"><span>Três Soldados Brancos</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="tweezer_bottom" data-dir="BUY"><span>Pinça de Fundo</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="dragonfly_doji" data-dir="BUY"><span>Doji Libélula</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="abandoned_baby_bullish" data-dir="BUY"><span>Bebê Abandonado</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bullish_kicker" data-dir="BUY"><span>Chute de Alta</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="climactic_pinbar" data-dir="BUY"><span>Pinbar Clímax Volume</span></label>
               </div>
             </div>
           </div>
@@ -559,20 +565,20 @@
             </div>
             <div id="acc-mql5-sell" class="p-2 space-y-1 bg-fintech-surface">
               <div class="grid grid-cols-1 gap-1 text-[11px]">
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="shooting_star" data-dir="SELL" checked><span>Estrela Cadente</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="hanging_man" data-dir="SELL" checked><span>Enforcado</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bearish_engulfing" data-dir="SELL" checked><span>Engolfo de Baixa</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="dark_cloud_cover" data-dir="SELL" checked><span>Nuvem Negra</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="evening_star" data-dir="SELL" checked><span>Estrela da Tarde</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bearish_harami" data-dir="SELL" checked><span>Harami de Baixa</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_inside_down" data-dir="SELL" checked><span>Três Por Dentro Baixa</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_outside_down" data-dir="SELL" checked><span>Três Por Fora Baixa</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_black_crows" data-dir="SELL" checked><span>Três Corvos Negros</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="tweezer_top" data-dir="SELL" checked><span>Pinça de Topo</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="gravestone_doji" data-dir="SELL" checked><span>Doji Lápide</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="abandoned_baby_bearish" data-dir="SELL" checked><span>Bebê Abandonado Baixa</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bearish_kicker" data-dir="SELL" checked><span>Chute de Baixa</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="climactic_bearish_pinbar" data-dir="SELL" checked><span>Pinbar Clímax Topo</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="shooting_star" data-dir="SELL"><span>Estrela Cadente</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="hanging_man" data-dir="SELL"><span>Enforcado</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bearish_engulfing" data-dir="SELL"><span>Engolfo de Baixa</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="dark_cloud_cover" data-dir="SELL"><span>Nuvem Negra</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="evening_star" data-dir="SELL"><span>Estrela da Tarde</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bearish_harami" data-dir="SELL"><span>Harami de Baixa</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_inside_down" data-dir="SELL"><span>Três Por Dentro Baixa</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_outside_down" data-dir="SELL"><span>Três Por Fora Baixa</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_black_crows" data-dir="SELL"><span>Três Corvos Negros</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="tweezer_top" data-dir="SELL"><span>Pinça de Topo</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="gravestone_doji" data-dir="SELL"><span>Doji Lápide</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="abandoned_baby_bearish" data-dir="SELL"><span>Bebê Abandonado Baixa</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bearish_kicker" data-dir="SELL"><span>Chute de Baixa</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="climactic_bearish_pinbar" data-dir="SELL"><span>Pinbar Clímax Topo</span></label>
               </div>
             </div>
           </div>

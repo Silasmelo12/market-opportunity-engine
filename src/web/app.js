@@ -17,31 +17,27 @@ window.appState = {
   activeTab: 'tab-radar',
   activeDirection: 'BOTH', // 'BOTH' (default) | 'BUY' | 'SELL'
   analysisData: null,
-  activeStrategies: new Set([
-    // BUY (Fundos)
-    't1_open', 't1_retest', 't2_open', 't2_retest',
-    'price_action_double_bottom_bos', 'double_bottom_bos',
-    'price_action_wyckoff_spring', 'wyckoff_spring',
-    'dca_dynamic', 'value_proxy', 'rebal_rf_rv', 'rebal_relative_strength',
-    'hammer', 'inverted_hammer', 'bullish_engulfing', 'piercing_line',
-    'morning_star', 'bullish_harami', 'three_inside_up', 'three_outside_up',
-    'three_white_soldiers', 'tweezer_bottom', 'dragonfly_doji',
-    'abandoned_baby_bullish', 'bullish_kicker', 'climactic_pinbar',
-    // SELL (Topos)
-    'sell_t1_open', 'sell_t1_retest', 'sell_t2_open', 'sell_t2_retest',
-    'sell_double_top_bos', 'sell_wyckoff_upthrust',
-    'sell_overbought_stat', 'sell_rebal_rv_rf', 'sell_rebal_relative_strength', 'sell_value_proxy',
-    'shooting_star', 'hanging_man', 'bearish_engulfing', 'dark_cloud_cover',
-    'evening_star', 'bearish_harami', 'three_inside_down', 'three_outside_down',
-    'three_black_crows', 'tweezer_top', 'gravestone_doji',
-    'abandoned_baby_bearish', 'bearish_kicker', 'climactic_bearish_pinbar'
-  ]),
+  activeStrategies: new Set([]), // Start completely unchecked by default
   chart: null,
   candleSeries: null,
   refLineSeriesList: []
 };
 
 const state = window.appState;
+
+// Ticker Aliases for Brazilian Mini Futures & Commodities
+const TICKER_ALIASES = {
+  'WIN': '^BVSP',
+  'WDO': 'USDBRL=X',
+  'XAUUSD': 'GC=F',
+  'GOLD': 'GC=F',
+};
+
+function resolveTicker(input) {
+  if (!input) return input;
+  const clean = String(input).trim().toUpperCase();
+  return TICKER_ALIASES[clean] || clean;
+}
 
 // DOM Elements
 const elements = {
@@ -74,21 +70,27 @@ const elements = {
 
 // Institutional Portuguese Asset Names Mapping
 const ASSET_NAMES = {
-  // Commodities
-  'GC=F': 'Ouro Futuro',
-  'SI=F': 'Prata Futuro',
-  'CL=F': 'Petróleo WTI',
-  'BZ=F': 'Petróleo Brent',
-  'HG=F': 'Cobre Futuro',
-  'NG=F': 'Gás Natural',
-  'ZC=F': 'Milho Futuro',
-  'ZS=F': 'Soja Futura',
-  'ZW=F': 'Trigo Futuro',
-  'KC=F': 'Café Arábica',
-  'CT=F': 'Algodão Futuro',
-  'SB=F': 'Açúcar Futuro',
-  'LE=F': 'Boi Gordo Futuro',
-  'HE=F': 'Suínos Futuro',
+  // Futuros B3 & Commodities Globais
+  '^BVSP': 'Mini Índice / Ibovespa (WIN)',
+  'WIN': 'Mini Índice / Ibovespa (WIN)',
+  'USDBRL=X': 'Mini Dólar (WDO / USDBRL)',
+  'WDO': 'Mini Dólar (WDO / USDBRL)',
+  'GC=F': 'Gold (Ouro / XAUUSD)',
+  'XAUUSD': 'Gold (Ouro / XAUUSD)',
+  'GOLD': 'Gold (Ouro / XAUUSD)',
+  'SI=F': 'Silver (Prata)',
+  'CL=F': 'Crude Oil WTI (Petróleo)',
+  'BZ=F': 'Brent Oil (Petróleo Brent)',
+  'HG=F': 'Copper (Cobre)',
+  'NG=F': 'Natural Gas (Gás Natural)',
+  'ZC=F': 'Corn (Milho)',
+  'ZS=F': 'Soybeans (Soja)',
+  'ZW=F': 'Wheat (Trigo)',
+  'KC=F': 'Coffee (Café Arábica)',
+  'CT=F': 'Cotton (Algodão)',
+  'SB=F': 'Sugar (Açúcar)',
+  'LE=F': 'Live Cattle (Boi Gordo)',
+  'HE=F': 'Lean Hogs (Suínos)',
   // Forex
   'EURUSD=X': 'EUR/USD',
   'GBPUSD=X': 'GBP/USD',
@@ -237,6 +239,13 @@ function formatPrice(price, ticker = null, category = null) {
   const t = (ticker || state.currentTicker || '').toUpperCase();
   const c = (category || '').toLowerCase();
 
+  if (t === '^BVSP' || t === 'WIN') {
+    return `${Math.round(num).toLocaleString('pt-BR')} pts`;
+  }
+  if (t === 'USDBRL=X' || t === 'WDO') {
+    return `R$ ${num.toFixed(4)}`;
+  }
+
   const isForex = t.endsWith('=X') || c.includes('forex') || c.includes('fx');
   const isUS = (!t.endsWith('.SA') && !t.endsWith('=F') && !isForex && !c.includes('brasil') && !c.includes('fii'));
   const isCommodity = t.endsWith('=F') || c.includes('commodit');
@@ -269,7 +278,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Listeners
   elements.btnLoadAnalysis.addEventListener('click', () => {
-    state.currentTicker = elements.inputTicker.value.trim().toUpperCase();
+    state.currentTicker = resolveTicker(elements.inputTicker.value.trim().toUpperCase());
+    elements.inputTicker.value = state.currentTicker;
     if (elements.simTicker) elements.simTicker.value = state.currentTicker;
     state.currentPeriod = elements.selectPeriod.value;
     state.lookbackN = parseInt(elements.inputLookbackN.value) || 10;
@@ -280,7 +290,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Auto trigger analysis on picking from datalist
   elements.inputTicker.addEventListener('change', () => {
-    const val = elements.inputTicker.value.trim().toUpperCase();
+    const val = resolveTicker(elements.inputTicker.value.trim().toUpperCase());
+    elements.inputTicker.value = val;
     if (val && val !== state.currentTicker) {
       state.currentTicker = val;
       if (elements.simTicker) elements.simTicker.value = val;
@@ -777,9 +788,10 @@ function renderRadarTable(items) {
       const strat = btn.getAttribute('data-strategy');
       const dir = btn.getAttribute('data-direction');
 
-      state.currentTicker = ticker;
-      elements.inputTicker.value = ticker;
-      if (elements.simTicker) elements.simTicker.value = ticker;
+      const resolved = resolveTicker(ticker);
+      state.currentTicker = resolved;
+      elements.inputTicker.value = resolved;
+      if (elements.simTicker) elements.simTicker.value = resolved;
 
       if (state.radarTimeframe && state.radarTimeframe !== state.currentTimeframe) {
         state.currentTimeframe = state.radarTimeframe;
@@ -1424,7 +1436,7 @@ async function runSimulation() {
   const mode = (elements.simMode && elements.simMode.value) || 'cycle_trade';
   showLoading(mode === 'cycle_trade' ? 'Executando backtest de trade (Compra ->Venda)...' : 'Executando simulação de acumulação financeira...');
   try {
-    const tickerInput = (elements.simTicker && elements.simTicker.value.trim().toUpperCase()) || state.currentTicker;
+    const tickerInput = resolveTicker((elements.simTicker && elements.simTicker.value.trim().toUpperCase()) || state.currentTicker);
     const capitalVal = parseFloat(document.getElementById('sim-contribution').value) || 1000;
     const payload = {
       ticker: tickerInput,
@@ -1496,7 +1508,7 @@ async function runSimulation() {
 async function runOptimizer() {
   showLoading('Varrendo centenas de combinações para encontrar a mais lucrativa...');
   try {
-    const tickerInput = (elements.simTicker && elements.simTicker.value.trim().toUpperCase()) || state.currentTicker;
+    const tickerInput = resolveTicker((elements.simTicker && elements.simTicker.value.trim().toUpperCase()) || state.currentTicker);
     const capitalVal = parseFloat(document.getElementById('sim-contribution').value) || 1000;
     const payload = {
       ticker: tickerInput,

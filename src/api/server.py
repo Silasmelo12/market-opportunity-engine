@@ -481,7 +481,7 @@ def analyze_asset(
 # UNIVERSO EXPANDIDO DE ATIVOS (151 TICKERS)
 # ==========================================
 TICKERS_BR_ACOES = [
-    'PETR4.SA', 'VALE3.SA', 'ITUB4.SA', 'BBDC4.SA', 'BBAS3.SA',
+    '^BVSP', 'PETR4.SA', 'VALE3.SA', 'ITUB4.SA', 'BBDC4.SA', 'BBAS3.SA',
     'ABEV3.SA', 'WEGE3.SA', 'RENT3.SA', 'EGIE3.SA', 'PRIO3.SA',
     'BRSR6.SA', 'KLBN4.SA', 'CXSE3.SA', 'BMGB4.SA', 'BRKM5.SA',
     'TASA4.SA', 'PMAM3.SA', 'CMIG4.SA', 'CPFE3.SA', 'POMO4.SA',
@@ -515,7 +515,7 @@ TICKERS_COMMODITIES = [
 ]
 
 TICKERS_FX = [
-    'EURUSD=X', 'GBPUSD=X', 'USDJPY=X', 'USDCHF=X', 'AUDUSD=X',
+    'USDBRL=X', 'EURUSD=X', 'GBPUSD=X', 'USDJPY=X', 'USDCHF=X', 'AUDUSD=X',
     'USDCAD=X', 'NZDUSD=X', 'EURJPY=X', 'GBPJPY=X', 'EURCHF=X',
 ]
 
@@ -524,6 +524,9 @@ TICKERS_CRYPTO = [
 ]
 
 TICKERS_FEATURED = [
+    ('^BVSP', 'Ações Brasil'),
+    ('USDBRL=X', 'Forex'),
+    ('GC=F', 'Commodities'),
     ('PETR4.SA', 'Ações Brasil'),
     ('VALE3.SA', 'Ações Brasil'),
     ('ITUB4.SA', 'Ações Brasil'),
