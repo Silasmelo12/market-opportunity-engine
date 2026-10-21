@@ -7,7 +7,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![TradingView](https://img.shields.io/badge/Lightweight_Charts-TradingView-131722?style=for-the-badge&logo=tradingview&logoColor=white)](https://tradingview.github.io/lightweight-charts/)
 [![Redis](https://img.shields.io/badge/Redis-Cache-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
-[![Pytest](https://img.shields.io/badge/Tests-49%20Passed-449C44?style=for-the-badge&logo=pytest&logoColor=white)](https://pytest.org/)
+[![Pytest](https://img.shields.io/badge/Tests-51%20Passed-449C44?style=for-the-badge&logo=pytest&logoColor=white)](https://pytest.org/)
 [![Theme: Dark/Light](https://img.shields.io/badge/Theme-Dark%20%7C%20Light-0284C7?style=for-the-badge)](https://github.com/)
 [![Timeframes](https://img.shields.io/badge/Timeframes-5m%20%7C%2015m%20%7C%2060m%20%7C%201d-8B5CF6?style=for-the-badge)](https://github.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
@@ -44,15 +44,20 @@ O sistema integra:
 
 ## 🚀 Novas Funcionalidades (v2.1)
 
-### 1. Simulador com Múltiplas Entradas por Ciclo (Multi-Buy Accumulation) & Reinvestimento de Fluxo de Caixa
-- No modo **Trade (Compra -> Venda)**, a ocorrência de novos sinais de compra enquanto uma posição está aberta não é mais descartada.
-- O motor executa uma nova compra em cada sinal confirmado, alocando capital adicional, acumulando cotas e recalculando com rigor o **Preço Médio Ponderado**:
-  $$\text{Preço Médio} = \frac{\sum (Q_i \times P_i)}{\sum Q_i}$$
+### 1. Seletor de Modelo de Ciclo (Compra Única 1x vs Acumulação Multi-Buy Nx) & Otimizador Alinhado
+- **Duas Abordagens Operacionais Selecionáveis**:
+  - **Compra Única (1x por Ciclo)**: executa apenas a 1ª compra confirmada após a liquidação do ciclo anterior e ignora compras adicionais até a venda, mantendo o capital investido fixo e operando com posição contida.
+  - **Acumulação Multi-Buy (Nx por Ciclo)**: executa compras em todos os sinais de compra confirmados no ciclo, acumulando cotas e recalculando o **Preço Médio Ponderado**:
+    $$\text{Preço Médio} = \frac{\sum (Q_i \times P_i)}{\sum Q_i}$$
+- **Otimizador ("Mais Lucrativa") Sincronizado**:
+  - O motor do otimizador de estratégias varre pares respeitando o tempo gráfico selecionado no simulador (inclusive intradiário 5m/15m/60m) e o modelo de ciclo ativo (1x ou Multi-Buy).
+  - A ação **"Aplicar e Simular"** produz convergência matemática de **100% de exatidão** entre as métricas exibidas no card da combinação campeã e os cards de KPI do simulador.
+- **Radar Reativo Bidirecional (Compra, Venda e Ambos)**:
+  - Navegação reativa instantânea entre sinais de fundo (`Compra`), topo (`Venda`) e visão consolidada (`Ambos`), com paginação integrada ao servidor e atualização dinâmica de estratégias.
 - **Contabilidade Realista de Fluxo de Caixa e Reinvestimento**:
   - Quando um sinal de venda (`SELL`) liquida a posição, 100% do montante apurado (capital inicial + lucros/prejuízos) retorna integralmente para a carteira líquida (`cash`).
   - As compras de ciclos subsequentes utilizam prioritariamente o saldo em caixa disponível antes de computar novo aporte de capital externo do bolso do investidor.
   - O **Capital Investido** e o **Retorno Global (%)** expressam com exatidão matemática o capital real desembolsado e a rentabilidade acumulada, eliminando distorções de alavancagem artificial.
-- No primeiro sinal confirmado de venda (`SELL`), 100% das cotas acumuladas são liquidadas no preço causal da barra, apurando o retorno consolidado do ciclo completo.
 - A tabela de histórico detalha cada ciclo com status semântico (`LUCRO`, `PREJUÍZO`, `EM ABERTO`) e exibe todas as sub-entradas com data, preço individual e quantidade de cotas.
 
 ### 2. Modo Visual Claro / Escuro (Theme Toggle)
@@ -195,7 +200,7 @@ pytest -v
 ```
 
 ```text
-======================= 49 passed in 4.80s =======================
+======================= 51 passed in 4.79s =======================
 ```
 
 ---
