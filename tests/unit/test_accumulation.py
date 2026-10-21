@@ -320,3 +320,50 @@ def test_simulate_cycle_trade_k_buys_exact_math():
     assert res.return_on_capital_pct == pytest.approx(30.55, abs=0.1)
 
 
+def test_simulate_cycle_trade_cash_reinvestment():
+    """
+    T001 Test:
+    Verifies that when a trade is closed at a profit:
+    1. The exit capital returns to the free cash pool.
+    2. The next trade uses available cash first, and does NOT increase 'total_invested' (money from pocket).
+    
+    Setup:
+    - Initial capital = 1000.0
+    - Cycle 1:
+        - Bar 1: Buy at 10.0 with 1000.0 -> 100 shares. Cash becomes 0.
+        - Bar 2: Sell at 12.0 -> Gross exit = 1200.0 (+20%). Cash becomes 1200.0.
+    - Cycle 2:
+        - Bar 3: Buy at 12.0 with 1200.0 (full compounded cash). -> 100 shares.
+          Since cash = 1200.0 >= 1200.0, this buy is financed entirely from cash!
+          No extra money from pocket is needed!
+        - Bar 4: Sell at 15.0 -> Gross exit = 100 * 15 = 1500.0.
+    - Final Outcome:
+        - Total money out of pocket (total_invested) = 1000.0 (NOT 2200.0!)
+        - Final cash/equity = 1500.0
+        - Net profit = 500.0
+        - Return % = 50.0%
+    """
+    series = make_test_series([10.0, 10.0, 12.0, 12.0, 15.0])
+    signals = [
+        SignalRecord("prop_reversal", "b1", 0, 1, 10.0, None, "BUY"),
+        SignalRecord("prop_reversal", "s1", 1, 2, 12.0, None, "SELL"),
+        SignalRecord("prop_reversal", "b2", 2, 3, 12.0, None, "BUY"),
+        SignalRecord("prop_reversal", "s2", 3, 4, 15.0, None, "SELL"),
+    ]
+
+    res = simulate_cycle_trade(
+        series,
+        signals,
+        initial_capital=1000.0,
+        contribution_amount=1000.0,
+    )
+
+    assert res.total_trades_count == 2
+    assert res.closed_trades_count == 2
+    assert res.total_invested == pytest.approx(1000.0)
+    assert res.final_equity == pytest.approx(1500.0)
+    assert res.net_profit == pytest.approx(500.0)
+    assert res.return_on_capital_pct == pytest.approx(50.0)
+
+
+
