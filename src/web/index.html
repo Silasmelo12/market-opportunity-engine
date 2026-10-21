@@ -784,16 +784,26 @@
 
         <!-- Simulator Configuration Form -->
         <div class="card-surface p-4 space-y-3 text-xs">
-          <!-- Row 1: Core Parameters -->
-          <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+          <!-- Row 1: Core Parameters & Timeframe -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-3">
             <div>
               <label class="text-gray-400 font-semibold block mb-1">Ativo para Simulação</label>
               <input id="sim-ticker" list="asset-datalist" type="text" value="PETR4.SA" placeholder="Digite ou selecione..." class="w-full bg-fintech-bg border border-fintech-border rounded px-3 py-1.5 text-white font-mono uppercase focus:border-fintech-cyan focus:outline-none">
             </div>
             <div>
+              <label class="text-gray-400 font-semibold block mb-1">Tempo Gráfico</label>
+              <select id="sim-interval" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-sans focus:border-fintech-cyan focus:outline-none">
+                <option value="5m">5 Minutos (Intraday)</option>
+                <option value="15m">15 Minutos (Intraday)</option>
+                <option value="60m">60 Minutos (1 Hora)</option>
+                <option value="1d" selected>Diário (1D)</option>
+                <option value="1wk">Semanal (1W)</option>
+              </select>
+            </div>
+            <div>
               <label class="text-gray-400 font-semibold block mb-1">Modo de Operação</label>
               <select id="sim-mode" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-sans focus:border-fintech-cyan focus:outline-none">
-                <option value="cycle_trade" selected>Trade (Compra ->Venda)</option>
+                <option value="cycle_trade" selected>Trade (Compra -> Venda)</option>
                 <option value="accumulation">Acumulação (DCA Fundos)</option>
               </select>
             </div>
