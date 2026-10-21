@@ -22,9 +22,64 @@ Signals confirmed on the final bar (t == len - 1) are recorded in pending_signal
 """
 
 from typing import List, Tuple, Dict, Any, Optional
+from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 from .base import OHLCVSeries, SignalRecord, ReferenceLineSegment
+
+
+@dataclass
+class DoublePatternParams:
+    """Parameters for refined double bottom and double top breakout strategies."""
+    trend_sma_period: int = 50
+    prior_move_pct: float = 0.06
+    relative_window: int = 60
+    depth_window: int = 40
+    rsi_period: int = 14
+    # Double bottom RSI limits
+    rsi_bottom_threshold: float = 45.0
+    rsi_bottom_break_limit: float = 60.0
+    # Double top RSI limits
+    rsi_top_threshold: float = 55.0
+    rsi_top_break_limit: float = 40.0
+
+
+def _sma(close: np.ndarray, period: int) -> np.ndarray:
+    """Computes Simple Moving Average using pandas rolling (strictly causal)."""
+    return (
+        pd.Series(close)
+        .rolling(window=period, min_periods=period)
+        .mean()
+        .to_numpy(dtype=np.float64)
+    )
+
+
+def _rolling_max_prev(high: np.ndarray, period: int) -> np.ndarray:
+    """
+    Computes max of previous `period` bars excluding the current bar t:
+    max(High[t-period : t]). Strictly causal.
+    """
+    return (
+        pd.Series(high)
+        .shift(1)
+        .rolling(window=period, min_periods=period)
+        .max()
+        .to_numpy(dtype=np.float64)
+    )
+
+
+def _rolling_min_prev(low: np.ndarray, period: int) -> np.ndarray:
+    """
+    Computes min of previous `period` bars excluding the current bar t:
+    min(Low[t-period : t]). Strictly causal.
+    """
+    return (
+        pd.Series(low)
+        .shift(1)
+        .rolling(window=period, min_periods=period)
+        .min()
+        .to_numpy(dtype=np.float64)
+    )
 
 
 def compute_rsi(close: np.ndarray, period: int = 14) -> np.ndarray:
