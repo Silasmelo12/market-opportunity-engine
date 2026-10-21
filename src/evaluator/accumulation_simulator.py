@@ -85,10 +85,12 @@ class CycleSimulationResult:
     max_drawdown_pct: float           # Drawdown máximo da curva (%)
     current_market_price: float       # Preço da última barra
     buy_and_hold_return_pct: float    # Retorno Buy & Hold no mesmo período (%)
-    trades: List[TradeRecord]         # Histórico de trades
-    timeline_timestamps: np.ndarray   # Array de timestamps
-    timeline_invested: np.ndarray     # Linha de capital investido
-    timeline_equity: np.ndarray       # Curva de evolução patrimonial
+    profit_factor: float = 0.0        # Ganhos brutos / Perdas brutas
+    avg_entries_per_cycle: float = 1.0 # Média de compras realizadas por ciclo
+    trades: List[TradeRecord] = None  # Histórico de trades
+    timeline_timestamps: np.ndarray = None # Array de timestamps
+    timeline_invested: np.ndarray = None   # Linha de capital investido
+    timeline_equity: np.ndarray = None     # Curva de evolução patrimonial
 
 
 @dataclass
@@ -352,6 +354,20 @@ def simulate_cycle_trade(
     first_close = float(close_sliced[0]) if len(close_sliced) > 0 else 1.0
     bnh_ret = ((last_close - first_close) / first_close) * 100.0 if first_close > 0 else 0.0
 
+    # Profit Factor (Gross Profits / Gross Losses)
+    gross_profit = sum(t.profit_loss for t in closed_trades if t.profit_loss > 0)
+    gross_loss = abs(sum(t.profit_loss for t in closed_trades if t.profit_loss < 0))
+    if gross_loss > 0:
+        profit_factor = round(gross_profit / gross_loss, 2)
+    elif gross_profit > 0:
+        profit_factor = 999.0
+    else:
+        profit_factor = 0.0
+
+    # Average entries per cycle
+    total_cycle_entries = sum(t.num_entries for t in trades)
+    avg_entries = (total_cycle_entries / len(trades)) if trades else 1.0
+
     return CycleSimulationResult(
         total_invested=round(initial_capital, 2),
         final_equity=round(final_eq, 2),
@@ -367,6 +383,8 @@ def simulate_cycle_trade(
         max_drawdown_pct=round(max_dd, 2),
         current_market_price=round(last_close, 2),
         buy_and_hold_return_pct=round(bnh_ret, 2),
+        profit_factor=profit_factor,
+        avg_entries_per_cycle=round(avg_entries, 2),
         trades=trades,
         timeline_timestamps=t_stamps,
         timeline_invested=timeline_invested,

@@ -1061,6 +1061,8 @@ def simulate_accumulation_endpoint(req: SimulateRequest):
             "avg_trade_return_pct": cycle_res.avg_trade_return_pct,
             "avg_trade_bars": cycle_res.avg_trade_bars,
             "buy_and_hold_return_pct": cycle_res.buy_and_hold_return_pct,
+            "profit_factor": cycle_res.profit_factor,
+            "avg_entries_per_cycle": cycle_res.avg_entries_per_cycle,
         }
 
         return SimulateResponse(
