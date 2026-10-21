@@ -366,4 +366,59 @@ def test_simulate_cycle_trade_cash_reinvestment():
     assert res.return_on_capital_pct == pytest.approx(50.0)
 
 
+def test_simulate_cycle_trade_single_buy_vs_multi_buy():
+    """
+    Validates cycle_entry_mode='single_buy' vs 'multi_buy':
+    Under 'single_buy', secondary buy signals within an active cycle must be ignored,
+    retaining a single entry, 1x shares, and fixed invested capital.
+    """
+    series = make_test_series([10.0, 10.0, 8.0, 12.0])
+    signals = [
+        SignalRecord("prop", "b1", 0, 1, 10.0, None, "BUY"),
+        SignalRecord("prop", "b2", 1, 2, 8.0, None, "BUY"),
+        SignalRecord("prop", "s1", 2, 3, 12.0, None, "SELL"),
+    ]
+
+    # 1. Single buy mode
+    res_single = simulate_cycle_trade(
+        series,
+        signals,
+        initial_capital=1000.0,
+        contribution_amount=1000.0,
+        cycle_entry_mode="single_buy",
+    )
+    assert res_single.total_trades_count == 1
+    t_single = res_single.trades[0]
+    assert t_single.num_entries == 1
+    assert len(t_single.buy_entries) == 1
+    assert t_single.total_shares == pytest.approx(100.0)
+    assert t_single.total_invested == pytest.approx(1000.0)
+    assert t_single.sell_price == pytest.approx(12.0)
+    assert t_single.exit_capital == pytest.approx(1200.0)
+    assert t_single.profit_loss == pytest.approx(200.0)
+    assert t_single.return_pct == pytest.approx(20.0)
+    assert res_single.total_invested == pytest.approx(1000.0)
+
+    # 2. Multi buy mode
+    res_multi = simulate_cycle_trade(
+        series,
+        signals,
+        initial_capital=1000.0,
+        contribution_amount=1000.0,
+        cycle_entry_mode="multi_buy",
+    )
+    assert res_multi.total_trades_count == 1
+    t_multi = res_multi.trades[0]
+    assert t_multi.num_entries == 2
+    assert len(t_multi.buy_entries) == 2
+    assert t_multi.total_shares == pytest.approx(225.0)
+    assert t_multi.total_invested == pytest.approx(2000.0)
+    assert t_multi.sell_price == pytest.approx(12.0)
+    assert t_multi.exit_capital == pytest.approx(2700.0)
+    assert t_multi.profit_loss == pytest.approx(700.0)
+    assert t_multi.return_pct == pytest.approx(35.0)
+    assert res_multi.total_invested == pytest.approx(2000.0)
+
+
+
 
