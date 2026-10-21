@@ -58,6 +58,23 @@ def test_api_radar_categories():
         assert item["category"] == "Criptomoedas"
 
 
+def test_api_radar_direction_filters():
+    # Test SELL direction filter
+    res_sell = client.get("/api/radar?interval=1d&direction=SELL&category=featured")
+    assert res_sell.status_code == 200
+    data_sell = res_sell.json()
+    assert "items" in data_sell
+    assert data_sell["direction"] == "SELL"
+    for item in data_sell["items"]:
+        assert item["direction"] == "SELL"
+
+    # Test BOTH direction filter
+    res_both = client.get("/api/radar?interval=1d&direction=BOTH&category=featured")
+    assert res_both.status_code == 200
+    data_both = res_both.json()
+    assert data_both["direction"] == "BOTH"
+
+
 def test_api_tickers():
     res = client.get("/api/tickers")
     assert res.status_code == 200
