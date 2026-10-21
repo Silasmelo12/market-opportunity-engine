@@ -57,7 +57,7 @@ description: "Tasks for feature 010: Correção do Radar, Seletor de Modelo de C
 
 ## Phase 5: Polish & Validação Global
 
-- [ ] T012 Executar a suíte de testes unitários (`python -m pytest tests/unit/ -v`) garantindo 100% de aprovação e regressão zero.
+- [X] T012 Executar a suíte de testes unitários (`python -m pytest tests/unit/ -v`) garantindo 100% de aprovação e regressão zero.
 - [ ] T013 Atualizar a documentação executiva em `README.md` com as instruções do seletor de modelo de ciclo (1x vs Multi-Buy), alinhamento do otimizador e correção de direção no Radar.
 
 ---
