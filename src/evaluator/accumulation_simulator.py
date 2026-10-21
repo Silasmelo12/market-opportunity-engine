@@ -31,6 +31,18 @@ class SimulationResult:
 
 
 @dataclass
+class BuyEntryRecord:
+    entry_id: int
+    date: str
+    bar_index: int
+    price: float
+    shares: float
+    capital: float
+    strategy_sub_id: str
+    strategy_label: str
+
+
+@dataclass
 class TradeRecord:
     trade_id: int
     buy_strategy_sub_id: str
@@ -50,6 +62,11 @@ class TradeRecord:
     entry_capital: float = 0.0
     exit_capital: float = 0.0
     status: str = "FECHADO"  # "FECHADO" | "ABERTO"
+    buy_entries: Optional[List[BuyEntryRecord]] = None
+    num_entries: int = 1
+    average_buy_price: float = 0.0
+    total_invested: float = 0.0
+    total_shares: float = 0.0
 
 
 @dataclass
