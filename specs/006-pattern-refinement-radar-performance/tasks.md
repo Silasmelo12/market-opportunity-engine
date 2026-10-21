@@ -15,7 +15,7 @@
 ## Phase 1: Setup
 
 - [X] T001 Adicionar `redis>=5.0.0` em `requirements.txt`
-- [ ] T002 [P] Adicionar variável opcional `REDIS_URL` (sync: false) em `render.yaml` e documentar em `README.md`
+- [X] T002 [P] Adicionar variável opcional `REDIS_URL` (sync: false) em `render.yaml` e documentar em `README.md`
 
 ---
 

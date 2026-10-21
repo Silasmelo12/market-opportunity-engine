@@ -9,6 +9,7 @@ Aplicação 100% Python via **Streamlit** (Single-Repo), com dados do **Yahoo Fi
 
 ### 1. Pré-Requisitos
 - Python 3.10+ instalado.
+- (Opcional) Instância do Redis para cache distribuído de alto desempenho via variável `REDIS_URL` (ex: `REDIS_URL=redis://localhost:6379/0`).
 - Instalar dependências:
   ```bash
   pip install -r requirements.txt
