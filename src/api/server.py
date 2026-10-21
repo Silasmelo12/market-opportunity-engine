@@ -18,7 +18,7 @@ from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from ..data_loader import DataLoader
+from ..data_loader import DataLoader, strip_corporate_suffix
 from ..strategies import StrategyCatalog, SignalRecord
 from ..evaluator import (
     evaluate_all_strategies,
@@ -657,7 +657,7 @@ def _scan_single_ticker(ticker: str, category: str, interval: str = "1d", horizo
             )
             item = RadarItem(
                 ticker=ticker,
-                asset_name=get_asset_name(ticker),
+                asset_name=strip_corporate_suffix(get_asset_name(ticker)),
                 category=category,
                 current_price=current_price,
                 strategy_sub_id=sub_id,
@@ -695,7 +695,7 @@ def _scan_single_ticker(ticker: str, category: str, interval: str = "1d", horizo
             )
             item = RadarItem(
                 ticker=ticker,
-                asset_name=get_asset_name(ticker),
+                asset_name=strip_corporate_suffix(get_asset_name(ticker)),
                 category=category,
                 current_price=current_price,
                 strategy_sub_id=sub_id,
@@ -737,7 +737,7 @@ def _scan_single_ticker(ticker: str, category: str, interval: str = "1d", horizo
             buy_items.append(
                 RadarItem(
                     ticker=ticker,
-                    asset_name=get_asset_name(ticker),
+                    asset_name=strip_corporate_suffix(get_asset_name(ticker)),
                     category=category,
                     current_price=current_price,
                     strategy_sub_id=sub_id,
@@ -776,7 +776,7 @@ def _scan_single_ticker(ticker: str, category: str, interval: str = "1d", horizo
             sell_items.append(
                 RadarItem(
                     ticker=ticker,
-                    asset_name=get_asset_name(ticker),
+                    asset_name=strip_corporate_suffix(get_asset_name(ticker)),
                     category=category,
                     current_price=current_price,
                     strategy_sub_id=sub_id,

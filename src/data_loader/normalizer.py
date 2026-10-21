@@ -144,3 +144,21 @@ def clean_and_normalize_df(df: pd.DataFrame, ticker: str, interval: str) -> OHLC
         dividends=div_arr,
         dy_rolling_12m=dy_rolling
     )
+
+import re
+
+def strip_corporate_suffix(name: Optional[str]) -> str:
+    """
+    Strips corporate suffixes such as 'S.A.', 'S/A', 'SA' from asset company names.
+    Preserves normal words, tickers, and trailing abbreviations like Inc.
+    """
+    if not name:
+        return ""
+    parts = name.split()
+    clean_parts = []
+    for p in parts:
+        clean_p = p.upper().rstrip(".,-")
+        if clean_p in ("S.A", "S/A", "SA"):
+            continue
+        clean_parts.append(p)
+    return " ".join(clean_parts).strip(" ,-")

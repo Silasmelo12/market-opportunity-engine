@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Market Opportunity & Top/Bottom Statistical Engine | 60fps Terminal</title>
+  <title>Market Opportunity & Top/Bottom Statistical Engine</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- TradingView Lightweight Charts CDN -->
@@ -47,9 +47,7 @@
           <div>
             <h1 class="text-xs sm:text-sm font-bold tracking-wide text-white uppercase flex items-center gap-1.5 sm:gap-2">
               <span>Market Engine</span>
-              <span class="text-[9px] sm:text-[10px] bg-fintech-cyan/20 text-fintech-cyan px-1.5 py-0.5 rounded font-mono border border-fintech-cyan/30">v4.0 60FPS</span>
             </h1>
-            <p class="text-[10px] sm:text-xs text-gray-400 hidden sm:block">Terminal Quantitativo Bidirecional: Fundos & Topos</p>
           </div>
         </div>
 
@@ -650,9 +648,21 @@
           </div>
         </div>
 
-        <!-- 60fps TradingView Chart Container -->
+        <!-- TradingView Chart Container with Zoom Controls -->
         <div class="p-2 sm:p-3">
-          <div class="card-surface p-1.5 sm:p-2">
+          <div class="card-surface p-1.5 sm:p-2 relative">
+            <!-- Zoom Controls (Float top-right) -->
+            <div class="absolute top-3 right-3 z-20 flex items-center gap-1 bg-fintech-surface/90 border border-fintech-border/80 rounded p-0.5 shadow-md backdrop-blur-sm">
+              <button id="btn-chart-zoom-in" title="Zoom In (+)" class="w-6 h-6 flex items-center justify-center text-xs font-bold text-gray-300 hover:text-white hover:bg-fintech-cyan/20 rounded transition">
+                +
+              </button>
+              <button id="btn-chart-zoom-out" title="Zoom Out (-)" class="w-6 h-6 flex items-center justify-center text-xs font-bold text-gray-300 hover:text-white hover:bg-fintech-cyan/20 rounded transition">
+                −
+              </button>
+              <button id="btn-chart-zoom-reset" title="Reset Zoom" class="px-1.5 h-6 flex items-center justify-center text-[10px] font-semibold text-gray-300 hover:text-white hover:bg-fintech-cyan/20 rounded transition border-l border-fintech-border/60">
+                Reset
+              </button>
+            </div>
             <div id="tv-chart-container" class="w-full relative"></div>
           </div>
         </div>

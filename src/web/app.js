@@ -1,3 +1,13 @@
+
+function stripCorporateSuffix(name) {
+  if (!name) return '';
+  const parts = String(name).split(/\s+/);
+  const clean = parts.filter(p => {
+    const up = p.toUpperCase().replace(/[.,-]+$/, '');
+    return up !== 'S.A' && up !== 'S/A' && up !== 'SA';
+  });
+  return clean.join(' ').replace(/^[ ,-]+|[ ,-]+$/, '');
+}
 /**
  * Market Opportunity & Top/Bottom Statistical Engine
  * 60fps TradingView Lightweight Charts & Zero-Latency Client-Side Bidirectional Filtering.
@@ -688,6 +698,54 @@ function initTradingViewChart() {
     });
     ro.observe(container);
   }
+
+  // Setup Zoom In, Zoom Out, and Reset buttons
+  setupChartZoomControls();
+}
+
+function setupChartZoomControls() {
+  const btnIn = document.getElementById('btn-chart-zoom-in');
+  const btnOut = document.getElementById('btn-chart-zoom-out');
+  const btnReset = document.getElementById('btn-chart-zoom-reset');
+
+  if (btnIn) {
+    btnIn.addEventListener('click', () => {
+      if (!state.chart) return;
+      const ts = state.chart.timeScale();
+      const range = ts.getVisibleLogicalRange();
+      if (!range) return;
+      const span = range.to - range.from;
+      if (span <= 10) return; // Prevent over-zooming
+      const delta = span * 0.2;
+      ts.setVisibleLogicalRange({
+        from: range.from + delta / 2,
+        to: range.to - delta / 2,
+      });
+    });
+  }
+
+  if (btnOut) {
+    btnOut.addEventListener('click', () => {
+      if (!state.chart) return;
+      const ts = state.chart.timeScale();
+      const range = ts.getVisibleLogicalRange();
+      if (!range) return;
+      const span = range.to - range.from;
+      if (span >= 3000) return; // Prevent infinite zoom-out
+      const delta = span * 0.2;
+      ts.setVisibleLogicalRange({
+        from: range.from - delta / 2,
+        to: range.to + delta / 2,
+      });
+    });
+  }
+
+  if (btnReset) {
+    btnReset.addEventListener('click', () => {
+      if (!state.chart) return;
+      state.chart.timeScale().fitContent();
+    });
+  }
 }
 
 // API: Radar Data (Paged, Cached, with Server/Client direction and strategy filtering)
@@ -806,7 +864,7 @@ function renderRadarTable(pageOrItems) {
       ? '<span class="text-xs px-2 py-0.5 rounded font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">COMPRA</span>'
       : '<span class="text-xs px-2 py-0.5 rounded font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">VENDA</span>';
 
-    const friendlyName = item.asset_name || getAssetName(item.ticker);
+    const friendlyName = stripCorporateSuffix(item.asset_name || getAssetName(item.ticker));
 
     tr.innerHTML = `
       <td class="px-4 py-3">
@@ -974,7 +1032,7 @@ async function loadAnalysisData(forceRefresh = false) {
 
     const assetTitleEl = document.getElementById('active-asset-title');
     if (assetTitleEl) {
-      assetTitleEl.textContent = `${state.currentTicker} • ${getAssetName(state.currentTicker)}`;
+      assetTitleEl.textContent = `${state.currentTicker} • ${stripCorporateSuffix(getAssetName(state.currentTicker))}`;
     }
     updateHeaderTimingBadge(state.analysisData.timing_status);
     applyClientSideFiltering();
@@ -1449,7 +1507,13 @@ function updateHeaderTimingBadge(timing) {
   else if (timing.status_category === 'EXTENDED') elements.headerStatusBadge.classList.add('badge-extended');
   else elements.headerStatusBadge.classList.add('badge-late');
 
-  elements.headerStatusBadge.innerHTML = `<span>${timing.status_label}</span> <span class="opacity-80">(${timing.distance_pct >= 0 ? '+' : ''}${timing.distance_pct.toFixed(1)}%)</span>`;
+  const distFormatted = `${timing.distance_pct >= 0 ? '+' : ''}${timing.distance_pct.toFixed(1)}%`;
+  // FR-020: Remover o texto/card 'Zona Ideal (Topo) 0,0%'
+  if (timing.status_label && timing.status_label.includes('ZONA IDEAL (TOPO)') && Math.abs(timing.distance_pct) < 0.05) {
+    elements.headerStatusBadge.classList.add('hidden');
+    return;
+  }
+  elements.headerStatusBadge.innerHTML = `<span>${timing.status_label}</span> <span class="opacity-80">(${distFormatted})</span>`;
 }
 
 // UI: Simulator Tab Setup & Runner

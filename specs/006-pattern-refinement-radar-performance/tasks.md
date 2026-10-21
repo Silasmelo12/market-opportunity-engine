@@ -96,11 +96,11 @@
 
 **Independent Test**: os botões +/−/Reset funcionam; os textos removidos não aparecem.
 
-- [ ] T036 [P] [US6] Adicionar botões +, −, Reset sobre o container do gráfico em `src/web/index.html`
-- [ ] T037 [US6] Implementar zoom ±20% via `getVisibleLogicalRange/setVisibleLogicalRange` e reset via `fitContent()`, com limites mínimo/máximo, em `src/web/app.js`
-- [ ] T038 [P] [US6] Remover o badge `v4.0 60FPS`, o subtítulo "Terminal Quantitativo…" e "60fps" do `<title>` em `src/web/index.html`, e o contador de FPS em `src/web/app.js`
-- [ ] T039 [P] [US6] Remover o card/texto "Zona Ideal (Topo)" em `src/web/index.html` e `src/web/app.js`
-- [ ] T040 [US6] Criar `strip_corporate_suffix()` (S.A., S/A, SA final) em `src/data_loader/normalizer.py`, aplicar em `asset_name` em `src/api/server.py`, e criar `stripCorporateSuffix()` equivalente em `src/web/app.js`; incluir um teste unitário em `tests/test_normalizer_suffix.py`
+- [X] T036 [P] [US6] Adicionar botões +, −, Reset sobre o container do gráfico em `src/web/index.html`
+- [X] T037 [US6] Implementar zoom ±20% via `getVisibleLogicalRange/setVisibleLogicalRange` e reset via `fitContent()`, com limites mínimo/máximo, em `src/web/app.js`
+- [X] T038 [P] [US6] Remover o badge `v4.0 60FPS`, o subtítulo "Terminal Quantitativo…" e "60fps" do `<title>` em `src/web/index.html`, e o contador de FPS em `src/web/app.js`
+- [X] T039 [P] [US6] Remover o card/texto "Zona Ideal (Topo)" em `src/web/index.html` e `src/web/app.js`
+- [X] T040 [US6] Criar `strip_corporate_suffix()` (S.A., S/A, SA final) em `src/data_loader/normalizer.py`, aplicar em `asset_name` em `src/api/server.py`, e criar `stripCorporateSuffix()` equivalente em `src/web/app.js`; incluir um teste unitário em `tests/test_normalizer_suffix.py`
 
 ---
 
