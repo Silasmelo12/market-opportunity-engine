@@ -1157,8 +1157,12 @@ def simulate_accumulation_endpoint(req: SimulateRequest):
 
 @app.post("/api/simulate/optimize", response_model=OptimizeCombinationsResponse)
 def optimize_combinations_endpoint(req: OptimizeCombinationsRequest):
+    period_to_use = req.period
+    if req.interval in ("5m", "15m", "60m") and req.period not in ("1d", "5d", "7d", "30d", "60d"):
+        period_to_use = "60d"
+
     try:
-        series = DataLoader.load_asset_data(ticker=req.ticker, interval=req.interval, period=req.period, use_cache=True)
+        series = DataLoader.load_asset_data(ticker=req.ticker, interval=req.interval, period=period_to_use, use_cache=True)
     except Exception as exc:
         raise HTTPException(status_code=400, detail=f"Erro ao carregar dados para {req.ticker}: {str(exc)}")
 
@@ -1179,6 +1183,7 @@ def optimize_combinations_endpoint(req: OptimizeCombinationsRequest):
         end_date=req.end_date,
         strategy_labels_map=STRATEGY_LABELS_PT,
         top_n=15,
+        cycle_entry_mode=req.cycle_entry_mode,
     )
 
     champ_model = None
@@ -1197,6 +1202,7 @@ def optimize_combinations_endpoint(req: OptimizeCombinationsRequest):
             max_drawdown_pct=champion.max_drawdown_pct,
             has_open_trade=champion.has_open_trade,
             final_equity=champion.final_equity,
+            cycle_entry_mode=champion.cycle_entry_mode,
         )
 
     top_models = [
@@ -1214,13 +1220,14 @@ def optimize_combinations_endpoint(req: OptimizeCombinationsRequest):
             max_drawdown_pct=c.max_drawdown_pct,
             has_open_trade=c.has_open_trade,
             final_equity=c.final_equity,
+            cycle_entry_mode=c.cycle_entry_mode,
         )
         for c in top_combos
     ]
 
     return OptimizeCombinationsResponse(
         ticker=req.ticker,
-        period=req.period,
+        period=period_to_use,
         initial_capital=req.initial_capital,
         total_combinations_tested=len(top_combos),
         champion=champ_model,
