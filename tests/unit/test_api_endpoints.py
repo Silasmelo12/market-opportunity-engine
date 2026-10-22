@@ -21,8 +21,12 @@ def test_api_strategies_catalog():
     assert "allocation" in data
     assert "mql5" in data
     assert len(data["mql5"]["strategies"]) == 14
+    assert "quant_buy" in data
+    assert "quant_sell" in data
+    assert len(data["quant_buy"]["strategies"]) == 10
+    assert len(data["quant_sell"]["strategies"]) == 10
     total_strategies = sum(len(g["strategies"]) for g in data.values())
-    assert total_strategies == 50  # 48 previously + 2 inverted double strategies
+    assert total_strategies == 70  # 50 previously + 20 quant strategies
 
 
 def test_api_analyze_synthetic(monkeypatch):
