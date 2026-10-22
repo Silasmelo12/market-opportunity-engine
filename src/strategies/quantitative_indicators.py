@@ -154,3 +154,173 @@ class QuantitativeIndicatorsEngine:
         self.supported_strategies = list(self.SUPPORTED_STRATEGIES)
         self.pending_signals: List[Dict[str, Any]] = []
 
+    def generate_bollinger_close_in(
+        self,
+        series: OHLCVSeries,
+        period: int = 20,
+        num_std: float = 2.0,
+    ) -> Tuple[List[SignalRecord], List[SignalRecord]]:
+        """
+        Bollinger Close-Outside then Close-Inside Reversal.
+        - BUY (Fundo): Close[t-1] < LowerBand[t-1] and Close[t] >= LowerBand[t].
+        - SELL (Topo): Close[t-1] > UpperBand[t-1] and Close[t] <= UpperBand[t].
+        """
+        n = series.length
+        if n < period + 2:
+            return [], []
+
+        sma = compute_sma(series.close, period)
+        std = compute_rolling_std(series.close, period)
+        upper = sma + num_std * std
+        lower = sma - num_std * std
+
+        prev_close = np.roll(series.close, 1)
+        prev_lower = np.roll(lower, 1)
+        prev_upper = np.roll(upper, 1)
+
+        valid = ~np.isnan(prev_lower) & ~np.isnan(lower)
+
+        # Buy condition (reversal from bottom)
+        buy_mask = valid & (prev_close < prev_lower) & (series.close >= lower)
+        buy_mask[:period + 1] = False
+
+        # Sell condition (reversal from top)
+        sell_mask = valid & (prev_close > prev_upper) & (series.close <= upper)
+        sell_mask[:period + 1] = False
+
+        buy_records, buy_pending = convert_signals_to_records(
+            series=series,
+            condition_mask=buy_mask,
+            strategy_id="bollinger_close_in",
+            strategy_sub_id="bb_reversal_buy",
+            direction="BUY",
+            ref_prices=lower,
+        )
+
+        sell_records, sell_pending = convert_signals_to_records(
+            series=series,
+            condition_mask=sell_mask,
+            strategy_id="bollinger_close_in",
+            strategy_sub_id="bb_reversal_sell",
+            direction="SELL",
+            ref_prices=upper,
+        )
+
+        self.pending_signals.extend(buy_pending + sell_pending)
+        return buy_records, sell_records
+
+    def generate_keltner_squeeze(
+        self,
+        series: OHLCVSeries,
+        period: int = 20,
+        bb_mult: float = 2.0,
+        kc_mult: float = 1.5,
+    ) -> Tuple[List[SignalRecord], List[SignalRecord]]:
+        """
+        Keltner Squeeze Breakout Strategy.
+        - Squeeze is ON when Bollinger Bands are completely inside Keltner Channel.
+        - Breakout fires when BB leaves KC (Squeeze turns OFF), signaled with momentum.
+        """
+        n = series.length
+        if n < period + 2:
+            return [], []
+
+        sma = compute_sma(series.close, period)
+        std = compute_rolling_std(series.close, period)
+        atr = compute_atr(series.high, series.low, series.close, period)
+
+        bb_upper = sma + bb_mult * std
+        bb_lower = sma - bb_mult * std
+
+        kc_upper = sma + kc_mult * atr
+        kc_lower = sma - kc_mult * atr
+
+        # Squeeze definition: BB inside KC
+        squeeze_on = (bb_lower > kc_lower) & (bb_upper < kc_upper)
+        prev_squeeze = np.roll(squeeze_on, 1)
+
+        # Fired when previous bar was in squeeze and current is out
+        squeeze_fired = prev_squeeze & (~squeeze_on)
+
+        # Momentum direction: close > sma or momentum positive
+        mom = series.close - np.roll(series.close, 5)
+
+        buy_mask = squeeze_fired & (mom > 0) & (series.close > sma)
+        sell_mask = squeeze_fired & (mom < 0) & (series.close < sma)
+
+        buy_mask[:period + 5] = False
+        sell_mask[:period + 5] = False
+
+        buy_records, buy_pending = convert_signals_to_records(
+            series=series,
+            condition_mask=buy_mask,
+            strategy_id="keltner_squeeze",
+            strategy_sub_id="squeeze_breakout_buy",
+            direction="BUY",
+            ref_prices=kc_upper,
+        )
+
+        sell_records, sell_pending = convert_signals_to_records(
+            series=series,
+            condition_mask=sell_mask,
+            strategy_id="keltner_squeeze",
+            strategy_sub_id="squeeze_breakout_sell",
+            direction="SELL",
+            ref_prices=kc_lower,
+        )
+
+        self.pending_signals.extend(buy_pending + sell_pending)
+        return buy_records, sell_records
+
+    def generate_zscore_extreme(
+        self,
+        series: OHLCVSeries,
+        period: int = 20,
+        threshold: float = 2.0,
+    ) -> Tuple[List[SignalRecord], List[SignalRecord]]:
+        """
+        Price Z-Score Reversal from Extremes.
+        - BUY (Fundo): Z[t-1] < -threshold and Z[t] > Z[t-1] (bottom inflection).
+        - SELL (Topo): Z[t-1] > +threshold and Z[t] < Z[t-1] (top inflection).
+        """
+        n = series.length
+        if n < period + 2:
+            return [], []
+
+        sma = compute_sma(series.close, period)
+        std = compute_rolling_std(series.close, period)
+
+        zscore = np.divide(series.close - sma, std, out=np.zeros_like(sma), where=std > 0)
+        prev_z = np.roll(zscore, 1)
+
+        valid = ~np.isnan(sma) & (std > 0)
+
+        buy_mask = valid & (prev_z < -threshold) & (zscore > prev_z)
+        sell_mask = valid & (prev_z > threshold) & (zscore < prev_z)
+
+        buy_mask[:period + 2] = False
+        sell_mask[:period + 2] = False
+
+        buy_records, buy_pending = convert_signals_to_records(
+            series=series,
+            condition_mask=buy_mask,
+            strategy_id="zscore_extreme",
+            strategy_sub_id="zscore_bottom_buy",
+            direction="BUY",
+            ref_prices=sma - threshold * std,
+        )
+
+        sell_records, sell_pending = convert_signals_to_records(
+            series=series,
+            condition_mask=sell_mask,
+            strategy_id="zscore_extreme",
+            strategy_sub_id="zscore_top_sell",
+            direction="SELL",
+            ref_prices=sma + threshold * std,
+        )
+
+        self.pending_signals.extend(buy_pending + sell_pending)
+        return buy_records, sell_records
+
+
+

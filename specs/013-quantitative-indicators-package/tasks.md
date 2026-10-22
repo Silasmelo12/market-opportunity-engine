@@ -34,10 +34,10 @@
 
 **Independent Test**: Executar `pytest tests/unit/test_quantitative_indicators.py -k "reversal or bollinger or squeeze or zscore"` e verificar sinais bidirecionais (BUY e SELL) gerados sem viés de antecipação.
 
-- [ ] T005 [P] [US1] Adicionar testes unitários para Bandas de Bollinger Fechou Fora/Dentro, Keltner Squeeze e Z-Score em `tests/unit/test_quantitative_indicators.py`.
-- [ ] T006 [US1] Implementar gerador de sinal de Bandas de Bollinger Fechou Fora/Dentro (`bollinger_close_in`) para compras (fundos) e vendas (topos) em `src/strategies/quantitative_indicators.py`.
-- [ ] T007 [US1] Implementar gerador de sinal de Keltner Squeeze (`keltner_squeeze`) com identificação de compressão e rompimento de momentum em `src/strategies/quantitative_indicators.py`.
-- [ ] T008 [US1] Implementar gerador de sinal de Z-Score de Preço em Extremos (`zscore_extreme`) em `src/strategies/quantitative_indicators.py`.
+- [x] T005 [P] [US1] Adicionar testes unitários para Bandas de Bollinger Fechou Fora/Dentro, Keltner Squeeze e Z-Score em `tests/unit/test_quantitative_indicators.py`.
+- [x] T006 [US1] Implementar gerador de sinal de Bandas de Bollinger Fechou Fora/Dentro (`bollinger_close_in`) para compras (fundos) e vendas (topos) em `src/strategies/quantitative_indicators.py`.
+- [x] T007 [US1] Implementar gerador de sinal de Keltner Squeeze (`keltner_squeeze`) com identificação de compressão e rompimento de momentum em `src/strategies/quantitative_indicators.py`.
+- [x] T008 [US1] Implementar gerador de sinal de Z-Score de Preço em Extremos (`zscore_extreme`) em `src/strategies/quantitative_indicators.py`.
 
 ---
 

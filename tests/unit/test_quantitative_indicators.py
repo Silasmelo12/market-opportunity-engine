@@ -44,3 +44,38 @@ def make_synthetic_ohlcv(n: int = 250, seed: int = 42) -> OHLCVSeries:
 def test_engine_initialization():
     engine = QuantitativeIndicatorsEngine()
     assert len(engine.supported_strategies) == 10
+
+
+def test_bollinger_close_in_signals():
+    series = make_synthetic_ohlcv(200)
+    engine = QuantitativeIndicatorsEngine()
+    buy_sigs, sell_sigs = engine.generate_bollinger_close_in(series)
+    assert isinstance(buy_sigs, list)
+    assert isinstance(sell_sigs, list)
+    for sig in buy_sigs:
+        assert sig.execution_bar_index == sig.signal_bar_index + 1
+        assert sig.execution_price == series.open[sig.execution_bar_index]
+        assert sig.direction == "BUY"
+
+
+def test_keltner_squeeze_signals():
+    series = make_synthetic_ohlcv(200)
+    engine = QuantitativeIndicatorsEngine()
+    buy_sigs, sell_sigs = engine.generate_keltner_squeeze(series)
+    assert isinstance(buy_sigs, list)
+    assert isinstance(sell_sigs, list)
+    for sig in buy_sigs:
+        assert sig.execution_bar_index == sig.signal_bar_index + 1
+        assert sig.direction == "BUY"
+
+
+def test_zscore_extreme_signals():
+    series = make_synthetic_ohlcv(200)
+    engine = QuantitativeIndicatorsEngine()
+    buy_sigs, sell_sigs = engine.generate_zscore_extreme(series)
+    assert isinstance(buy_sigs, list)
+    assert isinstance(sell_sigs, list)
+    for sig in buy_sigs:
+        assert sig.execution_bar_index == sig.signal_bar_index + 1
+        assert sig.direction == "BUY"
+
