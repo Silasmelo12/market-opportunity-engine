@@ -324,3 +324,153 @@ class QuantitativeIndicatorsEngine:
 
 
 
+
+    def generate_rsi_divergence(
+        self,
+        series: OHLCVSeries,
+        period: int = 14,
+        lookback_pivot: int = 5,
+    ) -> Tuple[List[SignalRecord], List[SignalRecord]]:
+        n = series.length
+        if n < period + lookback_pivot + 2:
+            return [], []
+
+        rsi = compute_rsi_series(series.close, period)
+
+        prev_low = np.roll(series.low, lookback_pivot)
+        prev_rsi = np.roll(rsi, lookback_pivot)
+        prev_high = np.roll(series.high, lookback_pivot)
+
+        valid = ~np.isnan(rsi) & ~np.isnan(prev_rsi)
+
+        bull_mask = valid & (series.low < prev_low) & (rsi > prev_rsi) & (rsi < 45.0) & (series.close > series.open)
+        bull_mask[:period + lookback_pivot + 1] = False
+
+        bear_mask = valid & (series.high > prev_high) & (rsi < prev_rsi) & (rsi > 55.0) & (series.close < series.open)
+        bear_mask[:period + lookback_pivot + 1] = False
+
+        buy_records, buy_pending = convert_signals_to_records(
+            series=series,
+            condition_mask=bull_mask,
+            strategy_id="rsi_divergence",
+            strategy_sub_id="rsi_bullish_div",
+            direction="BUY",
+            ref_prices=series.low,
+        )
+
+        sell_records, sell_pending = convert_signals_to_records(
+            series=series,
+            condition_mask=bear_mask,
+            strategy_id="rsi_divergence",
+            strategy_sub_id="rsi_bearish_div",
+            direction="SELL",
+            ref_prices=series.high,
+        )
+
+        self.pending_signals.extend(buy_pending + sell_pending)
+        return buy_records, sell_records
+
+    def generate_stochastic_extreme(
+        self,
+        series: OHLCVSeries,
+        k_period: int = 14,
+        d_period: int = 3,
+        slowing: int = 3,
+    ) -> Tuple[List[SignalRecord], List[SignalRecord]]:
+        n = series.length
+        if n < k_period + slowing + d_period + 2:
+            return [], []
+
+        s_high = pd.Series(series.high)
+        s_low = pd.Series(series.low)
+
+        lowest_low = s_low.rolling(window=k_period).min().to_numpy()
+        highest_high = s_high.rolling(window=k_period).max().to_numpy()
+
+        rng = highest_high - lowest_low
+        fast_k = np.divide(series.close - lowest_low, rng, out=np.zeros_like(lowest_low), where=rng > 0) * 100.0
+
+        slow_k = compute_sma(fast_k, slowing)
+        slow_d = compute_sma(slow_k, d_period)
+
+        prev_k = np.roll(slow_k, 1)
+        prev_d = np.roll(slow_d, 1)
+
+        valid = ~np.isnan(slow_k) & ~np.isnan(slow_d) & ~np.isnan(prev_k) & ~np.isnan(prev_d)
+
+        buy_mask = valid & (prev_k <= prev_d) & (slow_k > slow_d) & (slow_k < 25.0)
+        sell_mask = valid & (prev_k >= prev_d) & (slow_k < slow_d) & (slow_k > 75.0)
+
+        buy_mask[:k_period + slowing + d_period] = False
+        sell_mask[:k_period + slowing + d_period] = False
+
+        buy_records, buy_pending = convert_signals_to_records(
+            series=series,
+            condition_mask=buy_mask,
+            strategy_id="stochastic_extreme",
+            strategy_sub_id="stoch_oversold_cross",
+            direction="BUY",
+            ref_prices=series.low,
+        )
+
+        sell_records, sell_pending = convert_signals_to_records(
+            series=series,
+            condition_mask=sell_mask,
+            strategy_id="stochastic_extreme",
+            strategy_sub_id="stoch_overbought_cross",
+            direction="SELL",
+            ref_prices=series.high,
+        )
+
+        self.pending_signals.extend(buy_pending + sell_pending)
+        return buy_records, sell_records
+
+    def generate_macd_momentum(
+        self,
+        series: OHLCVSeries,
+        fast: int = 12,
+        slow: int = 26,
+        signal: int = 9,
+    ) -> Tuple[List[SignalRecord], List[SignalRecord]]:
+        n = series.length
+        if n < slow + signal + 3:
+            return [], []
+
+        ema_fast = compute_ema(series.close, fast)
+        ema_slow = compute_ema(series.close, slow)
+        macd_line = ema_fast - ema_slow
+        signal_line = compute_ema(macd_line, signal)
+        hist = macd_line - signal_line
+
+        prev_hist = np.roll(hist, 1)
+        prev2_hist = np.roll(hist, 2)
+
+        valid = ~np.isnan(hist) & ~np.isnan(prev_hist) & ~np.isnan(prev2_hist)
+
+        buy_mask = valid & (hist < 0) & (prev_hist < 0) & (hist > prev_hist) & (prev_hist <= prev2_hist)
+        sell_mask = valid & (hist > 0) & (prev_hist > 0) & (hist < prev_hist) & (prev_hist >= prev2_hist)
+
+        buy_mask[:slow + signal + 2] = False
+        sell_mask[:slow + signal + 2] = False
+
+        buy_records, buy_pending = convert_signals_to_records(
+            series=series,
+            condition_mask=buy_mask,
+            strategy_id="macd_momentum",
+            strategy_sub_id="macd_bottom_turn",
+            direction="BUY",
+            ref_prices=series.close,
+        )
+
+        sell_records, sell_pending = convert_signals_to_records(
+            series=series,
+            condition_mask=sell_mask,
+            strategy_id="macd_momentum",
+            strategy_sub_id="macd_top_turn",
+            direction="SELL",
+            ref_prices=series.close,
+        )
+
+        self.pending_signals.extend(buy_pending + sell_pending)
+        return buy_records, sell_records
+

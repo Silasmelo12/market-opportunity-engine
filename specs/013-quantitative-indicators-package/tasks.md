@@ -47,10 +47,10 @@
 
 **Independent Test**: Executar `pytest tests/unit/test_quantitative_indicators.py -k "oscillator or rsi or stoch or macd"` comprovando que extremos locais e inflexões não utilizam dados posteriores a $t$.
 
-- [ ] T009 [P] [US2] Adicionar testes unitários para Divergência de IFR, Estocástico Lento e MACD Histogram Momentum em `tests/unit/test_quantitative_indicators.py`.
-- [ ] T010 [US2] Implementar algoritmo quantitativo vetorizado de detecção de Divergência Regular de IFR/RSI (`rsi_divergence`) com confirmação de pivô sem repintura em `src/strategies/quantitative_indicators.py`.
-- [ ] T011 [US2] Implementar gerador de sinal do Estocástico Lento em Extremos (`stochastic_extreme`) com cruzamento de %K e %D em sobrevenda/sobrecompra em `src/strategies/quantitative_indicators.py`.
-- [ ] T012 [US2] Implementar gerador de sinal de MACD Histogram Momentum (`macd_momentum`) com inflexão de barras no histograma em `src/strategies/quantitative_indicators.py`.
+- [x] T009 [P] [US2] Adicionar testes unitários para Divergência de IFR, Estocástico Lento e MACD Histogram Momentum em `tests/unit/test_quantitative_indicators.py`.
+- [x] T010 [US2] Implementar algoritmo quantitativo vetorizado de detecção de Divergência Regular de IFR/RSI (`rsi_divergence`) com confirmação de pivô sem repintura em `src/strategies/quantitative_indicators.py`.
+- [x] T011 [US2] Implementar gerador de sinal do Estocástico Lento em Extremos (`stochastic_extreme`) com cruzamento de %K e %D em sobrevenda/sobrecompra em `src/strategies/quantitative_indicators.py`.
+- [x] T012 [US2] Implementar gerador de sinal de MACD Histogram Momentum (`macd_momentum`) com inflexão de barras no histograma em `src/strategies/quantitative_indicators.py`.
 
 ---
 

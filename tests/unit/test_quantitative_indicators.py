@@ -79,3 +79,35 @@ def test_zscore_extreme_signals():
         assert sig.execution_bar_index == sig.signal_bar_index + 1
         assert sig.direction == "BUY"
 
+
+def test_rsi_divergence_signals():
+    series = make_synthetic_ohlcv(200)
+    engine = QuantitativeIndicatorsEngine()
+    buy_sigs, sell_sigs = engine.generate_rsi_divergence(series)
+    assert isinstance(buy_sigs, list)
+    assert isinstance(sell_sigs, list)
+    for sig in buy_sigs:
+        assert sig.execution_bar_index == sig.signal_bar_index + 1
+        assert sig.direction == "BUY"
+
+
+def test_stochastic_extreme_signals():
+    series = make_synthetic_ohlcv(200)
+    engine = QuantitativeIndicatorsEngine()
+    buy_sigs, sell_sigs = engine.generate_stochastic_extreme(series)
+    assert isinstance(buy_sigs, list)
+    assert isinstance(sell_sigs, list)
+    for sig in buy_sigs:
+        assert sig.execution_bar_index == sig.signal_bar_index + 1
+
+
+def test_macd_momentum_signals():
+    series = make_synthetic_ohlcv(200)
+    engine = QuantitativeIndicatorsEngine()
+    buy_sigs, sell_sigs = engine.generate_macd_momentum(series)
+    assert isinstance(buy_sigs, list)
+    assert isinstance(sell_sigs, list)
+    for sig in buy_sigs:
+        assert sig.execution_bar_index == sig.signal_bar_index + 1
+
+
