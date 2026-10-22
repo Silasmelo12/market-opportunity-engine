@@ -172,19 +172,26 @@
           </div>
           <div class="overflow-x-auto touch-scroll">
             <table class="w-full text-left text-xs text-gray-300">
-              <thead class="bg-fintech-bg/60 text-gray-400 font-semibold uppercase text-[11px] border-b border-fintech-border whitespace-nowrap">
+                            <thead class="bg-fintech-bg/60 text-gray-400 font-semibold uppercase text-[11px] border-b border-fintech-border whitespace-nowrap">
                 <tr>
                   <th class="px-3 sm:px-4 py-2.5 sm:py-3">Ativo</th>
-                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Categoria</th>
-                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Direção</th>
-                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Preço Atual</th>
+                  <th class="px-2 sm:px-3 py-2.5 sm:py-3 text-center">Dir</th>
                   <th class="px-3 sm:px-4 py-2.5 sm:py-3">Estratégia Confirmada</th>
                   <th class="px-3 sm:px-4 py-2.5 sm:py-3">Status do Setup</th>
-                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Semáforo de Timing</th>
+                  <th class="px-2 sm:px-3 py-2.5 sm:py-3 text-center">Timing</th>
                   <th class="px-3 sm:px-4 py-2.5 sm:py-3">Distância (%)</th>
-                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Preço Gatilho</th>
-                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Histórico (N / Win Rate)</th>
-                  <th class="px-3 sm:px-4 py-2.5 sm:py-3 text-right">Ação</th>
+                  <th class="px-3 sm:px-4 py-2.5 sm:py-3 cursor-pointer hover:text-cyan-400 select-none text-right" id="th-sort-n" title="Clique para ordenar por Quantidade de Sinais">
+                    <div class="inline-flex items-center gap-1 justify-end">
+                      <span>Qtd Sinais</span>
+                      <span id="sort-icon-n" class="text-[10px] text-gray-500">↕</span>
+                    </div>
+                  </th>
+                  <th class="px-3 sm:px-4 py-2.5 sm:py-3 cursor-pointer hover:text-cyan-400 select-none text-right" id="th-sort-winrate" title="Clique para ordenar por Taxa de Acerto (Win Rate)">
+                    <div class="inline-flex items-center gap-1 justify-end">
+                      <span>Win Rate (%)</span>
+                      <span id="sort-icon-winrate" class="text-[10px] text-gray-500">↕</span>
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody id="radar-table-body" class="divide-y divide-fintech-border whitespace-nowrap">

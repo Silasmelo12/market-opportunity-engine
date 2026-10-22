@@ -33,8 +33,8 @@
 
 **Independent Test**: Carregar a aba Radar no navegador e constatar que a tabela exibe apenas as colunas essenciais, e o clique no ativo continua navegando para o gráfico.
 
-- [ ] T004 [US1] Atualizar o `<thead>` da tabela em `src/web/index.html` removendo Categoria, Preço Atual e Ação (redução de 11 para 8 colunas).
-- [ ] T005 [US1] Atualizar `renderRadarTable()` em `src/web/app.js` removendo as células de Categoria, Preço Atual e botão Ação, ajustando o `colspan="8"` das mensagens vazias.
+- [x] T004 [US1] Atualizar o `<thead>` da tabela em `src/web/index.html` removendo Categoria, Preço Atual e Ação (redução de 11 para 8 colunas).
+- [x] T005 [US1] Atualizar `renderRadarTable()` em `src/web/app.js` removendo as células de Categoria, Preço Atual e botão Ação, ajustando o `colspan="8"` das mensagens vazias.
 
 ---
 
@@ -44,8 +44,8 @@
 
 **Independent Test**: Observar as colunas Dir e Timing no Radar, verificando a bolinha colorida (com texto exibido no hover) e os badges compactos "C" e "V".
 
-- [ ] T006 [US2] Atualizar a renderização da coluna Direção em `renderRadarTable()` (`src/web/app.js`) para badge circular com inicial `"C"` ou `"V"` e tooltip descritivo.
-- [ ] T007 [US2] Atualizar a renderização da coluna Semáforo em `renderRadarTable()` (`src/web/app.js`) para círculo colorido minimalista de 12px com sombra suave e atributo `title` no hover.
+- [x] T006 [US2] Atualizar a renderização da coluna Direção em `renderRadarTable()` (`src/web/app.js`) para badge circular com inicial `"C"` ou `"V"` e tooltip descritivo.
+- [x] T007 [US2] Atualizar a renderização da coluna Semáforo em `renderRadarTable()` (`src/web/app.js`) para círculo colorido minimalista de 12px com sombra suave e atributo `title` no hover.
 
 ---
 
@@ -55,10 +55,10 @@
 
 **Independent Test**: Clicar nos cabeçalhos "Qtd Sinais" e "Win Rate (%)" alternando ordenação crescente e decrescente com feedback visual instantâneo.
 
-- [ ] T008 [US3] Adicionar IDs e indicadores de ordenação nos cabeçalhos `#th-sort-n` e `#th-sort-winrate` no `src/web/index.html`.
-- [ ] T009 [US3] Atualizar a renderização das linhas em `src/web/app.js` gerando duas células separadas: uma para `historical_n` e outra para `historical_win_rate`.
-- [ ] T010 [US3] Configurar listeners de clique nos cabeçalhos em `setupRadarTableSorting()` em `src/web/app.js` alternando `radarSortOrder` e atualizando os ícones.
-- [ ] T011 [US3] Integrar a ordenação antes da renderização das linhas em `renderRadarTable()` no `src/web/app.js`.
+- [x] T008 [US3] Adicionar IDs e indicadores de ordenação nos cabeçalhos `#th-sort-n` e `#th-sort-winrate` no `src/web/index.html`.
+- [x] T009 [US3] Atualizar a renderização das linhas em `src/web/app.js` gerando duas células separadas: uma para `historical_n` e outra para `historical_win_rate`.
+- [x] T010 [US3] Configurar listeners de clique nos cabeçalhos em `setupRadarTableSorting()` em `src/web/app.js` alternando `radarSortOrder` e atualizando os ícones.
+- [x] T011 [US3] Integrar a ordenação antes da renderização das linhas em `renderRadarTable()` no `src/web/app.js`.
 
 ---
 

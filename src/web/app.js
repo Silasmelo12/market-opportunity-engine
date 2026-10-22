@@ -289,6 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupRadarTimeframeButtons();
   setupRadarCategoryPills();
   setupRadarStrategyFilter();
+  setupRadarTableSorting();
   setupGranularStrategyCheckboxes();
   initTradingViewChart();
   setupSimulationTab();
@@ -1052,18 +1053,18 @@ function renderRadarTable(pageOrItems) {
   }
   elements.radarTableBody.innerHTML = '';
   if (!items || items.length === 0) {
-    elements.radarTableBody.innerHTML = `
+    elements.radarTableBody.innerHTML = 
       <tr>
-        <td colspan="11" class="text-center py-8 text-gray-500">
+        <td colspan="8" class="text-center py-8 text-gray-500">
           Nenhuma oportunidade com sinal ativo ou reteste pendente no momento.
         </td>
       </tr>
-    `;
+    ;
     return;
   }
 
   // Filter radar items by active direction and category
-  const filtered = items.filter(it => {
+  let filtered = items.filter(it => {
     // Direction filter
     if (state.activeDirection !== 'BOTH' && (it.direction || 'BUY') !== state.activeDirection) {
       return false;
@@ -1078,106 +1079,104 @@ function renderRadarTable(pageOrItems) {
   });
 
   if (filtered.length === 0) {
-    elements.radarTableBody.innerHTML = `
+    elements.radarTableBody.innerHTML = 
       <tr>
-        <td colspan="11" class="text-center py-8 text-gray-500">
-          Nenhuma oportunidade encontrada para a direção selecionada (${state.activeDirection}).
+        <td colspan="8" class="text-center py-8 text-gray-500">
+          Nenhuma oportunidade encontrada para a direção selecionada ().
         </td>
       </tr>
-    `;
+    ;
     return;
   }
+
+  // Sort filtered items if sortField is set
+  filtered = sortRadarItems(filtered);
 
   filtered.forEach(item => {
     const tr = document.createElement('tr');
     tr.className = 'hover:bg-fintech-surface-hover transition';
 
-    let badgeClass = 'badge-ideal';
-    if (item.timing_category === 'EXTENDED') badgeClass = 'badge-extended';
-    if (item.timing_category === 'LATE') badgeClass = 'badge-late';
+    // Minimalist Timing Indicator Dot
+    let dotClass = 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)]';
+    if (item.timing_category === 'EXTENDED') {
+      dotClass = 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.7)]';
+    } else if (item.timing_category === 'LATE') {
+      dotClass = 'bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.7)]';
+    }
 
     const isBuy = (item.direction === 'BUY');
+    // Compact Direction Badge: C (Compra) or V (Venda)
     const dirBadge = isBuy
-      ? '<span class="text-xs px-2 py-0.5 rounded font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">COMPRA</span>'
-      : '<span class="text-xs px-2 py-0.5 rounded font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">VENDA</span>';
+      ? '<span class="inline-flex items-center justify-center w-6 h-6 rounded-full font-bold text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 select-none" title="Compra (Fundo)">C</span>'
+      : '<span class="inline-flex items-center justify-center w-6 h-6 rounded-full font-bold text-xs bg-rose-500/20 text-rose-400 border border-rose-500/40 select-none" title="Venda (Topo)">V</span>';
 
     const friendlyName = stripCorporateSuffix(item.asset_name || getAssetName(item.ticker));
 
-    tr.innerHTML = `
-      <td class="px-4 py-3">
-        <button class="text-left group btn-open-ticker focus:outline-none cursor-pointer" data-ticker="${item.ticker}" data-strategy="${item.strategy_sub_id}" data-direction="${item.direction}">
+    tr.innerHTML = 
+      <td class="px-3 sm:px-4 py-2.5 sm:py-3">
+        <button class="text-left group btn-open-ticker focus:outline-none cursor-pointer" data-ticker="" data-strategy="" data-direction="">
           <div class="font-bold text-cyan-400 group-hover:text-cyan-200 group-hover:underline flex items-center gap-1.5 transition">
-            <span>${friendlyName}</span>
-            <span class="text-xs text-cyan-500/70 group-hover:text-cyan-300"></span>
+            <span></span>
+            <span class="text-xs text-cyan-500/70 group-hover:text-cyan-300">↗</span>
           </div>
-          <div class="text-[11px] text-gray-500 font-mono tracking-wide">${item.ticker}</div>
+          <div class="text-[11px] text-gray-500 font-mono tracking-wide"></div>
         </button>
       </td>
-      <td class="px-4 py-3 text-gray-400">${item.category}</td>
-      <td class="px-4 py-3">${dirBadge}</td>
-      <td class="px-4 py-3 font-mono font-semibold">${formatPrice(item.current_price, item.ticker, item.category)}</td>
-      <td class="px-4 py-3 ${isBuy ? 'text-emerald-300' : 'text-rose-300'} font-medium">${item.strategy_label}</td>
-      <td class="px-4 py-3 font-mono text-gray-300">${item.status_signal}</td>
-      <td class="px-4 py-3">
-        <span class="px-2 py-0.5 rounded text-[11px] font-semibold ${badgeClass}">
-          ${item.timing_label}
-        </span>
+      <td class="px-2 sm:px-3 py-2.5 sm:py-3 text-center"></td>
+      <td class="px-3 sm:px-4 py-2.5 sm:py-3  font-medium"></td>
+      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono text-gray-300"></td>
+      <td class="px-2 sm:px-3 py-2.5 sm:py-3 text-center">
+        <span class="inline-block w-3 h-3 rounded-full cursor-help " title=""></span>
       </td>
-      <td class="px-4 py-3 font-mono font-bold ${item.distance_pct >= 0 ? 'text-amber-400' : 'text-cyan-400'}">
-        ${item.distance_pct >= 0 ? '+' : ''}${item.distance_pct.toFixed(1)}%
+      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono font-bold ">
+        %
       </td>
-      <td class="px-4 py-3 font-mono text-gray-400">${formatPrice(item.recommended_price, item.ticker, item.category)}</td>
-      <td class="px-4 py-3 font-mono text-gray-400">${item.historical_n} entradas (${item.historical_win_rate.toFixed(1)}%)</td>
-      <td class="px-4 py-3 text-right">
-        <button class="bg-cyan-600/30 hover:bg-cyan-600 text-cyan-300 hover:text-white px-2.5 py-1 rounded text-xs font-semibold transition btn-open-ticker cursor-pointer" data-ticker="${item.ticker}" data-strategy="${item.strategy_sub_id}" data-direction="${item.direction}">
-          Abrir Gráfico →
-        </button>
+      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono text-right text-gray-200 font-semibold">
+        
       </td>
-    `;
+      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono text-right font-semibold ">
+        
+      </td>
+    ;
     elements.radarTableBody.appendChild(tr);
   });
 
+  // Re-attach click events to all ticker links
   document.querySelectorAll('.btn-open-ticker').forEach(btn => {
     btn.addEventListener('click', () => {
       const ticker = btn.getAttribute('data-ticker');
       const strat = btn.getAttribute('data-strategy');
-      const dir = btn.getAttribute('data-direction');
+      const dir = btn.getAttribute('data-direction') || 'BUY';
 
-      const resolved = resolveTicker(ticker);
-      state.currentTicker = resolved;
-      elements.inputTicker.value = resolved;
-      if (elements.simTicker) elements.simTicker.value = resolved;
+      state.currentTicker = ticker;
+      elements.inputTicker.value = ticker;
+      if (elements.simTicker) elements.simTicker.value = ticker;
 
-      if (state.radarTimeframe && state.radarTimeframe !== state.currentTimeframe) {
-        state.currentTimeframe = state.radarTimeframe;
-        document.querySelectorAll('#timeframe-buttons .tf-btn').forEach(b => {
-          if (b.getAttribute('data-tf') === state.currentTimeframe) {
-            b.classList.add('active', 'bg-fintech-cyan/20', 'text-fintech-cyan', 'border', 'border-fintech-cyan/40', 'font-bold');
-            b.classList.remove('bg-fintech-bg', 'text-gray-300');
-          } else {
-            b.classList.remove('active', 'bg-fintech-cyan/20', 'text-fintech-cyan', 'border', 'border-fintech-cyan/40', 'font-bold');
-            b.classList.add('bg-fintech-bg', 'text-gray-300');
-          }
+      // Synchronize direction if not BOTH
+      if (state.activeDirection !== 'BOTH' && state.activeDirection !== dir) {
+        state.activeDirection = dir;
+        const dirButtons = document.querySelectorAll('#global-direction-selector .dir-seg-btn');
+        dirButtons.forEach(b => {
+          b.classList.remove('active-buy', 'active-sell', 'active-both');
+          b.classList.add('text-gray-400');
         });
+        const activeBtn = document.querySelector(#global-direction-selector .dir-seg-btn[data-dir=""]);
+        if (activeBtn) {
+          activeBtn.classList.add(dir === 'BUY' ? 'active-buy' : 'active-sell');
+          activeBtn.classList.remove('text-gray-400');
+        }
+        updateSidebarDirectionFilter();
       }
 
-      // If user opened a specific strategy from radar, ensure it's selected and active
+      // Automatically select and isolate this strategy in chart sidebar
       if (strat) {
-        if (dir && (dir === 'BUY' || dir === 'SELL') && state.activeDirection !== dir) {
-          state.activeDirection = dir;
-          document.querySelectorAll('.direction-btn').forEach(b => {
-            const bDir = b.getAttribute('data-direction');
-            if (bDir === 'BOTH') {
-              b.classList.add('active', 'border-fintech-cyan', 'text-fintech-cyan');
-            } else {
-              b.classList.remove('active', 'border-fintech-cyan', 'text-fintech-cyan');
-            }
-          });
-        }
+        state.activeStrategies.clear();
+        document.querySelectorAll('.strategy-cb').forEach(cb => cb.checked = false);
+
         state.activeStrategies.add(strat);
         const aliases = STRATEGY_ALIASES[strat] || [];
-        aliases.forEach(a =>state.activeStrategies.add(a));
-        const cb = document.querySelector(`.strategy-cb[data-id="${strat}"]`);
+        aliases.forEach(a => state.activeStrategies.add(a));
+        const cb = document.querySelector(.strategy-cb[data-id=""]);
         if (cb) cb.checked = true;
       }
 
@@ -1186,6 +1185,7 @@ function renderRadarTable(pageOrItems) {
     });
   });
 }
+
 
 // API: Load Analysis Data (/api/analyze)
 async function loadAnalysisData(forceRefresh = false) {
@@ -2301,7 +2301,53 @@ function hideLoading() {
 }
 
 // UI: Radar Strategy Multi-Select Dropdown Filter
-async function setupRadarStrategyFilter() {
+async 
+// UI: Setup Radar Table Column Sorting
+function setupRadarTableSorting() {
+  const thN = document.getElementById('th-sort-n');
+  const thWin = document.getElementById('th-sort-winrate');
+  const iconN = document.getElementById('sort-icon-n');
+  const iconWin = document.getElementById('sort-icon-winrate');
+
+  function updateIcons() {
+    if (iconN) iconN.textContent = state.radarSortField === 'historical_n' ? (state.radarSortOrder === 'asc' ? '▲' : '▼') : '↕';
+    if (iconWin) iconWin.textContent = state.radarSortField === 'historical_win_rate' ? (state.radarSortOrder === 'asc' ? '▲' : '▼') : '↕';
+    if (iconN) iconN.className = state.radarSortField === 'historical_n' ? 'text-[10px] text-cyan-400 font-bold' : 'text-[10px] text-gray-500';
+    if (iconWin) iconWin.className = state.radarSortField === 'historical_win_rate' ? 'text-[10px] text-cyan-400 font-bold' : 'text-[10px] text-gray-500';
+  }
+
+  if (thN) {
+    thN.addEventListener('click', () => {
+      if (state.radarSortField === 'historical_n') {
+        state.radarSortOrder = state.radarSortOrder === 'desc' ? 'asc' : 'desc';
+      } else {
+        state.radarSortField = 'historical_n';
+        state.radarSortOrder = 'desc';
+      }
+      updateIcons();
+      if (state.lastRadarPage) {
+        renderRadarTable(state.lastRadarPage);
+      }
+    });
+  }
+
+  if (thWin) {
+    thWin.addEventListener('click', () => {
+      if (state.radarSortField === 'historical_win_rate') {
+        state.radarSortOrder = state.radarSortOrder === 'desc' ? 'asc' : 'desc';
+      } else {
+        state.radarSortField = 'historical_win_rate';
+        state.radarSortOrder = 'desc';
+      }
+      updateIcons();
+      if (state.lastRadarPage) {
+        renderRadarTable(state.lastRadarPage);
+      }
+    });
+  }
+}
+
+function setupRadarStrategyFilter() {
   const toggleBtn = document.getElementById('btn-radar-strat-toggle');
   const menu = document.getElementById('radar-strat-menu');
   const container = document.getElementById('radar-strat-checkbox-container');
