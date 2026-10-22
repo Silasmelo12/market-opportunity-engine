@@ -10,6 +10,7 @@ from src.evaluator import (
     simulate_accumulation,
     simulate_cycle_trade,
     optimize_strategy_pairs,
+    optimize_dca_strategies,
     classify_timing_status,
 )
 
@@ -418,6 +419,63 @@ def test_simulate_cycle_trade_single_buy_vs_multi_buy():
     assert t_multi.profit_loss == pytest.approx(700.0)
     assert t_multi.return_pct == pytest.approx(35.0)
     assert res_multi.total_invested == pytest.approx(2000.0)
+
+
+def test_optimize_dca_strategies_finds_champion():
+    """
+    US1 Test:
+    Verifies that optimize_dca_strategies evaluates individual BUY strategies
+    under DCA accumulation and returns the champion with the highest return_on_capital_pct.
+    
+    Setup:
+    - Closes: [10.0, 10.0, 12.0, 8.0, 20.0]
+    - Strategy A ('strat_good'):
+        - Buy at bar 1 (P=10.0), Buy at bar 3 (P=8.0).
+        - Total invested: 2000.
+        - Shares = 100 + 125 = 225.
+        - Final equity at bar 4 (P=20.0): 225 * 20 = 4500. Net profit = 2500, return = 125%.
+    - Strategy B ('strat_ok'):
+        - Buy at bar 2 (P=12.0).
+        - Total invested: 1000.
+        - Shares = 1000 / 12 = 83.333.
+        - Final equity at bar 4 (P=20.0): 83.333 * 20 = 1666.67. Net profit = 666.67, return = 66.67%.
+    - Sell signals (should be completely ignored by DCA optimizer).
+    """
+    series = make_test_series([10.0, 10.0, 12.0, 8.0, 20.0])
+    signals = [
+        SignalRecord("prop_reversal", "strat_good", 0, 1, 10.0, None, "BUY"),
+        SignalRecord("prop_reversal", "strat_good", 2, 3, 8.0, None, "BUY"),
+        SignalRecord("prop_reversal", "strat_ok", 1, 2, 12.0, None, "BUY"),
+        SignalRecord("prop_reversal", "sell_ignored", 3, 4, 20.0, None, "SELL"),
+    ]
+
+    champ, top_list = optimize_dca_strategies(
+        series=series,
+        signals=signals,
+        contribution_amount=1000.0,
+        strategy_labels_map={"strat_good": "Estratégia Superior", "strat_ok": "Estratégia Moderada"},
+        top_n=10,
+    )
+
+    assert champ is not None
+    assert champ.rank == 1
+    assert champ.buy_sub_id == "strat_good"
+    assert champ.buy_label == "Estratégia Superior"
+    assert champ.sell_sub_id is None
+    assert champ.sell_label == "-"
+    assert champ.simulation_mode == "accumulation"
+    assert champ.total_contributions == 2
+    assert champ.total_invested == pytest.approx(2000.0)
+    assert champ.total_shares == pytest.approx(225.0)
+    assert champ.final_equity == pytest.approx(4500.0)
+    assert champ.net_profit == pytest.approx(2500.0)
+    assert champ.total_return_pct == pytest.approx(125.0)
+    assert champ.average_buy_price == pytest.approx(2000.0 / 225.0, rel=1e-2)
+
+    assert len(top_list) == 2
+    assert top_list[1].buy_sub_id == "strat_ok"
+    assert top_list[1].total_return_pct == pytest.approx(66.67, rel=1e-2)
+
 
 
 
