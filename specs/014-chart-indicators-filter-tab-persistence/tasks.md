@@ -68,4 +68,4 @@
 **Purpose**: Verificação completa de conformidade com a Constituição, testes de regressão geral e documentação.
 
 - [x] T013 Executar a suíte de testes automatizados com `python -m pytest tests/ -v` garantindo zero regressões (81 testes passando).
-- [ ] T014 Atualizar checklist de requisitos em `specs/014-chart-indicators-filter-tab-persistence/checklists/requirements.md` e validar quickstart.md.
+- [x] T014 Atualizar checklist de requisitos em `specs/014-chart-indicators-filter-tab-persistence/checklists/requirements.md` e validar quickstart.md.
