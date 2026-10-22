@@ -25,7 +25,7 @@ description: "Task list for Gestor, Consultor de Rebalanceamento e Simulador Mul
 **Purpose**: Create the new portfolio evaluator module skeleton and export bindings.
 
 - [X] T001 Create module skeleton and imports for multi-asset portfolio evaluation in `src/evaluator/portfolio_simulator.py`
-- [ ] T002 Export portfolio simulator dataclasses and public functions in `src/evaluator/__init__.py`
+- [X] T002 Export portfolio simulator dataclasses and public functions in `src/evaluator/__init__.py`
 
 ---
 
