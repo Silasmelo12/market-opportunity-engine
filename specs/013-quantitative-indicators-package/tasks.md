@@ -87,4 +87,4 @@
 
 - [x] T022 Executar a suíte de testes completa do projeto com `pytest tests/ -v` garantindo zero regressões.
 - [x] T023 Validar rigor de latência executando benchmark em `test_quantitative_indicators.py` garantindo tempo de execução < 50ms por ativo.
-- [ ] T024 Atualizar checklist de requisitos em `specs/013-quantitative-indicators-package/checklists/requirements.md` e validar quickstart.md.
+- [x] T024 Atualizar checklist de requisitos em `specs/013-quantitative-indicators-package/checklists/requirements.md` e validar quickstart.md.
