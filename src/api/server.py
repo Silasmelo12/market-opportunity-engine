@@ -9,7 +9,7 @@ import os
 import json
 import time
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
@@ -27,6 +27,15 @@ from ..evaluator import (
     simulate_cycle_trade,
     optimize_strategy_pairs,
     optimize_dca_strategies,
+    PortfolioHolding,
+    AssetOpportunityProfile,
+    PortfolioActionRecommendation,
+    PortfolioLedgerEvent,
+    PortfolioCurvePoint,
+    PortfolioSimulationResult,
+    compute_asset_opportunity_profile,
+    advise_portfolio_rebalance,
+    simulate_portfolio_multi_asset,
 )
 from ..ui.theme import STRATEGY_LABELS_PT, get_friendly_label, get_asset_name, ASSET_NAMES_PT
 from .cache import daily_cache
@@ -47,6 +56,17 @@ from .schemas import (
     StrategyPairRankItemModel,
     OptimizeCombinationsRequest,
     OptimizeCombinationsResponse,
+    PortfolioHoldingInput,
+    PortfolioHoldingEvaluatedModel,
+    AssetOpportunityProfileModel,
+    PortfolioActionRecommendationModel,
+    PortfolioAdviseRequest,
+    PortfolioAdviseResponse,
+    PortfolioLedgerEventModel,
+    PortfolioCurvePointModel,
+    PortfolioSimulationMetricsModel,
+    PortfolioSimulateRequest,
+    PortfolioSimulateResponse,
 )
 
 app = FastAPI(
@@ -1312,6 +1332,125 @@ def optimize_combinations_endpoint(req: OptimizeCombinationsRequest):
         champion=champ_model,
         top_combinations=top_models,
     )
+
+
+def _resolve_portfolio_universe_tickers(
+    universe_category: str = "featured",
+    custom_tickers: Optional[List[str]] = None,
+    holdings_tickers: Optional[List[str]] = None,
+    max_assets: int = 24,
+) -> List[Tuple[str, str]]:
+    """
+    Resolves a deduplicated list of (ticker, category) pairs for portfolio analysis/simulation.
+    Always includes any tickers currently held by the user so they are evaluated for SELL/REBALANCE/ROTATE.
+    """
+    norm_cat = _normalize_category(universe_category)
+    if norm_cat == "custom" and custom_tickers:
+        raw_basket = [(t.strip().upper(), "Personalizado") for t in custom_tickers if t and t.strip()]
+    elif norm_cat == "featured":
+        raw_basket = list(TICKERS_FEATURED)
+    elif norm_cat == "acoes_br":
+        raw_basket = [(t, "Ações Brasil") for t in TICKERS_BR_ACOES if t != "^BVSP"]
+    elif norm_cat == "fiis":
+        raw_basket = [(t, "FIIs Brasil") for t in TICKERS_FIIS]
+    elif norm_cat == "usa":
+        raw_basket = [(t, "Ações EUA") for t in TICKERS_USA[:max_assets]]
+    elif norm_cat == "commodities":
+        raw_basket = [(t, "Commodities") for t in TICKERS_COMMODITIES]
+    elif norm_cat == "forex":
+        raw_basket = [(t, "Forex") for t in TICKERS_FX]
+    elif norm_cat == "crypto":
+        raw_basket = [(t, "Criptomoedas") for t in TICKERS_CRYPTO]
+    elif custom_tickers:
+        raw_basket = [(t.strip().upper(), "Personalizado") for t in custom_tickers if t and t.strip()]
+    else:
+        raw_basket = list(TICKERS_FEATURED)
+
+    seen = set()
+    final_basket: List[Tuple[str, str]] = []
+
+    for ht in (holdings_tickers or []):
+        t_clean = (ht or "").strip().upper()
+        if t_clean and t_clean not in seen:
+            seen.add(t_clean)
+            cat_label = "Carteira Atual"
+            for bt, bcat in DEFAULT_SCANNER_BASKET:
+                if bt.upper() == t_clean:
+                    cat_label = bcat
+                    break
+            final_basket.append((t_clean, cat_label))
+
+    for t_cand, c_label in raw_basket:
+        t_clean = (t_cand or "").strip().upper()
+        if not t_clean or t_clean == "^BVSP" or t_clean in seen:
+            continue
+        seen.add(t_clean)
+        final_basket.append((t_clean, c_label))
+        if len(final_basket) >= max_assets + len(holdings_tickers or []):
+            break
+
+    return final_basket
+
+
+def _load_and_profile_single_asset(
+    ticker: str,
+    category: str,
+    interval: str = "1d",
+    period: str = "2y",
+) -> Optional[Dict[str, Any]]:
+    """
+    Loads OHLCVSeries, runs StrategyCatalog, and computes AssetOpportunityProfile for one ticker.
+    Uses in-memory cache to accelerate repeated portfolio advisories and simulations.
+    """
+    period_to_use = period
+    if interval in ("5m", "15m", "30m") and period not in ("1d", "5d", "7d", "30d", "60d"):
+        period_to_use = "60d"
+    elif interval in ("60m", "1h", "2h", "4h", "12h") and period in ("5y", "max"):
+        period_to_use = "730d"
+
+    cache_key = f"portfolio_asset:{ticker}:{interval}:{period_to_use}"
+    cached = _get_cache(cache_key)
+    if cached is not None:
+        return cached
+
+    try:
+        series = DataLoader.load_asset_data(ticker=ticker, interval=interval, period=period_to_use, use_cache=True)
+    except Exception:
+        return None
+
+    if series is None or series.length < 15:
+        return None
+
+    catalog = StrategyCatalog(lookback_n=10, retest_window_m=5, tolerance_pct=0.005)
+    res = catalog.run_all(series)
+    signals = res["signals"]
+    prop_state = res["prop_current_state"]
+    pending = res["pending_signals"]
+
+    asset_name = strip_corporate_suffix(get_asset_name(ticker))
+    profile = compute_asset_opportunity_profile(
+        ticker=ticker,
+        series=series,
+        signals=signals,
+        prop_state=prop_state,
+        pending_signals=pending,
+        asset_name=asset_name,
+        category=category,
+        strategy_labels_map=STRATEGY_LABELS_PT,
+    )
+
+    bundle = {
+        "ticker": ticker.upper(),
+        "asset_name": asset_name,
+        "category": category,
+        "series": series,
+        "signals": signals,
+        "prop_state": prop_state,
+        "pending_signals": pending,
+        "profile": profile,
+    }
+    _set_cache(cache_key, bundle)
+    return bundle
 
 
 # Mount Web Terminal Static Assets at Root
