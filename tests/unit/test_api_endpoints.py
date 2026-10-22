@@ -260,3 +260,32 @@ def test_api_portfolio_simulate():
     assert len(data["curve"]) > 10
     assert "ledger_events" in data
     assert "opportunity_ranking" in data
+
+
+
+def test_portfolio_tab_dom_and_ergonomics():
+    res_html = client.get("/")
+    assert res_html.status_code == 200
+    html = res_html.text
+
+    # Verify navigation button and tab view container
+    assert 'data-tab="tab-portfolio"' in html
+    assert 'id="tab-portfolio"' in html
+    assert "Carteira" in html
+
+    # Verify US1, US2, US3 DOM containers
+    assert 'id="portfolio-cash-input"' in html
+    assert 'id="portfolio-recommendations-tbody"' in html
+    assert 'id="portfolio-ledger-tbody"' in html
+    assert 'id="portfolio-equity-chart"' in html
+    assert 'id="portfolio-allocation-chart"' in html
+    assert 'id="portfolio-ranking-tbody"' in html
+
+    # Verify app.js hides #global-direction-selector when tab-portfolio is active
+    res_js = client.get("/app.js")
+    assert res_js.status_code == 200
+    js = res_js.text
+    assert "tabId === 'tab-portfolio'" in js
+    assert "renderPortfolioEquityChart" in js
+    assert "renderPortfolioAllocationChart" in js
+    assert "renderPortfolioOpportunityRanking" in js

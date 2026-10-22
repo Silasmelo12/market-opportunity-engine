@@ -92,7 +92,7 @@ description: "Task list for Gestor, Consultor de Rebalanceamento e Simulador Mul
 - [X] T018 [US3] Add containers for the Portfolio Equity Evolution chart (`#portfolio-equity-chart`), Portfolio Allocation Breakdown chart (`#portfolio-allocation-chart`), and Universe Opportunity Score Ranking table (`#portfolio-ranking-tbody`) inside `#tab-portfolio` in `src/web/index.html`
 - [X] T019 [US3] Implement `renderPortfolioEquityChart`, `renderPortfolioAllocationChart`, and `renderPortfolioOpportunityRanking` using Plotly.js with automatic re-rendering on Light/Dark theme toggle in `src/web/app.js`
 - [X] T020 [P] [US3] Add semantic badge styles (`COMPRAR`, `VENDER TOTAL`, `VENDER PARCIAL / REBALANCEAR`, `ROTACIONAR`, `MANTER`), Potential Score progress bar styles, and Light Mode (`body.light-theme`) overrides for `#tab-portfolio` in `src/web/styles.css`
-- [ ] T021 [US3] Add UI/DOM structural verification tests for `#tab-portfolio`, navigation tab presence, and direction selector hiding in `tests/unit/test_api_endpoints.py`
+- [X] T021 [US3] Add UI/DOM structural verification tests for `#tab-portfolio`, navigation tab presence, and direction selector hiding in `tests/unit/test_api_endpoints.py`
 
 **Checkpoint**: All 3 user stories are complete, styled for Dark & Light themes, and covered by automated tests.
 
