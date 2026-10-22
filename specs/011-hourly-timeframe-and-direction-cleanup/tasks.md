@@ -40,5 +40,5 @@ description: "Tasks for feature 011: Suporte ao Timeframe 1h sem Erro 400 e Ocul
 
 ## Phase 4: Polish & Validação Global
 
-- [ ] T006 Executar a suíte de testes unitários (`python -m pytest tests/unit/ -v`) garantindo 100% de aprovação e regressão zero.
+- [X] T006 Executar a suíte de testes unitários (`python -m pytest tests/unit/ -v`) garantindo 100% de aprovação e regressão zero.
 - [ ] T007 Atualizar o `README.md` documentando o suporte ao timeframe de 60m/1h e a ergonomia contextual do cabeçalho.
