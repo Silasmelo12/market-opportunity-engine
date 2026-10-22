@@ -1491,7 +1491,57 @@
             </div>
           </div>
 
-          <div id="portfolio-charts-and-ranking-anchor"></div>
+          <!-- Charts Row: Equity Curve (8 cols) + Allocation Breakdown (4 cols) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            <div class="lg:col-span-8 card-surface p-3.5 sm:p-4">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-xs font-bold text-gray-200">Evolução Patrimonial: Carteira Gerenciada vs. Buy & Hold Cesta vs. Caixa</h3>
+                <span class="text-[10px] text-gray-400 font-mono">Zero Look-Ahead Bias</span>
+              </div>
+              <div id="portfolio-equity-chart" class="w-full h-72"></div>
+            </div>
+            <div class="lg:col-span-4 card-surface p-3.5 sm:p-4">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-xs font-bold text-gray-200">Distribuição Alvo da Carteira (%)</h3>
+                <span class="text-[10px] text-gray-400 font-mono">Ativos + Caixa</span>
+              </div>
+              <div id="portfolio-allocation-chart" class="w-full h-72"></div>
+            </div>
+          </div>
+
+          <!-- Universe Opportunity Score Ranking Table -->
+          <div class="card-surface p-3.5 sm:p-4 overflow-hidden">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+                <span>🏆</span>Ranking de Potencial do Universo & Par de Estratégias Campeão por Ativo
+              </h3>
+              <span class="text-[10px] text-gray-400 font-mono">Ordenado por Score de Potencial (0–100)</span>
+            </div>
+            <div class="overflow-x-auto touch-scroll max-h-64">
+              <table class="w-full text-left text-xs text-gray-300">
+                <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[10px] sticky top-0 whitespace-nowrap">
+                  <tr>
+                    <th class="px-2.5 py-2 text-center">Rank</th>
+                    <th class="px-2.5 py-2">Ativo</th>
+                    <th class="px-2.5 py-2 text-center font-mono">Score (0–100)</th>
+                    <th class="px-2.5 py-2">Estratégia Compra Campeã</th>
+                    <th class="px-2.5 py-2">Estratégia Venda Campeã</th>
+                    <th class="px-2.5 py-2 text-center font-mono">Win Rate</th>
+                    <th class="px-2.5 py-2 font-mono">Retorno Hist.</th>
+                    <th class="px-2.5 py-2 font-mono text-center">Max DD</th>
+                    <th class="px-2.5 py-2 text-center">Sinal / Timing</th>
+                  </tr>
+                </thead>
+                <tbody id="portfolio-ranking-tbody" class="divide-y divide-fintech-border font-mono whitespace-nowrap text-[11px]">
+                  <tr>
+                    <td colspan="9" class="px-4 py-4 text-center text-gray-500">
+                      Clique em "Gerar Plano de Hoje & Simular Carteira" para ranquear os ativos do universo.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
 
           <!-- Chronological Ledger of Portfolio Trades & Rebalances -->
           <div class="card-surface p-3.5 sm:p-4 overflow-hidden">
