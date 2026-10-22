@@ -37,7 +37,7 @@ description: "Tasks for feature 012: Suporte ao Otimizador Mais Lucrativa para A
 
 **Independent Test**: Alternar o seletor de "Modo de Operação" e validar que o wrapper da estratégia de venda é ocultado no modo DCA e reexibido no modo Trade.
 
-- [ ] T008 [P] [US2] Adicionar wrapper identificado `#sim-sell-strategy-container` ao seletor de Estratégia de Venda em `src/web/index.html`.
+- [X] T008 [P] [US2] Adicionar wrapper identificado `#sim-sell-strategy-container` ao seletor de Estratégia de Venda em `src/web/index.html`.
 - [ ] T009 [US2] Atualizar o listener do dropdown `sim-mode` em `src/web/app.js` para alternar a visibilidade de `#sim-sell-strategy-container` conforme o modo selecionado.
 
 ---
