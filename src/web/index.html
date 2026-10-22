@@ -627,7 +627,57 @@
           </div>
         </div>
         </div>
-      </aside>
+                <!-- 5. Indicadores Quantitativos de Fundo (10) -->
+          <div class="border border-fintech-border rounded overflow-hidden strategy-group-wrapper" data-direction="BUY">
+            <div class="accordion-header bg-fintech-bg px-2.5 py-1.5 flex items-center justify-between text-gray-200 font-semibold cursor-pointer" data-accordion="acc-quant-buy">
+              <div class="flex items-center space-x-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                <span class="text-xs">Indicadores Quantitativos - Fundo (10)</span>
+              </div>
+              <span class="accordion-arrow text-gray-400 text-xs transition-transform transform">&#9660;</span>
+            </div>
+            <div id="acc-quant-buy" class="accordion-content p-2 bg-fintech-surface space-y-1.5 border-t border-fintech-border hidden">
+              <div class="grid grid-cols-1 gap-1 text-[11px] text-gray-300">
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bollinger_close_in" data-dir="BUY"><span>Bollinger Fechou Fora/Dentro</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="keltner_squeeze" data-dir="BUY"><span>Keltner Squeeze (Compressão/Alta)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="zscore_extreme" data-dir="BUY"><span>Z-Score Fundo Extremo (&lt;-2.0)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="rsi_divergence" data-dir="BUY"><span>Divergência Regular IFR/RSI</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="stochastic_extreme" data-dir="BUY"><span>Estocástico Lento em Sobrevenda (&lt;25)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="macd_momentum" data-dir="BUY"><span>MACD Histogram Momentum (Alta)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="vwap_bands" data-dir="BUY"><span>Bandas de VWAP (Retorno à Média)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="mfi_extreme" data-dir="BUY"><span>Money Flow Index (MFI) Sobrevenda (&lt;20)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="volume_climax_vsa" data-dir="BUY"><span>Volume Clímax / VSA Absorção</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="supertrend_trailing" data-dir="BUY"><span>SuperTrend Virada Compradora</span></label>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Indicadores Quantitativos de Topo (10) -->
+          <div class="border border-fintech-border rounded overflow-hidden strategy-group-wrapper" data-direction="SELL">
+            <div class="accordion-header bg-fintech-bg px-2.5 py-1.5 flex items-center justify-between text-gray-200 font-semibold cursor-pointer" data-accordion="acc-quant-sell">
+              <div class="flex items-center space-x-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+                <span class="text-xs">Indicadores Quantitativos - Topo (10)</span>
+              </div>
+              <span class="accordion-arrow text-gray-400 text-xs transition-transform transform">&#9660;</span>
+            </div>
+            <div id="acc-quant-sell" class="accordion-content p-2 bg-fintech-surface space-y-1.5 border-t border-fintech-border hidden">
+              <div class="grid grid-cols-1 gap-1 text-[11px] text-gray-300">
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bollinger_close_in" data-dir="SELL"><span>Bollinger Fechou Fora/Dentro</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="keltner_squeeze" data-dir="SELL"><span>Keltner Squeeze (Compressão/Baixa)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="zscore_extreme" data-dir="SELL"><span>Z-Score Topo Extremo (&gt;+2.0)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="rsi_divergence" data-dir="SELL"><span>Divergência Regular IFR/RSI</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="stochastic_extreme" data-dir="SELL"><span>Estocástico Lento em Sobrecompra (&gt;75)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="macd_momentum" data-dir="SELL"><span>MACD Histogram Momentum (Baixa)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="vwap_bands" data-dir="SELL"><span>Bandas de VWAP (Retorno à Média)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="mfi_extreme" data-dir="SELL"><span>Money Flow Index (MFI) Sobrecompra (&gt;80)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="volume_climax_vsa" data-dir="SELL"><span>Volume Clímax / VSA Distribuição</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="supertrend_trailing" data-dir="SELL"><span>SuperTrend Virada Vendedora</span></label>
+              </div>
+            </div>
+          </div>
+
+</aside>
 
       <!-- Center & Right: 60fps Chart & Quantitative Panels -->
       <div class="flex-1 flex flex-col min-h-0 lg:h-full overflow-visible lg:overflow-y-auto">

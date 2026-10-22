@@ -33,8 +33,8 @@
 
 **Independent Test**: Abrir a aba Gráfico no navegador e constatar que os blocos "Indicadores Quantitativos de Fundo" e "Indicadores Quantitativos de Topo" estão presentes com todos os 10 checkboxes funcionais.
 
-- [ ] T004 [US1] Adicionar os acordeões `acc-quant-buy` e `acc-quant-sell` com os 10 checkboxes `.strategy-cb` em `src/web/index.html` no container `#strategy-accordion-container`.
-- [ ] T005 [US1] Mapear os 10 novos identificadores técnicos no objeto `STRATEGY_ALIASES` em `src/web/app.js` para ativação reativa de plotagem nas velas.
+- [x] T004 [US1] Adicionar os acordeões `acc-quant-buy` e `acc-quant-sell` com os 10 checkboxes `.strategy-cb` em `src/web/index.html` no container `#strategy-accordion-container`.
+- [x] T005 [US1] Mapear os 10 novos identificadores técnicos no objeto `STRATEGY_ALIASES` em `src/web/app.js` para ativação reativa de plotagem nas velas.
 
 ---
 
