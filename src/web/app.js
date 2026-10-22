@@ -212,6 +212,7 @@ const ASSET_NAMES = {
   'BNDA39.SA': 'Invesco QQQ Trust BDR',
   'ACWI11.SA': 'Trend ETF MSCI ACWI',
   'BACW39.SA': 'iShares MSCI ACWI BDR',
+  'SPCX34.SA': 'SpaceX BDR (Space Exploration)',
   // Ações EUA
   'AAPL': 'Apple',
   'MSFT': 'Microsoft',
@@ -2532,6 +2533,7 @@ state.portfolioState = {
   maxWeightPct: 25.0,
   lastAdviseResponse: null,
   lastSimulateResponse: null,
+  previousBackup: null,
 };
 
 function loadPortfolioStorage() {
@@ -2547,6 +2549,7 @@ function loadPortfolioStorage() {
       if (parsed.interval) state.portfolioState.interval = parsed.interval;
       if (parsed.period) state.portfolioState.period = parsed.period;
       if (parsed.maxWeightPct !== undefined) state.portfolioState.maxWeightPct = Number(parsed.maxWeightPct) || 25;
+      if (parsed.previousBackup && typeof parsed.previousBackup === 'object') state.portfolioState.previousBackup = parsed.previousBackup;
     }
   } catch (err) {
     console.warn('Erro ao carregar carteira do localStorage:', err);
@@ -2563,6 +2566,7 @@ function savePortfolioStorage() {
       interval: state.portfolioState.interval,
       period: state.portfolioState.period,
       maxWeightPct: state.portfolioState.maxWeightPct,
+      previousBackup: state.portfolioState.previousBackup,
     };
     localStorage.setItem(PORTFOLIO_STORAGE_KEY, JSON.stringify(payload));
   } catch (err) {
@@ -2735,6 +2739,121 @@ function setupPortfolioTab() {
       applyRecommendedPortfolioOrders();
     });
   }
+
+  // Undo Apply Orders Button
+  const btnUndo = document.getElementById('btn-portfolio-undo-apply');
+  if (btnUndo) {
+    btnUndo.addEventListener('click', () => {
+      undoAppliedPortfolioOrders();
+    });
+  }
+  updateUndoButtonVisibility();
+
+  // CSV Import Button and File Input
+  const btnImportCsv = document.getElementById('btn-portfolio-import-csv');
+  const fileInputCsv = document.getElementById('portfolio-csv-file-input');
+  if (btnImportCsv && fileInputCsv) {
+    btnImportCsv.addEventListener('click', () => {
+      fileInputCsv.value = '';
+      fileInputCsv.click();
+    });
+
+    fileInputCsv.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (file) {
+        importPortfolioHoldingsFromCsv(file);
+      }
+    });
+  }
+}
+
+function updateUndoButtonVisibility() {
+  const btnUndo = document.getElementById('btn-portfolio-undo-apply');
+  if (!btnUndo) return;
+  if (state.portfolioState.previousBackup) {
+    btnUndo.classList.remove('hidden');
+  } else {
+    btnUndo.classList.add('hidden');
+  }
+}
+
+function undoAppliedPortfolioOrders() {
+  const backup = state.portfolioState.previousBackup;
+  if (!backup) return;
+
+  state.portfolioState.holdings = Array.isArray(backup.holdings) ? JSON.parse(JSON.stringify(backup.holdings)) : [];
+  state.portfolioState.availableCash = Number(backup.availableCash) || 0;
+  state.portfolioState.previousBackup = null;
+
+  syncPortfolioInputsFromState();
+  savePortfolioStorage();
+  renderPortfolioHoldingsEditor();
+  updateUndoButtonVisibility();
+  runPortfolioAdviseAndSimulate();
+}
+
+function importPortfolioHoldingsFromCsv(file) {
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    try {
+      const text = evt.target.result;
+      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      if (lines.length === 0) return;
+
+      const delimiter = lines[0].includes(';') ? ';' : ',';
+      let startIndex = 0;
+      const firstLineLower = lines[0].toLowerCase();
+      if (firstLineLower.includes('ticker') || firstLineLower.includes('ativo') || firstLineLower.includes('código') || firstLineLower.includes('codigo') || firstLineLower.includes('papel') || firstLineLower.includes('symbol')) {
+        startIndex = 1;
+      }
+
+      // Backup current state for undo before importing
+      state.portfolioState.previousBackup = {
+        holdings: JSON.parse(JSON.stringify(state.portfolioState.holdings || [])),
+        availableCash: state.portfolioState.availableCash,
+      };
+
+      const importedHoldings = [];
+      for (let i = startIndex; i < lines.length; i++) {
+        const rawCols = lines[i].split(delimiter).map(c => c.trim().replace(/^["']|["']$/g, ''));
+        if (rawCols.length < 2) continue;
+
+        let rawTicker = rawCols[0].toUpperCase();
+        let rawShares = 0;
+        let rawPrice = 0;
+
+        if (rawCols.length >= 3) {
+          rawShares = Number(rawCols[1].replace(',', '.')) || 0;
+          rawPrice = Number(rawCols[2].replace(',', '.')) || 0;
+        } else {
+          rawShares = Number(rawCols[1].replace(',', '.')) || 0;
+        }
+
+        const resolved = resolveTicker(rawTicker);
+        if (resolved && rawShares > 0) {
+          importedHoldings.push({
+            ticker: resolved,
+            shares: Number(rawShares.toFixed(4)),
+            average_buy_price: Number(Math.max(0.01, rawPrice).toFixed(4)),
+          });
+        }
+      }
+
+      if (importedHoldings.length > 0) {
+        state.portfolioState.holdings = importedHoldings;
+        savePortfolioStorage();
+        renderPortfolioHoldingsEditor();
+        updateUndoButtonVisibility();
+        runPortfolioAdviseAndSimulate();
+      } else {
+        alert('Nenhum ativo válido encontrado no CSV. Formato esperado: Ticker, Quantidade, Preço Médio (Ex: PETR4.SA, 100, 35.50)');
+      }
+    } catch (err) {
+      console.error('Erro ao processar CSV de carteira:', err);
+      alert('Erro ao processar arquivo CSV.');
+    }
+  };
+  reader.readAsText(file);
 }
 
 function getActionBadgeHtml(actionType, actionLabel) {
@@ -2844,6 +2963,12 @@ function applyRecommendedPortfolioOrders() {
   const adviseData = state.portfolioState.lastAdviseResponse;
   if (!adviseData || !Array.isArray(adviseData.recommendations)) return;
 
+  // Save backup before applying orders so user can undo
+  state.portfolioState.previousBackup = {
+    holdings: JSON.parse(JSON.stringify(state.portfolioState.holdings || [])),
+    availableCash: state.portfolioState.availableCash,
+  };
+
   const newHoldings = [];
   adviseData.recommendations.forEach(r => {
     const targetSh = Number(r.target_shares) || 0;
@@ -2871,6 +2996,7 @@ function applyRecommendedPortfolioOrders() {
   syncPortfolioInputsFromState();
   savePortfolioStorage();
   renderPortfolioHoldingsEditor();
+  updateUndoButtonVisibility();
   runPortfolioAdviseAndSimulate();
 }
 
