@@ -17,6 +17,7 @@ MAX_PERIODS = {
     "5m": "60d",
     "15m": "60d",
     "30m": "60d",
+    "60m": "730d",
     "1h": "730d",
     "2h": "730d",
     "4h": "730d",
@@ -108,6 +109,10 @@ class DataLoader:
             download_period = "5y" if period in ("60d", "1y", "2y", "5y") else period
 
         req_days = _parse_period_days(period)
+        max_allowed_days = _parse_period_days(download_period)
+        effective_req_days = req_days
+        if effective_req_days is not None and max_allowed_days is not None:
+            effective_req_days = min(effective_req_days, max_allowed_days)
 
         df: pd.DataFrame = pd.DataFrame()
 
@@ -120,10 +125,11 @@ class DataLoader:
 
         # 2. Check if cache satisfies requested period depth
         need_download = df.empty
-        if not df.empty and req_days is not None and len(df) > 0:
+        if not df.empty and effective_req_days is not None and len(df) > 0:
             cached_days = (df.index[-1] - df.index[0]).days
             # If user wants a longer period than what's currently in cache, fetch fresh data
-            if req_days > cached_days + 15 and download_period != "60d":
+            max_ceiling = max_allowed_days if max_allowed_days is not None else 1825
+            if effective_req_days > cached_days + 15 and cached_days < max_ceiling - 30:
                 need_download = True
 
         # 3. Only reach out to yfinance if not in cache or cache is insufficient

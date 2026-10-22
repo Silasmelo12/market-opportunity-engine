@@ -12,7 +12,7 @@ description: "Tasks for feature 011: Suporte ao Timeframe 1h sem Erro 400 e Ocul
 
 ## Phase 1: Setup & Foundational
 
-- [ ] T001 [P] Adicionar `"60m": "730d"` e suporte a teto de 730 dias no mapeamento `MAX_PERIODS` de `src/data_loader/fetcher.py`.
+- [X] T001 [P] Adicionar `"60m": "730d"` e suporte a teto de 730 dias no mapeamento `MAX_PERIODS` de `src/data_loader/fetcher.py`.
 
 ---
 
