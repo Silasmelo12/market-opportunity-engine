@@ -1224,7 +1224,26 @@ async function renderOverviewDashboard() {
     }
   }
 
-  // 4. Populate Card 3: Posições no Lucro (Barra Verde/Rosa)
+  // 3.5. Populate Card 3: Proventos Recebidos (B3)
+  const incomeEl = document.getElementById('overview-total-income');
+  const latestIncomeEl = document.getElementById('overview-latest-income-val');
+  const b3TotalInc = Number(state.portfolioState.b3TotalIncome) || 0;
+  const b3Monthly = state.portfolioState.b3MonthlyIncome || [];
+
+  if (incomeEl) {
+    incomeEl.textContent = `R$ ${b3TotalInc.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+  if (latestIncomeEl) {
+    if (b3Monthly.length > 0) {
+      const lastM = b3Monthly[b3Monthly.length - 1];
+      const mVal = Number(lastM.total || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      latestIncomeEl.textContent = `R$ ${mVal} (${lastM.month_year})`;
+    } else {
+      latestIncomeEl.textContent = `R$ 0,00`;
+    }
+  }
+
+  // 4. Populate Card 4: Posições no Lucro (Barra Verde/Rosa)
   const ratioBadge = document.getElementById('overview-profit-ratio-badge');
   const ratioText = document.getElementById('overview-profit-ratio-text');
   const profitBar = document.getElementById('overview-profit-bar');
