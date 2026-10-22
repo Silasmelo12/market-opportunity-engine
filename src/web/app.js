@@ -1805,7 +1805,9 @@ async function runSimulation() {
 }
 
 async function runOptimizer() {
-  showLoading('Varrendo centenas de combinações para encontrar a mais lucrativa...');
+  const currentMode = (elements.simMode && elements.simMode.value) || 'cycle_trade';
+  const isDca = (currentMode === 'accumulation');
+  showLoading(isDca ? 'Varrendo estratégias de compra para encontrar a mais lucrativa em DCA...' : 'Varrendo centenas de combinações para encontrar a mais lucrativa...');
   try {
     const tickerInput = resolveTicker((elements.simTicker && elements.simTicker.value.trim().toUpperCase()) || state.currentTicker);
     const capitalVal = parseFloat(document.getElementById('sim-contribution').value) || 1000;
@@ -1828,9 +1830,11 @@ async function runOptimizer() {
       ticker: tickerInput,
       interval: selectedInterval,
       period: simPeriod,
+      simulation_mode: currentMode,
       cycle_entry_mode: selectedCycleMode,
+      contribution_amount: capitalVal,
       initial_capital: capitalVal,
-      min_trades: 2,
+      min_trades: isDca ? 1 : 2,
       start_date: document.getElementById('sim-start-date').value || null,
       end_date: document.getElementById('sim-end-date').value || null,
       lookback_n: state.lookbackN,
@@ -1852,21 +1856,75 @@ async function runOptimizer() {
     if (data.champion) {
       const c = data.champion;
       const countEl = document.getElementById('opt-champ-tested-count');
-      if (countEl) countEl.textContent = `${data.total_combinations_tested} combinações válidas rankeadas`;
+      if (countEl) {
+        countEl.textContent = isDca
+          ? `${data.total_combinations_tested} estratégias de compra avaliadas`
+          : `${data.total_combinations_tested} combinações válidas rankeadas`;
+      }
+
       const modeBadge = document.getElementById('opt-champ-mode-badge');
       if (modeBadge) {
-        modeBadge.textContent = c.cycle_entry_mode === 'single_buy' ? 'Compra Única (1x)' : 'Multi-Buy (Nx)';
+        if (isDca) {
+          modeBadge.textContent = 'Acumulação DCA (Fundos)';
+        } else {
+          modeBadge.textContent = c.cycle_entry_mode === 'single_buy' ? 'Compra Única (1x)' : 'Multi-Buy (Nx)';
+        }
       }
-      document.getElementById('opt-champ-buy-label').textContent = c.buy_label;
-      document.getElementById('opt-champ-sell-label').textContent = c.sell_label;
+
+      const buyLabelEl = document.getElementById('opt-champ-buy-label');
+      const sellLabelEl = document.getElementById('opt-champ-sell-label');
+      if (buyLabelEl) buyLabelEl.textContent = c.buy_label;
+
+      if (sellLabelEl) {
+        if (isDca) {
+          sellLabelEl.parentElement.innerHTML = `
+            <span class="text-emerald-400 font-semibold" id="opt-champ-buy-label">${c.buy_label}</span>
+            <span class="text-gray-400 font-normal text-xs">(Aportes Periódicos em Fundos)</span>
+          `;
+        } else {
+          sellLabelEl.textContent = c.sell_label || '-';
+        }
+      }
+
       document.getElementById('opt-champ-ret').textContent = `${c.total_return_pct >= 0 ? '+' : ''}${c.total_return_pct.toFixed(1)}%`;
       document.getElementById('opt-champ-pnl').textContent = `${c.net_profit >= 0 ? '+' : ''}R$ ${c.net_profit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-      document.getElementById('opt-champ-winrate').textContent = `${c.win_rate_pct.toFixed(1)}% (${c.winning_trades}/${c.closed_trades})`;
-      document.getElementById('opt-champ-trades').textContent = `${c.closed_trades} trades`;
-      document.getElementById('opt-champ-drawdown').textContent = `${c.max_drawdown_pct.toFixed(1)}%`;
+
+      const winRateEl = document.getElementById('opt-champ-winrate');
+      if (winRateEl) {
+        if (isDca) {
+          const avgP = c.average_buy_price != null ? `R$ ${c.average_buy_price.toFixed(2)}` : '-';
+          winRateEl.textContent = avgP;
+          winRateEl.previousElementSibling.textContent = 'Preço Médio de Compra';
+        } else {
+          winRateEl.textContent = `${c.win_rate_pct.toFixed(1)}% (${c.winning_trades}/${c.closed_trades})`;
+          winRateEl.previousElementSibling.textContent = 'Taxa de Acerto (Win Rate)';
+        }
+      }
+
+      const tradesEl = document.getElementById('opt-champ-trades');
+      if (tradesEl) {
+        if (isDca) {
+          tradesEl.textContent = `${c.closed_trades} aportes`;
+          tradesEl.previousElementSibling.textContent = 'Total de Aportes';
+        } else {
+          tradesEl.textContent = `${c.closed_trades} trades`;
+          tradesEl.previousElementSibling.textContent = 'Total de Trades';
+        }
+      }
+
+      const ddEl = document.getElementById('opt-champ-drawdown');
+      if (ddEl) {
+        if (isDca && c.total_invested != null) {
+          ddEl.textContent = `R$ ${c.total_invested.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+          ddEl.previousElementSibling.textContent = 'Total Aportado';
+        } else {
+          ddEl.textContent = `${c.max_drawdown_pct.toFixed(1)}%`;
+          ddEl.previousElementSibling.textContent = 'Max Drawdown';
+        }
+      }
     }
 
-    renderTopCombinationsTable(data.top_combinations || []);
+    renderTopCombinationsTable(data.top_combinations || [], isDca);
 
     if (elements.simOptimizerContainer) {
       elements.simOptimizerContainer.classList.remove('hidden');
@@ -1880,12 +1938,41 @@ async function runOptimizer() {
   }
 }
 
-function renderTopCombinationsTable(combos) {
+function renderTopCombinationsTable(combos, isDca = false) {
   if (!elements.simTopCombosTableBody) return;
   elements.simTopCombosTableBody.innerHTML = '';
 
+  const tableHeader = elements.simTopCombosTableBody.closest('table').querySelector('thead tr');
+  if (tableHeader) {
+    if (isDca) {
+      tableHeader.innerHTML = `
+        <th class="px-2.5 py-2 text-center">Rank</th>
+        <th class="px-2.5 py-2">Estratégia de Compra (Fundo)</th>
+        <th class="px-2.5 py-2 text-center">Aportes</th>
+        <th class="px-2.5 py-2 font-mono">Total Aportado</th>
+        <th class="px-2.5 py-2 font-mono">Preço Médio</th>
+        <th class="px-2.5 py-2 font-mono">Retorno (%)</th>
+        <th class="px-2.5 py-2 font-mono">Patrimônio Final</th>
+        <th class="px-2.5 py-2 font-mono">Lucro Líquido</th>
+        <th class="px-2.5 py-2 text-center">Ação</th>
+      `;
+    } else {
+      tableHeader.innerHTML = `
+        <th class="px-2.5 py-2 text-center">Rank</th>
+        <th class="px-2.5 py-2">Estratégia de Compra (Entrada)</th>
+        <th class="px-2.5 py-2">Estratégia de Venda (Saída)</th>
+        <th class="px-2.5 py-2 text-center">Trades</th>
+        <th class="px-2.5 py-2 text-center font-mono">Win Rate</th>
+        <th class="px-2.5 py-2 font-mono">Retorno (%)</th>
+        <th class="px-2.5 py-2 font-mono">Lucro Líquido</th>
+        <th class="px-2.5 py-2 font-mono text-center">Max Drawdown</th>
+        <th class="px-2.5 py-2 text-center">Ação</th>
+      `;
+    }
+  }
+
   if (!combos || combos.length === 0) {
-    elements.simTopCombosTableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-gray-500">Nenhuma combinação com no mínimo 2 trades encontrada no período.</td></tr>`;
+    elements.simTopCombosTableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-gray-500">${isDca ? 'Nenhuma estratégia com aportes encontrada no período.' : 'Nenhuma combinação com no mínimo 2 trades encontrada no período.'}</td></tr>`;
     return;
   }
 
@@ -1897,22 +1984,41 @@ function renderTopCombinationsTable(combos) {
     const retClass = item.total_return_pct >= 0 ? 'text-emerald-400' : 'text-rose-400';
     const pnlClass = item.net_profit >= 0 ? 'text-emerald-400' : 'text-rose-400';
 
-    tr.innerHTML = `
-      <td class="px-2.5 py-2 text-center font-bold text-amber-400">${rankBadge}</td>
-      <td class="px-2.5 py-2 text-emerald-300 font-medium font-sans">${item.buy_label}</td>
-      <td class="px-2.5 py-2 text-rose-300 font-medium font-sans">${item.sell_label}</td>
-      <td class="px-2.5 py-2 text-center text-white font-bold">${item.closed_trades}</td>
-      <td class="px-2.5 py-2 text-center text-gray-200">${item.win_rate_pct.toFixed(1)}%</td>
-      <td class="px-2.5 py-2 font-bold ${retClass}">${item.total_return_pct >= 0 ? '+' : ''}${item.total_return_pct.toFixed(1)}%</td>
-      <td class="px-2.5 py-2 font-bold ${pnlClass}">R$ ${item.net_profit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-      <td class="px-2.5 py-2 text-center text-rose-400">${item.max_drawdown_pct.toFixed(1)}%</td>
-      <td class="px-2.5 py-2 text-center">
-        <button class="btn-test-combo bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-[10px] px-2.5 py-1 rounded transition shadow"
-          data-buy="${item.buy_sub_id}" data-sell="${item.sell_sub_id}">
-           Testar
-        </button>
-      </td>
-    `;
+    if (isDca) {
+      tr.innerHTML = `
+        <td class="px-2.5 py-2 text-center font-bold text-amber-400">${rankBadge}</td>
+        <td class="px-2.5 py-2 text-emerald-300 font-medium font-sans">${item.buy_label}</td>
+        <td class="px-2.5 py-2 text-center text-white font-bold">${item.closed_trades}</td>
+        <td class="px-2.5 py-2 font-mono text-gray-300">R$ ${(item.total_invested || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+        <td class="px-2.5 py-2 font-mono text-amber-300">R$ ${(item.average_buy_price || 0).toFixed(2)}</td>
+        <td class="px-2.5 py-2 font-bold ${retClass}">${item.total_return_pct >= 0 ? '+' : ''}${item.total_return_pct.toFixed(1)}%</td>
+        <td class="px-2.5 py-2 font-bold text-cyan-300 font-mono">R$ ${(item.final_equity || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+        <td class="px-2.5 py-2 font-bold ${pnlClass}">R$ ${item.net_profit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+        <td class="px-2.5 py-2 text-center">
+          <button class="btn-test-combo bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-[10px] px-2.5 py-1 rounded transition shadow"
+            data-buy="${item.buy_sub_id}" data-sell="${item.sell_sub_id || ''}">
+             Testar
+          </button>
+        </td>
+      `;
+    } else {
+      tr.innerHTML = `
+        <td class="px-2.5 py-2 text-center font-bold text-amber-400">${rankBadge}</td>
+        <td class="px-2.5 py-2 text-emerald-300 font-medium font-sans">${item.buy_label}</td>
+        <td class="px-2.5 py-2 text-rose-300 font-medium font-sans">${item.sell_label}</td>
+        <td class="px-2.5 py-2 text-center text-white font-bold">${item.closed_trades}</td>
+        <td class="px-2.5 py-2 text-center text-gray-200">${item.win_rate_pct.toFixed(1)}%</td>
+        <td class="px-2.5 py-2 font-bold ${retClass}">${item.total_return_pct >= 0 ? '+' : ''}${item.total_return_pct.toFixed(1)}%</td>
+        <td class="px-2.5 py-2 font-bold ${pnlClass}">R$ ${item.net_profit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+        <td class="px-2.5 py-2 text-center text-rose-400">${item.max_drawdown_pct.toFixed(1)}%</td>
+        <td class="px-2.5 py-2 text-center">
+          <button class="btn-test-combo bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-[10px] px-2.5 py-1 rounded transition shadow"
+            data-buy="${item.buy_sub_id}" data-sell="${item.sell_sub_id}">
+             Testar
+          </button>
+        </td>
+      `;
+    }
     elements.simTopCombosTableBody.appendChild(tr);
   });
 
@@ -1922,7 +2028,7 @@ function renderTopCombinationsTable(combos) {
       const buyId = btn.getAttribute('data-buy');
       const sellId = btn.getAttribute('data-sell');
       if (elements.simBuyStrategy) elements.simBuyStrategy.value = buyId;
-      if (elements.simSellStrategy) elements.simSellStrategy.value = sellId;
+      if (elements.simSellStrategy && sellId) elements.simSellStrategy.value = sellId;
       runSimulation();
     });
   });
