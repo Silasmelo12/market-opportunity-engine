@@ -26,6 +26,7 @@ from ..evaluator import (
     simulate_accumulation,
     simulate_cycle_trade,
     optimize_strategy_pairs,
+    optimize_dca_strategies,
 )
 from ..ui.theme import STRATEGY_LABELS_PT, get_friendly_label, get_asset_name, ASSET_NAMES_PT
 from .cache import daily_cache
@@ -1182,17 +1183,31 @@ def optimize_combinations_endpoint(req: OptimizeCombinationsRequest):
     results = catalog.run_all(series)
     all_signals = results["signals"]
 
-    champion, top_combos = optimize_strategy_pairs(
-        series=series,
-        signals=all_signals,
-        initial_capital=req.initial_capital,
-        min_trades=req.min_trades,
-        start_date=req.start_date,
-        end_date=req.end_date,
-        strategy_labels_map=STRATEGY_LABELS_PT,
-        top_n=15,
-        cycle_entry_mode=req.cycle_entry_mode,
-    )
+    is_dca = (req.simulation_mode == "accumulation")
+
+    if is_dca:
+        contrib = req.contribution_amount if req.contribution_amount > 0 else req.initial_capital
+        champion, top_combos = optimize_dca_strategies(
+            series=series,
+            signals=all_signals,
+            contribution_amount=contrib,
+            start_date=req.start_date,
+            end_date=req.end_date,
+            strategy_labels_map=STRATEGY_LABELS_PT,
+            top_n=15,
+        )
+    else:
+        champion, top_combos = optimize_strategy_pairs(
+            series=series,
+            signals=all_signals,
+            initial_capital=req.initial_capital,
+            min_trades=req.min_trades,
+            start_date=req.start_date,
+            end_date=req.end_date,
+            strategy_labels_map=STRATEGY_LABELS_PT,
+            top_n=15,
+            cycle_entry_mode=req.cycle_entry_mode,
+        )
 
     champ_model = None
     if champion:
@@ -1202,6 +1217,7 @@ def optimize_combinations_endpoint(req: OptimizeCombinationsRequest):
             buy_label=champion.buy_label,
             sell_sub_id=champion.sell_sub_id,
             sell_label=champion.sell_label,
+            simulation_mode=champion.simulation_mode,
             closed_trades=champion.closed_trades,
             winning_trades=champion.winning_trades,
             win_rate_pct=champion.win_rate_pct,
@@ -1211,6 +1227,10 @@ def optimize_combinations_endpoint(req: OptimizeCombinationsRequest):
             has_open_trade=champion.has_open_trade,
             final_equity=champion.final_equity,
             cycle_entry_mode=champion.cycle_entry_mode,
+            total_invested=champion.total_invested,
+            average_buy_price=champion.average_buy_price,
+            total_shares=champion.total_shares,
+            total_contributions=champion.total_contributions,
         )
 
     top_models = [
@@ -1220,6 +1240,7 @@ def optimize_combinations_endpoint(req: OptimizeCombinationsRequest):
             buy_label=c.buy_label,
             sell_sub_id=c.sell_sub_id,
             sell_label=c.sell_label,
+            simulation_mode=c.simulation_mode,
             closed_trades=c.closed_trades,
             winning_trades=c.winning_trades,
             win_rate_pct=c.win_rate_pct,
@@ -1229,6 +1250,10 @@ def optimize_combinations_endpoint(req: OptimizeCombinationsRequest):
             has_open_trade=c.has_open_trade,
             final_equity=c.final_equity,
             cycle_entry_mode=c.cycle_entry_mode,
+            total_invested=c.total_invested,
+            average_buy_price=c.average_buy_price,
+            total_shares=c.total_shares,
+            total_contributions=c.total_contributions,
         )
         for c in top_combos
     ]
@@ -1236,6 +1261,7 @@ def optimize_combinations_endpoint(req: OptimizeCombinationsRequest):
     return OptimizeCombinationsResponse(
         ticker=req.ticker,
         period=period_to_use,
+        simulation_mode=req.simulation_mode,
         initial_capital=req.initial_capital,
         total_combinations_tested=len(top_combos),
         champion=champ_model,
