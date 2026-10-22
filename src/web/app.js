@@ -291,8 +291,23 @@ document.addEventListener('DOMContentLoaded', () => {
   initTradingViewChart();
   setupSimulationTab();
 
-  // Initial load
-  loadRadarData();
+
+  window.addEventListener('hashchange', () => {
+    const targetTab = getTabFromHash();
+    if (targetTab && targetTab !== state.activeTab) {
+      switchTab(targetTab, false);
+    }
+  });
+
+  // Initial tab restoration from URL hash or localStorage
+  const initialTab = getTabFromHash();
+  switchTab(initialTab, true);
+
+  if (initialTab !== 'tab-radar') {
+    // Also preload radar in background for 0ms tab switches
+    loadRadarData();
+  }
+
 
   // Listeners
   elements.btnLoadAnalysis.addEventListener('click', () => {
@@ -548,8 +563,18 @@ function setupNavigationTabs() {
   });
 }
 
-function switchTab(tabId) {
+function switchTab(tabId, updateHash = true) {
   state.activeTab = tabId;
+  try {
+    localStorage.setItem('market_engine_active_tab', tabId);
+  } catch (e) {}
+  if (updateHash && window.location.hash !== getHashFromTab(tabId)) {
+    try {
+      history.replaceState(null, '', getHashFromTab(tabId));
+    } catch (e) {
+      window.location.hash = getHashFromTab(tabId);
+    }
+  }
   document.querySelectorAll('#main-nav-tabs .nav-tab-btn').forEach(b => {
     if (b.getAttribute('data-tab') === tabId) {
       b.classList.add('active');

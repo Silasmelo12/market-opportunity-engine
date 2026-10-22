@@ -56,10 +56,10 @@
 
 **Independent Test**: Navegar para `#terminal` ou `#simulator`, pressionar F5 e constatar que a aplicação reabre diretamente na aba selecionada com gráfico ajustado e sem erros.
 
-- [ ] T009 [US3] Atualizar a função `switchTab()` em `src/web/app.js` para gravar o hash correspondente na URL (`window.location.hash`) e persistir no `localStorage`.
-- [ ] T010 [US3] Atualizar a inicialização em `DOMContentLoaded` em `src/web/app.js` para ler a hash inicial da URL ou `localStorage` e invocar `switchTab()`.
-- [ ] T011 [US3] Adicionar listener de evento `window.addEventListener('hashchange')` em `src/web/app.js` para suporte nativo ao botão Voltar/Avançar do navegador.
-- [ ] T012 [US3] Garantir o redimensionamento responsivo do gráfico (`resizeChartResponsive()` e `fitContent()`) com `requestAnimationFrame` quando a página iniciar diretamente na aba Gráfico.
+- [x] T009 [US3] Atualizar a função `switchTab()` em `src/web/app.js` para gravar o hash correspondente na URL (`window.location.hash`) e persistir no `localStorage`.
+- [x] T010 [US3] Atualizar a inicialização em `DOMContentLoaded` em `src/web/app.js` para ler a hash inicial da URL ou `localStorage` e invocar `switchTab()`.
+- [x] T011 [US3] Adicionar listener de evento `window.addEventListener('hashchange')` em `src/web/app.js` para suporte nativo ao botão Voltar/Avançar do navegador.
+- [x] T012 [US3] Garantir o redimensionamento responsivo do gráfico (`resizeChartResponsive()` e `fitContent()`) com `requestAnimationFrame` quando a página iniciar diretamente na aba Gráfico.
 
 ---
 
