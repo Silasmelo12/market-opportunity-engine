@@ -355,6 +355,19 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // UI: Direction Selector (Compra, Venda, Ambos)
+
+function updateSidebarDirectionFilter() {
+  const dir = state.activeDirection || 'BUY';
+  document.querySelectorAll('.strategy-group-wrapper').forEach(wrapper => {
+    const wrapDir = wrapper.getAttribute('data-direction');
+    if (dir === 'BOTH' || wrapDir === dir) {
+      wrapper.classList.remove('hidden');
+    } else {
+      wrapper.classList.add('hidden');
+    }
+  });
+}
+
 function setupDirectionSelector() {
   const dirButtons = document.querySelectorAll('#global-direction-selector .dir-seg-btn');
   dirButtons.forEach(btn => {

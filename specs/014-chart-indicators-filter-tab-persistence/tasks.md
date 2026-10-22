@@ -22,7 +22,7 @@
 
 **Purpose**: Criação de helpers centrais compartilhados no frontend para roteamento de hash e filtragem de direção.
 
-- [ ] T002 Implementar função `updateSidebarDirectionFilter()` em `src/web/app.js` para ocultar ou exibir `.strategy-group-wrapper` de acordo com `state.activeDirection`.
+- [x] T002 Implementar função `updateSidebarDirectionFilter()` em `src/web/app.js` para ocultar ou exibir `.strategy-group-wrapper` de acordo com `state.activeDirection`.
 - [ ] T003 Implementar helpers de mapeamento de abas e hash de URL (`getTabFromHash()`, `getHashFromTab()`) com suporte a `localStorage` em `src/web/app.js`.
 
 ---
