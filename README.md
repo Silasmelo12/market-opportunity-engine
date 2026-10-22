@@ -7,7 +7,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![TradingView](https://img.shields.io/badge/Lightweight_Charts-TradingView-131722?style=for-the-badge&logo=tradingview&logoColor=white)](https://tradingview.github.io/lightweight-charts/)
 [![Redis](https://img.shields.io/badge/Redis-Cache-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
-[![Pytest](https://img.shields.io/badge/Tests-51%20Passed-449C44?style=for-the-badge&logo=pytest&logoColor=white)](https://pytest.org/)
+[![Pytest](https://img.shields.io/badge/Tests-53%20Passed-449C44?style=for-the-badge&logo=pytest&logoColor=white)](https://pytest.org/)
 [![Theme: Dark/Light](https://img.shields.io/badge/Theme-Dark%20%7C%20Light-0284C7?style=for-the-badge)](https://github.com/)
 [![Timeframes](https://img.shields.io/badge/Timeframes-5m%20%7C%2015m%20%7C%2060m%20%7C%201d-8B5CF6?style=for-the-badge)](https://github.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
@@ -70,6 +70,12 @@ O sistema integra:
 - **Fator de Lucro (Profit Factor)**: Razão entre o somatório de lucros brutos e perdas brutas.
 - **Taxa de Acerto (Win Rate %)**: Percentual de ciclos fechados no lucro com detalhamento do total de vitórias e derrotas.
 - **Max Drawdown % & Média de Compras por Ciclo**: Avaliação profunda da resiliência patrimonial e do perfil de acumulação tática da estratégia.
+
+### 4. Suporte Robusto a Timeframe 1h / 60m & Ergonomia Contextual
+- **Execução sem Erro 400 no Timeframe de 1h (`60m` / `1h`)**:
+  - Teto de histórico configurado para 730 dias (2 anos) no `DataLoader` e normalizado nos endpoints `/api/simulate` e `/api/simulate/optimize`, eliminando recusas da API e requisições inválidas de 5 anos para velas horárias.
+- **Ocultação Contextual do Seletor de Direção**:
+  - O seletor global "Compra", "Venda" e "Ambos" permanece ativo onde define a visão dos ativos (**Radar** e **Gráfico**) e é automaticamente ocultado nas abas **Simulador** e **Playbook**, reduzindo ruído visual e alinhando a interface aos fluxos de backtest e documentação.
 
 ---
 
