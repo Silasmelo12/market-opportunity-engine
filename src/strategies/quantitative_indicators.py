@@ -17,3 +17,27 @@ import numpy as np
 import pandas as pd
 
 from .base import OHLCVSeries, SignalRecord, ReferenceLineSegment
+
+
+class QuantitativeIndicatorsEngine:
+    """
+    Engine executing quantitative technical indicator strategies.
+    """
+
+    SUPPORTED_STRATEGIES = [
+        "bollinger_close_in",
+        "keltner_squeeze",
+        "zscore_extreme",
+        "rsi_divergence",
+        "stochastic_extreme",
+        "macd_momentum",
+        "vwap_bands",
+        "mfi_extreme",
+        "volume_climax_vsa",
+        "supertrend_trailing",
+    ]
+
+    def __init__(self) -> None:
+        self.supported_strategies = list(self.SUPPORTED_STRATEGIES)
+        self.pending_signals: List[Dict[str, Any]] = []
+

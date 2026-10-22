@@ -15,7 +15,7 @@
 **Purpose**: Criação dos arquivos base e scaffolding de testes para o novo pacote de indicadores quantitativos.
 
 - [x] T001 Criar módulo base `src/strategies/quantitative_indicators.py` com importações vetorizadas (`numpy`, `pandas`) e docstrings de governança anti-lookahead.
-- [ ] T002 [P] Criar arquivo de teste unitário base `tests/unit/test_quantitative_indicators.py` com fixtures de séries sintéticas OHLCV de teste.
+- [x] T002 [P] Criar arquivo de teste unitário base `tests/unit/test_quantitative_indicators.py` com fixtures de séries sintéticas OHLCV de teste.
 
 ---
 
