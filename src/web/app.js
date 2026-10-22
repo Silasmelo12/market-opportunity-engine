@@ -1982,18 +1982,12 @@ async function runOptimizer() {
         }
       }
 
-      const buyLabelEl = document.getElementById('opt-champ-buy-label');
-      const sellLabelEl = document.getElementById('opt-champ-sell-label');
-      if (buyLabelEl) buyLabelEl.textContent = c.buy_label;
-
-      if (sellLabelEl) {
+      const titleContainer = document.getElementById('opt-champ-title-container') || (document.getElementById('opt-champ-buy-label') && document.getElementById('opt-champ-buy-label').parentElement);
+      if (titleContainer) {
         if (isDca) {
-          sellLabelEl.parentElement.innerHTML = `
-            <span class="text-emerald-400 font-semibold" id="opt-champ-buy-label">${c.buy_label}</span>
-            <span class="text-gray-400 font-normal text-xs">(Aportes Periódicos em Fundos)</span>
-          `;
+          titleContainer.innerHTML = '<span class="text-emerald-400 font-semibold" id="opt-champ-buy-label">' + c.buy_label + '</span> <span class="text-gray-400 font-normal text-xs">(Aportes Periódicos em Fundos)</span>';
         } else {
-          sellLabelEl.textContent = c.sell_label || '-';
+          titleContainer.innerHTML = '<span class="text-emerald-400 font-semibold" id="opt-champ-buy-label">' + c.buy_label + '</span> <span class="text-gray-400" id="opt-champ-arrow">-&gt;</span> <span class="text-rose-400 font-semibold" id="opt-champ-sell-label">' + (c.sell_label || '-') + '</span>';
         }
       }
 
