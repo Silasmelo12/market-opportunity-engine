@@ -45,4 +45,4 @@ description: "Tasks for feature 012: Suporte ao Otimizador Mais Lucrativa para A
 ## Phase 4: Polish & Validação Global
 
 - [X] T010 Executar a suíte de testes unitários (`python -m pytest tests/unit/ -v`) garantindo 100% de aprovação e regressão zero.
-- [ ] T011 Atualizar o `README.md` documentando o suporte ao otimizador de DCA e a ergonomia contextual no simulador.
+- [X] T011 Atualizar o `README.md` documentando o suporte ao otimizador de DCA e a ergonomia contextual no simulador.

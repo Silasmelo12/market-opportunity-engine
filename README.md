@@ -7,7 +7,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![TradingView](https://img.shields.io/badge/Lightweight_Charts-TradingView-131722?style=for-the-badge&logo=tradingview&logoColor=white)](https://tradingview.github.io/lightweight-charts/)
 [![Redis](https://img.shields.io/badge/Redis-Cache-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
-[![Pytest](https://img.shields.io/badge/Tests-53%20Passed-449C44?style=for-the-badge&logo=pytest&logoColor=white)](https://pytest.org/)
+[![Pytest](https://img.shields.io/badge/Tests-55%20Passed-449C44?style=for-the-badge&logo=pytest&logoColor=white)](https://pytest.org/)
 [![Theme: Dark/Light](https://img.shields.io/badge/Theme-Dark%20%7C%20Light-0284C7?style=for-the-badge)](https://github.com/)
 [![Timeframes](https://img.shields.io/badge/Timeframes-5m%20%7C%2015m%20%7C%2060m%20%7C%201d-8B5CF6?style=for-the-badge)](https://github.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
@@ -76,6 +76,15 @@ O sistema integra:
   - Teto de histórico configurado para 730 dias (2 anos) no `DataLoader` e normalizado nos endpoints `/api/simulate` e `/api/simulate/optimize`, eliminando recusas da API e requisições inválidas de 5 anos para velas horárias.
 - **Ocultação Contextual do Seletor de Direção**:
   - O seletor global "Compra", "Venda" e "Ambos" permanece ativo onde define a visão dos ativos (**Radar** e **Gráfico**) e é automaticamente ocultado nas abas **Simulador** e **Playbook**, reduzindo ruído visual e alinhando a interface aos fluxos de backtest e documentação.
+
+### 5. Otimizador "Mais Lucrativa" para Acumulação DCA (Fundos)
+- **Varredura Dedicada de Estratégias de Compra para DCA**:
+  - Quando o modo ativo é "Acumulação (DCA Fundos)", o botão "Mais Lucrativa" executa `optimize_dca_strategies`, avaliando individualmente cada estratégia de compra com aportes fixos periódicos ao longo de todo o histórico.
+  - Ranking ordenado por **Retorno sobre Capital Acumulado (%)** e **Patrimônio Final (R$)**, exibindo o total de aportes realizados, patrimônio final e preço médio ponderado.
+  - O card da Estratégia Campeã adapta-se semanticamente, eliminando menções a estratégias de venda, win rate de trades ou saídas parciais.
+  - A ação **"Aplicar e Simular"** sincroniza a estratégia de compra campeã no simulador com 100% de convergência nos KPIs.
+- **Ocultação Contextual do Seletor de Venda**:
+  - No modo DCA, o campo "Estratégia de Venda (Saída / Topo)" é automaticamente ocultado no formulário do simulador, tornando a interface limpa e intuitiva.
 
 ---
 
