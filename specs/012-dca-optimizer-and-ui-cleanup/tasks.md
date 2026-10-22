@@ -12,7 +12,7 @@ description: "Tasks for feature 012: Suporte ao Otimizador Mais Lucrativa para A
 
 ## Phase 1: Setup & Foundational
 
-- [ ] T001 [P] Atualizar schemas `OptimizeCombinationsRequest` e `StrategyPairRankItemModel` em `src/api/schemas.py` com suporte ao campo `simulation_mode`, `contribution_amount` e atributos enriquecidos de DCA (`total_invested`, `final_equity`, `average_buy_price`, `total_shares`).
+- [X] T001 [P] Atualizar schemas `OptimizeCombinationsRequest` e `StrategyPairRankItemModel` em `src/api/schemas.py` com suporte ao campo `simulation_mode`, `contribution_amount` e atributos enriquecidos de DCA (`total_invested`, `final_equity`, `average_buy_price`, `total_shares`).
 
 ---
 

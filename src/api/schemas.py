@@ -244,26 +244,33 @@ class StrategyPairRankItemModel(BaseModel):
     rank: int
     buy_sub_id: str
     buy_label: str
-    sell_sub_id: str
-    sell_label: str
-    closed_trades: int
-    winning_trades: int
-    win_rate_pct: float
+    sell_sub_id: Optional[str] = None
+    sell_label: Optional[str] = None
+    simulation_mode: str = "cycle_trade"
+    closed_trades: int = 0
+    winning_trades: int = 0
+    win_rate_pct: float = 0.0
     total_return_pct: float
     net_profit: float
-    max_drawdown_pct: float
-    has_open_trade: bool
+    max_drawdown_pct: float = 0.0
+    has_open_trade: bool = False
     final_equity: float
-    cycle_entry_mode: str = "multi_buy"
+    cycle_entry_mode: Optional[str] = "multi_buy"
+    total_invested: Optional[float] = None
+    average_buy_price: Optional[float] = None
+    total_shares: Optional[float] = None
+    total_contributions: Optional[int] = None
 
 
 class OptimizeCombinationsRequest(BaseModel):
     ticker: str
     interval: str = "1d"
     period: str = "2y"
+    simulation_mode: str = "cycle_trade"  # "cycle_trade" | "accumulation"
+    cycle_entry_mode: str = "multi_buy"   # "multi_buy" | "single_buy"
+    contribution_amount: float = 1000.0   # Aporte periódico para modo accumulation
     initial_capital: float = 1000.0
     min_trades: int = 2
-    cycle_entry_mode: str = "multi_buy"   # "multi_buy" | "single_buy"
     start_date: Optional[str] = None
     end_date: Optional[str] = None
     lookback_n: int = 10
@@ -274,6 +281,7 @@ class OptimizeCombinationsRequest(BaseModel):
 class OptimizeCombinationsResponse(BaseModel):
     ticker: str
     period: str
+    simulation_mode: str = "cycle_trade"
     initial_capital: float
     total_combinations_tested: int
     champion: Optional[StrategyPairRankItemModel] = None
