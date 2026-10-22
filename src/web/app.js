@@ -1209,6 +1209,102 @@ function renderRadarTable(pageOrItems) {
   });
 }
 
+// API: Load Analysis Data (/api/analyze)
+async function loadAnalysisData(forceRefresh = false) {
+  showLoading(`Analisando ${state.currentTicker} (${state.currentTimeframe})...`);
+  try {
+    const params = new URLSearchParams({
+      ticker: state.currentTicker,
+      interval: state.currentTimeframe,
+      period: state.currentPeriod,
+      lookback_n: state.lookbackN,
+      retest_m: state.retestM,
+      retest_tol: 0.005,
+      horizon_x: state.horizonX,
+      refresh: forceRefresh
+    });
+
+    const res = await fetch(`/api/analyze?${params.toString()}`);
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.detail || `HTTP ${res.status}`);
+    }
+
+    state.analysisData = await res.json();
+
+    if (state.candleSeries && state.analysisData.candles) {
+      const rawCandles = state.analysisData.candles || [];
+      const parsedCandles = [];
+      const seenTimes = new Set();
+
+      for (const c of rawCandles) {
+        if (!c || c.open == null || c.high == null || c.low == null || c.close == null) continue;
+        const o = Number(c.open);
+        const h = Number(c.high);
+        const l = Number(c.low);
+        const cl = Number(c.close);
+        if (isNaN(o) || isNaN(h) || isNaN(l) || isNaN(cl)) continue;
+
+        let timeVal;
+        if (!isNaN(c.time) && !isNaN(parseFloat(c.time)) && typeof c.time !== 'boolean') {
+          timeVal = parseInt(c.time, 10);
+        } else {
+          timeVal = String(c.time).trim();
+        }
+
+        if (!timeVal) continue;
+
+        parsedCandles.push({
+          time: timeVal,
+          open: o,
+          high: h,
+          low: l,
+          close: cl
+        });
+      }
+
+      parsedCandles.sort((a, b) => {
+        if (typeof a.time === 'number' && typeof b.time === 'number') {
+          return a.time - b.time;
+        }
+        return String(a.time).localeCompare(String(b.time));
+      });
+
+      const validCandles = [];
+      for (const candle of parsedCandles) {
+        const key = String(candle.time);
+        if (!seenTimes.has(key)) {
+          seenTimes.add(key);
+          validCandles.push(candle);
+        }
+      }
+
+      try {
+        state.candleSeries.setData(validCandles);
+        if (state.chart) {
+          state.chart.timeScale().fitContent();
+        }
+      } catch (err) {
+        console.error("Erro ao aplicar candles no Lightweight Charts:", err);
+      }
+    }
+
+    const assetTitleEl = document.getElementById('active-asset-title');
+    if (assetTitleEl) {
+      assetTitleEl.textContent = `${state.currentTicker} • ${stripCorporateSuffix(getAssetName(state.currentTicker))}`;
+    }
+    updateHeaderTimingBadge(state.analysisData.timing_status);
+    applyClientSideFiltering();
+
+  } catch (err) {
+    alert(`Erro na análise: ${err.message}`);
+  } finally {
+    hideLoading();
+  }
+}
+
+// 0ms CLIENT-SIDE FILTERING ENGINE
+
 function applyClientSideFiltering() {
   if (!state.analysisData) return;
 
