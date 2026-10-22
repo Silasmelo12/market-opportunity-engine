@@ -2861,3 +2861,138 @@ async function runPortfolioAdviseAndSimulate() {
     hideLoading();
   }
 }
+
+
+async function runPortfolioHistoricalSimulation(customList = []) {
+  const initialCap = Math.max(100, Number(state.portfolioState.availableCash) || 10000);
+  const simPayload = {
+    initial_capital: initialCap,
+    universe_category: state.portfolioState.universeCategory,
+    custom_tickers: customList,
+    interval: state.portfolioState.interval,
+    period: state.portfolioState.period,
+    max_weight_pct: state.portfolioState.maxWeightPct,
+    rebalance_band_pct: 5.0,
+    min_rotation_score_delta: 15.0,
+  };
+
+  const resSim = await fetch('/api/portfolio/simulate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(simPayload),
+  });
+
+  if (!resSim.ok) return;
+  const simData = await resSim.json();
+  state.portfolioState.lastSimulateResponse = simData;
+
+  renderPortfolioSimulationKPIs(simData.metrics || {});
+  renderPortfolioLedgerTable(simData.ledger_events || []);
+  if (typeof renderPortfolioEquityChart === 'function') {
+    renderPortfolioEquityChart(simData.curve || []);
+  }
+}
+
+function renderPortfolioSimulationKPIs(m) {
+  const elInit = document.getElementById('port-kpi-initial');
+  const elCashSub = document.getElementById('port-kpi-cash-sub');
+  const elFinal = document.getElementById('port-kpi-final');
+  const elProfitSub = document.getElementById('port-kpi-profit-sub');
+  const elRet = document.getElementById('port-kpi-return');
+  const elBenchSub = document.getElementById('port-kpi-bench-sub');
+  const elWin = document.getElementById('port-kpi-winrate');
+  const elExitsSub = document.getElementById('port-kpi-exits-sub');
+  const elPf = document.getElementById('port-kpi-pf');
+  const elRotSub = document.getElementById('port-kpi-rotations-sub');
+  const elDd = document.getElementById('port-kpi-dd');
+  const elEvSub = document.getElementById('port-kpi-events-sub');
+
+  const initCap = Number(m.initial_capital) || 0;
+  const finalEq = Number(m.final_equity) || 0;
+  const finalCash = Number(m.final_cash) || 0;
+  const netProfit = Number(m.net_profit) || 0;
+  const totRet = Number(m.total_return_pct) || 0;
+  const benchRet = Number(m.benchmark_return_pct) || 0;
+  const alpha = Number(m.alpha_vs_benchmark_pct) || 0;
+  const winRate = Number(m.win_rate_pct) || 0;
+  const pf = Number(m.profit_factor) || 0;
+  const dd = Number(m.max_drawdown_pct) || 0;
+
+  if (elInit) elInit.textContent = `R$ ${initCap.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  if (elCashSub) elCashSub.textContent = `Caixa final: R$ ${finalCash.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  if (elFinal) {
+    elFinal.textContent = `R$ ${finalEq.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    elFinal.className = `text-base sm:text-lg font-bold font-mono ${netProfit >= 0 ? 'text-fintech-green' : 'text-rose-400'}`;
+  }
+  if (elProfitSub) {
+    elProfitSub.textContent = `Lucro: ${netProfit >= 0 ? '+' : ''}R$ ${netProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+  if (elRet) {
+    elRet.textContent = `${totRet >= 0 ? '+' : ''}${totRet.toFixed(1)}%`;
+    elRet.className = `text-base sm:text-lg font-bold font-mono ${totRet >= 0 ? 'text-fintech-cyan' : 'text-rose-400'}`;
+  }
+  if (elBenchSub) {
+    elBenchSub.textContent = `B&H Cesta: ${benchRet >= 0 ? '+' : ''}${benchRet.toFixed(1)}% (Alfa: ${alpha >= 0 ? '+' : ''}${alpha.toFixed(1)}%)`;
+  }
+  if (elWin) elWin.textContent = `${winRate.toFixed(1)}%`;
+  if (elExitsSub) elExitsSub.textContent = `${m.winning_exits_count || 0}W / ${m.losing_exits_count || 0}L (${m.closed_exits_count || 0} saídas)`;
+  if (elPf) elPf.textContent = pf.toFixed(2);
+  if (elRotSub) elRotSub.textContent = `${m.rebalance_rotations_count || 0} rebalanceamentos/rotações`;
+  if (elDd) elDd.textContent = `${dd.toFixed(1)}%`;
+  if (elEvSub) elEvSub.textContent = `${m.total_events_count || 0} ordens executadas`;
+}
+
+function renderPortfolioLedgerTable(events) {
+  const tbody = document.getElementById('portfolio-ledger-tbody');
+  const countBadge = document.getElementById('portfolio-ledger-count-badge');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  if (countBadge) countBadge.textContent = `${events.length} eventos`;
+
+  if (!events || events.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="13" class="px-4 py-6 text-center text-gray-500">
+          Nenhuma operação executada no período selecionado.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  events.forEach(ev => {
+    const tr = document.createElement('tr');
+    tr.className = 'hover:bg-fintech-surface-hover';
+
+    const delta = Number(ev.shares_delta) || 0;
+    const deltaSign = delta > 0 ? '+' : '';
+    const deltaColor = delta > 0 ? 'text-emerald-400' : 'text-rose-400';
+
+    let pnlHtml = '<span class="text-gray-500">-</span>';
+    if (ev.realized_pnl_value !== null && ev.realized_pnl_value !== undefined) {
+      const pVal = Number(ev.realized_pnl_value) || 0;
+      const pPct = Number(ev.realized_pnl_pct) || 0;
+      const pClass = pVal >= 0 ? 'text-emerald-400' : 'text-rose-400';
+      const pSign = pVal >= 0 ? '+' : '';
+      pnlHtml = `<span class="font-bold ${pClass}">${pSign}R$ ${pVal.toFixed(2)} (${pSign}${pPct.toFixed(1)}%)</span>`;
+    }
+
+    tr.innerHTML = `
+      <td class="px-2.5 py-2 text-center text-gray-400 font-bold">${ev.event_id}</td>
+      <td class="px-2.5 py-2 text-gray-300">${ev.date}</td>
+      <td class="px-2.5 py-2">${getActionBadgeHtml(ev.event_type, ev.event_label)}</td>
+      <td class="px-2.5 py-2 font-bold text-white">${ev.ticker}</td>
+      <td class="px-2.5 py-2 text-cyan-300 font-sans">${ev.strategy_label}</td>
+      <td class="px-2.5 py-2 text-center text-amber-300 font-bold">${(Number(ev.potential_score) || 0).toFixed(1)}</td>
+      <td class="px-2.5 py-2 text-white">R$ ${(Number(ev.execution_price) || 0).toFixed(2)}</td>
+      <td class="px-2.5 py-2 font-bold ${deltaColor}">${deltaSign}${delta.toLocaleString('pt-BR')}</td>
+      <td class="px-2.5 py-2 text-white">R$ ${(Number(ev.trade_value) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td class="px-2.5 py-2">${pnlHtml}</td>
+      <td class="px-2.5 py-2 text-center text-gray-300">${(Number(ev.weight_before_pct) || 0).toFixed(1)}% → ${(Number(ev.weight_after_pct) || 0).toFixed(1)}%</td>
+      <td class="px-2.5 py-2 text-gray-300">R$ ${(Number(ev.cash_after) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td class="px-2.5 py-2 font-bold text-white">R$ ${(Number(ev.portfolio_equity_after) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
