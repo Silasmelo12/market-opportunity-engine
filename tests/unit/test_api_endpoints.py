@@ -152,6 +152,33 @@ def test_api_simulate_optimize():
         assert "sell_sub_id" in data["champion"]
 
 
+def test_api_simulate_optimize_accumulation():
+    payload = {
+        "ticker": "PETR4.SA",
+        "interval": "1d",
+        "period": "1y",
+        "simulation_mode": "accumulation",
+        "contribution_amount": 1000.0,
+        "initial_capital": 1000.0,
+    }
+    res = client.post("/api/simulate/optimize", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["simulation_mode"] == "accumulation"
+    assert "champion" in data
+    assert "top_combinations" in data
+    if data["champion"]:
+        c = data["champion"]
+        assert c["rank"] == 1
+        assert c["buy_sub_id"] is not None
+        assert c["sell_sub_id"] is None or c["sell_label"] == "-"
+        assert c["simulation_mode"] == "accumulation"
+        assert c["total_invested"] is not None
+        assert c["final_equity"] is not None
+        assert c["total_return_pct"] is not None
+        assert c["closed_trades"] >= 1
+
+
 def test_root_serves_spa():
     res = client.get("/")
     assert res.status_code == 200
