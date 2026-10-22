@@ -151,4 +151,15 @@ def test_supertrend_trailing_signals():
         assert sig.execution_bar_index == sig.signal_bar_index + 1
 
 
+def test_quantitative_engine_benchmark_latency():
+    import time
+    series = make_synthetic_ohlcv(500)
+    engine = QuantitativeIndicatorsEngine()
+    t0 = time.perf_counter()
+    buys, sells = engine.generate_signals(series)
+    elapsed_ms = (time.perf_counter() - t0) * 1000.0
+    assert elapsed_ms < 50.0  # Must be faster than 50ms for 500 bars
+
+
+
 
