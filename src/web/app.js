@@ -521,6 +521,16 @@ function switchTab(tabId) {
     }
   });
 
+  // Toggle Global Direction Selector visibility: only displayed in Radar and Gráfico (Terminal)
+  const dirSelector = document.getElementById('global-direction-selector');
+  if (dirSelector) {
+    if (tabId === 'tab-simulator' || tabId === 'tab-playbook') {
+      dirSelector.classList.add('hidden');
+    } else {
+      dirSelector.classList.remove('hidden');
+    }
+  }
+
   if (tabId === 'tab-terminal') {
     if (!state.analysisData) {
       loadAnalysisData();

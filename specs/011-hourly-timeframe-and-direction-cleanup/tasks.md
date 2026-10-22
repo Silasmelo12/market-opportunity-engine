@@ -34,7 +34,7 @@ description: "Tasks for feature 011: Suporte ao Timeframe 1h sem Erro 400 e Ocul
 
 **Independent Test**: Alternar entre as 4 abas e confirmar que `#global-direction-selector` é ocultado imediatamente em `tab-simulator` e `tab-playbook`, e exibido em `tab-radar` e `tab-terminal`.
 
-- [ ] T005 [US2] Atualizar a função `switchTab` em `src/web/app.js` para ocultar `#global-direction-selector` nas abas `tab-simulator` e `tab-playbook`, e exibi-lo exclusivamente em `tab-radar` e `tab-terminal`.
+- [X] T005 [US2] Atualizar a função `switchTab` em `src/web/app.js` para ocultar `#global-direction-selector` nas abas `tab-simulator` e `tab-playbook`, e exibi-lo exclusivamente em `tab-radar` e `tab-terminal`.
 
 ---
 
