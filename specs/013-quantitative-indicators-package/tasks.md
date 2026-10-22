@@ -23,7 +23,7 @@
 
 **Purpose**: Funções matemáticas contíguas reutilizadas entre as diferentes famílias de indicadores (sem look-ahead bias).
 
-- [ ] T003 Implementar helpers de cálculo contíguo vetorizado em `src/strategies/quantitative_indicators.py` para SMA, EMA, desvio padrão rolling e True Range / ATR.
+- [x] T003 Implementar helpers de cálculo contíguo vetorizado em `src/strategies/quantitative_indicators.py` para SMA, EMA, desvio padrão rolling e True Range / ATR.
 - [ ] T004 Implementar função auxiliar de conversão de arrays de sinal booleano para a lista padronizada de `SignalRecord` com preenchimento estrito em `Open[t+1]` em `src/strategies/quantitative_indicators.py`.
 
 ---
