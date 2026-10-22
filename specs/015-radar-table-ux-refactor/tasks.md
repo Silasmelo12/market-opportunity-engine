@@ -66,5 +66,5 @@
 
 **Purpose**: Verificação de integridade, testes de regressão e validação.
 
-- [ ] T012 Executar suíte de testes completa com `python -m pytest tests/ -v` garantindo 100% de aprovação (82 testes).
-- [ ] T013 Atualizar checklist de requisitos em `specs/015-radar-table-ux-refactor/checklists/requirements.md` e validar quickstart.md.
+- [x] T012 Executar suíte de testes completa com `python -m pytest tests/ -v` garantindo 100% de aprovação (82 testes).
+- [x] T013 Atualizar checklist de requisitos em `specs/015-radar-table-ux-refactor/checklists/requirements.md` e validar quickstart.md.
