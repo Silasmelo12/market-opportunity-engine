@@ -1643,15 +1643,18 @@ function setupSimulationTab() {
       const legendInfo = document.getElementById('sim-curve-legend-info');
 
       const cycleContainer = document.getElementById('sim-cycle-mode-container');
+      const sellStrategyContainer = document.getElementById('sim-sell-strategy-container');
 
       if (mode === 'cycle_trade') {
         if (cycleContainer) cycleContainer.classList.remove('hidden');
+        if (sellStrategyContainer) sellStrategyContainer.classList.remove('hidden');
         if (lblCap) lblCap.textContent = 'Capital Inicial (R$)';
         if (lblInv) lblInv.textContent = 'Capital Inicial';
         if (lblAux) lblAux.textContent = 'Win Rate / Acertos';
         if (legendInfo) legendInfo.textContent = 'Evolução de Saldo em Caixa + Posição a Mercado';
       } else {
         if (cycleContainer) cycleContainer.classList.add('hidden');
+        if (sellStrategyContainer) sellStrategyContainer.classList.add('hidden');
         if (lblCap) lblCap.textContent = 'Aporte por Sinal (R$)';
         if (lblInv) lblInv.textContent = 'Total Aportado';
         if (lblAux) lblAux.textContent = 'Alfa vs. DCA Passivo';
