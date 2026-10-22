@@ -26,6 +26,8 @@ window.appState = {
   radarTotalPages: 1,
   radarTotalAssets: 0,
   radarStrategies: new Set(),
+  radarSortField: null,
+  radarSortOrder: 'desc',
   lookbackN: 10,
   retestM: 5,
   horizonX: 60,
@@ -400,6 +402,22 @@ function getTabFromHash() {
 
 function getHashFromTab(tabId) {
   return TAB_TO_HASH_MAP[tabId] || '#radar';
+}
+
+
+function sortRadarItems(items) {
+  if (!state.radarSortField || !items || items.length === 0) return items;
+  const field = state.radarSortField;
+  const isAsc = state.radarSortOrder === 'asc';
+
+  return [...items].sort((a, b) => {
+    let valA = a[field] != null ? a[field] : (isAsc ? Infinity : -Infinity);
+    let valB = b[field] != null ? b[field] : (isAsc ? Infinity : -Infinity);
+
+    if (valA < valB) return isAsc ? -1 : 1;
+    if (valA > valB) return isAsc ? 1 : -1;
+    return 0;
+  });
 }
 
 function updateSidebarDirectionFilter() {

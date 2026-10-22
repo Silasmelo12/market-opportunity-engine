@@ -22,8 +22,8 @@
 
 **Purpose**: Adição do estado e métodos de ordenação na Single Page Application.
 
-- [ ] T002 Adicionar `radarSortField` e `radarSortOrder` ao `window.appState` em `src/web/app.js`.
-- [ ] T003 Implementar função auxiliar `sortRadarItems(items)` em `src/web/app.js` para ordenar por `historical_n` ou `historical_win_rate`.
+- [x] T002 Adicionar `radarSortField` e `radarSortOrder` ao `window.appState` em `src/web/app.js`.
+- [x] T003 Implementar função auxiliar `sortRadarItems(items)` em `src/web/app.js` para ordenar por `historical_n` ou `historical_win_rate`.
 
 ---
 
