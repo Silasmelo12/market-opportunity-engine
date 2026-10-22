@@ -111,6 +111,27 @@ def test_api_simulate():
     assert data["metrics"]["total_invested"] >= 0
 
 
+def test_api_simulate_hourly_60m():
+    payload = {
+        "ticker": "PETR4.SA",
+        "interval": "60m",
+        "period": "2y",
+        "simulation_mode": "cycle_trade",
+        "buy_strategy": "t1_open",
+        "sell_strategy": "sell_t1_open",
+        "contribution_amount": 1000.0,
+        "lookback_n": 10,
+        "retest_m": 5,
+        "retest_tol": 0.005,
+    }
+    res = client.post("/api/simulate", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert "metrics" in data
+    assert "curve" in data
+    assert data["period"] in ("2y", "730d")
+
+
 def test_api_simulate_optimize():
     payload = {
         "ticker": "PETR4.SA",

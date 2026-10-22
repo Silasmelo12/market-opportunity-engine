@@ -311,7 +311,7 @@ def analyze_asset(
     )
 
     # Format dates
-    is_intraday = interval in ("5m", "15m", "30m", "1h", "2h", "4h", "12h")
+    is_intraday = interval in ("5m", "15m", "30m", "60m", "1h", "2h", "4h", "12h")
     date_strs: List[str] = []
     ts_seconds: List[int] = []
 
@@ -910,8 +910,14 @@ def get_all_tickers():
 
 @app.post("/api/simulate", response_model=SimulateResponse)
 def simulate_accumulation_endpoint(req: SimulateRequest):
+    period_to_use = req.period
+    if req.interval in ("5m", "15m", "30m") and req.period not in ("1d", "5d", "7d", "30d", "60d"):
+        period_to_use = "60d"
+    elif req.interval in ("60m", "1h", "2h", "4h", "12h") and req.period in ("5y", "max"):
+        period_to_use = "730d"
+
     try:
-        series = DataLoader.load_asset_data(ticker=req.ticker, interval=req.interval, period=req.period, use_cache=True)
+        series = DataLoader.load_asset_data(ticker=req.ticker, interval=req.interval, period=period_to_use, use_cache=True)
     except Exception as exc:
         raise HTTPException(status_code=400, detail=f"Erro ao carregar dados para {req.ticker}: {str(exc)}")
 
@@ -1068,7 +1074,7 @@ def simulate_accumulation_endpoint(req: SimulateRequest):
 
         return SimulateResponse(
             ticker=req.ticker,
-            period=req.period,
+            period=period_to_use,
             metrics=metrics_obj,
             curve=curve_points,
             trades=trades_list,
@@ -1148,7 +1154,7 @@ def simulate_accumulation_endpoint(req: SimulateRequest):
 
     return SimulateResponse(
         ticker=req.ticker,
-        period=req.period,
+        period=period_to_use,
         metrics=metrics_obj,
         curve=curve_points,
         trades=trades_list,
@@ -1158,8 +1164,10 @@ def simulate_accumulation_endpoint(req: SimulateRequest):
 @app.post("/api/simulate/optimize", response_model=OptimizeCombinationsResponse)
 def optimize_combinations_endpoint(req: OptimizeCombinationsRequest):
     period_to_use = req.period
-    if req.interval in ("5m", "15m", "60m") and req.period not in ("1d", "5d", "7d", "30d", "60d"):
+    if req.interval in ("5m", "15m", "30m") and req.period not in ("1d", "5d", "7d", "30d", "60d"):
         period_to_use = "60d"
+    elif req.interval in ("60m", "1h", "2h", "4h", "12h") and req.period in ("5y", "max"):
+        period_to_use = "730d"
 
     try:
         series = DataLoader.load_asset_data(ticker=req.ticker, interval=req.interval, period=period_to_use, use_cache=True)
