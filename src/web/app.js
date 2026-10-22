@@ -566,7 +566,7 @@ function updateChartsTheme(theme) {
       'xaxis.linecolor': borderColor,
       'yaxis.linecolor': borderColor,
     };
-    ['plot-ranking', 'plot-scatter', 'plot-simulation-curve'].forEach(id => {
+    ['plot-ranking', 'plot-scatter', 'plot-simulation-curve', 'portfolio-equity-chart', 'portfolio-allocation-chart'].forEach(id => {
       const el = document.getElementById(id);
       if (el && el.data) {
         Plotly.relayout(el, plotlyLayoutUpdate).catch(() => {});
@@ -646,6 +646,13 @@ function switchTab(tabId, updateHash = true) {
     setTimeout(() => {
       const p3 = document.getElementById('plot-simulation-curve');
       if (p3 && window.Plotly) Plotly.Plots.resize(p3);
+    }, 60);
+  } else if (tabId === 'tab-portfolio') {
+    setTimeout(() => {
+      ['portfolio-equity-chart', 'portfolio-allocation-chart'].forEach(cid => {
+        const cEl = document.getElementById(cid);
+        if (cEl && cEl.data && window.Plotly) Plotly.Plots.resize(cEl);
+      });
     }, 60);
   }
 }
@@ -2992,6 +2999,214 @@ function renderPortfolioLedgerTable(events) {
       <td class="px-2.5 py-2 text-center text-gray-300">${(Number(ev.weight_before_pct) || 0).toFixed(1)}% → ${(Number(ev.weight_after_pct) || 0).toFixed(1)}%</td>
       <td class="px-2.5 py-2 text-gray-300">R$ ${(Number(ev.cash_after) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
       <td class="px-2.5 py-2 font-bold text-white">R$ ${(Number(ev.portfolio_equity_after) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+
+function renderPortfolioEquityChart(curve) {
+  const container = document.getElementById('portfolio-equity-chart');
+  if (!container || !window.Plotly) return;
+
+  if (!curve || curve.length === 0) {
+    Plotly.purge(container);
+    container.innerHTML = '<div class="flex items-center justify-center h-full text-xs text-gray-500 font-mono">Execute a análise/simulação para gerar a curva patrimonial.</div>';
+    return;
+  }
+  container.innerHTML = '';
+
+  const isLight = (document.documentElement.getAttribute('data-theme') || 'dark') === 'light';
+  const bgColor = isLight ? '#FFFFFF' : '#0B0E14';
+  const textColor = isLight ? '#334155' : '#8B98A5';
+  const gridColor = isLight ? 'rgba(226, 232, 240, 0.8)' : 'rgba(38, 43, 56, 0.5)';
+  const borderColor = isLight ? '#E2E8F0' : '#262B38';
+
+  const dates = curve.map(c => c.date);
+  const eqValues = curve.map(c => Number(c.portfolio_equity) || 0);
+  const benchValues = curve.map(c => Number(c.benchmark_equity) || 0);
+  const cashValues = curve.map(c => Number(c.cash_balance) || 0);
+
+  const traces = [
+    {
+      x: dates,
+      y: eqValues,
+      type: 'scatter',
+      mode: 'lines',
+      name: 'Carteira Gerenciada',
+      line: { color: '#00E676', width: 2.5 },
+      fill: 'tozeroy',
+      fillcolor: 'rgba(0, 230, 118, 0.08)',
+      hovertemplate: '<b>%{x}</b><br>Patrimônio Carteira: R$ %{y:,.2f}<extra></extra>',
+    },
+    {
+      x: dates,
+      y: benchValues,
+      type: 'scatter',
+      mode: 'lines',
+      name: 'Buy & Hold Equal-Weight',
+      line: { color: '#00E5FF', width: 1.8, dash: 'dot' },
+      hovertemplate: '<b>%{x}</b><br>Benchmark Cesta: R$ %{y:,.2f}<extra></extra>',
+    },
+    {
+      x: dates,
+      y: cashValues,
+      type: 'scatter',
+      mode: 'lines',
+      name: 'Caixa Livre',
+      line: { color: '#F59E0B', width: 1.2, dash: 'dash' },
+      hovertemplate: '<b>%{x}</b><br>Caixa Livre: R$ %{y:,.2f}<extra></extra>',
+    },
+  ];
+
+  const layout = {
+    paper_bgcolor: bgColor,
+    plot_bgcolor: bgColor,
+    font: { family: 'JetBrains Mono, monospace', size: 11, color: textColor },
+    margin: { t: 25, r: 20, b: 35, l: 65 },
+    legend: { orientation: 'h', y: 1.12, x: 0, font: { size: 10 } },
+    xaxis: {
+      gridcolor: gridColor,
+      linecolor: borderColor,
+      tickfont: { size: 10 },
+    },
+    yaxis: {
+      gridcolor: gridColor,
+      linecolor: borderColor,
+      tickprefix: 'R$ ',
+      tickfont: { size: 10 },
+    },
+    hovermode: 'x unified',
+  };
+
+  Plotly.newPlot(container, traces, layout, { responsive: true, displayModeBar: false });
+}
+
+function renderPortfolioAllocationChart(adviseData) {
+  const container = document.getElementById('portfolio-allocation-chart');
+  if (!container || !window.Plotly) return;
+
+  if (!adviseData) {
+    Plotly.purge(container);
+    container.innerHTML = '<div class="flex items-center justify-center h-full text-xs text-gray-500 font-mono">Execute a análise para visualizar os pesos por ativo.</div>';
+    return;
+  }
+  container.innerHTML = '';
+
+  const isLight = (document.documentElement.getAttribute('data-theme') || 'dark') === 'light';
+  const bgColor = isLight ? '#FFFFFF' : '#0B0E14';
+  const textColor = isLight ? '#334155' : '#8B98A5';
+  const gridColor = isLight ? 'rgba(226, 232, 240, 0.8)' : 'rgba(38, 43, 56, 0.5)';
+  const borderColor = isLight ? '#E2E8F0' : '#262B38';
+
+  const recs = (adviseData.recommendations || []).filter(r => (Number(r.current_weight_pct) > 0 || Number(r.target_weight_pct) > 0));
+  const totalEq = Math.max(1, Number(adviseData.total_portfolio_equity) || 1);
+  const currCashPct = Number(((Number(adviseData.current_cash) || 0) / totalEq * 100).toFixed(2));
+  const projCashPct = Number(((Number(adviseData.projected_cash_after) || 0) / totalEq * 100).toFixed(2));
+
+  const labels = recs.map(r => r.ticker).concat(['CAIXA']);
+  const currentWeights = recs.map(r => Number(r.current_weight_pct) || 0).concat([currCashPct]);
+  const targetWeights = recs.map(r => Number(r.target_weight_pct) || 0).concat([projCashPct]);
+
+  const traces = [
+    {
+      x: labels,
+      y: currentWeights,
+      name: 'Peso Atual (%)',
+      type: 'bar',
+      marker: { color: '#64748B' },
+      hovertemplate: '<b>%{x}</b><br>Peso Atual: %{y:.1f}%<extra></extra>',
+    },
+    {
+      x: labels,
+      y: targetWeights,
+      name: 'Peso Alvo Recomendado (%)',
+      type: 'bar',
+      marker: { color: '#00E5FF' },
+      hovertemplate: '<b>%{x}</b><br>Peso Alvo: %{y:.1f}%<extra></extra>',
+    },
+  ];
+
+  const layout = {
+    barmode: 'group',
+    paper_bgcolor: bgColor,
+    plot_bgcolor: bgColor,
+    font: { family: 'JetBrains Mono, monospace', size: 11, color: textColor },
+    margin: { t: 25, r: 15, b: 40, l: 45 },
+    legend: { orientation: 'h', y: 1.12, x: 0, font: { size: 10 } },
+    xaxis: {
+      gridcolor: gridColor,
+      linecolor: borderColor,
+      tickfont: { size: 10 },
+    },
+    yaxis: {
+      gridcolor: gridColor,
+      linecolor: borderColor,
+      ticksuffix: '%',
+      range: [0, 105],
+      tickfont: { size: 10 },
+    },
+  };
+
+  Plotly.newPlot(container, traces, layout, { responsive: true, displayModeBar: false });
+}
+
+function renderPortfolioOpportunityRanking(ranking) {
+  const tbody = document.getElementById('portfolio-ranking-tbody');
+  const countBadge = document.getElementById('portfolio-ranking-count-badge');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const list = ranking || [];
+  if (countBadge) countBadge.textContent = `${list.length} ativos avaliados`;
+
+  if (list.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="10" class="px-4 py-6 text-center text-gray-500">
+          Nenhum ativo avaliado no universo selecionado.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  list.forEach((p, idx) => {
+    const tr = document.createElement('tr');
+    tr.className = 'hover:bg-fintech-surface-hover';
+
+    const score = Number(p.potential_score) || 0;
+    const scoreBarColor = score >= 75 ? 'bg-emerald-400' : (score >= 55 ? 'bg-cyan-400' : 'bg-amber-400');
+
+    let sigBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-700/50 text-gray-400">NEUTRO</span>';
+    if (p.active_direction === 'BUY') {
+      sigBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">🟢 ZONA DE COMPRA</span>';
+    } else if (p.active_direction === 'SELL') {
+      sigBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/40">🔴 ZONA DE VENDA</span>';
+    }
+
+    const retPct = Number(p.historical_return_pct) || 0;
+    const retColor = retPct >= 0 ? 'text-emerald-400' : 'text-rose-400';
+
+    tr.innerHTML = `
+      <td class="px-3 py-2 text-center font-bold text-gray-400">#${idx + 1}</td>
+      <td class="px-3 py-2">
+        <span class="font-bold text-white">${stripCorporateSuffix(p.asset_name || p.ticker)}</span>
+        <span class="text-[10px] text-gray-400 ml-1">(${p.ticker})</span>
+      </td>
+      <td class="px-3 py-2 text-cyan-300 font-sans">${p.champion_buy_label}</td>
+      <td class="px-3 py-2 text-amber-300 font-sans">${p.champion_sell_label}</td>
+      <td class="px-3 py-2 text-center">
+        <div class="font-bold text-white">${score.toFixed(1)}</div>
+        <div class="w-16 h-1.5 bg-gray-800 rounded overflow-hidden mx-auto mt-0.5">
+          <div class="h-full ${scoreBarColor}" style="width: ${Math.min(100, Math.max(0, score))}%"></div>
+        </div>
+      </td>
+      <td class="px-3 py-2 text-center">${sigBadge}</td>
+      <td class="px-3 py-2 text-center text-gray-300">${p.timing_label || p.timing_category} (${(Number(p.distance_pct) || 0).toFixed(1)}%)</td>
+      <td class="px-3 py-2 text-center font-bold text-emerald-400">${(Number(p.win_rate_pct) || 0).toFixed(1)}%</td>
+      <td class="px-3 py-2 text-center font-bold ${retColor}">${retPct >= 0 ? '+' : ''}${retPct.toFixed(1)}%</td>
+      <td class="px-3 py-2 text-center text-rose-400">${(Number(p.max_drawdown_pct) || 0).toFixed(1)}%</td>
     `;
     tbody.appendChild(tr);
   });
