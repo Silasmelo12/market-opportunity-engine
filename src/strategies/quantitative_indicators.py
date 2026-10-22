@@ -729,3 +729,43 @@ class QuantitativeIndicatorsEngine:
         self.pending_signals.extend(buy_pending + sell_pending)
         return buy_records, sell_records
 
+
+    def generate_signals(
+        self,
+        series: OHLCVSeries,
+        strategy_id: Optional[str] = None,
+    ) -> Tuple[List[SignalRecord], List[SignalRecord]]:
+        """
+        Routes to specific strategy or runs all 10 quantitative indicators.
+        Returns (buy_signals, sell_signals).
+        """
+        self.pending_signals.clear()
+        
+        methods = {
+            "bollinger_close_in": self.generate_bollinger_close_in,
+            "keltner_squeeze": self.generate_keltner_squeeze,
+            "zscore_extreme": self.generate_zscore_extreme,
+            "rsi_divergence": self.generate_rsi_divergence,
+            "stochastic_extreme": self.generate_stochastic_extreme,
+            "macd_momentum": self.generate_macd_momentum,
+            "vwap_bands": self.generate_vwap_bands,
+            "mfi_extreme": self.generate_mfi_extreme,
+            "volume_climax_vsa": self.generate_volume_climax_vsa,
+            "supertrend_trailing": self.generate_supertrend_trailing,
+        }
+
+        if strategy_id:
+            fn = methods.get(strategy_id)
+            if fn:
+                return fn(series)
+            return [], []
+
+        all_buys: List[SignalRecord] = []
+        all_sells: List[SignalRecord] = []
+        for fn in methods.values():
+            buys, sells = fn(series)
+            all_buys.extend(buys)
+            all_sells.extend(sells)
+
+        return all_buys, all_sells
+
