@@ -3,6 +3,7 @@ Data fetching layer with local Parquet cache, intraday ceiling rules, and yfinan
 """
 
 import os
+import time
 from pathlib import Path
 from typing import Optional
 import pandas as pd

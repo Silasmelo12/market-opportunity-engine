@@ -278,3 +278,48 @@ def test_simulate_portfolio_multi_asset_zero_lookahead_and_cash_conservation():
         assert e_tr.shares_delta == e_fl.shares_delta
         assert e_tr.execution_price == e_fl.execution_price
         assert e_tr.cash_after == e_fl.cash_after
+
+
+def test_simulate_portfolio_desired_val_proportional_and_alpha():
+    from src.evaluator.portfolio_simulator import simulate_portfolio_multi_asset
+
+    # Two assets with simultaneous BUY signal at bar 5
+    s_a = _make_mock_series("PETR4.SA", n_bars=40, base_price=30.0)
+    s_b = _make_mock_series("VALE3.SA", n_bars=40, base_price=50.0)
+
+    sigs_a = [
+        SignalRecord("prop", "t1_open", 4, 5, 30.0, 29.5, direction="BUY"),
+    ]
+    sigs_b = [
+        SignalRecord("prop", "t1_open", 4, 5, 50.0, 49.5, direction="BUY"),
+    ]
+
+    bundles = [
+        {"ticker": "PETR4.SA", "asset_name": "Petrobras", "series": s_a, "signals": sigs_a},
+        {"ticker": "VALE3.SA", "asset_name": "Vale", "series": s_b, "signals": sigs_b},
+    ]
+
+    # Initial cash 10,000, max_weight 50% (room_val = 5,000 each)
+    # Both candidates present: cash_pool=10,000. With equal or proportional scores,
+    # desired_val = min(cash_pool * w_prop, room_val) ensures desired_val respects proportionality
+    # and doesn't collapse to room_val if cash_pool * w_prop < room_val.
+    res = simulate_portfolio_multi_asset(
+        asset_bundles=bundles,
+        initial_capital=10000.0,
+        max_weight_pct=50.0,
+        rebalance_band_pct=5.0,
+    )
+
+    # Check alpha metric consistency: alpha_vs_benchmark_pct must equal tot_ret - bench_ret
+    expected_alpha = round(res.total_return_pct - res.benchmark_return_pct, 2)
+    assert res.alpha_vs_benchmark_pct == expected_alpha
+
+    # Verify BUY events were generated and allocation respected max weight and cash bounds
+    buy_events = [e for e in res.ledger_events if e.event_type == "BUY"]
+    assert len(buy_events) == 2
+    for be in buy_events:
+        # Initial cash was 10k, so at buy bar max_cap_val was 5000. Each trade value must not exceed 5000.
+        assert be.trade_value <= 5000.0 + 1e-2
+        assert be.cash_after >= 0.0
+
+

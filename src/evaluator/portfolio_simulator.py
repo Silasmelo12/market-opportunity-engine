@@ -172,7 +172,7 @@ class PortfolioSimulationResult:
     net_profit: float
     total_return_pct: float
     benchmark_return_pct: float
-    alpha_vs_benchmark_pct: float
+    alpha_vs_benchmark_pct: float  # Arithmetic excess return over benchmark: round(total_return_pct - benchmark_return_pct, 2)
     max_drawdown_pct: float
     win_rate_pct: float
     profit_factor: float
@@ -1256,7 +1256,7 @@ def simulate_portfolio_multi_asset(
                     continue
 
                 w_prop = max(1.0, c_score) / score_sum if score_sum > 0 else (1.0 / len(buy_candidates_today))
-                desired_val = max(cash_pool * w_prop, room_val)
+                desired_val = min(cash_pool * w_prop, room_val)
                 alloc_val = min(cash, room_val, desired_val)
                 buy_sh = round_shares_for_ticker(t_code, alloc_val / p_buy, mode="floor")
                 if buy_sh <= 0.0:
@@ -1345,6 +1345,7 @@ def simulate_portfolio_multi_asset(
     net_profit = round(final_eq - init_cap, 2)
     tot_ret_pct = round(((final_eq / init_cap) - 1.0) * 100.0, 2) if init_cap > 0 else 0.0
     bench_ret_pct = round(((final_bench / init_cap) - 1.0) * 100.0, 2) if init_cap > 0 else 0.0
+    # Arithmetic excess return over benchmark (alpha): (total_return_pct - benchmark_return_pct)
     alpha_pct = round(tot_ret_pct - bench_ret_pct, 2)
     win_rate = round((winning_exits / closed_exits) * 100.0, 2) if closed_exits > 0 else 0.0
     if gross_loss_sum > 0:

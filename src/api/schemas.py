@@ -416,7 +416,10 @@ class PortfolioSimulationMetricsModel(BaseModel):
     net_profit: float
     total_return_pct: float
     benchmark_return_pct: float
-    alpha_vs_benchmark_pct: float
+    alpha_vs_benchmark_pct: float = Field(
+        ...,
+        description="Arithmetic excess return over benchmark percentage (total_return_pct - benchmark_return_pct)"
+    )
     max_drawdown_pct: float
     win_rate_pct: float
     profit_factor: float
@@ -449,3 +452,60 @@ class PortfolioSimulateResponse(BaseModel):
     curve: List[PortfolioCurvePointModel] = []
     ledger_events: List[PortfolioLedgerEventModel] = []
     opportunity_ranking: List[AssetOpportunityProfileModel] = []
+
+
+class PortfolioQuotesRequest(BaseModel):
+    tickers: List[str]
+
+
+class QuoteItem(BaseModel):
+    ticker: str
+    price: float
+    change_pct: float
+    time: Optional[str] = None
+
+
+class PortfolioQuotesResponse(BaseModel):
+    quotes: Dict[str, QuoteItem]
+
+
+# 9. Models for B3 Spreadsheet Integration
+
+class B3MovementRecord(BaseModel):
+    data: str
+    entrada_saida: str  # "Credito" | "Debito"
+    tipo: str           # "Compra", "Venda", "Rendimento", etc.
+    ticker_raw: str
+    ticker_clean: str   # Ex: "PETR4"
+    ticker_sa: str      # Ex: "PETR4.SA"
+    quantidade: float
+    preco_unitario: float
+    valor_operacao: float
+    instituicao: Optional[str] = None
+
+
+class B3Holding(BaseModel):
+    ticker: str              # "PETR4.SA"
+    ticker_clean: str        # "PETR4"
+    shares: float            # Cotas em custódia líquida
+    average_buy_price: float # Preço Médio ponderado contábil (R$)
+    total_invested: float    # shares * average_buy_price
+    asset_class: str         # "Ações Brasil", "FIIs", "BDRs", "Outros"
+
+
+class B3MonthlyIncome(BaseModel):
+    month_year: str          # "YYYY-MM"
+    dividendos: float
+    jcp: float
+    rendimentos: float
+    total: float
+
+
+class B3ParseResult(BaseModel):
+    filename: str
+    total_movements: int
+    holdings: List[B3Holding]
+    total_invested: float
+    total_income: float
+    monthly_income: List[B3MonthlyIncome]
+

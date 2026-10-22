@@ -45,7 +45,7 @@
             
           </div>
           <div>
-            <h1 class="text-xs sm:text-sm font-bold tracking-wide text-white uppercase flex items-center gap-1.5 sm:gap-2">
+            <h1 class="text-base sm:text-xl font-extrabold tracking-wider text-white uppercase flex items-center gap-1.5 sm:gap-2">
               <span>Market Engine</span>
             </h1>
           </div>
@@ -53,14 +53,14 @@
 
         <!-- Quick Status Badge, Theme Toggle & Refresh -->
         <div class="flex items-center space-x-2 lg:order-last">
-          <div id="header-status-badge" class="hidden items-center gap-1 px-2 py-0.5 rounded text-[10px] sm:text-xs font-semibold font-mono">
+          <div id="header-status-badge" class="hidden items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold font-mono">
             <!-- Rendered dynamically -->
           </div>
-          <button id="btn-theme-toggle" title="Alternar Tema Claro / Escuro" class="bg-fintech-border hover:bg-gray-700 text-[11px] sm:text-xs text-gray-200 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded transition flex items-center gap-1.5 shrink-0 cursor-pointer">
+          <button id="btn-theme-toggle" title="Alternar Tema Claro / Escuro" class="bg-fintech-border hover:bg-gray-700 text-xs text-gray-200 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded transition flex items-center gap-1.5 shrink-0 cursor-pointer">
             <span id="theme-toggle-icon">🌙</span>
             <span id="theme-toggle-text" class="hidden sm:inline">Escuro</span>
           </button>
-          <button id="btn-refresh-data" class="bg-fintech-border hover:bg-gray-700 text-[11px] sm:text-xs text-gray-200 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded transition flex items-center gap-1 shrink-0">
+          <button id="btn-refresh-data" class="bg-fintech-border hover:bg-gray-700 text-xs text-gray-200 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded transition flex items-center gap-1 shrink-0">
             <span>🔄</span> <span class="hidden sm:inline">Atualizar</span>
           </button>
         </div>
@@ -79,22 +79,25 @@
         </button>
       </div>
 
-      <!-- 4 Main Navigation Tabs (Touch-scrollable on mobile) -->
+      <!-- Main Navigation Tabs (Touch-scrollable on mobile) -->
       <nav class="flex items-center space-x-1 overflow-x-auto no-scrollbar touch-scroll border-t border-fintech-border/40 pt-1 lg:border-t-0 lg:pt-0" id="main-nav-tabs">
-        <button class="nav-tab-btn active" data-tab="tab-radar">
-          <span></span>Radar
+        <button class="nav-tab-btn active" data-tab="tab-overview">
+          <span>Visão Geral</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-radar">
+          <span>Radar</span>
         </button>
         <button class="nav-tab-btn" data-tab="tab-terminal">
-          <span></span>Gráfico
+          <span>Gráfico</span>
         </button>
         <button class="nav-tab-btn" data-tab="tab-simulator">
-          <span></span>Simulador
+          <span>Simulador</span>
         </button>
         <button class="nav-tab-btn" data-tab="tab-portfolio">
-          <span></span>Carteira
+          <span>Carteira</span>
         </button>
         <button class="nav-tab-btn" data-tab="tab-playbook">
-          <span></span>Playbook
+          <span>Playbook</span>
         </button>
       </nav>
 
@@ -111,10 +114,387 @@
     </div>
 
     <!-- ========================================== -->
+    <!-- TAB 0: VISÃO GERAL / EXECUTIVO (INVESTIDOR10 STYLE) -->
+    <!-- ========================================== -->
+    <section id="tab-overview" class="tab-view h-full p-2.5 sm:p-5 overflow-y-auto">
+      <div class="max-w-7xl mx-auto space-y-4 sm:space-y-5">
+        
+        <!-- Sub-Header com Abas de Navegação Estilo Investidor10 -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-fintech-border/80 pb-2">
+          <h2 class="text-lg font-bold text-white sr-only">Visao Geral e Alocacao da Carteira</h2>
+          <div class="flex items-center space-x-1 sm:space-x-2 overflow-x-auto no-scrollbar touch-scroll" id="overview-sub-nav">
+            <button class="overview-sub-btn active px-3 py-1.5 rounded-md text-xs font-bold text-white bg-fintech-surface border border-fintech-border shadow-sm" data-sub="resumo">
+              <span>Resumo</span>
+            </button>
+            <button class="overview-sub-btn px-3 py-1.5 rounded-md text-xs font-semibold text-gray-400 hover:text-white hover:bg-fintech-surface/60 transition" data-sub="posicoes">
+              <span>Posições</span>
+            </button>
+            <button class="overview-sub-btn px-3 py-1.5 rounded-md text-xs font-semibold text-gray-400 hover:text-white hover:bg-fintech-surface/60 transition" data-sub="patrimonio">
+              <span>Patrimônio</span>
+            </button>
+            <button class="overview-sub-btn px-3 py-1.5 rounded-md text-xs font-semibold text-gray-400 hover:text-white hover:bg-fintech-surface/60 transition" data-sub="metas">
+              <span>Metas</span>
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button id="btn-overview-open-metas" class="bg-fintech-surface hover:bg-fintech-surface-hover text-xs font-semibold text-cyan-300 hover:text-white px-3 py-1.5 rounded border border-fintech-border transition flex items-center gap-1.5 cursor-pointer" title="Definir Metas e Objetivos Financeiros de Longo Prazo">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+              <span>Definir Metas</span>
+            </button>
+            <button id="btn-overview-config-ideal" class="bg-fintech-surface hover:bg-fintech-surface-hover text-xs font-semibold text-gray-200 px-3 py-1.5 rounded border border-fintech-border transition flex items-center gap-1.5">
+              <span class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Configurar % Ideal</span>
+            </button>
+            <button id="btn-overview-sync-b3" class="bg-cyan-600 hover:bg-cyan-500 text-xs font-bold text-white px-3 py-1.5 rounded shadow transition flex items-center gap-1.5" title="Sincronizar dados automaticamente com a planilha oficial em B3/">
+              <span>🔄 Sincronizar B3</span>
+            </button>
+            <button id="btn-overview-import-csv" class="bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white px-3 py-1.5 rounded shadow transition flex items-center gap-1.5" title="Importar planilha B3 (.xlsx) ou arquivo .csv">
+              <span>+ Importar B3 / CSV</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 1. Hero KPI Cards (Layout Investidor10 5 Colunas com Proventos da B3) -->
+        <div id="overview-section-kpis" class="overview-panel">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          
+          <!-- Card 1: Patrimônio Total -->
+          <div class="card-surface p-4 flex flex-col justify-between">
+            <div class="flex items-center justify-between text-gray-400 text-xs">
+              <span class="flex items-center gap-1.5 font-medium">
+                <span class="text-base">💼</span> Patrimônio total
+              </span>
+              <span id="overview-card1-var" class="text-emerald-400 font-bold font-mono text-[11px] bg-emerald-500/10 px-1.5 py-0.5 rounded">+0.0% ▲</span>
+            </div>
+            <div class="mt-2">
+              <span id="overview-total-equity" class="text-2xl sm:text-3xl font-extrabold font-mono text-white tracking-tight">R$ 0,00</span>
+            </div>
+            <div class="mt-2 text-xs text-gray-400 border-t border-fintech-border/40 pt-1.5 flex justify-between">
+              <span>Valor investido:</span>
+              <span id="overview-invested-val" class="font-bold font-mono text-gray-300">R$ 0,00</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Lucro Total & Destaques -->
+          <div class="card-surface p-4 flex flex-col justify-between">
+            <div class="flex items-center justify-between text-gray-400 text-xs">
+              <span class="flex items-center gap-1.5 font-medium">
+                <span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span> Destaques da Carteira
+              </span>
+              <span class="text-[10px] text-gray-500 font-mono">Performance</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 mt-2">
+              <div>
+                <span class="text-[10px] text-gray-400 block">Melhor ativo</span>
+                <span id="overview-best-asset" class="font-bold font-mono text-white text-sm block">--</span>
+                <span id="overview-best-pct" class="text-[10px] font-bold font-mono text-emerald-400 bg-emerald-500/10 px-1 rounded inline-block mt-0.5">-- ↗</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-gray-400 block">Pior ativo</span>
+                <span id="overview-worst-asset" class="font-bold font-mono text-white text-sm block">--</span>
+                <span id="overview-worst-pct" class="text-[10px] font-bold font-mono text-rose-400 bg-rose-500/10 px-1 rounded inline-block mt-0.5">-- ↘</span>
+              </div>
+            </div>
+            <div class="mt-2 text-xs text-gray-400 border-t border-fintech-border/40 pt-1.5 flex justify-between">
+              <span>Lucro estimado:</span>
+              <span id="overview-total-profit" class="font-bold font-mono text-emerald-400">R$ 0,00</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Proventos Recebidos (B3) -->
+          <div class="card-surface p-4 flex flex-col justify-between">
+            <div class="flex items-center justify-between text-gray-400 text-xs">
+              <span class="flex items-center gap-1.5 font-medium">
+                <span class="text-base">💰</span> Proventos Recebidos
+              </span>
+              <span class="text-[10px] text-amber-400 font-mono bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/30">B3 Oficial</span>
+            </div>
+            <div class="mt-2">
+              <span id="overview-total-income" class="text-2xl sm:text-3xl font-extrabold font-mono text-amber-300 tracking-tight">R$ 0,00</span>
+            </div>
+            <div class="mt-2 text-xs text-gray-400 border-t border-fintech-border/40 pt-1.5 flex justify-between">
+              <span>Último mês:</span>
+              <span id="overview-latest-income-val" class="font-bold font-mono text-gray-300">R$ 0,00</span>
+            </div>
+          </div>
+
+          <!-- Card 4: Posições no Lucro (Barra Verde/Rosa) -->
+          <div class="card-surface p-4 flex flex-col justify-between">
+            <div class="flex items-center justify-between text-gray-400 text-xs">
+              <span class="flex items-center gap-1.5 font-medium">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span> Posições no Lucro
+              </span>
+              <span id="overview-profit-ratio-badge" class="bg-cyan-500/20 text-cyan-300 text-[10px] px-1.5 py-0.5 rounded font-bold font-mono">0%</span>
+            </div>
+            <div class="mt-2">
+              <div class="flex items-baseline gap-1.5">
+                <span id="overview-profit-ratio-text" class="text-xl sm:text-2xl font-bold font-mono text-white">0 de 0</span>
+                <span class="text-xs text-gray-400">ativos</span>
+              </div>
+              <!-- Barra Bi-Color de Posições -->
+              <div class="w-full h-2.5 bg-rose-500/40 rounded-full overflow-hidden mt-1.5 flex">
+                <div id="overview-profit-bar" class="h-full bg-emerald-400 transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="mt-2 text-[11px] text-gray-400 border-t border-fintech-border/40 pt-1.5 flex justify-between">
+              <span class="text-emerald-400 font-bold" id="overview-gainers-count">0 no lucro ▲</span>
+              <span class="text-rose-400 font-bold" id="overview-losers-count">0 no prejuízo ▼</span>
+            </div>
+          </div>
+
+          <!-- Card 5: Oportunidades de Compra Hoje -->
+          <div class="card-surface p-4 flex flex-col justify-between">
+            <div class="flex items-center justify-between text-gray-400 text-xs">
+              <span class="flex items-center gap-1.5 font-medium">
+                <span class="w-2 h-2 rounded-full bg-purple-400 inline-block"></span> Oportunidades de Compra
+              </span>
+              <span class="text-[10px] text-gray-500 font-mono">Radar Quant</span>
+            </div>
+            <div class="mt-2 flex items-baseline justify-between">
+              <span id="overview-buy-ops-count" class="text-2xl sm:text-3xl font-extrabold font-mono text-emerald-400">0 ativos</span>
+            </div>
+            <div class="mt-2 pt-1.5 border-t border-fintech-border/40">
+              <button id="btn-overview-goto-radar" class="w-full py-1 text-xs font-bold text-center text-cyan-300 hover:text-white bg-fintech-bg hover:bg-fintech-surface-hover border border-fintech-border rounded transition flex items-center justify-center gap-1">
+                Ver oportunidades no Radar →
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        </div>
+
+
+        <!-- 2. Gráficos Centrais (Evolução do Patrimônio + Ativos na Carteira) -->
+        <div id="overview-section-charts" class="overview-panel">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          
+          <!-- Lado Esquerdo: Evolução do Patrimônio (Barras Empilhadas) -->
+          <div class="lg:col-span-7 card-surface p-4 flex flex-col justify-between">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-fintech-border pb-3 mb-2">
+              <div>
+                <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
+                  Evolução do Patrimônio
+                  <span class="text-[10px] font-mono font-normal text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/30" title="A projeção histórica utiliza a rentabilidade dos ativos para estimar a trajetória temporal recente.">Estimado</span>
+                </h3>
+                <div class="flex items-center gap-3 text-[11px] text-gray-400 mt-1">
+                  <span class="flex items-center gap-1">
+                    <span class="w-2.5 h-2.5 rounded-sm bg-emerald-600 inline-block"></span> Valor aplicado
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <span class="w-2.5 h-2.5 rounded-sm bg-emerald-400 inline-block"></span> Ganho de capital
+                  </span>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <select id="overview-period-select" class="bg-fintech-bg border border-fintech-border rounded px-2 py-1 text-xs text-white font-sans focus:outline-none focus:border-cyan-400">
+                  <option value="12m" selected>Últimos 12 Meses</option>
+                  <option value="all">Desde o Início</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="overview-stacked-bar-chart" class="w-full h-64 min-h-[260px]"></div>
+          </div>
+
+          <!-- Lado Direito: Ativos na Carteira (Donut + Legenda Limpa) -->
+          <div class="lg:col-span-5 card-surface p-4 flex flex-col justify-between">
+            <div class="flex items-center justify-between border-b border-fintech-border pb-3 mb-2">
+              <h3 class="text-sm font-bold text-white">Ativos na Carteira (Alocação)</h3>
+              <span class="text-xs text-gray-400 font-mono" id="overview-class-count-badge">4 Classes</span>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
+              <div class="sm:col-span-7">
+                <div id="overview-donut-chart" class="w-full h-56 min-h-[220px]"></div>
+              </div>
+              <div class="sm:col-span-5 space-y-1.5 text-xs font-mono" id="overview-donut-legend">
+                <!-- Legenda gerada dinamicamente com percentuais -->
+                <div class="flex items-center justify-between text-gray-300">
+                  <span class="flex items-center gap-1 text-[11px] font-sans"><span class="w-2 h-2 rounded-full bg-cyan-400"></span> Ações</span>
+                  <span class="font-bold" id="leg-pct-acoes">0%</span>
+                </div>
+                <div class="flex items-center justify-between text-gray-300">
+                  <span class="flex items-center gap-1 text-[11px] font-sans"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> BDRs</span>
+                  <span class="font-bold" id="leg-pct-bdrs">0%</span>
+                </div>
+                <div class="flex items-center justify-between text-gray-300">
+                  <span class="flex items-center gap-1 text-[11px] font-sans"><span class="w-2 h-2 rounded-full bg-amber-400"></span> FIIs</span>
+                  <span class="font-bold" id="leg-pct-fiis">0%</span>
+                </div>
+                <div class="flex items-center justify-between text-gray-300">
+                  <span class="flex items-center gap-1 text-[11px] font-sans"><span class="w-2 h-2 rounded-full bg-purple-400"></span> Macro/Ouro</span>
+                  <span class="font-bold" id="leg-pct-macro">0%</span>
+                </div>
+                <div class="flex items-center justify-between text-gray-400 border-t border-fintech-border/40 pt-1">
+                  <span class="flex items-center gap-1 text-[11px] font-sans"><span class="w-2 h-2 rounded-full bg-gray-500"></span> Caixa Livre</span>
+                  <span class="font-bold" id="leg-pct-cash">0%</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-2 pt-2 border-t border-fintech-border/40 text-[11px] text-gray-400 flex justify-between">
+              <span>Maior concentração:</span>
+              <span id="overview-top-asset-label" class="font-bold font-mono text-white">--</span>
+            </div>
+          </div>
+
+        </div>
+
+        </div>
+
+        <!-- 3. Seção "Meus Ativos" Agrupada por Categoria com Accordions (Investidor10 Style) -->
+        <div id="overview-section-posicoes" class="overview-panel">
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <span>Meus Ativos na Carteira</span>
+              <span id="overview-total-assets-badge" class="text-xs bg-fintech-surface px-2 py-0.5 rounded text-gray-400 font-mono">0 ativos</span>
+            </h3>
+            <div class="text-xs text-gray-400 font-mono">
+              Status de Rebalanceamento & Aporte
+            </div>
+          </div>
+
+          <!-- Container de Categorias Expansíveis (Ações, BDRs, FIIs, Ouro) -->
+          <div id="overview-categories-accordions" class="space-y-3">
+            <!-- Gerado via JavaScript agrupando a carteira -->
+          </div>
+        </div>
+
+        </div>
+
+        <!-- 4. Metas da Carteira em Andamento (Investidor10 Style) -->
+        <div id="overview-section-metas" class="overview-panel">
+          <div class="card-surface p-4 space-y-4">
+        <div class="card-surface p-4 space-y-4">
+          <div class="flex items-center justify-between border-b border-fintech-border pb-2">
+            <div>
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <span>Metas Financeiras em Andamento</span>
+              </h3>
+              <span class="text-[10px] text-gray-400 font-mono">Plano de Longo Prazo</span>
+            </div>
+            <button id="btn-edit-metas" class="bg-fintech-surface hover:bg-fintech-surface-hover text-xs text-cyan-300 hover:text-white px-2.5 py-1 rounded border border-fintech-border transition flex items-center gap-1.5 cursor-pointer">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+              <span>Ajustar Metas</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Meta 1: Patrimônio Total -->
+            <div class="bg-fintech-bg p-3.5 rounded border border-fintech-border space-y-2">
+              <div class="flex justify-between items-center text-xs">
+                <span class="font-semibold text-gray-200">Total de Patrimônio</span>
+                <span class="font-mono text-cyan-400 font-bold" id="meta-patrimonio-pct">0.0%</span>
+              </div>
+              <div class="w-full h-2.5 bg-fintech-surface rounded-full overflow-hidden">
+                <div id="meta-patrimonio-bar" class="h-full bg-cyan-400 transition-all duration-500" style="width: 0%"></div>
+              </div>
+              <div class="grid grid-cols-4 gap-1 text-[10px] text-gray-400 pt-1 font-mono">
+                <div>
+                  <span class="block text-gray-500">Atual:</span>
+                  <span id="meta-patrimonio-atual" class="font-bold text-white">R$ 0</span>
+                </div>
+                <div>
+                  <span class="block text-gray-500">Faltam:</span>
+                  <span id="meta-patrimonio-faltam" class="font-bold text-amber-300">R$ 0</span>
+                </div>
+                <div>
+                  <span class="block text-gray-500">Objetivo:</span>
+                  <span class="font-bold text-white">R$ 100K</span>
+                </div>
+                <div class="text-right">
+                  <span class="block text-gray-500">Previsão:</span>
+                  <span class="font-bold text-emerald-400">2027</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Meta 2: Proventos Mensais ou Reserva -->
+            <div class="bg-fintech-bg p-3.5 rounded border border-fintech-border space-y-2">
+              <div class="flex justify-between items-center text-xs">
+                <span class="font-semibold text-gray-200">Meta de Alocação em Renda Passiva (FIIs + Dividendos)</span>
+                <span class="font-mono text-emerald-400 font-bold" id="meta-renda-pct">0.0%</span>
+              </div>
+              <div class="w-full h-2.5 bg-fintech-surface rounded-full overflow-hidden">
+                <div id="meta-renda-bar" class="h-full bg-emerald-400 transition-all duration-500" style="width: 0%"></div>
+              </div>
+              <div class="grid grid-cols-4 gap-1 text-[10px] text-gray-400 pt-1 font-mono">
+                <div>
+                  <span class="block text-gray-500">Atual:</span>
+                  <span id="meta-renda-atual" class="font-bold text-white">R$ 0</span>
+                </div>
+                <div>
+                  <span class="block text-gray-500">Faltam:</span>
+                  <span id="meta-renda-faltam" class="font-bold text-amber-300">R$ 0</span>
+                </div>
+                <div>
+                  <span class="block text-gray-500">Objetivo:</span>
+                  <span class="font-bold text-white">R$ 30K</span>
+                </div>
+                <div class="text-right">
+                  <span class="block text-gray-500">Alocação:</span>
+                  <span class="font-bold text-cyan-300">30%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 1: RADAR DE MERCADO                   -->
+    <!-- ========================================== -->
+
+    <!-- ========================================== -->
     <!-- TAB 1: RADAR DE MERCADO                   -->
     <!-- ========================================== -->
     <section id="tab-radar" class="tab-view h-full p-2.5 sm:p-4 overflow-y-auto">
       <div class="max-w-7xl mx-auto space-y-3 sm:space-y-4">
+
+        <!-- Executive Command Deck / Macro KPI Summary -->
+        <div id="radar-executive-deck" class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
+          <div class="card-surface p-3 sm:p-3.5 flex flex-col justify-between border-l-2 border-l-emerald-500">
+            <span class="text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider">Oportunidades em Compra</span>
+            <div class="flex items-baseline justify-between mt-1">
+              <span id="exec-kpi-buys" class="text-lg sm:text-2xl font-bold font-mono text-emerald-400">--</span>
+              <span class="text-[10px] text-gray-500 font-mono">Setup Ideal</span>
+            </div>
+            <div class="text-[10px] text-gray-400 mt-0.5 truncate" id="exec-kpi-buys-sub">Varrendo universo</div>
+          </div>
+
+          <div class="card-surface p-3 sm:p-3.5 flex flex-col justify-between border-l-2 border-l-rose-500">
+            <span class="text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider">Topos em Alerta (Venda)</span>
+            <div class="flex items-baseline justify-between mt-1">
+              <span id="exec-kpi-sells" class="text-lg sm:text-2xl font-bold font-mono text-rose-400">--</span>
+              <span class="text-[10px] text-gray-500 font-mono">Exaustão</span>
+            </div>
+            <div class="text-[10px] text-gray-400 mt-0.5 truncate" id="exec-kpi-sells-sub">Risco de reversão</div>
+          </div>
+
+          <div class="card-surface p-3 sm:p-3.5 flex flex-col justify-between border-l-2 border-l-cyan-500">
+            <span class="text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider">Maior Assimetria Hoje</span>
+            <div class="flex items-baseline justify-between mt-1">
+              <span id="exec-kpi-top-asset" class="text-base sm:text-xl font-bold font-mono text-cyan-300 truncate">--</span>
+              <span id="exec-kpi-top-score" class="text-[10px] font-mono font-bold text-emerald-400">--</span>
+            </div>
+            <div class="text-[10px] text-gray-400 mt-0.5 truncate" id="exec-kpi-top-strat">Estratégia campeã</div>
+          </div>
+
+          <div class="card-surface p-3 sm:p-3.5 flex flex-col justify-between border-l-2 border-l-amber-500">
+            <span class="text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider">Regime do Mercado</span>
+            <div class="flex items-baseline justify-between mt-1">
+              <span id="exec-kpi-market-regime" class="text-base sm:text-xl font-bold text-amber-300 truncate">Equilibrado</span>
+              <span class="text-[10px] font-mono text-gray-400" id="exec-kpi-scan-time">--</span>
+            </div>
+            <div class="text-[10px] text-gray-400 mt-0.5 truncate">Filtro Global Ativo</div>
+          </div>
+        </div>
+
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
           <div>
             <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
@@ -137,7 +517,7 @@
               <button id="btn-radar-strat-toggle" class="bg-fintech-surface hover:bg-fintech-surface-hover text-gray-300 hover:text-white text-xs px-2.5 py-1.5 sm:py-2 rounded border border-fintech-border flex items-center gap-1.5 shrink-0">
                 <span>Filtro de Estratégias</span>
                 <span id="radar-strat-badge" class="bg-fintech-cyan/20 text-fintech-cyan text-[10px] px-1 rounded font-mono hidden">0</span>
-                <span class="text-[9px] text-gray-400">▼</span>
+                <span class="text-xs text-gray-400">▼</span>
               </button>
               <div id="radar-strat-menu" class="absolute left-0 mt-1 w-64 bg-fintech-surface border border-fintech-border rounded shadow-xl z-50 p-2 hidden max-h-60 overflow-y-auto text-xs space-y-1">
                 <div class="text-[10px] text-gray-400 border-b border-fintech-border pb-1 mb-1 flex justify-between items-center">
@@ -489,15 +869,30 @@
 
         <!-- Strategy Wrapper (collapsible on mobile, always visible on desktop) -->
         <div id="strategies-wrapper-collapsible" class="hidden lg:flex flex-col flex-1 min-h-0 overflow-hidden">
-          <!-- Strategy Granular Selector (48 Strategies) with 0ms Reactivity -->
-          <div class="p-2 border-b border-fintech-border flex items-center justify-between bg-fintech-bg/40 shrink-0">
-            <span class="text-[11px] font-bold text-gray-300 uppercase tracking-wider">Estratégias (48)</span>
-            <div class="flex items-center space-x-1.5 text-[10px]">
-              <button id="btn-toggle-all-accordions" type="button" class="text-gray-400 hover:text-white hover:underline">Recolher</button>
-              <span class="text-gray-600">|</span>
-              <button id="btn-select-all-global" type="button" class="text-cyan-400 hover:underline font-semibold">Marcar</button>
-              <span class="text-gray-600">|</span>
-              <button id="btn-deselect-all-global" type="button" class="text-gray-400 hover:underline">Desmarcar</button>
+          <!-- Strategy Granular Selector with Presets & 0ms Reactivity -->
+          <div class="p-2 border-b border-fintech-border bg-fintech-bg/40 shrink-0 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-gray-300 uppercase tracking-wider">Estratégias (48)</span>
+              <div class="flex items-center space-x-1.5 text-[10px]">
+                <button id="btn-toggle-all-accordions" type="button" class="text-gray-400 hover:text-white hover:underline">Recolher</button>
+                <span class="text-gray-600">|</span>
+                <button id="btn-select-all-global" type="button" class="text-cyan-400 hover:underline font-semibold">Todas</button>
+                <span class="text-gray-600">|</span>
+                <button id="btn-deselect-all-global" type="button" class="text-gray-400 hover:underline">Limpar</button>
+              </div>
+            </div>
+
+            <!-- Cognitive Triage Presets -->
+            <div class="grid grid-cols-3 gap-1 pt-1 border-t border-fintech-border/40">
+              <button id="btn-preset-institutional" type="button" class="px-1.5 py-1 text-[10px] font-bold rounded bg-cyan-950/40 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-900/60 transition truncate" title="Top Sharpe & Price Action Institucional (Wyckoff, BOS, Negação Causal)">
+                Top Institucional
+              </button>
+              <button id="btn-preset-reversal" type="button" class="px-1.5 py-1 text-[10px] font-bold rounded bg-emerald-950/40 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-900/60 transition truncate" title="Sobrevenda Estatística Extrema (RSI, Z-Score, Bandas)">
+                Reversão Extrema
+              </button>
+              <button id="btn-preset-trend" type="button" class="px-1.5 py-1 text-[10px] font-bold rounded bg-amber-950/40 text-amber-300 border border-amber-500/30 hover:bg-amber-900/60 transition truncate" title="Seguidores de Tendência & Momentum (Supertrend, VWAP, MACD)">
+                Tendência/Fluxo
+              </button>
             </div>
           </div>
 
@@ -933,11 +1328,14 @@
 
           <!-- Row 2: Strategy Selectors & Action Buttons -->
           <div class="grid grid-cols-1 md:grid-cols-12 gap-3 pt-2 border-t border-fintech-border/60">
-            <!-- Buy Strategy Dropdown -->
+            <!-- Buy Strategy Dropdown with Typeahead Filter -->
             <div class="md:col-span-4">
-              <label class="text-emerald-400 font-semibold block mb-1 flex items-center gap-1">
-                <span></span>Estratégia de Compra (Entrada)
-              </label>
+              <div class="flex items-center justify-between mb-1">
+                <label class="text-emerald-400 font-semibold block flex items-center gap-1">
+                  <span>Estratégia de Compra (Entrada)</span>
+                </label>
+                <input id="input-search-sim-buy" type="text" placeholder="Filtrar estratégia..." class="bg-fintech-bg border border-fintech-border rounded px-1.5 py-0.5 text-[10px] text-white font-mono w-24 focus:w-36 transition-all focus:border-emerald-400 focus:outline-none">
+              </div>
               <select id="sim-buy-strategy" class="w-full bg-fintech-bg border border-emerald-500/40 rounded px-2.5 py-1.5 text-white font-sans focus:border-emerald-400 focus:outline-none">
                 <option value="ALL" selected>Todas as Compras (Portfólio / Qualquer Sinal)</option>
                 <optgroup label="Proprietárias de Fundo (Reversão Causal)">
@@ -988,11 +1386,14 @@
 </select>
             </div>
 
-            <!-- Sell Strategy Dropdown -->
+            <!-- Sell Strategy Dropdown with Typeahead Filter -->
             <div class="md:col-span-4" id="sim-sell-strategy-container">
-              <label class="text-rose-400 font-semibold block mb-1 flex items-center gap-1">
-                <span></span>Estratégia de Venda (Saída / Topo)
-              </label>
+              <div class="flex items-center justify-between mb-1">
+                <label class="text-rose-400 font-semibold block flex items-center gap-1">
+                  <span>Estratégia de Venda (Saída / Topo)</span>
+                </label>
+                <input id="input-search-sim-sell" type="text" placeholder="Filtrar estratégia..." class="bg-fintech-bg border border-fintech-border rounded px-1.5 py-0.5 text-[10px] text-white font-mono w-24 focus:w-36 transition-all focus:border-rose-400 focus:outline-none">
+              </div>
               <select id="sim-sell-strategy" class="w-full bg-fintech-bg border border-rose-500/40 rounded px-2.5 py-1.5 text-white font-sans focus:border-rose-400 focus:outline-none">
                 <option value="ALL" selected>Todas as Vendas (Portfólio / Qualquer Sinal)</option>
                 <optgroup label="Proprietárias de Topo (Negação Causal)">
@@ -1089,23 +1490,23 @@
 
             <!-- Champion KPIs Grid -->
             <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mt-3 pt-3 border-t border-fintech-border/50 text-xs">
-              <div class="bg-fintech-bg/60 p-2 rounded border border-fintech-border">
+              <div class="bg-fintech-bg/80 p-2 rounded">
                 <span class="text-gray-400 text-[10px] block">Retorno Total Acumulado</span>
                 <span class="text-base font-bold text-emerald-400 font-mono" id="opt-champ-ret">+0.0%</span>
               </div>
-              <div class="bg-fintech-bg/60 p-2 rounded border border-fintech-border">
+              <div class="bg-fintech-bg/80 p-2 rounded">
                 <span class="text-gray-400 text-[10px] block">Lucro Líquido (R$)</span>
                 <span class="text-base font-bold text-cyan-300 font-mono" id="opt-champ-pnl">R$ 0,00</span>
               </div>
-              <div class="bg-fintech-bg/60 p-2 rounded border border-fintech-border">
+              <div class="bg-fintech-bg/80 p-2 rounded">
                 <span class="text-gray-400 text-[10px] block">Taxa de Acerto (Win Rate)</span>
                 <span class="text-base font-bold text-white font-mono" id="opt-champ-winrate">0.0%</span>
               </div>
-              <div class="bg-fintech-bg/60 p-2 rounded border border-fintech-border">
+              <div class="bg-fintech-bg/80 p-2 rounded">
                 <span class="text-gray-400 text-[10px] block">Total de Trades</span>
                 <span class="text-base font-bold text-amber-300 font-mono" id="opt-champ-trades">0 trades</span>
               </div>
-              <div class="bg-fintech-bg/60 p-2 rounded border border-fintech-border">
+              <div class="bg-fintech-bg/80 p-2 rounded">
                 <span class="text-gray-400 text-[10px] block">Max Drawdown</span>
                 <span class="text-base font-bold text-rose-400 font-mono" id="opt-champ-drawdown">0.0%</span>
               </div>
@@ -1156,22 +1557,22 @@
           <div class="card-surface p-2.5 sm:p-3">
             <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Retorno Estratégia</div>
             <div class="text-base sm:text-lg font-bold text-fintech-cyan font-mono" id="sim-kpi-return">0.0%</div>
-            <div class="text-[9px] text-gray-400 font-mono" id="sim-kpi-bnh-sub">B&H: 0.0%</div>
+            <div class="text-[10px] text-gray-400 font-mono" id="sim-kpi-bnh-sub">B&H: 0.0%</div>
           </div>
           <div class="card-surface p-2.5 sm:p-3">
             <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Fator de Lucro</div>
             <div class="text-base sm:text-lg font-bold text-amber-400 font-mono" id="sim-kpi-profit-factor">0.00</div>
-            <div class="text-[9px] text-gray-400 font-mono" id="sim-kpi-profit-sub">Lucro: R$ 0,00</div>
+            <div class="text-[10px] text-gray-400 font-mono" id="sim-kpi-profit-sub">Lucro: R$ 0,00</div>
           </div>
           <div class="card-surface p-2.5 sm:p-3">
             <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold" id="sim-kpi-label-aux">Taxa de Acerto (Win Rate)</div>
             <div class="text-base sm:text-lg font-bold text-emerald-400 font-mono" id="sim-kpi-winrate">0.0%</div>
-            <div class="text-[9px] text-gray-400 font-mono" id="sim-kpi-trades-sub">0 trades</div>
+            <div class="text-[10px] text-gray-400 font-mono" id="sim-kpi-trades-sub">0 trades</div>
           </div>
           <div class="card-surface p-2.5 sm:p-3">
             <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Drawdown Máximo</div>
             <div class="text-base sm:text-lg font-bold text-rose-400 font-mono" id="sim-kpi-drawdown">0.0%</div>
-            <div class="text-[9px] text-gray-400 font-mono" id="sim-kpi-avg-entries-sub">Média compras: 1.0</div>
+            <div class="text-[10px] text-gray-400 font-mono" id="sim-kpi-avg-entries-sub">Média compras: 1.0</div>
           </div>
         </div>
 
@@ -1240,11 +1641,11 @@
             Monitora rompimentos de suporte ou resistência e executa na reversão com confirmação de fechamento (Zero Look-Ahead Bias).
           </p>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-            <div class="bg-fintech-bg p-3 rounded border border-fintech-border">
+            <div class="bg-fintech-bg/60 p-3 rounded">
               <span class="font-bold text-fintech-green block mb-1">Compra (Negação de Fundo):</span>
               Violação da mínima de T-1 ou mínima de N barras, fechando de volta acima. Execução na Abertura de T+1 ou no reteste.
             </div>
-            <div class="bg-fintech-bg p-3 rounded border border-fintech-border">
+            <div class="bg-fintech-bg/60 p-3 rounded">
               <span class="font-bold text-fintech-red block mb-1">Venda (Negação de Topo):</span>
               Violação da máxima de T-1 ou máxima de N barras, fechando de volta abaixo. Execução na Abertura de T+1 ou no reteste.
             </div>
@@ -1256,13 +1657,13 @@
             <span></span>Grupo 2: Price Action Institucional (BOS & Wyckoff)
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-            <div class="bg-fintech-bg p-3 rounded border border-fintech-border space-y-1.5">
+            <div class="bg-fintech-bg/60 p-3 rounded space-y-1.5">
               <span class="font-bold text-white block">Fundo Duplo / Topo Duplo + BOS (Refinados):</span>
               <p class="text-gray-300">
                 Padrões de reversão estrutural com confirmação de rompimento do neckline (BOS). O Fundo Duplo exige tendência prévia de baixa (abaixo da SMA50 ou queda ≥ 6%), filtro anti-máxima de 60 barras, e IFR/RSI não exausto (< 45 nos fundos e ≤ 60 no rompimento).
               </p>
             </div>
-            <div class="bg-fintech-bg p-3 rounded border border-fintech-border space-y-1.5">
+            <div class="bg-fintech-bg/60 p-3 rounded space-y-1.5">
               <span class="font-bold text-white block">Wyckoff Spring & Upthrust (UTAD):</span>
               <p class="text-gray-300">
                 Varredura de liquidez com rompimento falso de suporte (Spring) ou de resistência (Upthrust) com volume acima da média.
@@ -1276,11 +1677,11 @@
             <span></span>Grupo 3: Alocação Quantitativa & Rebalanceamento
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-            <div class="bg-fintech-bg p-3 rounded border border-fintech-border space-y-1">
+            <div class="bg-fintech-bg/60 p-3 rounded space-y-1">
               <span class="font-bold text-white block">DCA Dinâmico / Excesso Estatístico:</span>
               <p class="text-gray-300">Aumenta compras quando o preço cai além de 2 desvios padrão da SMA(200) ou RSI < 30. Sinaliza venda/realização parcial quando sobe além de 2 desvios padrão ou RSI >70.</p>
             </div>
-            <div class="bg-fintech-bg p-3 rounded border border-fintech-border space-y-1">
+            <div class="bg-fintech-bg/60 p-3 rounded space-y-1">
               <span class="font-bold text-white block">Rebalanceamento de Carteira:</span>
               <p class="text-gray-300">Rebalanceia peso da carteira entre Renda Fixa e Renda Variável ao exceder a tolerância (+/- 5%), comprando na baixa e realizando no topo.</p>
             </div>
@@ -1306,7 +1707,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-              <span>💼</span>Gestor, Consultor de Rebalanceamento & Simulador Multiativos de Carteira
+              <span></span>Gestor, Consultor de Rebalanceamento & Simulador Multiativos de Carteira
             </h2>
             <p class="text-[11px] sm:text-xs text-gray-400">
               Alocação inteligente de capital nas estratégias campeãs de cada ativo, plano de ordens de hoje (comprar, vender e rebalancear) e backtest histórico multiativos.
@@ -1314,7 +1715,7 @@
           </div>
           <div class="flex items-center gap-2">
             <button id="btn-run-portfolio" class="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold px-4 py-2 rounded shadow-lg transition flex items-center gap-1.5 cursor-pointer">
-              <span>⚡</span>Gerar Plano de Hoje & Simular Carteira
+              <span class="text-black font-extrabold">▶</span> Gerar Plano de Hoje & Simular Carteira
             </button>
           </div>
         </div>
@@ -1386,9 +1787,12 @@
                 <p class="text-[10px] text-gray-400">Deixe vazio para 100% em caixa ou importe/cadastre seus ativos atuais para rebalancear.</p>
               </div>
               <div class="flex items-center gap-1.5">
-                <input type="file" id="portfolio-csv-file-input" accept=".csv,.txt" class="hidden">
-                <button id="btn-portfolio-import-csv" type="button" class="text-[11px] px-2.5 py-1 rounded bg-cyan-950/50 hover:bg-cyan-900/60 text-cyan-300 hover:text-cyan-200 border border-cyan-800/60 transition cursor-pointer flex items-center gap-1" title="Importar arquivo CSV com colunas Ticker, Quantidade e Preço Médio">
-                  <span>📥</span>Importar CSV
+                <input type="file" id="portfolio-csv-file-input" accept=".xlsx,.xls,.csv,.txt" class="hidden">
+                <button id="btn-portfolio-sync-b3" type="button" class="text-[11px] px-2.5 py-1 rounded bg-emerald-950/50 hover:bg-emerald-900/60 text-emerald-300 hover:text-emerald-200 border border-emerald-800/60 transition cursor-pointer flex items-center gap-1" title="Sincronizar dados automaticamente com a planilha B3 em disco">
+                  <span>🔄</span>Sincronizar B3
+                </button>
+                <button id="btn-portfolio-import-csv" type="button" class="text-[11px] px-2.5 py-1 rounded bg-cyan-950/50 hover:bg-cyan-900/60 text-cyan-300 hover:text-cyan-200 border border-cyan-800/60 transition cursor-pointer flex items-center gap-1" title="Importar planilha oficial B3 (.xlsx) ou arquivo CSV">
+                  <span>📁</span>Importar B3 / CSV
                 </button>
                 <button id="btn-portfolio-undo-apply" type="button" class="hidden text-[11px] px-2.5 py-1 rounded bg-amber-950/50 hover:bg-amber-900/60 text-amber-300 hover:text-amber-200 border border-amber-800/60 transition cursor-pointer flex items-center gap-1" title="Desfazer aplicação de ordens e restaurar carteira anterior">
                   <span>↩️</span>Desfazer Aplicação
@@ -1447,7 +1851,7 @@
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div>
               <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                <span>🎯</span>Plano de Ação & Rebalanceamento Hoje (Boleta de Recomendações)
+                <span></span>Plano de Ação & Rebalanceamento Hoje (Boleta de Recomendações)
               </h3>
               <p class="text-[11px] text-gray-400">
                 O que comprar, quanto comprar, o que vender, quanto vender e como rebalancear sua carteira agora segundo a estratégia campeã de cada ativo.
@@ -1463,7 +1867,7 @@
                 <span id="advise-cash-transition" class="font-bold text-fintech-cyan font-mono">R$ 10.000,00 → R$ 0,00</span>
               </div>
               <button id="btn-apply-portfolio-orders" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-2 rounded shadow transition cursor-pointer hidden">
-                ✓ Aplicar Ordens na Minha Carteira
+                Aplicar Ordens na Minha Carteira
               </button>
             </div>
           </div>
@@ -1502,7 +1906,7 @@
           <div class="flex items-center justify-between">
             <div>
               <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                <span>📈</span>Simulador Histórico da Carteira (Backtest Multiativos Zero Look-Ahead)
+                <span></span>Simulador Histórico da Carteira (Backtest Multiativos Zero Look-Ahead)
               </h3>
               <p class="text-[11px] text-gray-400">
                 Simula como o motor teria gerenciado e rebalanceado o capital ao longo do período, comparando contra o Buy & Hold em pesos iguais da cesta.
@@ -1515,32 +1919,32 @@
             <div class="card-surface p-2.5 sm:p-3">
               <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Capital Inicial</div>
               <div class="text-base sm:text-lg font-bold text-white font-mono" id="port-kpi-initial">R$ 10.000,00</div>
-              <div class="text-[9px] text-gray-400 font-mono" id="port-kpi-cash-sub">Caixa final: R$ 0,00</div>
+              <div class="text-[10px] text-gray-400 font-mono" id="port-kpi-cash-sub">Caixa final: R$ 0,00</div>
             </div>
             <div class="card-surface p-2.5 sm:p-3">
               <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Patrimônio Final</div>
               <div class="text-base sm:text-lg font-bold text-fintech-green font-mono" id="port-kpi-final">R$ 10.000,00</div>
-              <div class="text-[9px] text-gray-400 font-mono" id="port-kpi-profit-sub">Lucro: R$ 0,00</div>
+              <div class="text-[10px] text-gray-400 font-mono" id="port-kpi-profit-sub">Lucro: R$ 0,00</div>
             </div>
             <div class="card-surface p-2.5 sm:p-3">
               <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Retorno Carteira</div>
               <div class="text-base sm:text-lg font-bold text-fintech-cyan font-mono" id="port-kpi-return">+0.0%</div>
-              <div class="text-[9px] text-gray-400 font-mono" id="port-kpi-bench-sub">B&H Cesta: 0.0% (Alfa: 0.0%)</div>
+              <div class="text-[10px] text-gray-400 font-mono" id="port-kpi-bench-sub">B&H Cesta: 0.0% (Alfa: 0.0%)</div>
             </div>
             <div class="card-surface p-2.5 sm:p-3">
               <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Taxa de Acerto (Saídas)</div>
               <div class="text-base sm:text-lg font-bold text-emerald-400 font-mono" id="port-kpi-winrate">0.0%</div>
-              <div class="text-[9px] text-gray-400 font-mono" id="port-kpi-exits-sub">0 saídas fechadas</div>
+              <div class="text-[10px] text-gray-400 font-mono" id="port-kpi-exits-sub">0 saídas fechadas</div>
             </div>
             <div class="card-surface p-2.5 sm:p-3">
               <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Fator de Lucro</div>
               <div class="text-base sm:text-lg font-bold text-amber-400 font-mono" id="port-kpi-pf">0.00</div>
-              <div class="text-[9px] text-gray-400 font-mono" id="port-kpi-rotations-sub">0 rebalanceamentos/rotações</div>
+              <div class="text-[10px] text-gray-400 font-mono" id="port-kpi-rotations-sub">0 rebalanceamentos/rotações</div>
             </div>
             <div class="card-surface p-2.5 sm:p-3">
               <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Max Drawdown Carteira</div>
               <div class="text-base sm:text-lg font-bold text-rose-400 font-mono" id="port-kpi-dd">0.0%</div>
-              <div class="text-[9px] text-gray-400 font-mono" id="port-kpi-events-sub">0 ordens totais</div>
+              <div class="text-[10px] text-gray-400 font-mono" id="port-kpi-events-sub">0 ordens totais</div>
             </div>
           </div>
 
@@ -1566,7 +1970,7 @@
           <div class="card-surface p-3.5 sm:p-4 overflow-hidden">
             <div class="flex items-center justify-between mb-2">
               <h3 class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
-                <span>🏆</span>Ranking de Potencial do Universo & Par de Estratégias Campeão por Ativo
+                <span></span>Ranking de Potencial do Universo & Par de Estratégias Campeão por Ativo
               </h3>
               <span class="text-[10px] text-gray-400 font-mono">Ordenado por Score de Potencial (0–100)</span>
             </div>
@@ -1600,7 +2004,7 @@
           <div class="card-surface p-3.5 sm:p-4 overflow-hidden">
             <div class="flex items-center justify-between mb-2">
               <h3 class="text-xs font-bold text-gray-200 flex items-center gap-1.5">
-                <span>📜</span>Histórico Cronológico de Compras, Vendas e Rebalanceamentos da Carteira
+                <span></span>Histórico Cronológico de Compras, Vendas e Rebalanceamentos da Carteira
               </h3>
               <span class="text-[10px] text-gray-400 font-mono" id="portfolio-ledger-count-badge">0 eventos</span>
             </div>
@@ -1639,7 +2043,106 @@
 
   </main>
 
+  <!-- Confirmation Pre-flight Modal for Applying Orders -->
+  <div id="modal-apply-orders" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-fintech-surface max-w-lg w-full p-4 sm:p-6 space-y-4 border border-fintech-border shadow-2xl rounded-lg">
+      <div class="flex items-center justify-between border-b border-fintech-border pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">✓</div>
+          <div>
+            <h3 class="text-sm sm:text-base font-bold text-white">Revisão Prévia de Execução de Ordens</h3>
+            <p class="text-[11px] text-gray-400">Confirme a aplicação das ordens recomendadas na sua carteira.</p>
+          </div>
+        </div>
+        <button id="btn-modal-close" class="text-gray-400 hover:text-white text-lg font-bold p-1">✕</button>
+      </div>
+
+      <div class="space-y-2">
+        <div class="flex justify-between items-center text-xs bg-fintech-bg/60 p-2.5 rounded">
+          <span class="text-gray-400">Total de Ordens Propostas:</span>
+          <span id="modal-orders-count" class="font-bold font-mono text-white">0</span>
+        </div>
+        <div class="flex justify-between items-center text-xs bg-fintech-bg/60 p-2.5 rounded">
+          <span class="text-gray-400">Transição de Caixa:</span>
+          <span id="modal-cash-transition" class="font-bold font-mono text-fintech-cyan">R$ 0,00 → R$ 0,00</span>
+        </div>
+      </div>
+
+      <!-- Compact Table of orders to confirm -->
+      <div class="max-h-48 overflow-y-auto touch-scroll text-xs divide-y divide-fintech-border">
+        <table class="w-full text-left text-gray-300">
+          <thead class="bg-fintech-bg text-gray-400 uppercase text-[10px] sticky top-0 font-mono">
+            <tr>
+              <th class="px-2.5 py-1.5">Ativo</th>
+              <th class="px-2.5 py-1.5">Ação</th>
+              <th class="px-2.5 py-1.5 font-mono text-right">Qtd</th>
+              <th class="px-2.5 py-1.5 font-mono text-right">Valor Estimado</th>
+            </tr>
+          </thead>
+          <tbody id="modal-orders-tbody" class="divide-y divide-fintech-border font-mono text-[11px]">
+            <!-- Injected dynamically -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="bg-amber-500/10 rounded p-2.5 text-[11px] text-amber-300 flex items-start gap-2">
+        <span class="text-base leading-none">Aviso:</span>
+        <span>As alterações atualizarão a sua custódia e recalcularão os pesos ideais. Você poderá desfazer a qualquer momento pelo botão <strong>Desfazer Aplicação</strong>.</span>
+      </div>
+
+      <div class="flex items-center justify-end gap-2.5 pt-2">
+        <button id="btn-modal-cancel" class="px-3.5 py-2 text-xs font-semibold text-gray-300 hover:text-white bg-fintech-bg border border-fintech-border rounded hover:bg-fintech-surface-hover transition">
+          Cancelar
+        </button>
+        <button id="btn-modal-confirm" class="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded shadow-lg transition">
+          Confirmar Execução
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification System for High-Stakes Actions -->
+  <div id="toast-notification" class="fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-2xl border text-xs font-medium transition-all duration-300 transform translate-y-16 opacity-0 pointer-events-none">
+    <span id="toast-icon" class="text-base">✓</span>
+    <span id="toast-message" class="text-white">Ação concluída com sucesso.</span>
+    <button id="toast-action-btn" class="ml-2 font-bold underline hover:opacity-80 hidden">Desfazer</button>
+  </div>
+
   <!-- Application Logic -->
   <script src="app.js"></script>
+
+  <!-- Modal de Configuração de Metas -->
+  <div id="modal-overview-metas" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-fintech-surface max-w-md w-full p-4 sm:p-6 space-y-4 border border-fintech-border shadow-2xl rounded-lg">
+      <div class="flex items-center justify-between border-b border-fintech-border pb-3">
+        <div>
+          <h3 class="text-sm sm:text-base font-bold text-white">Configurar Metas de Longo Prazo</h3>
+          <p class="text-[11px] text-gray-400">Defina seus objetivos financeiros patrimoniais e de proventos.</p>
+        </div>
+        <button id="btn-modal-metas-close" class="text-gray-400 hover:text-white text-lg font-bold p-1">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="text-xs text-gray-300 block mb-1">Meta de Patrimônio Total (R$)</label>
+          <input id="input-meta-patrimonio" type="number" step="1000" min="1000" placeholder="Ex: 100000" class="w-full bg-fintech-bg border border-fintech-border rounded px-3 py-1.5 text-xs text-white font-mono focus:border-fintech-cyan focus:outline-none">
+        </div>
+        <div>
+          <label class="text-xs text-gray-300 block mb-1">Meta de FIIs & Proventos (R$)</label>
+          <input id="input-meta-renda" type="number" step="1000" min="1000" placeholder="Ex: 30000" class="w-full bg-fintech-bg border border-fintech-border rounded px-3 py-1.5 text-xs text-white font-mono focus:border-fintech-cyan focus:outline-none">
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2.5 pt-2">
+        <button id="btn-modal-metas-cancel" class="px-3.5 py-2 text-xs font-semibold text-gray-300 hover:text-white bg-fintech-bg border border-fintech-border rounded hover:bg-fintech-surface-hover transition">
+          Cancelar
+        </button>
+        <button id="btn-modal-metas-save" class="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded shadow-lg transition">
+          Salvar Metas
+        </button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

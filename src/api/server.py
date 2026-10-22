@@ -14,12 +14,13 @@ from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 import pandas as pd
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, Query, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from ..data_loader import DataLoader, strip_corporate_suffix
+from ..data_loader import DataLoader, strip_corporate_suffix, parse_b3_file
 from ..strategies import StrategyCatalog, SignalRecord
+
 from ..evaluator import (
     evaluate_all_strategies,
     classify_timing_status,
@@ -67,7 +68,12 @@ from .schemas import (
     PortfolioSimulationMetricsModel,
     PortfolioSimulateRequest,
     PortfolioSimulateResponse,
+    PortfolioQuotesRequest,
+    PortfolioQuotesResponse,
+    QuoteItem,
+    B3ParseResult,
 )
+
 
 app = FastAPI(
     title="Market Opportunity & Bottom Statistical Engine",
@@ -1731,5 +1737,111 @@ def simulate_portfolio_endpoint(req: PortfolioSimulateRequest):
 
 # Mount Web Terminal Static Assets at Root
 static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "web")
+@app.post("/api/portfolio/quotes", response_model=PortfolioQuotesResponse)
+def get_portfolio_quotes_endpoint(req: PortfolioQuotesRequest):
+    results: Dict[str, QuoteItem] = {}
+    if not req.tickers:
+        return PortfolioQuotesResponse(quotes=results)
+
+    # Normalize tickers
+    resolved_tickers = []
+    for t in req.tickers:
+        clean = t.strip().upper()
+        if not clean:
+            continue
+        # If Brazilian equity, FII, or BDR without suffix, append .SA
+        has_sa = clean.endswith('.SA')
+        is_b3 = any(clean.endswith(sfx) for sfx in ('3', '4', '5', '6', '11', '34', '33', '35', '39'))
+        if is_b3 and not has_sa:
+            resolved = f"{clean}.SA"
+        else:
+            resolved = clean
+        resolved_tickers.append((t, resolved))
+
+    def _fetch_single_quote(original_ticker: str, yf_ticker: str) -> Optional[QuoteItem]:
+        cache_key = f"quote_{yf_ticker}"
+        cached = _get_cache(cache_key)
+        if cached:
+            return cached
+
+        try:
+            series = DataLoader.load_asset_data(ticker=yf_ticker, period="5d", interval="1d", use_cache=True)
+            if series is not None and series.close is not None and len(series.close) >= 1:
+                close_price = float(series.close[-1])
+                prev_price = float(series.close[-2]) if len(series.close) >= 2 else close_price
+                chg = ((close_price - prev_price) / prev_price * 100.0) if prev_price > 0 else 0.0
+                time_str = str(series.timestamps[-1]) if (series.timestamps is not None and len(series.timestamps) > 0) else None
+                item = QuoteItem(
+                    ticker=original_ticker,
+                    price=round(close_price, 4),
+                    change_pct=round(chg, 2),
+                    time=time_str,
+                )
+                _set_cache(cache_key, item)
+                return item
+        except Exception as err:
+            logger.warning(f"Error fetching quote for {yf_ticker}: {err}")
+        return None
+
+    with ThreadPoolExecutor(max_workers=min(10, max(1, len(resolved_tickers)))) as executor:
+        futures = {executor.submit(_fetch_single_quote, orig, yf): orig for orig, yf in resolved_tickers}
+        for f in futures:
+            res = f.result()
+            if res:
+                results[res.ticker.upper()] = res
+
+    return PortfolioQuotesResponse(quotes=results)
+
+
+# 10. Endpoints for B3 Official Spreadsheet Integration
+
+@app.get("/api/b3/sync-local", response_model=B3ParseResult)
+def b3_sync_local():
+    """
+    Scans the local B3/ directory for the most recent official movement spreadsheet (.xlsx or .csv)
+    and returns parsed holdings, Preço Médio contábil and passive income.
+    """
+    b3_dir = Path("B3")
+    if not b3_dir.exists():
+        # Also check relative to workspace
+        b3_dir = Path(__file__).resolve().parent.parent.parent / "B3"
+    
+    if not b3_dir.exists():
+        raise HTTPException(status_code=404, detail="Diretório B3/ não encontrado.")
+
+    # Find .xlsx or .csv files in B3/
+    files = list(b3_dir.glob("*.xlsx")) + list(b3_dir.glob("*.csv"))
+    if not files:
+        raise HTTPException(status_code=404, detail="Nenhum arquivo de movimentação (.xlsx ou .csv) encontrado na pasta B3/.")
+
+    # Select the most recent file by modification time
+    latest_file = max(files, key=lambda f: f.stat().st_mtime)
+    try:
+        result = parse_b3_file(latest_file, filename=latest_file.name)
+        return result
+    except Exception as err:
+        logger.error(f"Erro ao processar planilha B3 {latest_file}: {err}")
+        raise HTTPException(status_code=500, detail=f"Erro ao processar planilha B3: {str(err)}")
+
+
+@app.post("/api/b3/parse", response_model=B3ParseResult)
+async def b3_parse_uploaded_file(file: UploadFile = File(...)):
+    """
+    Parses an uploaded B3 spreadsheet (.xlsx or .csv) and computes custody holdings and income.
+    """
+    try:
+        content = await file.read()
+        filename = file.filename or "movimentacao.xlsx"
+        result = parse_b3_file(content, filename=filename)
+        return result
+    except Exception as err:
+        logger.error(f"Erro ao processar arquivo B3 enviado {file.filename}: {err}")
+        raise HTTPException(status_code=400, detail=f"Erro ao processar planilha B3: {str(err)}")
+
+
 if os.path.exists(static_dir):
+
     app.mount("/", StaticFiles(directory=static_dir, html=True), name="web")
+
+
+
