@@ -356,6 +356,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // UI: Direction Selector (Compra, Venda, Ambos)
 
+
+const TAB_HASH_MAP = {
+  '#radar': 'tab-radar',
+  '#/': 'tab-radar',
+  '#terminal': 'tab-terminal',
+  '#grafico': 'tab-terminal',
+  '#simulator': 'tab-simulator',
+  '#simulador': 'tab-simulator',
+  '#playbook': 'tab-playbook',
+};
+
+const TAB_TO_HASH_MAP = {
+  'tab-radar': '#radar',
+  'tab-terminal': '#terminal',
+  'tab-simulator': '#simulator',
+  'tab-playbook': '#playbook',
+};
+
+function getTabFromHash() {
+  const hash = (window.location.hash || '').toLowerCase();
+  if (TAB_HASH_MAP[hash]) return TAB_HASH_MAP[hash];
+  const saved = localStorage.getItem('market_engine_active_tab');
+  if (saved && TAB_TO_HASH_MAP[saved]) return saved;
+  return 'tab-radar';
+}
+
+function getHashFromTab(tabId) {
+  return TAB_TO_HASH_MAP[tabId] || '#radar';
+}
+
 function updateSidebarDirectionFilter() {
   const dir = state.activeDirection || 'BUY';
   document.querySelectorAll('.strategy-group-wrapper').forEach(wrapper => {
