@@ -24,7 +24,7 @@ description: "Tasks for feature 011: Suporte ao Timeframe 1h sem Erro 400 e Ocul
 
 - [X] T002 [P] [US1] Criar teste unitário em `tests/unit/test_resampler.py` (`test_load_asset_data_hourly_60m_supported`) validando que `DataLoader.load_asset_data` com `interval="60m"` e `interval="1h"` retorna série temporal com sucesso sem lançar ValueError.
 - [X] T003 [US1] Atualizar `src/api/server.py` nos endpoints de simulação e otimização para aceitar e normalizar `60m` e limitar períodos horários ao teto de 730d.
-- [ ] T004 [US1] Atualizar `src/web/app.js` em `runSimulation` e `runOptimizer` para ajustar períodos horários para `730d` (em vez de `60d` ou `5y`).
+- [X] T004 [US1] Atualizar `src/web/app.js` em `runSimulation` e `runOptimizer` para ajustar períodos horários para `730d` (em vez de `60d` ou `5y`).
 
 ---
 

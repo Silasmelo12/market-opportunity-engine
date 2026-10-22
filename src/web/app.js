@@ -1679,12 +1679,15 @@ async function runSimulation() {
     const simIntervalEl = document.getElementById('sim-interval');
     const selectedInterval = (simIntervalEl && simIntervalEl.value) || state.currentTimeframe || '1d';
 
-    // Intraday intervals (5m, 15m) in yfinance require periods <= 60d
+    // Intraday intervals (5m, 15m, 30m) require periods <= 60d in yfinance
+    // Hourly intervals (60m, 1h, 2h, 4h, 12h) support up to 730d (2y)
     let simPeriod = state.currentPeriod;
-    if (selectedInterval === '5m') {
+    if (selectedInterval === '5m' || selectedInterval === '15m' || selectedInterval === '30m') {
       simPeriod = '60d';
-    } else if (selectedInterval === '15m' || selectedInterval === '60m') {
-      simPeriod = '60d';
+    } else if (['60m', '1h', '2h', '4h', '12h'].includes(selectedInterval)) {
+      if (simPeriod === '5y' || simPeriod === 'max') {
+        simPeriod = '730d';
+      }
     }
 
     const cycleModeEl = document.getElementById('sim-cycle-mode');
@@ -1800,8 +1803,12 @@ async function runOptimizer() {
     const selectedInterval = (simIntervalEl && simIntervalEl.value) || state.currentTimeframe || '1d';
 
     let simPeriod = state.currentPeriod;
-    if (selectedInterval === '5m' || selectedInterval === '15m' || selectedInterval === '60m') {
+    if (selectedInterval === '5m' || selectedInterval === '15m' || selectedInterval === '30m') {
       simPeriod = '60d';
+    } else if (['60m', '1h', '2h', '4h', '12h'].includes(selectedInterval)) {
+      if (simPeriod === '5y' || simPeriod === 'max') {
+        simPeriod = '730d';
+      }
     }
 
     const cycleModeEl = document.getElementById('sim-cycle-mode');
