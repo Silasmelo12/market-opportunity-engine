@@ -60,11 +60,11 @@
 
 **Independent Test**: Executar `pytest tests/unit/test_quantitative_indicators.py -k "volume or vwap or mfi or vsa or supertrend"` validando cálculos ponderados por volume e bandas dinâmicas de ATR.
 
-- [ ] T013 [P] [US3] Adicionar testes unitários para Bandas de VWAP, MFI, Volume Clímax/VSA e SuperTrend em `tests/unit/test_quantitative_indicators.py`.
-- [ ] T014 [US3] Implementar estratégia de Bandas de VWAP (`vwap_bands`) com desvios padrão ponderados por volume em `src/strategies/quantitative_indicators.py`.
-- [ ] T015 [US3] Implementar estratégia de Money Flow Index em Extremos (`mfi_extreme`) em `src/strategies/quantitative_indicators.py`.
-- [ ] T016 [US3] Implementar estratégia de Volume Clímax & Absorção VSA (`volume_climax_vsa`) em `src/strategies/quantitative_indicators.py`.
-- [ ] T017 [US3] Implementar estratégia de SuperTrend / ATR Trailing (`supertrend_trailing`) com máquina de estados $O(N)$ em `src/strategies/quantitative_indicators.py`.
+- [x] T013 [P] [US3] Adicionar testes unitários para Bandas de VWAP, MFI, Volume Clímax/VSA e SuperTrend em `tests/unit/test_quantitative_indicators.py`.
+- [x] T014 [US3] Implementar estratégia de Bandas de VWAP (`vwap_bands`) com desvios padrão ponderados por volume em `src/strategies/quantitative_indicators.py`.
+- [x] T015 [US3] Implementar estratégia de Money Flow Index em Extremos (`mfi_extreme`) em `src/strategies/quantitative_indicators.py`.
+- [x] T016 [US3] Implementar estratégia de Volume Clímax & Absorção VSA (`volume_climax_vsa`) em `src/strategies/quantitative_indicators.py`.
+- [x] T017 [US3] Implementar estratégia de SuperTrend / ATR Trailing (`supertrend_trailing`) com máquina de estados $O(N)$ em `src/strategies/quantitative_indicators.py`.
 
 ---
 

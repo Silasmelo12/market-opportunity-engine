@@ -474,3 +474,258 @@ class QuantitativeIndicatorsEngine:
         self.pending_signals.extend(buy_pending + sell_pending)
         return buy_records, sell_records
 
+
+    def generate_vwap_bands(
+        self,
+        series: OHLCVSeries,
+        window: int = 20,
+        num_std: float = 2.0,
+    ) -> Tuple[List[SignalRecord], List[SignalRecord]]:
+        n = series.length
+        if n < window + 2:
+            return [], []
+
+        tp = (series.high + series.low + series.close) / 3.0
+        pv = tp * series.volume
+
+        s_pv = pd.Series(pv)
+        s_vol = pd.Series(series.volume)
+
+        roll_pv = s_pv.rolling(window=window).sum().to_numpy()
+        roll_vol = s_vol.rolling(window=window).sum().to_numpy()
+
+        vwap = np.divide(roll_pv, roll_vol, out=np.zeros_like(roll_pv), where=roll_vol > 0)
+
+        # Rolling standard deviation from VWAP
+        diff_sq = ((tp - vwap) ** 2) * series.volume
+        s_diff_sq = pd.Series(diff_sq)
+        roll_diff_sq = s_diff_sq.rolling(window=window).sum().to_numpy()
+        vwap_std = np.sqrt(np.divide(roll_diff_sq, roll_vol, out=np.zeros_like(roll_diff_sq), where=roll_vol > 0))
+
+        lower_band = vwap - num_std * vwap_std
+        upper_band = vwap + num_std * vwap_std
+
+        prev_close = np.roll(series.close, 1)
+        prev_lower = np.roll(lower_band, 1)
+        prev_upper = np.roll(upper_band, 1)
+
+        valid = ~np.isnan(lower_band) & ~np.isnan(prev_lower) & (roll_vol > 0)
+
+        # Bottom return to mean
+        buy_mask = valid & (prev_close < prev_lower) & (series.close >= lower_band)
+        # Top return to mean
+        sell_mask = valid & (prev_close > prev_upper) & (series.close <= upper_band)
+
+        buy_mask[:window + 1] = False
+        sell_mask[:window + 1] = False
+
+        buy_records, buy_pending = convert_signals_to_records(
+            series=series,
+            condition_mask=buy_mask,
+            strategy_id="vwap_bands",
+            strategy_sub_id="vwap_band_buy",
+            direction="BUY",
+            ref_prices=lower_band,
+        )
+
+        sell_records, sell_pending = convert_signals_to_records(
+            series=series,
+            condition_mask=sell_mask,
+            strategy_id="vwap_bands",
+            strategy_sub_id="vwap_band_sell",
+            direction="SELL",
+            ref_prices=upper_band,
+        )
+
+        self.pending_signals.extend(buy_pending + sell_pending)
+        return buy_records, sell_records
+
+    def generate_mfi_extreme(
+        self,
+        series: OHLCVSeries,
+        period: int = 14,
+        oversold: float = 20.0,
+        overbought: float = 80.0,
+    ) -> Tuple[List[SignalRecord], List[SignalRecord]]:
+        n = series.length
+        if n < period + 2:
+            return [], []
+
+        tp = (series.high + series.low + series.close) / 3.0
+        prev_tp = np.roll(tp, 1)
+        prev_tp[0] = tp[0]
+
+        raw_money_flow = tp * series.volume
+
+        pos_flow = np.where(tp > prev_tp, raw_money_flow, 0.0)
+        neg_flow = np.where(tp < prev_tp, raw_money_flow, 0.0)
+
+        s_pos = pd.Series(pos_flow)
+        s_neg = pd.Series(neg_flow)
+
+        roll_pos = s_pos.rolling(window=period).sum().to_numpy()
+        roll_neg = s_neg.rolling(window=period).sum().to_numpy()
+
+        mr = np.divide(roll_pos, roll_neg, out=np.zeros_like(roll_pos), where=roll_neg > 0)
+        mfi = 100.0 - (100.0 / (1.0 + mr))
+        mfi[roll_neg == 0] = 100.0
+
+        prev_mfi = np.roll(mfi, 1)
+        valid = ~np.isnan(mfi) & ~np.isnan(prev_mfi)
+
+        buy_mask = valid & (prev_mfi < oversold) & (mfi > prev_mfi)
+        sell_mask = valid & (prev_mfi > overbought) & (mfi < prev_mfi)
+
+        buy_mask[:period + 1] = False
+        sell_mask[:period + 1] = False
+
+        buy_records, buy_pending = convert_signals_to_records(
+            series=series,
+            condition_mask=buy_mask,
+            strategy_id="mfi_extreme",
+            strategy_sub_id="mfi_bottom_buy",
+            direction="BUY",
+            ref_prices=series.low,
+        )
+
+        sell_records, sell_pending = convert_signals_to_records(
+            series=series,
+            condition_mask=sell_mask,
+            strategy_id="mfi_extreme",
+            strategy_sub_id="mfi_top_sell",
+            direction="SELL",
+            ref_prices=series.high,
+        )
+
+        self.pending_signals.extend(buy_pending + sell_pending)
+        return buy_records, sell_records
+
+    def generate_volume_climax_vsa(
+        self,
+        series: OHLCVSeries,
+        vol_period: int = 20,
+        vol_mult: float = 2.0,
+    ) -> Tuple[List[SignalRecord], List[SignalRecord]]:
+        n = series.length
+        if n < vol_period + 2:
+            return [], []
+
+        sma_vol = compute_sma(series.volume, vol_period)
+        atr = compute_atr(series.high, series.low, series.close, 14)
+
+        spread = series.high - series.low
+        close_location = np.divide(series.close - series.low, spread, out=np.zeros_like(spread), where=spread > 0)
+
+        valid = ~np.isnan(sma_vol) & (sma_vol > 0) & (spread > 0)
+
+        # Climax volume condition
+        is_climax_vol = valid & (series.volume > vol_mult * sma_vol) & (spread > 1.2 * atr)
+
+        # Absorption bottom: ultra-high volume, closes in upper half (rejection of lows)
+        buy_mask = is_climax_vol & (close_location >= 0.55) & (series.close > series.open)
+        # Climax top / distribution: ultra-high volume, closes in lower half (rejection of highs)
+        sell_mask = is_climax_vol & (close_location <= 0.45) & (series.close < series.open)
+
+        buy_mask[:vol_period + 1] = False
+        sell_mask[:vol_period + 1] = False
+
+        buy_records, buy_pending = convert_signals_to_records(
+            series=series,
+            condition_mask=buy_mask,
+            strategy_id="volume_climax_vsa",
+            strategy_sub_id="vsa_absorption_buy",
+            direction="BUY",
+            ref_prices=series.low,
+        )
+
+        sell_records, sell_pending = convert_signals_to_records(
+            series=series,
+            condition_mask=sell_mask,
+            strategy_id="volume_climax_vsa",
+            strategy_sub_id="vsa_climax_sell",
+            direction="SELL",
+            ref_prices=series.high,
+        )
+
+        self.pending_signals.extend(buy_pending + sell_pending)
+        return buy_records, sell_records
+
+    def generate_supertrend_trailing(
+        self,
+        series: OHLCVSeries,
+        period: int = 10,
+        multiplier: float = 3.0,
+    ) -> Tuple[List[SignalRecord], List[SignalRecord]]:
+        n = series.length
+        if n < period + 2:
+            return [], []
+
+        atr = compute_atr(series.high, series.low, series.close, period)
+        hl2 = (series.high + series.low) / 2.0
+
+        basic_upper = hl2 + multiplier * atr
+        basic_lower = hl2 - multiplier * atr
+
+        final_upper = np.zeros(n, dtype=np.float64)
+        final_lower = np.zeros(n, dtype=np.float64)
+        supertrend = np.zeros(n, dtype=np.float64)
+        trend = np.ones(n, dtype=np.int32)  # 1: Up, -1: Down
+
+        for i in range(1, n):
+            # Final upper band
+            if basic_upper[i] < final_upper[i-1] or series.close[i-1] > final_upper[i-1]:
+                final_upper[i] = basic_upper[i]
+            else:
+                final_upper[i] = final_upper[i-1]
+
+            # Final lower band
+            if basic_lower[i] > final_lower[i-1] or series.close[i-1] < final_lower[i-1]:
+                final_lower[i] = basic_lower[i]
+            else:
+                final_lower[i] = final_lower[i-1]
+
+            # Trend determination
+            if trend[i-1] == 1:
+                if series.close[i] < final_lower[i]:
+                    trend[i] = -1
+                    supertrend[i] = final_upper[i]
+                else:
+                    trend[i] = 1
+                    supertrend[i] = final_lower[i]
+            else:
+                if series.close[i] > final_upper[i]:
+                    trend[i] = 1
+                    supertrend[i] = final_lower[i]
+                else:
+                    trend[i] = -1
+                    supertrend[i] = final_upper[i]
+
+        prev_trend = np.roll(trend, 1)
+
+        buy_mask = (prev_trend == -1) & (trend == 1)
+        sell_mask = (prev_trend == 1) & (trend == -1)
+
+        buy_mask[:period + 2] = False
+        sell_mask[:period + 2] = False
+
+        buy_records, buy_pending = convert_signals_to_records(
+            series=series,
+            condition_mask=buy_mask,
+            strategy_id="supertrend_trailing",
+            strategy_sub_id="supertrend_bull_flip",
+            direction="BUY",
+            ref_prices=supertrend,
+        )
+
+        sell_records, sell_pending = convert_signals_to_records(
+            series=series,
+            condition_mask=sell_mask,
+            strategy_id="supertrend_trailing",
+            strategy_sub_id="supertrend_bear_flip",
+            direction="SELL",
+            ref_prices=supertrend,
+        )
+
+        self.pending_signals.extend(buy_pending + sell_pending)
+        return buy_records, sell_records
+

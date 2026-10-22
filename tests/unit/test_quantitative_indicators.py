@@ -111,3 +111,44 @@ def test_macd_momentum_signals():
         assert sig.execution_bar_index == sig.signal_bar_index + 1
 
 
+def test_vwap_bands_signals():
+    series = make_synthetic_ohlcv(200)
+    engine = QuantitativeIndicatorsEngine()
+    buy_sigs, sell_sigs = engine.generate_vwap_bands(series)
+    assert isinstance(buy_sigs, list)
+    assert isinstance(sell_sigs, list)
+    for sig in buy_sigs:
+        assert sig.execution_bar_index == sig.signal_bar_index + 1
+
+
+def test_mfi_extreme_signals():
+    series = make_synthetic_ohlcv(200)
+    engine = QuantitativeIndicatorsEngine()
+    buy_sigs, sell_sigs = engine.generate_mfi_extreme(series)
+    assert isinstance(buy_sigs, list)
+    assert isinstance(sell_sigs, list)
+    for sig in buy_sigs:
+        assert sig.execution_bar_index == sig.signal_bar_index + 1
+
+
+def test_volume_climax_signals():
+    series = make_synthetic_ohlcv(200)
+    engine = QuantitativeIndicatorsEngine()
+    buy_sigs, sell_sigs = engine.generate_volume_climax_vsa(series)
+    assert isinstance(buy_sigs, list)
+    assert isinstance(sell_sigs, list)
+    for sig in buy_sigs:
+        assert sig.execution_bar_index == sig.signal_bar_index + 1
+
+
+def test_supertrend_trailing_signals():
+    series = make_synthetic_ohlcv(200)
+    engine = QuantitativeIndicatorsEngine()
+    buy_sigs, sell_sigs = engine.generate_supertrend_trailing(series)
+    assert isinstance(buy_sigs, list)
+    assert isinstance(sell_sigs, list)
+    for sig in buy_sigs:
+        assert sig.execution_bar_index == sig.signal_bar_index + 1
+
+
+
