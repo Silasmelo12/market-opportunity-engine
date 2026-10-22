@@ -5,7 +5,9 @@ Unit tests for OHLCV Resampling and Intraday Data Normalization.
 import numpy as np
 import pandas as pd
 import pytest
+from unittest.mock import patch, MagicMock
 from src.data_loader import resample_ohlcv, clean_and_normalize_df
+from src.data_loader.fetcher import DataLoader, MAX_PERIODS
 
 
 def test_resample_ohlcv_hourly_to_4h():
@@ -86,3 +88,54 @@ def test_clean_and_normalize_intraday_window():
     assert series.length == 50
     assert series.interval == "5m"
     assert series.dy_rolling_12m is not None
+
+
+def test_load_asset_data_hourly_60m_supported():
+    """
+    Verifies that DataLoader supports '60m' and '1h' intervals,
+    mapping them to the 730d ceiling without raising ValueError.
+    """
+    assert "60m" in MAX_PERIODS
+    assert MAX_PERIODS["60m"] == "730d"
+    assert MAX_PERIODS["1h"] == "730d"
+
+    dummy_df = pd.DataFrame(
+        {
+            "Open": [10.0, 11.0],
+            "High": [11.0, 12.0],
+            "Low": [9.5, 10.5],
+            "Close": [10.5, 11.5],
+            "Volume": [1000, 2000],
+        },
+        index=pd.date_range("2024-01-01 10:00", periods=2, freq="1h")
+    )
+
+    with patch("yfinance.Ticker") as mock_ticker_cls:
+        mock_instance = MagicMock()
+        mock_instance.history.return_value = dummy_df
+        mock_ticker_cls.return_value = mock_instance
+
+        # Test with interval="60m" and period="2y"
+        series_60m = DataLoader.load_asset_data(
+            ticker="MOCK_TEST_60M",
+            interval="60m",
+            period="2y",
+            use_cache=False
+        )
+        assert series_60m is not None
+        assert series_60m.interval == "60m"
+        call_kwargs = mock_instance.history.call_args.kwargs
+        assert call_kwargs["period"] == "730d"
+
+        # Test with interval="1h" and period="5y"
+        series_1h = DataLoader.load_asset_data(
+            ticker="MOCK_TEST_1H",
+            interval="1h",
+            period="5y",
+            use_cache=False
+        )
+        assert series_1h is not None
+        assert series_1h.interval == "1h"
+        call_kwargs = mock_instance.history.call_args.kwargs
+        assert call_kwargs["period"] == "730d"
+
