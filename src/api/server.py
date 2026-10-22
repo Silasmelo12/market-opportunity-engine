@@ -1570,6 +1570,146 @@ def advise_portfolio_endpoint(req: PortfolioAdviseRequest):
     )
 
 
+@app.post("/api/portfolio/simulate", response_model=PortfolioSimulateResponse)
+def simulate_portfolio_endpoint(req: PortfolioSimulateRequest):
+    basket = _resolve_portfolio_universe_tickers(
+        universe_category=req.universe_category,
+        custom_tickers=req.custom_tickers,
+        holdings_tickers=[],
+        max_assets=24,
+    )
+
+    bundles: List[Dict[str, Any]] = []
+    max_workers = min(10, max(1, len(basket)))
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = [
+            executor.submit(_load_and_profile_single_asset, t, cat, req.interval, req.period)
+            for t, cat in basket
+        ]
+        for f in futures:
+            res = f.result()
+            if res is not None:
+                bundles.append(res)
+
+    sim_res = simulate_portfolio_multi_asset(
+        asset_bundles=bundles,
+        initial_capital=req.initial_capital,
+        max_weight_pct=req.max_weight_pct,
+        rebalance_band_pct=req.rebalance_band_pct,
+        min_rotation_score_delta=req.min_rotation_score_delta,
+        start_date=req.start_date,
+        end_date=req.end_date,
+        strategy_labels_map=STRATEGY_LABELS_PT,
+    )
+
+    metrics_model = PortfolioSimulationMetricsModel(
+        initial_capital=sim_res.initial_capital,
+        final_equity=sim_res.final_equity,
+        final_cash=sim_res.final_cash,
+        final_invested_value=sim_res.final_invested_value,
+        net_profit=sim_res.net_profit,
+        total_return_pct=sim_res.total_return_pct,
+        benchmark_return_pct=sim_res.benchmark_return_pct,
+        alpha_vs_benchmark_pct=sim_res.alpha_vs_benchmark_pct,
+        max_drawdown_pct=sim_res.max_drawdown_pct,
+        win_rate_pct=sim_res.win_rate_pct,
+        profit_factor=sim_res.profit_factor,
+        total_events_count=sim_res.total_events_count,
+        closed_exits_count=sim_res.closed_exits_count,
+        winning_exits_count=sim_res.winning_exits_count,
+        losing_exits_count=sim_res.losing_exits_count,
+        rebalance_rotations_count=sim_res.rebalance_rotations_count,
+    )
+
+    final_holdings_models = [
+        PortfolioHoldingEvaluatedModel(
+            ticker=h.ticker,
+            asset_name=h.asset_name,
+            shares=h.shares,
+            average_buy_price=h.average_buy_price,
+            current_price=h.current_price,
+            market_value=h.market_value,
+            invested_value=h.invested_value,
+            unrealized_pnl_value=h.unrealized_pnl_value,
+            unrealized_pnl_pct=h.unrealized_pnl_pct,
+            current_weight_pct=h.current_weight_pct,
+            entry_bar_index=h.entry_bar_index,
+        )
+        for h in sim_res.current_holdings
+    ]
+
+    curve_models = [
+        PortfolioCurvePointModel(
+            date=c.date,
+            portfolio_equity=c.portfolio_equity,
+            cash_balance=c.cash_balance,
+            invested_equity=c.invested_equity,
+            benchmark_equity=c.benchmark_equity,
+            drawdown_pct=c.drawdown_pct,
+        )
+        for c in sim_res.curve
+    ]
+
+    ledger_models = [
+        PortfolioLedgerEventModel(
+            event_id=ev.event_id,
+            date=ev.date,
+            ticker=ev.ticker,
+            asset_name=ev.asset_name,
+            event_type=ev.event_type,
+            event_label=ev.event_label,
+            strategy_sub_id=ev.strategy_sub_id,
+            strategy_label=ev.strategy_label,
+            potential_score=ev.potential_score,
+            execution_price=ev.execution_price,
+            shares_delta=ev.shares_delta,
+            trade_value=ev.trade_value,
+            realized_pnl_value=ev.realized_pnl_value,
+            realized_pnl_pct=ev.realized_pnl_pct,
+            weight_before_pct=ev.weight_before_pct,
+            weight_after_pct=ev.weight_after_pct,
+            cash_after=ev.cash_after,
+            portfolio_equity_after=ev.portfolio_equity_after,
+        )
+        for ev in sim_res.ledger_events
+    ]
+
+    ranking_models = [
+        AssetOpportunityProfileModel(
+            ticker=p.ticker,
+            asset_name=p.asset_name,
+            category=p.category,
+            current_price=p.current_price,
+            champion_buy_id=p.champion_buy_id,
+            champion_buy_label=p.champion_buy_label,
+            champion_sell_id=p.champion_sell_id,
+            champion_sell_label=p.champion_sell_label,
+            win_rate_pct=p.win_rate_pct,
+            historical_return_pct=p.historical_return_pct,
+            max_drawdown_pct=p.max_drawdown_pct,
+            closed_trades=p.closed_trades,
+            active_direction=p.active_direction,
+            timing_category=p.timing_category,
+            timing_label=p.timing_label,
+            distance_pct=p.distance_pct,
+            recommended_price=p.recommended_price,
+            potential_score=p.potential_score,
+        )
+        for p in sim_res.opportunity_profiles
+    ]
+
+    return PortfolioSimulateResponse(
+        universe_category=req.universe_category,
+        interval=req.interval,
+        period=req.period,
+        metrics=metrics_model,
+        final_holdings=final_holdings_models,
+        curve=curve_models,
+        ledger_events=ledger_models,
+        opportunity_ranking=ranking_models,
+    )
+
+
 # Mount Web Terminal Static Assets at Root
 static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "web")
 if os.path.exists(static_dir):

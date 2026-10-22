@@ -72,7 +72,7 @@ description: "Task list for Gestor, Consultor de Rebalanceamento e Simulador Mul
 ### Implementation & Tests for User Story 2
 
 - [X] T013 [US2] Implement `simulate_portfolio_multi_asset` in `src/evaluator/portfolio_simulator.py` with unified chronological `master_timeline`, causal forward-fill mark-to-market pricing, Equal-Weight Buy & Hold benchmark curve, bar-by-bar precedence (`SELL_FULL` -> `SELL_PARTIAL_REBALANCE` -> `ROTATE_OUT`/`ROTATE_IN` -> `BUY`), and consolidated KPIs (`final_equity`, `net_profit`, `total_return_pct`, `benchmark_return_pct`, `alpha_vs_benchmark_pct`, `max_drawdown_pct`, `win_rate_pct`, `profit_factor`, `rebalance_rotations_count`)
-- [ ] T014 [US2] Implement `POST /api/portfolio/simulate` endpoint in `src/api/server.py`
+- [X] T014 [US2] Implement `POST /api/portfolio/simulate` endpoint in `src/api/server.py`
 - [ ] T015 [US2] Add the 6 Portfolio Simulator KPI cards, Current/Final Holdings summary table, and Chronological Ledger table (`#portfolio-ledger-tbody`) markup inside `#tab-portfolio` in `src/web/index.html`
 - [ ] T016 [US2] Integrate `POST /api/portfolio/simulate` in `src/web/app.js` to populate the 6 KPI cards and render the chronological operations & rebalancing ledger table (`#portfolio-ledger-tbody`)
 - [ ] T017 [P] [US2] Write unit tests for `simulate_portfolio_multi_asset` (including strict Zero Look-Ahead Bias truncation test verifying decisions up to bar $t$ are identical when $t+1 \dots N$ are truncated, cash conservation, and API contract test for `POST /api/portfolio/simulate`) in `tests/unit/test_portfolio_simulator.py` and `tests/unit/test_api_endpoints.py`
