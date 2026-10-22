@@ -57,7 +57,7 @@ description: "Task list for Gestor, Consultor de Rebalanceamento e Simulador Mul
 - [X] T009 [US1] Add the 5th main navigation tab button (`data-tab="tab-portfolio"` "Carteira") and the `#tab-portfolio` HTML section (Left sidebar with `#portfolio-cash-input`, `#portfolio-holdings-list`, holding add/clear controls, `#portfolio-universe-select`, `#portfolio-custom-tickers-input`, `#portfolio-interval-select`, `#portfolio-period-select`, `#portfolio-max-weight-input`, `#btn-run-portfolio`, and Main section for Today's Action Plan summary cards + `#portfolio-recommendations-tbody`) in `src/web/index.html`
 - [X] T010 [US1] Implement client-side portfolio state management with `localStorage` persistence (`market_engine_portfolio_v1`), contextual hiding of `#global-direction-selector` on `tab-portfolio`, holding list CRUD, `POST /api/portfolio/advise` integration, and rendering of `#portfolio-recommendations-tbody` and `#btn-apply-portfolio-orders` in `src/web/app.js`
 - [X] T011 [P] [US1] Write unit tests for `compute_asset_opportunity_profile` and `advise_portfolio_rebalance` (verifying 100% cash allocation with 25% cap, `.SA` integer lot rounding, `SELL_FULL`, `SELL_PARTIAL_REBALANCE`, `ROTATE_OUT`/`ROTATE_IN`, and strict cash conservation) in `tests/unit/test_portfolio_simulator.py`
-- [ ] T012 [P] [US1] Write FastAPI contract tests for `POST /api/portfolio/advise` in `tests/unit/test_api_endpoints.py`
+- [X] T012 [P] [US1] Write FastAPI contract tests for `POST /api/portfolio/advise` in `tests/unit/test_api_endpoints.py`
 
 **Checkpoint**: User Story 1 (Consultor de Rebalanceamento Hoje) is fully functional and independently testable.
 

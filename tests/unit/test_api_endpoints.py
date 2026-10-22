@@ -207,3 +207,32 @@ def test_asset_names_and_radar_items():
         assert "asset_name" in item
         assert item["asset_name"] is not None
         assert len(item["asset_name"]) > 0
+
+
+
+def test_api_portfolio_advise():
+    payload = {
+        "available_cash": 10000.0,
+        "holdings": [
+            {"ticker": "PETR4.SA", "shares": 50.0, "average_buy_price": 35.0}
+        ],
+        "universe_category": "custom",
+        "custom_tickers": ["PETR4.SA", "VALE3.SA", "ITUB4.SA", "BBAS3.SA"],
+        "interval": "1d",
+        "period": "1y",
+        "max_weight_pct": 25.0,
+        "rebalance_band_pct": 5.0,
+        "min_rotation_score_delta": 15.0,
+    }
+    res = client.post("/api/portfolio/advise", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["current_cash"] == 10000.0
+    assert data["total_portfolio_equity"] > 10000.0
+    assert data["projected_cash_after"] >= 0.0
+    assert "holdings_evaluated" in data
+    assert len(data["holdings_evaluated"]) == 1
+    assert data["holdings_evaluated"][0]["ticker"] == "PETR4.SA"
+    assert "recommendations" in data
+    assert "opportunity_ranking" in data
+    assert len(data["opportunity_ranking"]) >= 3
