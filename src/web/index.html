@@ -1442,7 +1442,95 @@
           </div>
         </div>
 
-        <div id="portfolio-simulation-sections-anchor"></div>
+        <!-- ======================================================= -->
+        <!-- SECTION B: SIMULADOR HISTÓRICO MULTIATIVOS (BACKTEST)   -->
+        <!-- ======================================================= -->
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <span>📈</span>Simulador Histórico da Carteira (Backtest Multiativos Zero Look-Ahead)
+              </h3>
+              <p class="text-[11px] text-gray-400">
+                Simula como o motor teria gerenciado e rebalanceado o capital ao longo do período, comparando contra o Buy & Hold em pesos iguais da cesta.
+              </p>
+            </div>
+          </div>
+
+          <!-- 6 Institutional KPI Cards -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3" id="portfolio-kpi-grid">
+            <div class="card-surface p-2.5 sm:p-3">
+              <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Capital Inicial</div>
+              <div class="text-base sm:text-lg font-bold text-white font-mono" id="port-kpi-initial">R$ 10.000,00</div>
+              <div class="text-[9px] text-gray-400 font-mono" id="port-kpi-cash-sub">Caixa final: R$ 0,00</div>
+            </div>
+            <div class="card-surface p-2.5 sm:p-3">
+              <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Patrimônio Final</div>
+              <div class="text-base sm:text-lg font-bold text-fintech-green font-mono" id="port-kpi-final">R$ 10.000,00</div>
+              <div class="text-[9px] text-gray-400 font-mono" id="port-kpi-profit-sub">Lucro: R$ 0,00</div>
+            </div>
+            <div class="card-surface p-2.5 sm:p-3">
+              <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Retorno Carteira</div>
+              <div class="text-base sm:text-lg font-bold text-fintech-cyan font-mono" id="port-kpi-return">+0.0%</div>
+              <div class="text-[9px] text-gray-400 font-mono" id="port-kpi-bench-sub">B&H Cesta: 0.0% (Alfa: 0.0%)</div>
+            </div>
+            <div class="card-surface p-2.5 sm:p-3">
+              <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Taxa de Acerto (Saídas)</div>
+              <div class="text-base sm:text-lg font-bold text-emerald-400 font-mono" id="port-kpi-winrate">0.0%</div>
+              <div class="text-[9px] text-gray-400 font-mono" id="port-kpi-exits-sub">0 saídas fechadas</div>
+            </div>
+            <div class="card-surface p-2.5 sm:p-3">
+              <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Fator de Lucro</div>
+              <div class="text-base sm:text-lg font-bold text-amber-400 font-mono" id="port-kpi-pf">0.00</div>
+              <div class="text-[9px] text-gray-400 font-mono" id="port-kpi-rotations-sub">0 rebalanceamentos/rotações</div>
+            </div>
+            <div class="card-surface p-2.5 sm:p-3">
+              <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Max Drawdown Carteira</div>
+              <div class="text-base sm:text-lg font-bold text-rose-400 font-mono" id="port-kpi-dd">0.0%</div>
+              <div class="text-[9px] text-gray-400 font-mono" id="port-kpi-events-sub">0 ordens totais</div>
+            </div>
+          </div>
+
+          <div id="portfolio-charts-and-ranking-anchor"></div>
+
+          <!-- Chronological Ledger of Portfolio Trades & Rebalances -->
+          <div class="card-surface p-3.5 sm:p-4 overflow-hidden">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-xs font-bold text-gray-200 flex items-center gap-1.5">
+                <span>📜</span>Histórico Cronológico de Compras, Vendas e Rebalanceamentos da Carteira
+              </h3>
+              <span class="text-[10px] text-gray-400 font-mono" id="portfolio-ledger-count-badge">0 eventos</span>
+            </div>
+            <div class="overflow-x-auto touch-scroll max-h-80">
+              <table class="w-full text-left text-xs text-gray-300">
+                <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[10px] sticky top-0 whitespace-nowrap">
+                  <tr>
+                    <th class="px-2.5 py-2 text-center">#</th>
+                    <th class="px-2.5 py-2 font-mono">Data</th>
+                    <th class="px-2.5 py-2">Operação</th>
+                    <th class="px-2.5 py-2">Ativo</th>
+                    <th class="px-2.5 py-2">Estratégia Acionada</th>
+                    <th class="px-2.5 py-2 text-center font-mono">Score</th>
+                    <th class="px-2.5 py-2 font-mono">Preço Exec.</th>
+                    <th class="px-2.5 py-2 font-mono">Cotas</th>
+                    <th class="px-2.5 py-2 font-mono">Valor Ordem</th>
+                    <th class="px-2.5 py-2 font-mono">Lucro/Prej. Realizado</th>
+                    <th class="px-2.5 py-2 font-mono text-center">Peso (Antes → Depois)</th>
+                    <th class="px-2.5 py-2 font-mono">Caixa Restante</th>
+                    <th class="px-2.5 py-2 font-mono">Patrimônio Total</th>
+                  </tr>
+                </thead>
+                <tbody id="portfolio-ledger-tbody" class="divide-y divide-fintech-border font-mono whitespace-nowrap text-[11px]">
+                  <tr>
+                    <td colspan="13" class="px-4 py-6 text-center text-gray-500">
+                      Execute a simulação da carteira para visualizar o histórico barra a barra de alocações e rotações.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
