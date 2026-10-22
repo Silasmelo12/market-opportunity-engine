@@ -339,10 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupOverviewSubNav();
   setupOverviewMetasModal();
 
-  // Auto-sync B3 if no holdings in storage or explicitly requested
-  if (!state.portfolioState.holdings || state.portfolioState.holdings.length === 0) {
-    loadB3SpreadsheetData(false);
-  }
+  // Holdings are loaded purely from storage or user uploads
 
 
   window.addEventListener('hashchange', () => {
@@ -3645,16 +3642,9 @@ function setupPortfolioTab() {
   }
   updateUndoButtonVisibility();
 
-  // CSV / B3 Import Button and File Input
+  // CSV / B3 Import Button and Multi-File Input
   const btnImportCsv = document.getElementById('btn-portfolio-import-csv');
-  const btnSyncB3 = document.getElementById('btn-portfolio-sync-b3');
   const fileInputCsv = document.getElementById('portfolio-csv-file-input');
-
-  if (btnSyncB3) {
-    btnSyncB3.addEventListener('click', async () => {
-      await loadB3SpreadsheetData(true);
-    });
-  }
 
   if (btnImportCsv && fileInputCsv) {
     btnImportCsv.addEventListener('click', () => {
@@ -3663,64 +3653,45 @@ function setupPortfolioTab() {
     });
 
     fileInputCsv.addEventListener('change', async (e) => {
-      const file = e.target.files && e.target.files[0];
-      if (file) {
-        if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-          await uploadB3SpreadsheetFile(file);
-        } else {
-          importPortfolioHoldingsFromCsv(file);
-        }
+      const files = Array.from(e.target.files || []);
+      if (files.length === 0) return;
+
+      const hasExcel = files.some(f => f.name.endsWith('.xlsx') || f.name.endsWith('.xls'));
+      if (hasExcel || files.length > 1) {
+        await uploadMultipleB3Spreadsheets(files);
+      } else {
+        importPortfolioHoldingsFromCsv(files[0]);
       }
     });
   }
 }
 
-async function loadB3SpreadsheetData(forceNotification = false) {
-  showLoading('Sincronizando carteira com planilha oficial B3...');
-  try {
-    const res = await fetch('/api/b3/sync-local');
-    if (!res.ok) {
-      const errData = await res.json().catch(() => ({}));
-      if (forceNotification) {
-        alert(errData.detail || 'Nenhuma planilha oficial encontrada em B3/.');
-      }
-      return;
-    }
-    const data = await res.json();
-    applyB3ParsedResult(data);
-    if (forceNotification) {
-      showToastNotification("Planilha B3 sincronizada com sucesso!", false);
-    }
-  } catch (err) {
-    console.warn('Erro ao sincronizar B3 local:', err);
-    if (forceNotification) {
-      alert('Falha ao comunicar com o servidor para sincronização da B3.');
-    }
-  } finally {
-    hideLoading();
-  }
-}
-
-async function uploadB3SpreadsheetFile(file) {
-  showLoading('Processando planilha oficial B3...');
+async function uploadMultipleB3Spreadsheets(files) {
+  const count = files.length;
+  showLoading(`Processando ${count} ${count === 1 ? 'planilha da B3' : 'planilhas da B3 combinadas'}...`);
   try {
     const formData = new FormData();
-    formData.append('file', file);
+    files.forEach(f => {
+      formData.append('files', f);
+    });
+
     const res = await fetch('/api/b3/parse', {
       method: 'POST',
       body: formData,
     });
+
     if (!res.ok) {
       const errData = await res.json().catch(() => ({}));
-      alert(errData.detail || 'Erro ao processar planilha B3 enviada.');
+      alert(errData.detail || 'Erro ao processar planilhas da B3.');
       return;
     }
+
     const data = await res.json();
     applyB3ParsedResult(data);
-      showToastNotification("Planilha B3 carregada com sucesso!", false);
+    showToastNotification(`${count} ${count === 1 ? 'planilha processada' : 'planilhas combinadas'} com sucesso! (${data.holdings.length} ativos em custódia)`, false);
   } catch (err) {
-    console.error('Erro ao enviar planilha B3:', err);
-    alert('Erro ao processar arquivo B3.');
+    console.error('Erro ao enviar planilhas B3:', err);
+    alert('Erro ao processar arquivos da B3.');
   } finally {
     hideLoading();
   }

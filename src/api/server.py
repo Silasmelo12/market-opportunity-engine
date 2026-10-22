@@ -17,8 +17,11 @@ import pandas as pd
 from fastapi import FastAPI, Query, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+import logging
 
-from ..data_loader import DataLoader, strip_corporate_suffix, parse_b3_file
+logger = logging.getLogger("api_server")
+
+from ..data_loader import DataLoader, strip_corporate_suffix, parse_b3_file, parse_multiple_b3_files
 from ..strategies import StrategyCatalog, SignalRecord
 
 from ..evaluator import (
@@ -1825,18 +1828,39 @@ def b3_sync_local():
 
 
 @app.post("/api/b3/parse", response_model=B3ParseResult)
-async def b3_parse_uploaded_file(file: UploadFile = File(...)):
+async def b3_parse_uploaded_file(
+    file: Optional[UploadFile] = File(None),
+    files: Optional[List[UploadFile]] = File(None)
+):
     """
-    Parses an uploaded B3 spreadsheet (.xlsx or .csv) and computes custody holdings and income.
+    Parses one or multiple uploaded B3 spreadsheets (.xlsx or .csv) and computes
+    consolidated custody holdings, average buy prices, and passive income.
     """
+    upload_list: List[UploadFile] = []
+    if files:
+        upload_list.extend(files)
+    if file:
+        upload_list.append(file)
+    
+    if not upload_list:
+        raise HTTPException(status_code=400, detail="Nenhum arquivo enviado.")
+
     try:
-        content = await file.read()
-        filename = file.filename or "movimentacao.xlsx"
-        result = parse_b3_file(content, filename=filename)
+        files_data = []
+        for f in upload_list:
+            content = await f.read()
+            fname = f.filename or "b3_arquivo.xlsx"
+            files_data.append((fname, content))
+        
+        if len(files_data) == 1:
+            fname, content = files_data[0]
+            result = parse_b3_file(content, filename=fname)
+        else:
+            result = parse_multiple_b3_files(files_data)
         return result
     except Exception as err:
-        logger.error(f"Erro ao processar arquivo B3 enviado {file.filename}: {err}")
-        raise HTTPException(status_code=400, detail=f"Erro ao processar planilha B3: {str(err)}")
+        logger.error(f"Erro ao processar planilhas B3 enviadas: {err}")
+        raise HTTPException(status_code=400, detail=f"Erro ao processar planilhas B3: {str(err)}")
 
 
 if os.path.exists(static_dir):
