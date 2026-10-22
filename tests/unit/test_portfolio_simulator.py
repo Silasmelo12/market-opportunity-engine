@@ -173,3 +173,108 @@ def test_advise_portfolio_triggers_sell_full_and_partial_rebalance_and_rotation(
     actions_b = {r.ticker: r.action_type for r in res_b["recommendations"]}
     assert actions_b.get("ABEV3.SA") == "ROTATE_OUT"
     assert actions_b.get("ITUB4.SA") == "ROTATE_IN"
+
+
+
+def test_simulate_portfolio_multi_asset_zero_lookahead_and_cash_conservation():
+    from src.evaluator.portfolio_simulator import simulate_portfolio_multi_asset
+
+    s_a = _make_mock_series("PETR4.SA", n_bars=60, base_price=30.0)
+    s_b = _make_mock_series("VALE3.SA", n_bars=60, base_price=50.0)
+    s_c = _make_mock_series("ITUB4.SA", n_bars=60, base_price=25.0)
+
+    sigs_a = [
+        SignalRecord("prop", "t1_open", 4, 5, 30.0, 29.5, direction="BUY"),
+        SignalRecord("prop", "sell_t1_open", 20, 21, 36.0, 36.5, direction="SELL"),
+        SignalRecord("prop", "t1_open", 35, 36, 31.0, 30.5, direction="BUY"),
+        SignalRecord("prop", "sell_t1_open", 50, 51, 38.0, 38.5, direction="SELL"),
+    ]
+    sigs_b = [
+        SignalRecord("prop", "t1_open", 8, 9, 50.0, 49.5, direction="BUY"),
+        SignalRecord("prop", "sell_t1_open", 28, 29, 58.0, 58.5, direction="SELL"),
+    ]
+    sigs_c = [
+        SignalRecord("prop", "t1_open", 12, 13, 25.0, 24.5, direction="BUY"),
+        SignalRecord("prop", "sell_t1_open", 42, 43, 29.0, 29.5, direction="SELL"),
+    ]
+
+    bundles_full = [
+        {"ticker": "PETR4.SA", "asset_name": "Petrobras", "series": s_a, "signals": sigs_a},
+        {"ticker": "VALE3.SA", "asset_name": "Vale", "series": s_b, "signals": sigs_b},
+        {"ticker": "ITUB4.SA", "asset_name": "Itaú", "series": s_c, "signals": sigs_c},
+    ]
+
+    res_full = simulate_portfolio_multi_asset(
+        asset_bundles=bundles_full,
+        initial_capital=10000.0,
+        max_weight_pct=35.0,
+        rebalance_band_pct=5.0,
+    )
+
+    assert res_full.initial_capital == 10000.0
+    assert res_full.final_equity > 10000.0
+    assert res_full.total_events_count >= 4
+    assert len(res_full.curve) == 60
+    for ev in res_full.ledger_events:
+        assert ev.cash_after >= 0.0
+        assert ev.portfolio_equity_after > 0.0
+
+    # Strict Zero Look-Ahead Bias Truncation Test at bar cutoff = 30
+    cutoff = 30
+
+    def _slice_series(s: OHLCVSeries, k: int) -> OHLCVSeries:
+        return OHLCVSeries(
+            ticker=s.ticker,
+            interval=s.interval,
+            timestamps=s.timestamps[:k],
+            open=s.open[:k],
+            high=s.high[:k],
+            low=s.low[:k],
+            close=s.close[:k],
+            volume=s.volume[:k],
+        )
+
+    bundles_trunc = [
+        {
+            "ticker": "PETR4.SA",
+            "asset_name": "Petrobras",
+            "series": _slice_series(s_a, cutoff),
+            "signals": [sig for sig in sigs_a if sig.execution_bar_index < cutoff],
+        },
+        {
+            "ticker": "VALE3.SA",
+            "asset_name": "Vale",
+            "series": _slice_series(s_b, cutoff),
+            "signals": [sig for sig in sigs_b if sig.execution_bar_index < cutoff],
+        },
+        {
+            "ticker": "ITUB4.SA",
+            "asset_name": "Itaú",
+            "series": _slice_series(s_c, cutoff),
+            "signals": [sig for sig in sigs_c if sig.execution_bar_index < cutoff],
+        },
+    ]
+
+    res_trunc = simulate_portfolio_multi_asset(
+        asset_bundles=bundles_trunc,
+        initial_capital=10000.0,
+        max_weight_pct=35.0,
+        rebalance_band_pct=5.0,
+    )
+
+    # Every curve point up to cutoff must match bit-for-bit!
+    for i in range(cutoff):
+        assert res_trunc.curve[i].date == res_full.curve[i].date
+        assert res_trunc.curve[i].portfolio_equity == res_full.curve[i].portfolio_equity
+        assert res_trunc.curve[i].cash_balance == res_full.curve[i].cash_balance
+
+    # Every ledger event up to cutoff date must match bit-for-bit!
+    cutoff_date = res_trunc.curve[-1].date
+    full_events_up_to_cutoff = [e for e in res_full.ledger_events if e.date <= cutoff_date]
+    assert len(res_trunc.ledger_events) == len(full_events_up_to_cutoff)
+    for e_tr, e_fl in zip(res_trunc.ledger_events, full_events_up_to_cutoff):
+        assert e_tr.ticker == e_fl.ticker
+        assert e_tr.event_type == e_fl.event_type
+        assert e_tr.shares_delta == e_fl.shares_delta
+        assert e_tr.execution_price == e_fl.execution_price
+        assert e_tr.cash_after == e_fl.cash_after

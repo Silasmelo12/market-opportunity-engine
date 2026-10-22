@@ -236,3 +236,27 @@ def test_api_portfolio_advise():
     assert "recommendations" in data
     assert "opportunity_ranking" in data
     assert len(data["opportunity_ranking"]) >= 3
+
+
+
+def test_api_portfolio_simulate():
+    payload = {
+        "initial_capital": 10000.0,
+        "universe_category": "custom",
+        "custom_tickers": ["PETR4.SA", "VALE3.SA", "ITUB4.SA", "BBAS3.SA"],
+        "interval": "1d",
+        "period": "1y",
+        "max_weight_pct": 25.0,
+        "rebalance_band_pct": 5.0,
+        "min_rotation_score_delta": 15.0,
+    }
+    res = client.post("/api/portfolio/simulate", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert "metrics" in data
+    assert data["metrics"]["initial_capital"] == 10000.0
+    assert data["metrics"]["final_equity"] > 0.0
+    assert "curve" in data
+    assert len(data["curve"]) > 10
+    assert "ledger_events" in data
+    assert "opportunity_ranking" in data
