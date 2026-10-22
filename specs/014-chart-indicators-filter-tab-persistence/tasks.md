@@ -44,9 +44,9 @@
 
 **Independent Test**: Carregar a página e clicar na aba Gráfico mantendo "Compra" ativo; verificar que todas as seções de venda estão com a classe `hidden`.
 
-- [ ] T006 [US2] Chamar `updateSidebarDirectionFilter()` dentro de `DOMContentLoaded` em `src/web/app.js` para aplicar o filtro logo no primeiro render.
-- [ ] T007 [US2] Chamar `updateSidebarDirectionFilter()` dentro de `switchTab(tabId)` em `src/web/app.js` sempre que a aba Gráfico for ativada.
-- [ ] T008 [US2] Conectar `updateSidebarDirectionFilter()` aos cliques dos botões de direção no `#global-direction-selector` em `src/web/app.js`.
+- [x] T006 [US2] Chamar `updateSidebarDirectionFilter()` dentro de `DOMContentLoaded` em `src/web/app.js` para aplicar o filtro logo no primeiro render.
+- [x] T007 [US2] Chamar `updateSidebarDirectionFilter()` dentro de `switchTab(tabId)` em `src/web/app.js` sempre que a aba Gráfico for ativada.
+- [x] T008 [US2] Conectar `updateSidebarDirectionFilter()` aos cliques dos botões de direção no `#global-direction-selector` em `src/web/app.js`.
 
 ---
 

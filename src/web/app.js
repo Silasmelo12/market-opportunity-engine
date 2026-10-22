@@ -280,6 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   setupNavigationTabs();
   setupDirectionSelector();
+  updateSidebarDirectionFilter();
   setupAccordions();
   setupMobileStrategiesToggle();
   setupTimeframeButtons();
@@ -432,6 +433,7 @@ function setupDirectionSelector() {
         }
       });
 
+      updateSidebarDirectionFilter();
       // 0ms instant client-side update
       applyClientSideFiltering();
 
@@ -575,6 +577,7 @@ function switchTab(tabId) {
   }
 
   if (tabId === 'tab-terminal') {
+    updateSidebarDirectionFilter();
     if (!state.analysisData) {
       loadAnalysisData();
     } else {
