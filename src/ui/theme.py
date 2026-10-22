@@ -233,6 +233,7 @@ ASSET_NAMES_PT: Dict[str, str] = {
     "BNDA39.SA": "Invesco QQQ Trust BDR",
     "ACWI11.SA": "Trend ETF MSCI ACWI",
     "BACW39.SA": "iShares MSCI ACWI BDR",
+    "SPCX34.SA": "SpaceX BDR (Space Exploration)",
     # Ações EUA
     "AAPL": "Apple",
     "MSFT": "Microsoft",

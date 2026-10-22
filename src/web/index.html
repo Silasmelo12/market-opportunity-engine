@@ -161,12 +161,12 @@
           <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 active-cat shrink-0" data-cat="featured">Destaques (14)</button>
           <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="Ações Brasil">Ações Brasil (31)</button>
           <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="FIIs Brasil">FIIs Brasil (23)</button>
-          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="BDRs">BDRs (40)</button>
+          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="BDRs">BDRs (41)</button>
           <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="Ações EUA">Ações EUA (71)</button>
           <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="Commodities">Commodities (14)</button>
           <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="Forex">Forex (11)</button>
           <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="Criptomoedas">Cripto (3)</button>
-          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="all">Todos (193)</button>
+          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="all">Todos (194)</button>
         </div>
 
         <!-- Radar Opportunities Table -->
@@ -440,6 +440,7 @@
                 <option value="BNDA39.SA">BNDA39.SA - Invesco QQQ Trust BDR (BDRs)</option>
                 <option value="ACWI11.SA">ACWI11.SA - Trend ETF MSCI ACWI (BDRs/ETFs)</option>
                 <option value="BACW39.SA">BACW39.SA - iShares MSCI ACWI BDR (BDRs)</option>
+                <option value="SPCX34.SA">SPCX34.SA - SpaceX BDR (BDRs)</option>
               </datalist>
             </div>
           </div>
@@ -1382,11 +1383,20 @@
             <div class="flex flex-wrap items-center justify-between gap-2 border-b border-fintech-border pb-2">
               <div>
                 <h3 class="font-bold text-emerald-400 uppercase tracking-wider text-[11px]">2. Minhas Posições Atuais (Opcional)</h3>
-                <p class="text-[10px] text-gray-400">Deixe vazio para simular começando 100% em caixa (ex: R$ 10.000,00) ou cadastre seus ativos atuais para rebalancear.</p>
+                <p class="text-[10px] text-gray-400">Deixe vazio para 100% em caixa ou importe/cadastre seus ativos atuais para rebalancear.</p>
               </div>
-              <button id="btn-portfolio-clear-holdings" class="text-[11px] px-2.5 py-1 rounded bg-fintech-bg hover:bg-rose-950/60 text-gray-300 hover:text-rose-300 border border-fintech-border transition cursor-pointer">
-                Limpar (100% em Caixa)
-              </button>
+              <div class="flex items-center gap-1.5">
+                <input type="file" id="portfolio-csv-file-input" accept=".csv,.txt" class="hidden">
+                <button id="btn-portfolio-import-csv" type="button" class="text-[11px] px-2.5 py-1 rounded bg-cyan-950/50 hover:bg-cyan-900/60 text-cyan-300 hover:text-cyan-200 border border-cyan-800/60 transition cursor-pointer flex items-center gap-1" title="Importar arquivo CSV com colunas Ticker, Quantidade e Preço Médio">
+                  <span>📥</span>Importar CSV
+                </button>
+                <button id="btn-portfolio-undo-apply" type="button" class="hidden text-[11px] px-2.5 py-1 rounded bg-amber-950/50 hover:bg-amber-900/60 text-amber-300 hover:text-amber-200 border border-amber-800/60 transition cursor-pointer flex items-center gap-1" title="Desfazer aplicação de ordens e restaurar carteira anterior">
+                  <span>↩️</span>Desfazer Aplicação
+                </button>
+                <button id="btn-portfolio-clear-holdings" class="text-[11px] px-2.5 py-1 rounded bg-fintech-bg hover:bg-rose-950/60 text-gray-300 hover:text-rose-300 border border-fintech-border transition cursor-pointer">
+                  Limpar (100% Caixa)
+                </button>
+              </div>
             </div>
 
             <!-- Add Holding Inline Form -->

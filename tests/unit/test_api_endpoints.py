@@ -90,10 +90,11 @@ def test_api_tickers():
     assert "commodities" in data
     assert "forex" in data
     assert "crypto" in data
-    assert data["total"] == 193
+    assert data["total"] == 194
     assert "bdrs" in data
-    assert len(data["bdrs"]) == 40
+    assert len(data["bdrs"]) == 41
     assert "TMCO34.SA" in data["bdrs"]
+    assert "SPCX34.SA" in data["bdrs"]
 
 
 def test_api_simulate():
