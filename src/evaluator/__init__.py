@@ -21,6 +21,17 @@ from .timing_classifier import (
     TimingStatus,
     classify_timing_status,
 )
+from .portfolio_simulator import (
+    PortfolioHolding,
+    AssetOpportunityProfile,
+    PortfolioActionRecommendation,
+    PortfolioLedgerEvent,
+    PortfolioCurvePoint,
+    PortfolioSimulationResult,
+    compute_asset_opportunity_profile,
+    advise_portfolio_rebalance,
+    simulate_portfolio_multi_asset,
+)
 
 __all__ = [
     "evaluate_strategy_performance",
@@ -36,4 +47,13 @@ __all__ = [
     "optimize_dca_strategies",
     "TimingStatus",
     "classify_timing_status",
+    "PortfolioHolding",
+    "AssetOpportunityProfile",
+    "PortfolioActionRecommendation",
+    "PortfolioLedgerEvent",
+    "PortfolioCurvePoint",
+    "PortfolioSimulationResult",
+    "compute_asset_opportunity_profile",
+    "advise_portfolio_rebalance",
+    "simulate_portfolio_multi_asset",
 ]

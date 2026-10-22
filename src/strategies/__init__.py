@@ -12,13 +12,13 @@ from .base import (
 from .proprietary_reversal import ProprietaryReversalEngine
 from .mql5_candles import MQL5CandleEngine
 from .classic_engines import ClassicStrategiesEngine, compute_rsi
+from .quantitative_indicators import QuantitativeIndicatorsEngine
 
 
 class StrategyCatalog:
     """
-    Orchestrates all strategy families (4 Proprietary variants, 6 Classic engines,
-    and 14 MQL5 candlestick patterns = 24 distinct sub-strategies) while maintaining
-    state isolation and collecting pending alerts on the latest bar.
+    Orchestrates all strategy families (Proprietary, Classic, MQL5, and 10 Quantitative Indicators)
+    while maintaining state isolation and collecting pending alerts on the latest bar.
     """
 
     def __init__(
@@ -34,6 +34,7 @@ class StrategyCatalog:
         )
         self.classic_engine = ClassicStrategiesEngine()
         self.mql5_engine = MQL5CandleEngine()
+        self.quant_engine = QuantitativeIndicatorsEngine()
 
     def run_all(
         self,
@@ -51,18 +52,22 @@ class StrategyCatalog:
         prop_sigs, prop_lines = self.prop_engine.generate_signals(series)
         classic_sigs, _ = self.classic_engine.generate_signals(series, benchmark_close=benchmark_close)
         mql5_sigs, _ = self.mql5_engine.generate_signals(series)
+        quant_buys, quant_sells = self.quant_engine.generate_signals(series)
 
-        all_signals = prop_sigs + classic_sigs + mql5_sigs
+        all_signals = prop_sigs + classic_sigs + mql5_sigs + quant_buys + quant_sells
         pending = (
             self.prop_engine.pending_signals
             + self.classic_engine.pending_signals
             + self.mql5_engine.pending_signals
+            + self.quant_engine.pending_signals
         )
 
         total_signals_map: Dict[str, int] = dict(self.prop_engine.total_signals_by_variant)
-        for sig in classic_sigs + mql5_sigs:
+        for sig in classic_sigs + mql5_sigs + quant_buys + quant_sells:
             if sig.metadata and "total_variant_signals" in sig.metadata:
                 total_signals_map[sig.strategy_sub_id] = int(sig.metadata["total_variant_signals"])
+            else:
+                total_signals_map[sig.strategy_sub_id] = total_signals_map.get(sig.strategy_sub_id, 0) + 1
 
         return {
             "signals": all_signals,
@@ -81,6 +86,8 @@ __all__ = [
     "ProprietaryReversalEngine",
     "MQL5CandleEngine",
     "ClassicStrategiesEngine",
+    "QuantitativeIndicatorsEngine",
     "StrategyCatalog",
     "compute_rsi",
 ]
+

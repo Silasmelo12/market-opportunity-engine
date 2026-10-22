@@ -26,6 +26,8 @@ window.appState = {
   radarTotalPages: 1,
   radarTotalAssets: 0,
   radarStrategies: new Set(),
+  radarSortField: null,
+  radarSortOrder: 'desc',
   lookbackN: 10,
   retestM: 5,
   horizonX: 60,
@@ -280,18 +282,36 @@ document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   setupNavigationTabs();
   setupDirectionSelector();
+  updateSidebarDirectionFilter();
   setupAccordions();
   setupMobileStrategiesToggle();
   setupTimeframeButtons();
   setupRadarTimeframeButtons();
   setupRadarCategoryPills();
   setupRadarStrategyFilter();
+  setupRadarTableSorting();
   setupGranularStrategyCheckboxes();
   initTradingViewChart();
   setupSimulationTab();
+  setupPortfolioTab();
 
-  // Initial load
-  loadRadarData();
+
+  window.addEventListener('hashchange', () => {
+    const targetTab = getTabFromHash();
+    if (targetTab && targetTab !== state.activeTab) {
+      switchTab(targetTab, false);
+    }
+  });
+
+  // Initial tab restoration from URL hash or localStorage
+  const initialTab = getTabFromHash();
+  switchTab(initialTab, true);
+
+  if (initialTab !== 'tab-radar') {
+    // Also preload radar in background for 0ms tab switches
+    loadRadarData();
+  }
+
 
   // Listeners
   elements.btnLoadAnalysis.addEventListener('click', () => {
@@ -355,6 +375,68 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // UI: Direction Selector (Compra, Venda, Ambos)
+
+
+const TAB_HASH_MAP = {
+  '#radar': 'tab-radar',
+  '#/': 'tab-radar',
+  '#terminal': 'tab-terminal',
+  '#grafico': 'tab-terminal',
+  '#simulator': 'tab-simulator',
+  '#simulador': 'tab-simulator',
+  '#playbook': 'tab-playbook',
+  '#portfolio': 'tab-portfolio',
+  '#carteira': 'tab-portfolio',
+};
+
+const TAB_TO_HASH_MAP = {
+  'tab-radar': '#radar',
+  'tab-terminal': '#terminal',
+  'tab-simulator': '#simulator',
+  'tab-playbook': '#playbook',
+  'tab-portfolio': '#portfolio',
+};
+
+function getTabFromHash() {
+  const hash = (window.location.hash || '').toLowerCase();
+  if (TAB_HASH_MAP[hash]) return TAB_HASH_MAP[hash];
+  const saved = localStorage.getItem('market_engine_active_tab');
+  if (saved && TAB_TO_HASH_MAP[saved]) return saved;
+  return 'tab-radar';
+}
+
+function getHashFromTab(tabId) {
+  return TAB_TO_HASH_MAP[tabId] || '#radar';
+}
+
+
+function sortRadarItems(items) {
+  if (!state.radarSortField || !items || items.length === 0) return items;
+  const field = state.radarSortField;
+  const isAsc = state.radarSortOrder === 'asc';
+
+  return [...items].sort((a, b) => {
+    let valA = a[field] != null ? a[field] : (isAsc ? Infinity : -Infinity);
+    let valB = b[field] != null ? b[field] : (isAsc ? Infinity : -Infinity);
+
+    if (valA < valB) return isAsc ? -1 : 1;
+    if (valA > valB) return isAsc ? 1 : -1;
+    return 0;
+  });
+}
+
+function updateSidebarDirectionFilter() {
+  const dir = state.activeDirection || 'BUY';
+  document.querySelectorAll('.strategy-group-wrapper').forEach(wrapper => {
+    const wrapDir = wrapper.getAttribute('data-direction');
+    if (dir === 'BOTH' || wrapDir === dir) {
+      wrapper.classList.remove('hidden');
+    } else {
+      wrapper.classList.add('hidden');
+    }
+  });
+}
+
 function setupDirectionSelector() {
   const dirButtons = document.querySelectorAll('#global-direction-selector .dir-seg-btn');
   dirButtons.forEach(btn => {
@@ -389,6 +471,7 @@ function setupDirectionSelector() {
         }
       });
 
+      updateSidebarDirectionFilter();
       // 0ms instant client-side update
       applyClientSideFiltering();
 
@@ -483,7 +566,7 @@ function updateChartsTheme(theme) {
       'xaxis.linecolor': borderColor,
       'yaxis.linecolor': borderColor,
     };
-    ['plot-ranking', 'plot-scatter', 'plot-simulation-curve'].forEach(id => {
+    ['plot-ranking', 'plot-scatter', 'plot-simulation-curve', 'portfolio-equity-chart', 'portfolio-allocation-chart'].forEach(id => {
       const el = document.getElementById(id);
       if (el && el.data) {
         Plotly.relayout(el, plotlyLayoutUpdate).catch(() => {});
@@ -503,8 +586,18 @@ function setupNavigationTabs() {
   });
 }
 
-function switchTab(tabId) {
+function switchTab(tabId, updateHash = true) {
   state.activeTab = tabId;
+  try {
+    localStorage.setItem('market_engine_active_tab', tabId);
+  } catch (e) {}
+  if (updateHash && window.location.hash !== getHashFromTab(tabId)) {
+    try {
+      history.replaceState(null, '', getHashFromTab(tabId));
+    } catch (e) {
+      window.location.hash = getHashFromTab(tabId);
+    }
+  }
   document.querySelectorAll('#main-nav-tabs .nav-tab-btn').forEach(b => {
     if (b.getAttribute('data-tab') === tabId) {
       b.classList.add('active');
@@ -524,7 +617,7 @@ function switchTab(tabId) {
   // Toggle Global Direction Selector visibility: only displayed in Radar and Gráfico (Terminal)
   const dirSelector = document.getElementById('global-direction-selector');
   if (dirSelector) {
-    if (tabId === 'tab-simulator' || tabId === 'tab-playbook') {
+    if (tabId === 'tab-simulator' || tabId === 'tab-playbook' || tabId === 'tab-portfolio') {
       dirSelector.classList.add('hidden');
     } else {
       dirSelector.classList.remove('hidden');
@@ -532,6 +625,7 @@ function switchTab(tabId) {
   }
 
   if (tabId === 'tab-terminal') {
+    updateSidebarDirectionFilter();
     if (!state.analysisData) {
       loadAnalysisData();
     } else {
@@ -552,6 +646,13 @@ function switchTab(tabId) {
     setTimeout(() => {
       const p3 = document.getElementById('plot-simulation-curve');
       if (p3 && window.Plotly) Plotly.Plots.resize(p3);
+    }, 60);
+  } else if (tabId === 'tab-portfolio') {
+    setTimeout(() => {
+      ['portfolio-equity-chart', 'portfolio-allocation-chart'].forEach(cid => {
+        const cEl = document.getElementById(cid);
+        if (cEl && cEl.data && window.Plotly) Plotly.Plots.resize(cEl);
+      });
     }, 60);
   }
 }
@@ -684,6 +785,38 @@ const STRATEGY_ALIASES = {
   'sell_double_top_bos': ['sell_double_top_bos', 'double_top_bos'],
   'buy_double_top_inverted': ['buy_double_top_inverted'],
   'sell_double_bottom_inverted': ['sell_double_bottom_inverted'],
+  // Quantitative Indicators Aliases (Feature 013 & 014)
+  'bollinger_close_in': ['bollinger_close_in', 'bb_reversal_buy', 'bb_reversal_sell'],
+  'bb_reversal_buy': ['bollinger_close_in', 'bb_reversal_buy'],
+  'bb_reversal_sell': ['bollinger_close_in', 'bb_reversal_sell'],
+  'keltner_squeeze': ['keltner_squeeze', 'squeeze_breakout_buy', 'squeeze_breakout_sell'],
+  'squeeze_breakout_buy': ['keltner_squeeze', 'squeeze_breakout_buy'],
+  'squeeze_breakout_sell': ['keltner_squeeze', 'squeeze_breakout_sell'],
+  'zscore_extreme': ['zscore_extreme', 'zscore_bottom_buy', 'zscore_top_sell'],
+  'zscore_bottom_buy': ['zscore_extreme', 'zscore_bottom_buy'],
+  'zscore_top_sell': ['zscore_extreme', 'zscore_top_sell'],
+  'rsi_divergence': ['rsi_divergence', 'rsi_bullish_div', 'rsi_bearish_div'],
+  'rsi_bullish_div': ['rsi_divergence', 'rsi_bullish_div'],
+  'rsi_bearish_div': ['rsi_divergence', 'rsi_bearish_div'],
+  'stochastic_extreme': ['stochastic_extreme', 'stoch_oversold_cross', 'stoch_overbought_cross'],
+  'stoch_oversold_cross': ['stochastic_extreme', 'stoch_oversold_cross'],
+  'stoch_overbought_cross': ['stochastic_extreme', 'stoch_overbought_cross'],
+  'macd_momentum': ['macd_momentum', 'macd_bottom_turn', 'macd_top_turn'],
+  'macd_bottom_turn': ['macd_momentum', 'macd_bottom_turn'],
+  'macd_top_turn': ['macd_momentum', 'macd_top_turn'],
+  'vwap_bands': ['vwap_bands', 'vwap_band_buy', 'vwap_band_sell'],
+  'vwap_band_buy': ['vwap_bands', 'vwap_band_buy'],
+  'vwap_band_sell': ['vwap_bands', 'vwap_band_sell'],
+  'mfi_extreme': ['mfi_extreme', 'mfi_bottom_buy', 'mfi_top_sell'],
+  'mfi_bottom_buy': ['mfi_extreme', 'mfi_bottom_buy'],
+  'mfi_top_sell': ['mfi_extreme', 'mfi_top_sell'],
+  'volume_climax_vsa': ['volume_climax_vsa', 'vsa_absorption_buy', 'vsa_climax_sell'],
+  'vsa_absorption_buy': ['volume_climax_vsa', 'vsa_absorption_buy'],
+  'vsa_climax_sell': ['volume_climax_vsa', 'vsa_climax_sell'],
+  'supertrend_trailing': ['supertrend_trailing', 'supertrend_bull_flip', 'supertrend_bear_flip'],
+  'supertrend_bull_flip': ['supertrend_trailing', 'supertrend_bull_flip'],
+  'supertrend_bear_flip': ['supertrend_trailing', 'supertrend_bear_flip'],
+
 };
 
 function isStrategyActive(subId, sigDirection = null) {
@@ -933,7 +1066,7 @@ function renderRadarTable(pageOrItems) {
   if (!items || items.length === 0) {
     elements.radarTableBody.innerHTML = `
       <tr>
-        <td colspan="11" class="text-center py-8 text-gray-500">
+        <td colspan="8" class="text-center py-8 text-gray-500">
           Nenhuma oportunidade com sinal ativo ou reteste pendente no momento.
         </td>
       </tr>
@@ -942,7 +1075,7 @@ function renderRadarTable(pageOrItems) {
   }
 
   // Filter radar items by active direction and category
-  const filtered = items.filter(it => {
+  let filtered = items.filter(it => {
     // Direction filter
     if (state.activeDirection !== 'BOTH' && (it.direction || 'BUY') !== state.activeDirection) {
       return false;
@@ -959,73 +1092,94 @@ function renderRadarTable(pageOrItems) {
   if (filtered.length === 0) {
     elements.radarTableBody.innerHTML = `
       <tr>
-        <td colspan="11" class="text-center py-8 text-gray-500">
-          Nenhuma oportunidade encontrada para a direção selecionada (${state.activeDirection}).
+        <td colspan="8" class="text-center py-8 text-gray-500">
+          Nenhuma oportunidade encontrada para a direção selecionada (${state.activeDirection || 'BUY'}).
         </td>
       </tr>
     `;
     return;
   }
 
+  // Sort filtered items if sortField is set
+  filtered = sortRadarItems(filtered);
+
   filtered.forEach(item => {
     const tr = document.createElement('tr');
     tr.className = 'hover:bg-fintech-surface-hover transition';
 
-    let badgeClass = 'badge-ideal';
-    if (item.timing_category === 'EXTENDED') badgeClass = 'badge-extended';
-    if (item.timing_category === 'LATE') badgeClass = 'badge-late';
+    // Minimalist Timing Indicator Dot
+    let dotClass = 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)]';
+    if (item.timing_category === 'EXTENDED') {
+      dotClass = 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.7)]';
+    } else if (item.timing_category === 'LATE') {
+      dotClass = 'bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.7)]';
+    }
 
     const isBuy = (item.direction === 'BUY');
+    // Compact Direction Badge: C (Compra) or V (Venda)
     const dirBadge = isBuy
-      ? '<span class="text-xs px-2 py-0.5 rounded font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">COMPRA</span>'
-      : '<span class="text-xs px-2 py-0.5 rounded font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">VENDA</span>';
+      ? '<span class="inline-flex items-center justify-center w-6 h-6 rounded-full font-bold text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 select-none" title="Compra (Fundo)">C</span>'
+      : '<span class="inline-flex items-center justify-center w-6 h-6 rounded-full font-bold text-xs bg-rose-500/20 text-rose-400 border border-rose-500/40 select-none" title="Venda (Topo)">V</span>';
 
     const friendlyName = stripCorporateSuffix(item.asset_name || getAssetName(item.ticker));
 
     tr.innerHTML = `
-      <td class="px-4 py-3">
+      <td class="px-3 sm:px-4 py-2.5 sm:py-3">
         <button class="text-left group btn-open-ticker focus:outline-none cursor-pointer" data-ticker="${item.ticker}" data-strategy="${item.strategy_sub_id}" data-direction="${item.direction}">
           <div class="font-bold text-cyan-400 group-hover:text-cyan-200 group-hover:underline flex items-center gap-1.5 transition">
             <span>${friendlyName}</span>
-            <span class="text-xs text-cyan-500/70 group-hover:text-cyan-300"></span>
+            <span class="text-xs text-cyan-500/70 group-hover:text-cyan-300">↗</span>
           </div>
           <div class="text-[11px] text-gray-500 font-mono tracking-wide">${item.ticker}</div>
         </button>
       </td>
-      <td class="px-4 py-3 text-gray-400">${item.category}</td>
-      <td class="px-4 py-3">${dirBadge}</td>
-      <td class="px-4 py-3 font-mono font-semibold">${formatPrice(item.current_price, item.ticker, item.category)}</td>
-      <td class="px-4 py-3 ${isBuy ? 'text-emerald-300' : 'text-rose-300'} font-medium">${item.strategy_label}</td>
-      <td class="px-4 py-3 font-mono text-gray-300">${item.status_signal}</td>
-      <td class="px-4 py-3">
-        <span class="px-2 py-0.5 rounded text-[11px] font-semibold ${badgeClass}">
-          ${item.timing_label}
-        </span>
+      <td class="px-2 sm:px-3 py-2.5 sm:py-3 text-center">${dirBadge}</td>
+      <td class="px-3 sm:px-4 py-2.5 sm:py-3 ${isBuy ? 'text-emerald-300' : 'text-rose-300'} font-medium">${item.strategy_label}</td>
+      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono text-gray-300">${item.status_signal}</td>
+      <td class="px-2 sm:px-3 py-2.5 sm:py-3 text-center">
+        <span class="inline-block w-3 h-3 rounded-full cursor-help ${dotClass}" title="${item.timing_label}"></span>
       </td>
-      <td class="px-4 py-3 font-mono font-bold ${item.distance_pct >= 0 ? 'text-amber-400' : 'text-cyan-400'}">
+      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono font-bold ${item.distance_pct >= 0 ? 'text-amber-400' : 'text-cyan-400'}">
         ${item.distance_pct >= 0 ? '+' : ''}${item.distance_pct.toFixed(1)}%
       </td>
-      <td class="px-4 py-3 font-mono text-gray-400">${formatPrice(item.recommended_price, item.ticker, item.category)}</td>
-      <td class="px-4 py-3 font-mono text-gray-400">${item.historical_n} entradas (${item.historical_win_rate.toFixed(1)}%)</td>
-      <td class="px-4 py-3 text-right">
-        <button class="bg-cyan-600/30 hover:bg-cyan-600 text-cyan-300 hover:text-white px-2.5 py-1 rounded text-xs font-semibold transition btn-open-ticker cursor-pointer" data-ticker="${item.ticker}" data-strategy="${item.strategy_sub_id}" data-direction="${item.direction}">
-          Abrir Gráfico →
-        </button>
+      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono text-right text-gray-200 font-semibold">
+        ${item.historical_n !== undefined && item.historical_n !== null ? item.historical_n : '-'}
+      </td>
+      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono text-right font-semibold ${item.historical_win_rate >= 60 ? 'text-emerald-400' : 'text-gray-300'}">
+        ${item.historical_win_rate !== undefined && item.historical_win_rate !== null ? item.historical_win_rate.toFixed(1) + '%' : '-'}
       </td>
     `;
     elements.radarTableBody.appendChild(tr);
   });
 
+  // Re-attach click events to all ticker links
   document.querySelectorAll('.btn-open-ticker').forEach(btn => {
     btn.addEventListener('click', () => {
       const ticker = btn.getAttribute('data-ticker');
       const strat = btn.getAttribute('data-strategy');
-      const dir = btn.getAttribute('data-direction');
+      const dir = btn.getAttribute('data-direction') || 'BUY';
 
-      const resolved = resolveTicker(ticker);
-      state.currentTicker = resolved;
-      elements.inputTicker.value = resolved;
-      if (elements.simTicker) elements.simTicker.value = resolved;
+      state.currentTicker = ticker;
+      elements.inputTicker.value = ticker;
+      if (elements.simTicker) elements.simTicker.value = ticker;
+
+      // Synchronize direction if not BOTH
+      if (state.activeDirection !== 'BOTH' && state.activeDirection !== dir) {
+        state.activeDirection = dir;
+        const dirButtons = document.querySelectorAll('#global-direction-selector .dir-seg-btn');
+        dirButtons.forEach(b => {
+          b.classList.remove('active-buy', 'active-sell', 'active-both');
+          b.classList.add('text-gray-400');
+        });
+        const activeBtn = document.querySelector(`#global-direction-selector .dir-seg-btn[data-dir="${dir}"]`);
+        if (activeBtn) {
+          if (dir === 'BUY') activeBtn.classList.add('active-buy');
+          else if (dir === 'SELL') activeBtn.classList.add('active-sell');
+          else activeBtn.classList.add('active-both');
+          activeBtn.classList.remove('text-gray-400');
+        }
+        updateSidebarDirectionFilter();
+      }
 
       if (state.radarTimeframe && state.radarTimeframe !== state.currentTimeframe) {
         state.currentTimeframe = state.radarTimeframe;
@@ -1042,20 +1196,9 @@ function renderRadarTable(pageOrItems) {
 
       // If user opened a specific strategy from radar, ensure it's selected and active
       if (strat) {
-        if (dir && (dir === 'BUY' || dir === 'SELL') && state.activeDirection !== dir) {
-          state.activeDirection = dir;
-          document.querySelectorAll('.direction-btn').forEach(b => {
-            const bDir = b.getAttribute('data-direction');
-            if (bDir === 'BOTH') {
-              b.classList.add('active', 'border-fintech-cyan', 'text-fintech-cyan');
-            } else {
-              b.classList.remove('active', 'border-fintech-cyan', 'text-fintech-cyan');
-            }
-          });
-        }
         state.activeStrategies.add(strat);
         const aliases = STRATEGY_ALIASES[strat] || [];
-        aliases.forEach(a =>state.activeStrategies.add(a));
+        aliases.forEach(a => state.activeStrategies.add(a));
         const cb = document.querySelector(`.strategy-cb[data-id="${strat}"]`);
         if (cb) cb.checked = true;
       }
@@ -1160,7 +1303,8 @@ async function loadAnalysisData(forceRefresh = false) {
   }
 }
 
-// 0ms CLIENT-SIDE FILTERING ENGINE (Direction & Strategy Selective)
+// 0ms CLIENT-SIDE FILTERING ENGINE
+
 function applyClientSideFiltering() {
   if (!state.analysisData) return;
 
@@ -1879,18 +2023,12 @@ async function runOptimizer() {
         }
       }
 
-      const buyLabelEl = document.getElementById('opt-champ-buy-label');
-      const sellLabelEl = document.getElementById('opt-champ-sell-label');
-      if (buyLabelEl) buyLabelEl.textContent = c.buy_label;
-
-      if (sellLabelEl) {
+      const titleContainer = document.getElementById('opt-champ-title-container') || (document.getElementById('opt-champ-buy-label') && document.getElementById('opt-champ-buy-label').parentElement);
+      if (titleContainer) {
         if (isDca) {
-          sellLabelEl.parentElement.innerHTML = `
-            <span class="text-emerald-400 font-semibold" id="opt-champ-buy-label">${c.buy_label}</span>
-            <span class="text-gray-400 font-normal text-xs">(Aportes Periódicos em Fundos)</span>
-          `;
+          titleContainer.innerHTML = '<span class="text-emerald-400 font-semibold" id="opt-champ-buy-label">' + c.buy_label + '</span> <span class="text-gray-400 font-normal text-xs">(Aportes Periódicos em Fundos)</span>';
         } else {
-          sellLabelEl.textContent = c.sell_label || '-';
+          titleContainer.innerHTML = '<span class="text-emerald-400 font-semibold" id="opt-champ-buy-label">' + c.buy_label + '</span> <span class="text-gray-400" id="opt-champ-arrow">-&gt;</span> <span class="text-rose-400 font-semibold" id="opt-champ-sell-label">' + (c.sell_label || '-') + '</span>';
         }
       }
 
@@ -2186,6 +2324,52 @@ function hideLoading() {
 }
 
 // UI: Radar Strategy Multi-Select Dropdown Filter
+
+// UI: Setup Radar Table Column Sorting
+function setupRadarTableSorting() {
+  const thN = document.getElementById('th-sort-n');
+  const thWin = document.getElementById('th-sort-winrate');
+  const iconN = document.getElementById('sort-icon-n');
+  const iconWin = document.getElementById('sort-icon-winrate');
+
+  function updateIcons() {
+    if (iconN) iconN.textContent = state.radarSortField === 'historical_n' ? (state.radarSortOrder === 'asc' ? '▲' : '▼') : '↕';
+    if (iconWin) iconWin.textContent = state.radarSortField === 'historical_win_rate' ? (state.radarSortOrder === 'asc' ? '▲' : '▼') : '↕';
+    if (iconN) iconN.className = state.radarSortField === 'historical_n' ? 'text-[10px] text-cyan-400 font-bold' : 'text-[10px] text-gray-500';
+    if (iconWin) iconWin.className = state.radarSortField === 'historical_win_rate' ? 'text-[10px] text-cyan-400 font-bold' : 'text-[10px] text-gray-500';
+  }
+
+  if (thN) {
+    thN.addEventListener('click', () => {
+      if (state.radarSortField === 'historical_n') {
+        state.radarSortOrder = state.radarSortOrder === 'desc' ? 'asc' : 'desc';
+      } else {
+        state.radarSortField = 'historical_n';
+        state.radarSortOrder = 'desc';
+      }
+      updateIcons();
+      if (state.lastRadarPage) {
+        renderRadarTable(state.lastRadarPage);
+      }
+    });
+  }
+
+  if (thWin) {
+    thWin.addEventListener('click', () => {
+      if (state.radarSortField === 'historical_win_rate') {
+        state.radarSortOrder = state.radarSortOrder === 'desc' ? 'asc' : 'desc';
+      } else {
+        state.radarSortField = 'historical_win_rate';
+        state.radarSortOrder = 'desc';
+      }
+      updateIcons();
+      if (state.lastRadarPage) {
+        renderRadarTable(state.lastRadarPage);
+      }
+    });
+  }
+}
+
 async function setupRadarStrategyFilter() {
   const toggleBtn = document.getElementById('btn-radar-strat-toggle');
   const menu = document.getElementById('radar-strat-menu');
@@ -2289,4 +2473,753 @@ function updateRadarStratCheckboxes() {
     cb.checked = state.radarStrategies.has(id);
   });
   updateRadarStratBadge();
+}
+
+
+// =========================================================
+// TAB 5: GESTOR E SIMULADOR MULTIATIVOS DE CARTEIRA (016)
+// =========================================================
+const PORTFOLIO_STORAGE_KEY = 'market_engine_portfolio_v1';
+
+state.portfolioState = {
+  availableCash: 10000.0,
+  holdings: [],
+  universeCategory: 'featured',
+  customTickers: '',
+  interval: '1d',
+  period: '2y',
+  maxWeightPct: 25.0,
+  lastAdviseResponse: null,
+  lastSimulateResponse: null,
+};
+
+function loadPortfolioStorage() {
+  try {
+    const raw = localStorage.getItem(PORTFOLIO_STORAGE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object') {
+      if (parsed.availableCash !== undefined) state.portfolioState.availableCash = Number(parsed.availableCash) || 0;
+      if (Array.isArray(parsed.holdings)) state.portfolioState.holdings = parsed.holdings;
+      if (parsed.universeCategory) state.portfolioState.universeCategory = parsed.universeCategory;
+      if (parsed.customTickers !== undefined) state.portfolioState.customTickers = String(parsed.customTickers);
+      if (parsed.interval) state.portfolioState.interval = parsed.interval;
+      if (parsed.period) state.portfolioState.period = parsed.period;
+      if (parsed.maxWeightPct !== undefined) state.portfolioState.maxWeightPct = Number(parsed.maxWeightPct) || 25;
+    }
+  } catch (err) {
+    console.warn('Erro ao carregar carteira do localStorage:', err);
+  }
+}
+
+function savePortfolioStorage() {
+  try {
+    const payload = {
+      availableCash: state.portfolioState.availableCash,
+      holdings: state.portfolioState.holdings,
+      universeCategory: state.portfolioState.universeCategory,
+      customTickers: state.portfolioState.customTickers,
+      interval: state.portfolioState.interval,
+      period: state.portfolioState.period,
+      maxWeightPct: state.portfolioState.maxWeightPct,
+    };
+    localStorage.setItem(PORTFOLIO_STORAGE_KEY, JSON.stringify(payload));
+  } catch (err) {
+    console.warn('Erro ao salvar carteira no localStorage:', err);
+  }
+}
+
+function syncPortfolioInputsFromState() {
+  const cashEl = document.getElementById('portfolio-cash-input');
+  const maxWEl = document.getElementById('portfolio-max-weight-input');
+  const univEl = document.getElementById('portfolio-universe-select');
+  const customWrap = document.getElementById('portfolio-custom-tickers-wrapper');
+  const customEl = document.getElementById('portfolio-custom-tickers-input');
+  const intEl = document.getElementById('portfolio-interval-select');
+  const perEl = document.getElementById('portfolio-period-select');
+
+  if (cashEl) cashEl.value = state.portfolioState.availableCash;
+  if (maxWEl) maxWEl.value = state.portfolioState.maxWeightPct;
+  if (univEl) univEl.value = state.portfolioState.universeCategory;
+  if (customEl) customEl.value = state.portfolioState.customTickers;
+  if (intEl) intEl.value = state.portfolioState.interval;
+  if (perEl) perEl.value = state.portfolioState.period;
+  if (customWrap) {
+    if (state.portfolioState.universeCategory === 'custom') customWrap.classList.remove('hidden');
+    else customWrap.classList.add('hidden');
+  }
+}
+
+function readPortfolioInputsToState() {
+  const cashEl = document.getElementById('portfolio-cash-input');
+  const maxWEl = document.getElementById('portfolio-max-weight-input');
+  const univEl = document.getElementById('portfolio-universe-select');
+  const customEl = document.getElementById('portfolio-custom-tickers-input');
+  const intEl = document.getElementById('portfolio-interval-select');
+  const perEl = document.getElementById('portfolio-period-select');
+
+  if (cashEl) state.portfolioState.availableCash = Math.max(0, Number(cashEl.value) || 0);
+  if (maxWEl) state.portfolioState.maxWeightPct = Math.min(100, Math.max(5, Number(maxWEl.value) || 25));
+  if (univEl) state.portfolioState.universeCategory = univEl.value || 'featured';
+  if (customEl) state.portfolioState.customTickers = customEl.value || '';
+  if (intEl) state.portfolioState.interval = intEl.value || '1d';
+  if (perEl) state.portfolioState.period = perEl.value || '2y';
+
+  savePortfolioStorage();
+}
+
+function renderPortfolioHoldingsEditor() {
+  const tbody = document.getElementById('portfolio-holdings-list');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const holdings = state.portfolioState.holdings || [];
+  if (holdings.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" class="px-3 py-3 text-center text-gray-500 font-sans text-[11px]">
+          Nenhuma posição cadastrada (100% em Caixa). Adicione ativos acima se já possuir carteira montada.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  holdings.forEach((h, idx) => {
+    const tr = document.createElement('tr');
+    tr.className = 'hover:bg-fintech-surface-hover';
+    const cost = (Number(h.shares) || 0) * (Number(h.average_buy_price) || 0);
+    const name = stripCorporateSuffix(getAssetName(h.ticker));
+    tr.innerHTML = `
+      <td class="px-2.5 py-1.5 font-bold text-white">
+        ${name} <span class="text-[10px] text-gray-400">(${h.ticker})</span>
+      </td>
+      <td class="px-2.5 py-1.5 text-amber-300 font-bold">${Number(h.shares).toLocaleString('pt-BR')}</td>
+      <td class="px-2.5 py-1.5 text-gray-200">R$ ${Number(h.average_buy_price).toFixed(2)}</td>
+      <td class="px-2.5 py-1.5 text-cyan-300">R$ ${cost.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td class="px-2.5 py-1.5 text-right">
+        <button class="btn-remove-holding text-rose-400 hover:text-rose-300 text-xs font-bold px-1.5 cursor-pointer" data-idx="${idx}" title="Remover ativo">✕</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  tbody.querySelectorAll('.btn-remove-holding').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = parseInt(btn.getAttribute('data-idx'), 10);
+      if (!isNaN(i)) {
+        state.portfolioState.holdings.splice(i, 1);
+        savePortfolioStorage();
+        renderPortfolioHoldingsEditor();
+      }
+    });
+  });
+}
+
+function setupPortfolioTab() {
+  loadPortfolioStorage();
+  syncPortfolioInputsFromState();
+  renderPortfolioHoldingsEditor();
+
+  const univEl = document.getElementById('portfolio-universe-select');
+  if (univEl) {
+    univEl.addEventListener('change', () => {
+      readPortfolioInputsToState();
+      syncPortfolioInputsFromState();
+    });
+  }
+
+  ['portfolio-cash-input', 'portfolio-max-weight-input', 'portfolio-custom-tickers-input', 'portfolio-interval-select', 'portfolio-period-select'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('change', () => readPortfolioInputsToState());
+    }
+  });
+
+  const btnAdd = document.getElementById('btn-portfolio-add-holding');
+  if (btnAdd) {
+    btnAdd.addEventListener('click', () => {
+      const tEl = document.getElementById('portfolio-add-ticker');
+      const sEl = document.getElementById('portfolio-add-shares');
+      const pEl = document.getElementById('portfolio-add-avgprice');
+      const ticker = resolveTicker((tEl ? tEl.value : '').trim().toUpperCase());
+      const shares = Number(sEl ? sEl.value : 0);
+      const avgPrice = Number(pEl ? pEl.value : 0);
+      if (!ticker || shares <= 0 || avgPrice <= 0) return;
+
+      const existingIdx = state.portfolioState.holdings.findIndex(x => x.ticker.toUpperCase() === ticker);
+      if (existingIdx >= 0) {
+        const prev = state.portfolioState.holdings[existingIdx];
+        const totShares = Number(prev.shares) + shares;
+        const newAvg = ((Number(prev.shares) * Number(prev.average_buy_price)) + (shares * avgPrice)) / totShares;
+        state.portfolioState.holdings[existingIdx] = {
+          ticker,
+          shares: Number(totShares.toFixed(4)),
+          average_buy_price: Number(newAvg.toFixed(4)),
+        };
+      } else {
+        state.portfolioState.holdings.push({
+          ticker,
+          shares: Number(shares.toFixed(4)),
+          average_buy_price: Number(avgPrice.toFixed(4)),
+        });
+      }
+      if (tEl) tEl.value = '';
+      if (sEl) sEl.value = '';
+      if (pEl) pEl.value = '';
+      savePortfolioStorage();
+      renderPortfolioHoldingsEditor();
+    });
+  }
+
+  const btnClear = document.getElementById('btn-portfolio-clear-holdings');
+  if (btnClear) {
+    btnClear.addEventListener('click', () => {
+      state.portfolioState.holdings = [];
+      savePortfolioStorage();
+      renderPortfolioHoldingsEditor();
+    });
+  }
+
+  const btnRun = document.getElementById('btn-run-portfolio');
+  if (btnRun) {
+    btnRun.addEventListener('click', () => {
+      runPortfolioAdviseAndSimulate();
+    });
+  }
+
+  const btnApplyOrders = document.getElementById('btn-apply-portfolio-orders');
+  if (btnApplyOrders) {
+    btnApplyOrders.addEventListener('click', () => {
+      applyRecommendedPortfolioOrders();
+    });
+  }
+}
+
+function getActionBadgeHtml(actionType, actionLabel) {
+  if (actionType === 'BUY') {
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">🟢 ${actionLabel}</span>`;
+  }
+  if (actionType === 'SELL_FULL') {
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/40">🔴 ${actionLabel}</span>`;
+  }
+  if (actionType === 'SELL_PARTIAL_REBALANCE') {
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-amber-500/20 text-amber-400 border border-amber-500/40">⚖️ ${actionLabel}</span>`;
+  }
+  if (actionType === 'ROTATE_OUT' || actionType === 'ROTATE_IN') {
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">🔄 ${actionLabel}</span>`;
+  }
+  return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-700/50 text-gray-300 border border-gray-600">⏸️ ${actionLabel}</span>`;
+}
+
+function renderPortfolioAdviseSection(data) {
+  state.portfolioState.lastAdviseResponse = data;
+  const eqEl = document.getElementById('advise-total-equity');
+  const cashTransEl = document.getElementById('advise-cash-transition');
+  const btnApply = document.getElementById('btn-apply-portfolio-orders');
+  const tbody = document.getElementById('portfolio-recommendations-tbody');
+
+  if (eqEl) {
+    eqEl.textContent = `R$ ${(Number(data.total_portfolio_equity) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+  if (cashTransEl) {
+    const cBefore = (Number(data.current_cash) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const cAfter = (Number(data.projected_cash_after) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    cashTransEl.textContent = `R$ ${cBefore} → R$ ${cAfter}`;
+  }
+
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const recs = data.recommendations || [];
+  const hasExecutableOrders = recs.some(r => r.action_type !== 'HOLD' && Math.abs(Number(r.recommended_shares_delta) || 0) > 0);
+  if (btnApply) {
+    if (hasExecutableOrders) btnApply.classList.remove('hidden');
+    else btnApply.classList.add('hidden');
+  }
+
+  if (recs.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="10" class="px-4 py-6 text-center text-gray-400 font-mono">
+          Nenhuma oportunidade ativa em zona de compra no momento. Recomendação: manter saldo em Caixa aguardando novo fundo estatístico.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  recs.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.className = 'hover:bg-fintech-surface-hover';
+
+    const delta = Number(r.recommended_shares_delta) || 0;
+    const deltaSign = delta > 0 ? '+' : '';
+    const deltaColor = delta > 0 ? 'text-emerald-400' : (delta < 0 ? 'text-rose-400' : 'text-gray-400');
+    const score = Number(r.potential_score) || 0;
+    const scoreBarColor = score >= 75 ? 'bg-emerald-400' : (score >= 55 ? 'bg-cyan-400' : 'bg-amber-400');
+
+    let timingDot = '<span class="inline-block w-2.5 h-2.5 rounded-full bg-rose-400" title="Atrasado"></span>';
+    if (r.timing_category === 'IDEAL') {
+      timingDot = '<span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-emerald-500/30" title="Timing Ideal"></span>';
+    } else if (r.timing_category === 'EXTENDED') {
+      timingDot = '<span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-400 ring-2 ring-amber-500/30" title="Timing Estendido"></span>';
+    }
+
+    tr.innerHTML = `
+      <td class="px-3 py-2.5">${getActionBadgeHtml(r.action_type, r.action_label)}</td>
+      <td class="px-3 py-2.5">
+        <div class="font-bold text-white">${stripCorporateSuffix(r.asset_name || r.ticker)}</div>
+        <div class="text-[10px] text-gray-400 font-mono">${r.ticker}</div>
+      </td>
+      <td class="px-3 py-2.5 text-cyan-300 font-medium">${r.strategy_label}</td>
+      <td class="px-3 py-2.5 text-center font-mono">
+        <div class="font-bold text-white">${score.toFixed(1)}</div>
+        <div class="w-16 h-1.5 bg-gray-800 rounded overflow-hidden mx-auto mt-0.5">
+          <div class="h-full ${scoreBarColor}" style="width: ${Math.min(100, Math.max(0, score))}%"></div>
+        </div>
+      </td>
+      <td class="px-3 py-2.5 text-center">${timingDot} <span class="text-[10px] text-gray-300 ml-1">${r.timing_category}</span></td>
+      <td class="px-3 py-2.5 font-mono text-white">R$ ${(Number(r.current_price) || 0).toFixed(2)}</td>
+      <td class="px-3 py-2.5 font-mono font-bold ${deltaColor}">
+        ${delta !== 0 ? `${deltaSign}${delta.toLocaleString('pt-BR')} cotas` : '0 (Manter)'}
+        <div class="text-[10px] text-gray-400 font-normal">Final: ${(Number(r.target_shares) || 0).toLocaleString('pt-BR')} cotas</div>
+      </td>
+      <td class="px-3 py-2.5 font-mono font-bold text-white">
+        ${r.order_value > 0 ? `R$ ${Number(r.order_value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '-'}
+      </td>
+      <td class="px-3 py-2.5 font-mono text-center">
+        <span class="text-gray-400">${(Number(r.current_weight_pct) || 0).toFixed(1)}%</span>
+        <span class="text-gray-500 mx-1">→</span>
+        <span class="font-bold text-cyan-300">${(Number(r.target_weight_pct) || 0).toFixed(1)}%</span>
+      </td>
+      <td class="px-3 py-2.5 text-gray-300 text-[11px] max-w-xs truncate" title="${r.reason_text}">${r.reason_text}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function applyRecommendedPortfolioOrders() {
+  const adviseData = state.portfolioState.lastAdviseResponse;
+  if (!adviseData || !Array.isArray(adviseData.recommendations)) return;
+
+  const newHoldings = [];
+  adviseData.recommendations.forEach(r => {
+    const targetSh = Number(r.target_shares) || 0;
+    if (targetSh > 0) {
+      const existing = state.portfolioState.holdings.find(h => h.ticker.toUpperCase() === r.ticker.toUpperCase());
+      let avgP = Number(r.current_price) || 0;
+      if (existing && Number(r.recommended_shares_delta) > 0) {
+        const oldSh = Number(existing.shares) || 0;
+        const oldAvg = Number(existing.average_buy_price) || avgP;
+        const addSh = Number(r.recommended_shares_delta) || 0;
+        avgP = ((oldSh * oldAvg) + (addSh * Number(r.current_price))) / (oldSh + addSh);
+      } else if (existing) {
+        avgP = Number(existing.average_buy_price) || avgP;
+      }
+      newHoldings.push({
+        ticker: r.ticker,
+        shares: Number(targetSh.toFixed(4)),
+        average_buy_price: Number(avgP.toFixed(4)),
+      });
+    }
+  });
+
+  state.portfolioState.holdings = newHoldings;
+  state.portfolioState.availableCash = Number((Number(adviseData.projected_cash_after) || 0).toFixed(2));
+  syncPortfolioInputsFromState();
+  savePortfolioStorage();
+  renderPortfolioHoldingsEditor();
+  runPortfolioAdviseAndSimulate();
+}
+
+async function runPortfolioAdviseAndSimulate() {
+  readPortfolioInputsToState();
+  const customList = (state.portfolioState.customTickers || '')
+    .split(',')
+    .map(s => resolveTicker(s.trim().toUpperCase()))
+    .filter(Boolean);
+
+  showLoading('Otimizando estratégias campeãs por ativo e calculando rebalanceamento da carteira...');
+  try {
+    const advisePayload = {
+      available_cash: state.portfolioState.availableCash,
+      holdings: state.portfolioState.holdings,
+      universe_category: state.portfolioState.universeCategory,
+      custom_tickers: customList,
+      interval: state.portfolioState.interval,
+      period: state.portfolioState.period,
+      max_weight_pct: state.portfolioState.maxWeightPct,
+      rebalance_band_pct: 5.0,
+      min_rotation_score_delta: 15.0,
+    };
+
+    const resAdvise = await fetch('/api/portfolio/advise', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(advisePayload),
+    });
+
+    if (resAdvise.ok) {
+      const adviseData = await resAdvise.json();
+      renderPortfolioAdviseSection(adviseData);
+      if (typeof renderPortfolioOpportunityRanking === 'function') {
+        renderPortfolioOpportunityRanking(adviseData.opportunity_ranking || []);
+      }
+      if (typeof renderPortfolioAllocationChart === 'function') {
+        renderPortfolioAllocationChart(adviseData);
+      }
+    }
+
+    if (typeof runPortfolioHistoricalSimulation === 'function') {
+      await runPortfolioHistoricalSimulation(customList);
+    }
+  } catch (err) {
+    console.error('Erro ao processar carteira:', err);
+  } finally {
+    hideLoading();
+  }
+}
+
+
+async function runPortfolioHistoricalSimulation(customList = []) {
+  const initialCap = Math.max(100, Number(state.portfolioState.availableCash) || 10000);
+  const simPayload = {
+    initial_capital: initialCap,
+    universe_category: state.portfolioState.universeCategory,
+    custom_tickers: customList,
+    interval: state.portfolioState.interval,
+    period: state.portfolioState.period,
+    max_weight_pct: state.portfolioState.maxWeightPct,
+    rebalance_band_pct: 5.0,
+    min_rotation_score_delta: 15.0,
+  };
+
+  const resSim = await fetch('/api/portfolio/simulate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(simPayload),
+  });
+
+  if (!resSim.ok) return;
+  const simData = await resSim.json();
+  state.portfolioState.lastSimulateResponse = simData;
+
+  renderPortfolioSimulationKPIs(simData.metrics || {});
+  renderPortfolioLedgerTable(simData.ledger_events || []);
+  if (typeof renderPortfolioEquityChart === 'function') {
+    renderPortfolioEquityChart(simData.curve || []);
+  }
+}
+
+function renderPortfolioSimulationKPIs(m) {
+  const elInit = document.getElementById('port-kpi-initial');
+  const elCashSub = document.getElementById('port-kpi-cash-sub');
+  const elFinal = document.getElementById('port-kpi-final');
+  const elProfitSub = document.getElementById('port-kpi-profit-sub');
+  const elRet = document.getElementById('port-kpi-return');
+  const elBenchSub = document.getElementById('port-kpi-bench-sub');
+  const elWin = document.getElementById('port-kpi-winrate');
+  const elExitsSub = document.getElementById('port-kpi-exits-sub');
+  const elPf = document.getElementById('port-kpi-pf');
+  const elRotSub = document.getElementById('port-kpi-rotations-sub');
+  const elDd = document.getElementById('port-kpi-dd');
+  const elEvSub = document.getElementById('port-kpi-events-sub');
+
+  const initCap = Number(m.initial_capital) || 0;
+  const finalEq = Number(m.final_equity) || 0;
+  const finalCash = Number(m.final_cash) || 0;
+  const netProfit = Number(m.net_profit) || 0;
+  const totRet = Number(m.total_return_pct) || 0;
+  const benchRet = Number(m.benchmark_return_pct) || 0;
+  const alpha = Number(m.alpha_vs_benchmark_pct) || 0;
+  const winRate = Number(m.win_rate_pct) || 0;
+  const pf = Number(m.profit_factor) || 0;
+  const dd = Number(m.max_drawdown_pct) || 0;
+
+  if (elInit) elInit.textContent = `R$ ${initCap.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  if (elCashSub) elCashSub.textContent = `Caixa final: R$ ${finalCash.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  if (elFinal) {
+    elFinal.textContent = `R$ ${finalEq.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    elFinal.className = `text-base sm:text-lg font-bold font-mono ${netProfit >= 0 ? 'text-fintech-green' : 'text-rose-400'}`;
+  }
+  if (elProfitSub) {
+    elProfitSub.textContent = `Lucro: ${netProfit >= 0 ? '+' : ''}R$ ${netProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+  if (elRet) {
+    elRet.textContent = `${totRet >= 0 ? '+' : ''}${totRet.toFixed(1)}%`;
+    elRet.className = `text-base sm:text-lg font-bold font-mono ${totRet >= 0 ? 'text-fintech-cyan' : 'text-rose-400'}`;
+  }
+  if (elBenchSub) {
+    elBenchSub.textContent = `B&H Cesta: ${benchRet >= 0 ? '+' : ''}${benchRet.toFixed(1)}% (Alfa: ${alpha >= 0 ? '+' : ''}${alpha.toFixed(1)}%)`;
+  }
+  if (elWin) elWin.textContent = `${winRate.toFixed(1)}%`;
+  if (elExitsSub) elExitsSub.textContent = `${m.winning_exits_count || 0}W / ${m.losing_exits_count || 0}L (${m.closed_exits_count || 0} saídas)`;
+  if (elPf) elPf.textContent = pf.toFixed(2);
+  if (elRotSub) elRotSub.textContent = `${m.rebalance_rotations_count || 0} rebalanceamentos/rotações`;
+  if (elDd) elDd.textContent = `${dd.toFixed(1)}%`;
+  if (elEvSub) elEvSub.textContent = `${m.total_events_count || 0} ordens executadas`;
+}
+
+function renderPortfolioLedgerTable(events) {
+  const tbody = document.getElementById('portfolio-ledger-tbody');
+  const countBadge = document.getElementById('portfolio-ledger-count-badge');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  if (countBadge) countBadge.textContent = `${events.length} eventos`;
+
+  if (!events || events.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="13" class="px-4 py-6 text-center text-gray-500">
+          Nenhuma operação executada no período selecionado.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  events.forEach(ev => {
+    const tr = document.createElement('tr');
+    tr.className = 'hover:bg-fintech-surface-hover';
+
+    const delta = Number(ev.shares_delta) || 0;
+    const deltaSign = delta > 0 ? '+' : '';
+    const deltaColor = delta > 0 ? 'text-emerald-400' : 'text-rose-400';
+
+    let pnlHtml = '<span class="text-gray-500">-</span>';
+    if (ev.realized_pnl_value !== null && ev.realized_pnl_value !== undefined) {
+      const pVal = Number(ev.realized_pnl_value) || 0;
+      const pPct = Number(ev.realized_pnl_pct) || 0;
+      const pClass = pVal >= 0 ? 'text-emerald-400' : 'text-rose-400';
+      const pSign = pVal >= 0 ? '+' : '';
+      pnlHtml = `<span class="font-bold ${pClass}">${pSign}R$ ${pVal.toFixed(2)} (${pSign}${pPct.toFixed(1)}%)</span>`;
+    }
+
+    tr.innerHTML = `
+      <td class="px-2.5 py-2 text-center text-gray-400 font-bold">${ev.event_id}</td>
+      <td class="px-2.5 py-2 text-gray-300">${ev.date}</td>
+      <td class="px-2.5 py-2">${getActionBadgeHtml(ev.event_type, ev.event_label)}</td>
+      <td class="px-2.5 py-2 font-bold text-white">${ev.ticker}</td>
+      <td class="px-2.5 py-2 text-cyan-300 font-sans">${ev.strategy_label}</td>
+      <td class="px-2.5 py-2 text-center text-amber-300 font-bold">${(Number(ev.potential_score) || 0).toFixed(1)}</td>
+      <td class="px-2.5 py-2 text-white">R$ ${(Number(ev.execution_price) || 0).toFixed(2)}</td>
+      <td class="px-2.5 py-2 font-bold ${deltaColor}">${deltaSign}${delta.toLocaleString('pt-BR')}</td>
+      <td class="px-2.5 py-2 text-white">R$ ${(Number(ev.trade_value) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td class="px-2.5 py-2">${pnlHtml}</td>
+      <td class="px-2.5 py-2 text-center text-gray-300">${(Number(ev.weight_before_pct) || 0).toFixed(1)}% → ${(Number(ev.weight_after_pct) || 0).toFixed(1)}%</td>
+      <td class="px-2.5 py-2 text-gray-300">R$ ${(Number(ev.cash_after) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td class="px-2.5 py-2 font-bold text-white">R$ ${(Number(ev.portfolio_equity_after) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+
+function renderPortfolioEquityChart(curve) {
+  const container = document.getElementById('portfolio-equity-chart');
+  if (!container || !window.Plotly) return;
+
+  if (!curve || curve.length === 0) {
+    Plotly.purge(container);
+    container.innerHTML = '<div class="flex items-center justify-center h-full text-xs text-gray-500 font-mono">Execute a análise/simulação para gerar a curva patrimonial.</div>';
+    return;
+  }
+  container.innerHTML = '';
+
+  const isLight = (document.documentElement.getAttribute('data-theme') || 'dark') === 'light';
+  const bgColor = isLight ? '#FFFFFF' : '#0B0E14';
+  const textColor = isLight ? '#334155' : '#8B98A5';
+  const gridColor = isLight ? 'rgba(226, 232, 240, 0.8)' : 'rgba(38, 43, 56, 0.5)';
+  const borderColor = isLight ? '#E2E8F0' : '#262B38';
+
+  const dates = curve.map(c => c.date);
+  const eqValues = curve.map(c => Number(c.portfolio_equity) || 0);
+  const benchValues = curve.map(c => Number(c.benchmark_equity) || 0);
+  const cashValues = curve.map(c => Number(c.cash_balance) || 0);
+
+  const traces = [
+    {
+      x: dates,
+      y: eqValues,
+      type: 'scatter',
+      mode: 'lines',
+      name: 'Carteira Gerenciada',
+      line: { color: '#00E676', width: 2.5 },
+      fill: 'tozeroy',
+      fillcolor: 'rgba(0, 230, 118, 0.08)',
+      hovertemplate: '<b>%{x}</b><br>Patrimônio Carteira: R$ %{y:,.2f}<extra></extra>',
+    },
+    {
+      x: dates,
+      y: benchValues,
+      type: 'scatter',
+      mode: 'lines',
+      name: 'Buy & Hold Equal-Weight',
+      line: { color: '#00E5FF', width: 1.8, dash: 'dot' },
+      hovertemplate: '<b>%{x}</b><br>Benchmark Cesta: R$ %{y:,.2f}<extra></extra>',
+    },
+    {
+      x: dates,
+      y: cashValues,
+      type: 'scatter',
+      mode: 'lines',
+      name: 'Caixa Livre',
+      line: { color: '#F59E0B', width: 1.2, dash: 'dash' },
+      hovertemplate: '<b>%{x}</b><br>Caixa Livre: R$ %{y:,.2f}<extra></extra>',
+    },
+  ];
+
+  const layout = {
+    paper_bgcolor: bgColor,
+    plot_bgcolor: bgColor,
+    font: { family: 'JetBrains Mono, monospace', size: 11, color: textColor },
+    margin: { t: 25, r: 20, b: 35, l: 65 },
+    legend: { orientation: 'h', y: 1.12, x: 0, font: { size: 10 } },
+    xaxis: {
+      gridcolor: gridColor,
+      linecolor: borderColor,
+      tickfont: { size: 10 },
+    },
+    yaxis: {
+      gridcolor: gridColor,
+      linecolor: borderColor,
+      tickprefix: 'R$ ',
+      tickfont: { size: 10 },
+    },
+    hovermode: 'x unified',
+  };
+
+  Plotly.newPlot(container, traces, layout, { responsive: true, displayModeBar: false });
+}
+
+function renderPortfolioAllocationChart(adviseData) {
+  const container = document.getElementById('portfolio-allocation-chart');
+  if (!container || !window.Plotly) return;
+
+  if (!adviseData) {
+    Plotly.purge(container);
+    container.innerHTML = '<div class="flex items-center justify-center h-full text-xs text-gray-500 font-mono">Execute a análise para visualizar os pesos por ativo.</div>';
+    return;
+  }
+  container.innerHTML = '';
+
+  const isLight = (document.documentElement.getAttribute('data-theme') || 'dark') === 'light';
+  const bgColor = isLight ? '#FFFFFF' : '#0B0E14';
+  const textColor = isLight ? '#334155' : '#8B98A5';
+  const gridColor = isLight ? 'rgba(226, 232, 240, 0.8)' : 'rgba(38, 43, 56, 0.5)';
+  const borderColor = isLight ? '#E2E8F0' : '#262B38';
+
+  const recs = (adviseData.recommendations || []).filter(r => (Number(r.current_weight_pct) > 0 || Number(r.target_weight_pct) > 0));
+  const totalEq = Math.max(1, Number(adviseData.total_portfolio_equity) || 1);
+  const currCashPct = Number(((Number(adviseData.current_cash) || 0) / totalEq * 100).toFixed(2));
+  const projCashPct = Number(((Number(adviseData.projected_cash_after) || 0) / totalEq * 100).toFixed(2));
+
+  const labels = recs.map(r => r.ticker).concat(['CAIXA']);
+  const currentWeights = recs.map(r => Number(r.current_weight_pct) || 0).concat([currCashPct]);
+  const targetWeights = recs.map(r => Number(r.target_weight_pct) || 0).concat([projCashPct]);
+
+  const traces = [
+    {
+      x: labels,
+      y: currentWeights,
+      name: 'Peso Atual (%)',
+      type: 'bar',
+      marker: { color: '#64748B' },
+      hovertemplate: '<b>%{x}</b><br>Peso Atual: %{y:.1f}%<extra></extra>',
+    },
+    {
+      x: labels,
+      y: targetWeights,
+      name: 'Peso Alvo Recomendado (%)',
+      type: 'bar',
+      marker: { color: '#00E5FF' },
+      hovertemplate: '<b>%{x}</b><br>Peso Alvo: %{y:.1f}%<extra></extra>',
+    },
+  ];
+
+  const layout = {
+    barmode: 'group',
+    paper_bgcolor: bgColor,
+    plot_bgcolor: bgColor,
+    font: { family: 'JetBrains Mono, monospace', size: 11, color: textColor },
+    margin: { t: 25, r: 15, b: 40, l: 45 },
+    legend: { orientation: 'h', y: 1.12, x: 0, font: { size: 10 } },
+    xaxis: {
+      gridcolor: gridColor,
+      linecolor: borderColor,
+      tickfont: { size: 10 },
+    },
+    yaxis: {
+      gridcolor: gridColor,
+      linecolor: borderColor,
+      ticksuffix: '%',
+      range: [0, 105],
+      tickfont: { size: 10 },
+    },
+  };
+
+  Plotly.newPlot(container, traces, layout, { responsive: true, displayModeBar: false });
+}
+
+function renderPortfolioOpportunityRanking(ranking) {
+  const tbody = document.getElementById('portfolio-ranking-tbody');
+  const countBadge = document.getElementById('portfolio-ranking-count-badge');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const list = ranking || [];
+  if (countBadge) countBadge.textContent = `${list.length} ativos avaliados`;
+
+  if (list.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="10" class="px-4 py-6 text-center text-gray-500">
+          Nenhum ativo avaliado no universo selecionado.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  list.forEach((p, idx) => {
+    const tr = document.createElement('tr');
+    tr.className = 'hover:bg-fintech-surface-hover';
+
+    const score = Number(p.potential_score) || 0;
+    const scoreBarColor = score >= 75 ? 'bg-emerald-400' : (score >= 55 ? 'bg-cyan-400' : 'bg-amber-400');
+
+    let sigBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-700/50 text-gray-400">NEUTRO</span>';
+    if (p.active_direction === 'BUY') {
+      sigBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">🟢 ZONA DE COMPRA</span>';
+    } else if (p.active_direction === 'SELL') {
+      sigBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/40">🔴 ZONA DE VENDA</span>';
+    }
+
+    const retPct = Number(p.historical_return_pct) || 0;
+    const retColor = retPct >= 0 ? 'text-emerald-400' : 'text-rose-400';
+
+    tr.innerHTML = `
+      <td class="px-3 py-2 text-center font-bold text-gray-400">#${idx + 1}</td>
+      <td class="px-3 py-2">
+        <span class="font-bold text-white">${stripCorporateSuffix(p.asset_name || p.ticker)}</span>
+        <span class="text-[10px] text-gray-400 ml-1">(${p.ticker})</span>
+      </td>
+      <td class="px-3 py-2 text-cyan-300 font-sans">${p.champion_buy_label}</td>
+      <td class="px-3 py-2 text-amber-300 font-sans">${p.champion_sell_label}</td>
+      <td class="px-3 py-2 text-center">
+        <div class="font-bold text-white">${score.toFixed(1)}</div>
+        <div class="w-16 h-1.5 bg-gray-800 rounded overflow-hidden mx-auto mt-0.5">
+          <div class="h-full ${scoreBarColor}" style="width: ${Math.min(100, Math.max(0, score))}%"></div>
+        </div>
+      </td>
+      <td class="px-3 py-2 text-center">${sigBadge}</td>
+      <td class="px-3 py-2 text-center text-gray-300">${p.timing_label || p.timing_category} (${(Number(p.distance_pct) || 0).toFixed(1)}%)</td>
+      <td class="px-3 py-2 text-center font-bold text-emerald-400">${(Number(p.win_rate_pct) || 0).toFixed(1)}%</td>
+      <td class="px-3 py-2 text-center font-bold ${retColor}">${retPct >= 0 ? '+' : ''}${retPct.toFixed(1)}%</td>
+      <td class="px-3 py-2 text-center text-rose-400">${(Number(p.max_drawdown_pct) || 0).toFixed(1)}%</td>
+    `;
+    tbody.appendChild(tr);
+  });
 }

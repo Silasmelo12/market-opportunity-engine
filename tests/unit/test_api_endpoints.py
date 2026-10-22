@@ -21,8 +21,12 @@ def test_api_strategies_catalog():
     assert "allocation" in data
     assert "mql5" in data
     assert len(data["mql5"]["strategies"]) == 14
+    assert "quant_buy" in data
+    assert "quant_sell" in data
+    assert len(data["quant_buy"]["strategies"]) == 10
+    assert len(data["quant_sell"]["strategies"]) == 10
     total_strategies = sum(len(g["strategies"]) for g in data.values())
-    assert total_strategies == 50  # 48 previously + 2 inverted double strategies
+    assert total_strategies == 70  # 50 previously + 20 quant strategies
 
 
 def test_api_analyze_synthetic(monkeypatch):
@@ -203,3 +207,85 @@ def test_asset_names_and_radar_items():
         assert "asset_name" in item
         assert item["asset_name"] is not None
         assert len(item["asset_name"]) > 0
+
+
+
+def test_api_portfolio_advise():
+    payload = {
+        "available_cash": 10000.0,
+        "holdings": [
+            {"ticker": "PETR4.SA", "shares": 50.0, "average_buy_price": 35.0}
+        ],
+        "universe_category": "custom",
+        "custom_tickers": ["PETR4.SA", "VALE3.SA", "ITUB4.SA", "BBAS3.SA"],
+        "interval": "1d",
+        "period": "1y",
+        "max_weight_pct": 25.0,
+        "rebalance_band_pct": 5.0,
+        "min_rotation_score_delta": 15.0,
+    }
+    res = client.post("/api/portfolio/advise", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["current_cash"] == 10000.0
+    assert data["total_portfolio_equity"] > 10000.0
+    assert data["projected_cash_after"] >= 0.0
+    assert "holdings_evaluated" in data
+    assert len(data["holdings_evaluated"]) == 1
+    assert data["holdings_evaluated"][0]["ticker"] == "PETR4.SA"
+    assert "recommendations" in data
+    assert "opportunity_ranking" in data
+    assert len(data["opportunity_ranking"]) >= 3
+
+
+
+def test_api_portfolio_simulate():
+    payload = {
+        "initial_capital": 10000.0,
+        "universe_category": "custom",
+        "custom_tickers": ["PETR4.SA", "VALE3.SA", "ITUB4.SA", "BBAS3.SA"],
+        "interval": "1d",
+        "period": "1y",
+        "max_weight_pct": 25.0,
+        "rebalance_band_pct": 5.0,
+        "min_rotation_score_delta": 15.0,
+    }
+    res = client.post("/api/portfolio/simulate", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert "metrics" in data
+    assert data["metrics"]["initial_capital"] == 10000.0
+    assert data["metrics"]["final_equity"] > 0.0
+    assert "curve" in data
+    assert len(data["curve"]) > 10
+    assert "ledger_events" in data
+    assert "opportunity_ranking" in data
+
+
+
+def test_portfolio_tab_dom_and_ergonomics():
+    res_html = client.get("/")
+    assert res_html.status_code == 200
+    html = res_html.text
+
+    # Verify navigation button and tab view container
+    assert 'data-tab="tab-portfolio"' in html
+    assert 'id="tab-portfolio"' in html
+    assert "Carteira" in html
+
+    # Verify US1, US2, US3 DOM containers
+    assert 'id="portfolio-cash-input"' in html
+    assert 'id="portfolio-recommendations-tbody"' in html
+    assert 'id="portfolio-ledger-tbody"' in html
+    assert 'id="portfolio-equity-chart"' in html
+    assert 'id="portfolio-allocation-chart"' in html
+    assert 'id="portfolio-ranking-tbody"' in html
+
+    # Verify app.js hides #global-direction-selector when tab-portfolio is active
+    res_js = client.get("/app.js")
+    assert res_js.status_code == 200
+    js = res_js.text
+    assert "tabId === 'tab-portfolio'" in js
+    assert "renderPortfolioEquityChart" in js
+    assert "renderPortfolioAllocationChart" in js
+    assert "renderPortfolioOpportunityRanking" in js

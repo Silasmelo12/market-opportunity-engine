@@ -9,7 +9,7 @@ import os
 import json
 import time
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
@@ -27,6 +27,15 @@ from ..evaluator import (
     simulate_cycle_trade,
     optimize_strategy_pairs,
     optimize_dca_strategies,
+    PortfolioHolding,
+    AssetOpportunityProfile,
+    PortfolioActionRecommendation,
+    PortfolioLedgerEvent,
+    PortfolioCurvePoint,
+    PortfolioSimulationResult,
+    compute_asset_opportunity_profile,
+    advise_portfolio_rebalance,
+    simulate_portfolio_multi_asset,
 )
 from ..ui.theme import STRATEGY_LABELS_PT, get_friendly_label, get_asset_name, ASSET_NAMES_PT
 from .cache import daily_cache
@@ -47,6 +56,17 @@ from .schemas import (
     StrategyPairRankItemModel,
     OptimizeCombinationsRequest,
     OptimizeCombinationsResponse,
+    PortfolioHoldingInput,
+    PortfolioHoldingEvaluatedModel,
+    AssetOpportunityProfileModel,
+    PortfolioActionRecommendationModel,
+    PortfolioAdviseRequest,
+    PortfolioAdviseResponse,
+    PortfolioLedgerEventModel,
+    PortfolioCurvePointModel,
+    PortfolioSimulationMetricsModel,
+    PortfolioSimulateRequest,
+    PortfolioSimulateResponse,
 )
 
 app = FastAPI(
@@ -144,6 +164,19 @@ def _get_group_id(sub_id: str) -> str:
         "sell_overbought_stat", "sell_value_proxy", "sell_rebal_rv_rf", "sell_rebal_relative_strength"
     ):
         return "allocation"
+    if sub_id in (
+        "bollinger_close_in", "bb_reversal_buy", "bb_reversal_sell",
+        "keltner_squeeze", "squeeze_breakout_buy", "squeeze_breakout_sell",
+        "zscore_extreme", "zscore_bottom_buy", "zscore_top_sell",
+        "rsi_divergence", "rsi_bullish_div", "rsi_bearish_div",
+        "stochastic_extreme", "stoch_oversold_cross", "stoch_overbought_cross",
+        "macd_momentum", "macd_bottom_turn", "macd_top_turn",
+        "vwap_bands", "vwap_band_buy", "vwap_band_sell",
+        "mfi_extreme", "mfi_bottom_buy", "mfi_top_sell",
+        "volume_climax_vsa", "vsa_absorption_buy", "vsa_climax_sell",
+        "supertrend_trailing", "supertrend_bull_flip", "supertrend_bear_flip"
+    ):
+        return "quant"
     return "mql5"
 
 
@@ -236,6 +269,38 @@ def get_strategy_catalog():
                 {"id": "abandoned_baby_bullish", "label": STRATEGY_LABELS_PT["abandoned_baby_bullish"], "direction": "BUY"},
                 {"id": "bullish_kicker", "label": STRATEGY_LABELS_PT["bullish_kicker"], "direction": "BUY"},
                 {"id": "climactic_pinbar", "label": STRATEGY_LABELS_PT["climactic_pinbar"], "direction": "BUY"},
+            ],
+        },
+        "quant_buy": {
+            "name": "Indicadores Quantitativos - Compra (Fundos)",
+            "direction": "BUY",
+            "strategies": [
+                {"id": "bollinger_close_in", "label": STRATEGY_LABELS_PT["bollinger_close_in"], "direction": "BUY"},
+                {"id": "keltner_squeeze", "label": STRATEGY_LABELS_PT["keltner_squeeze"], "direction": "BUY"},
+                {"id": "zscore_extreme", "label": STRATEGY_LABELS_PT["zscore_extreme"], "direction": "BUY"},
+                {"id": "rsi_divergence", "label": STRATEGY_LABELS_PT["rsi_divergence"], "direction": "BUY"},
+                {"id": "stochastic_extreme", "label": STRATEGY_LABELS_PT["stochastic_extreme"], "direction": "BUY"},
+                {"id": "macd_momentum", "label": STRATEGY_LABELS_PT["macd_momentum"], "direction": "BUY"},
+                {"id": "vwap_bands", "label": STRATEGY_LABELS_PT["vwap_bands"], "direction": "BUY"},
+                {"id": "mfi_extreme", "label": STRATEGY_LABELS_PT["mfi_extreme"], "direction": "BUY"},
+                {"id": "volume_climax_vsa", "label": STRATEGY_LABELS_PT["volume_climax_vsa"], "direction": "BUY"},
+                {"id": "supertrend_trailing", "label": STRATEGY_LABELS_PT["supertrend_trailing"], "direction": "BUY"},
+            ],
+        },
+        "quant_sell": {
+            "name": "Indicadores Quantitativos - Venda (Topos)",
+            "direction": "SELL",
+            "strategies": [
+                {"id": "bollinger_close_in", "label": STRATEGY_LABELS_PT["bollinger_close_in"], "direction": "SELL"},
+                {"id": "keltner_squeeze", "label": STRATEGY_LABELS_PT["keltner_squeeze"], "direction": "SELL"},
+                {"id": "zscore_extreme", "label": STRATEGY_LABELS_PT["zscore_extreme"], "direction": "SELL"},
+                {"id": "rsi_divergence", "label": STRATEGY_LABELS_PT["rsi_divergence"], "direction": "SELL"},
+                {"id": "stochastic_extreme", "label": STRATEGY_LABELS_PT["stochastic_extreme"], "direction": "SELL"},
+                {"id": "macd_momentum", "label": STRATEGY_LABELS_PT["macd_momentum"], "direction": "SELL"},
+                {"id": "vwap_bands", "label": STRATEGY_LABELS_PT["vwap_bands"], "direction": "SELL"},
+                {"id": "mfi_extreme", "label": STRATEGY_LABELS_PT["mfi_extreme"], "direction": "SELL"},
+                {"id": "volume_climax_vsa", "label": STRATEGY_LABELS_PT["volume_climax_vsa"], "direction": "SELL"},
+                {"id": "supertrend_trailing", "label": STRATEGY_LABELS_PT["supertrend_trailing"], "direction": "SELL"},
             ],
         },
         "mql5_sell": {
@@ -1266,6 +1331,382 @@ def optimize_combinations_endpoint(req: OptimizeCombinationsRequest):
         total_combinations_tested=len(top_combos),
         champion=champ_model,
         top_combinations=top_models,
+    )
+
+
+def _resolve_portfolio_universe_tickers(
+    universe_category: str = "featured",
+    custom_tickers: Optional[List[str]] = None,
+    holdings_tickers: Optional[List[str]] = None,
+    max_assets: int = 24,
+) -> List[Tuple[str, str]]:
+    """
+    Resolves a deduplicated list of (ticker, category) pairs for portfolio analysis/simulation.
+    Always includes any tickers currently held by the user so they are evaluated for SELL/REBALANCE/ROTATE.
+    """
+    norm_cat = _normalize_category(universe_category)
+    if norm_cat == "custom" and custom_tickers:
+        raw_basket = [(t.strip().upper(), "Personalizado") for t in custom_tickers if t and t.strip()]
+    elif norm_cat == "featured":
+        raw_basket = list(TICKERS_FEATURED)
+    elif norm_cat == "acoes_br":
+        raw_basket = [(t, "Ações Brasil") for t in TICKERS_BR_ACOES if t != "^BVSP"]
+    elif norm_cat == "fiis":
+        raw_basket = [(t, "FIIs Brasil") for t in TICKERS_FIIS]
+    elif norm_cat == "usa":
+        raw_basket = [(t, "Ações EUA") for t in TICKERS_USA[:max_assets]]
+    elif norm_cat == "commodities":
+        raw_basket = [(t, "Commodities") for t in TICKERS_COMMODITIES]
+    elif norm_cat == "forex":
+        raw_basket = [(t, "Forex") for t in TICKERS_FX]
+    elif norm_cat == "crypto":
+        raw_basket = [(t, "Criptomoedas") for t in TICKERS_CRYPTO]
+    elif custom_tickers:
+        raw_basket = [(t.strip().upper(), "Personalizado") for t in custom_tickers if t and t.strip()]
+    else:
+        raw_basket = list(TICKERS_FEATURED)
+
+    seen = set()
+    final_basket: List[Tuple[str, str]] = []
+
+    for ht in (holdings_tickers or []):
+        t_clean = (ht or "").strip().upper()
+        if t_clean and t_clean not in seen:
+            seen.add(t_clean)
+            cat_label = "Carteira Atual"
+            for bt, bcat in DEFAULT_SCANNER_BASKET:
+                if bt.upper() == t_clean:
+                    cat_label = bcat
+                    break
+            final_basket.append((t_clean, cat_label))
+
+    for t_cand, c_label in raw_basket:
+        t_clean = (t_cand or "").strip().upper()
+        if not t_clean or t_clean == "^BVSP" or t_clean in seen:
+            continue
+        seen.add(t_clean)
+        final_basket.append((t_clean, c_label))
+        if len(final_basket) >= max_assets + len(holdings_tickers or []):
+            break
+
+    return final_basket
+
+
+def _load_and_profile_single_asset(
+    ticker: str,
+    category: str,
+    interval: str = "1d",
+    period: str = "2y",
+) -> Optional[Dict[str, Any]]:
+    """
+    Loads OHLCVSeries, runs StrategyCatalog, and computes AssetOpportunityProfile for one ticker.
+    Uses in-memory cache to accelerate repeated portfolio advisories and simulations.
+    """
+    period_to_use = period
+    if interval in ("5m", "15m", "30m") and period not in ("1d", "5d", "7d", "30d", "60d"):
+        period_to_use = "60d"
+    elif interval in ("60m", "1h", "2h", "4h", "12h") and period in ("5y", "max"):
+        period_to_use = "730d"
+
+    cache_key = f"portfolio_asset:{ticker}:{interval}:{period_to_use}"
+    cached = _get_cache(cache_key)
+    if cached is not None:
+        return cached
+
+    try:
+        series = DataLoader.load_asset_data(ticker=ticker, interval=interval, period=period_to_use, use_cache=True)
+    except Exception:
+        return None
+
+    if series is None or series.length < 15:
+        return None
+
+    catalog = StrategyCatalog(lookback_n=10, retest_window_m=5, tolerance_pct=0.005)
+    res = catalog.run_all(series)
+    signals = res["signals"]
+    prop_state = res["prop_current_state"]
+    pending = res["pending_signals"]
+
+    asset_name = strip_corporate_suffix(get_asset_name(ticker))
+    profile = compute_asset_opportunity_profile(
+        ticker=ticker,
+        series=series,
+        signals=signals,
+        prop_state=prop_state,
+        pending_signals=pending,
+        asset_name=asset_name,
+        category=category,
+        strategy_labels_map=STRATEGY_LABELS_PT,
+    )
+
+    bundle = {
+        "ticker": ticker.upper(),
+        "asset_name": asset_name,
+        "category": category,
+        "series": series,
+        "signals": signals,
+        "prop_state": prop_state,
+        "pending_signals": pending,
+        "profile": profile,
+    }
+    _set_cache(cache_key, bundle)
+    return bundle
+
+
+@app.post("/api/portfolio/advise", response_model=PortfolioAdviseResponse)
+def advise_portfolio_endpoint(req: PortfolioAdviseRequest):
+    holdings_tickers = [h.ticker for h in req.holdings if h.ticker]
+    basket = _resolve_portfolio_universe_tickers(
+        universe_category=req.universe_category,
+        custom_tickers=req.custom_tickers,
+        holdings_tickers=holdings_tickers,
+        max_assets=24,
+    )
+
+    bundles: List[Dict[str, Any]] = []
+    max_workers = min(10, max(1, len(basket)))
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = [
+            executor.submit(_load_and_profile_single_asset, t, cat, req.interval, req.period)
+            for t, cat in basket
+        ]
+        for f in futures:
+            res = f.result()
+            if res is not None:
+                bundles.append(res)
+
+    profiles = [b["profile"] for b in bundles]
+    holdings_dicts = [
+        {"ticker": h.ticker, "shares": h.shares, "average_buy_price": h.average_buy_price}
+        for h in req.holdings
+    ]
+
+    advise_res = advise_portfolio_rebalance(
+        available_cash=req.available_cash,
+        holdings_input=holdings_dicts,
+        opportunity_profiles=profiles,
+        max_weight_pct=req.max_weight_pct,
+        rebalance_band_pct=req.rebalance_band_pct,
+        min_rotation_score_delta=req.min_rotation_score_delta,
+    )
+
+    holdings_models = [
+        PortfolioHoldingEvaluatedModel(
+            ticker=h.ticker,
+            asset_name=h.asset_name,
+            shares=h.shares,
+            average_buy_price=h.average_buy_price,
+            current_price=h.current_price,
+            market_value=h.market_value,
+            invested_value=h.invested_value,
+            unrealized_pnl_value=h.unrealized_pnl_value,
+            unrealized_pnl_pct=h.unrealized_pnl_pct,
+            current_weight_pct=h.current_weight_pct,
+            entry_bar_index=h.entry_bar_index,
+        )
+        for h in advise_res["holdings_evaluated"]
+    ]
+
+    rec_models = [
+        PortfolioActionRecommendationModel(
+            ticker=r.ticker,
+            asset_name=r.asset_name,
+            action_type=r.action_type,
+            action_label=r.action_label,
+            reason_text=r.reason_text,
+            strategy_sub_id=r.strategy_sub_id,
+            strategy_label=r.strategy_label,
+            potential_score=r.potential_score,
+            timing_category=r.timing_category,
+            current_price=r.current_price,
+            reference_price=r.reference_price,
+            current_shares=r.current_shares,
+            recommended_shares_delta=r.recommended_shares_delta,
+            target_shares=r.target_shares,
+            order_value=r.order_value,
+            current_weight_pct=r.current_weight_pct,
+            target_weight_pct=r.target_weight_pct,
+        )
+        for r in advise_res["recommendations"]
+    ]
+
+    ranking_models = [
+        AssetOpportunityProfileModel(
+            ticker=p.ticker,
+            asset_name=p.asset_name,
+            category=p.category,
+            current_price=p.current_price,
+            champion_buy_id=p.champion_buy_id,
+            champion_buy_label=p.champion_buy_label,
+            champion_sell_id=p.champion_sell_id,
+            champion_sell_label=p.champion_sell_label,
+            win_rate_pct=p.win_rate_pct,
+            historical_return_pct=p.historical_return_pct,
+            max_drawdown_pct=p.max_drawdown_pct,
+            closed_trades=p.closed_trades,
+            active_direction=p.active_direction,
+            timing_category=p.timing_category,
+            timing_label=p.timing_label,
+            distance_pct=p.distance_pct,
+            recommended_price=p.recommended_price,
+            potential_score=p.potential_score,
+        )
+        for p in advise_res["opportunity_ranking"]
+    ]
+
+    return PortfolioAdviseResponse(
+        universe_category=req.universe_category,
+        interval=req.interval,
+        period=req.period,
+        current_cash=advise_res["current_cash"],
+        current_holdings_value=advise_res["current_holdings_value"],
+        total_portfolio_equity=advise_res["total_portfolio_equity"],
+        projected_cash_after=advise_res["projected_cash_after"],
+        projected_invested_after=advise_res["projected_invested_after"],
+        max_weight_pct=advise_res["max_weight_pct"],
+        holdings_evaluated=holdings_models,
+        recommendations=rec_models,
+        opportunity_ranking=ranking_models,
+    )
+
+
+@app.post("/api/portfolio/simulate", response_model=PortfolioSimulateResponse)
+def simulate_portfolio_endpoint(req: PortfolioSimulateRequest):
+    basket = _resolve_portfolio_universe_tickers(
+        universe_category=req.universe_category,
+        custom_tickers=req.custom_tickers,
+        holdings_tickers=[],
+        max_assets=24,
+    )
+
+    bundles: List[Dict[str, Any]] = []
+    max_workers = min(10, max(1, len(basket)))
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = [
+            executor.submit(_load_and_profile_single_asset, t, cat, req.interval, req.period)
+            for t, cat in basket
+        ]
+        for f in futures:
+            res = f.result()
+            if res is not None:
+                bundles.append(res)
+
+    sim_res = simulate_portfolio_multi_asset(
+        asset_bundles=bundles,
+        initial_capital=req.initial_capital,
+        max_weight_pct=req.max_weight_pct,
+        rebalance_band_pct=req.rebalance_band_pct,
+        min_rotation_score_delta=req.min_rotation_score_delta,
+        start_date=req.start_date,
+        end_date=req.end_date,
+        strategy_labels_map=STRATEGY_LABELS_PT,
+    )
+
+    metrics_model = PortfolioSimulationMetricsModel(
+        initial_capital=sim_res.initial_capital,
+        final_equity=sim_res.final_equity,
+        final_cash=sim_res.final_cash,
+        final_invested_value=sim_res.final_invested_value,
+        net_profit=sim_res.net_profit,
+        total_return_pct=sim_res.total_return_pct,
+        benchmark_return_pct=sim_res.benchmark_return_pct,
+        alpha_vs_benchmark_pct=sim_res.alpha_vs_benchmark_pct,
+        max_drawdown_pct=sim_res.max_drawdown_pct,
+        win_rate_pct=sim_res.win_rate_pct,
+        profit_factor=sim_res.profit_factor,
+        total_events_count=sim_res.total_events_count,
+        closed_exits_count=sim_res.closed_exits_count,
+        winning_exits_count=sim_res.winning_exits_count,
+        losing_exits_count=sim_res.losing_exits_count,
+        rebalance_rotations_count=sim_res.rebalance_rotations_count,
+    )
+
+    final_holdings_models = [
+        PortfolioHoldingEvaluatedModel(
+            ticker=h.ticker,
+            asset_name=h.asset_name,
+            shares=h.shares,
+            average_buy_price=h.average_buy_price,
+            current_price=h.current_price,
+            market_value=h.market_value,
+            invested_value=h.invested_value,
+            unrealized_pnl_value=h.unrealized_pnl_value,
+            unrealized_pnl_pct=h.unrealized_pnl_pct,
+            current_weight_pct=h.current_weight_pct,
+            entry_bar_index=h.entry_bar_index,
+        )
+        for h in sim_res.current_holdings
+    ]
+
+    curve_models = [
+        PortfolioCurvePointModel(
+            date=c.date,
+            portfolio_equity=c.portfolio_equity,
+            cash_balance=c.cash_balance,
+            invested_equity=c.invested_equity,
+            benchmark_equity=c.benchmark_equity,
+            drawdown_pct=c.drawdown_pct,
+        )
+        for c in sim_res.curve
+    ]
+
+    ledger_models = [
+        PortfolioLedgerEventModel(
+            event_id=ev.event_id,
+            date=ev.date,
+            ticker=ev.ticker,
+            asset_name=ev.asset_name,
+            event_type=ev.event_type,
+            event_label=ev.event_label,
+            strategy_sub_id=ev.strategy_sub_id,
+            strategy_label=ev.strategy_label,
+            potential_score=ev.potential_score,
+            execution_price=ev.execution_price,
+            shares_delta=ev.shares_delta,
+            trade_value=ev.trade_value,
+            realized_pnl_value=ev.realized_pnl_value,
+            realized_pnl_pct=ev.realized_pnl_pct,
+            weight_before_pct=ev.weight_before_pct,
+            weight_after_pct=ev.weight_after_pct,
+            cash_after=ev.cash_after,
+            portfolio_equity_after=ev.portfolio_equity_after,
+        )
+        for ev in sim_res.ledger_events
+    ]
+
+    ranking_models = [
+        AssetOpportunityProfileModel(
+            ticker=p.ticker,
+            asset_name=p.asset_name,
+            category=p.category,
+            current_price=p.current_price,
+            champion_buy_id=p.champion_buy_id,
+            champion_buy_label=p.champion_buy_label,
+            champion_sell_id=p.champion_sell_id,
+            champion_sell_label=p.champion_sell_label,
+            win_rate_pct=p.win_rate_pct,
+            historical_return_pct=p.historical_return_pct,
+            max_drawdown_pct=p.max_drawdown_pct,
+            closed_trades=p.closed_trades,
+            active_direction=p.active_direction,
+            timing_category=p.timing_category,
+            timing_label=p.timing_label,
+            distance_pct=p.distance_pct,
+            recommended_price=p.recommended_price,
+            potential_score=p.potential_score,
+        )
+        for p in sim_res.opportunity_profiles
+    ]
+
+    return PortfolioSimulateResponse(
+        universe_category=req.universe_category,
+        interval=req.interval,
+        period=req.period,
+        metrics=metrics_model,
+        final_holdings=final_holdings_models,
+        curve=curve_models,
+        ledger_events=ledger_models,
+        opportunity_ranking=ranking_models,
     )
 
 

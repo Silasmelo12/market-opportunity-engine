@@ -90,6 +90,9 @@
         <button class="nav-tab-btn" data-tab="tab-simulator">
           <span></span>Simulador
         </button>
+        <button class="nav-tab-btn" data-tab="tab-portfolio">
+          <span></span>Carteira
+        </button>
         <button class="nav-tab-btn" data-tab="tab-playbook">
           <span></span>Playbook
         </button>
@@ -172,19 +175,26 @@
           </div>
           <div class="overflow-x-auto touch-scroll">
             <table class="w-full text-left text-xs text-gray-300">
-              <thead class="bg-fintech-bg/60 text-gray-400 font-semibold uppercase text-[11px] border-b border-fintech-border whitespace-nowrap">
+                            <thead class="bg-fintech-bg/60 text-gray-400 font-semibold uppercase text-[11px] border-b border-fintech-border whitespace-nowrap">
                 <tr>
                   <th class="px-3 sm:px-4 py-2.5 sm:py-3">Ativo</th>
-                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Categoria</th>
-                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Direção</th>
-                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Preço Atual</th>
+                  <th class="px-2 sm:px-3 py-2.5 sm:py-3 text-center">Dir</th>
                   <th class="px-3 sm:px-4 py-2.5 sm:py-3">Estratégia Confirmada</th>
                   <th class="px-3 sm:px-4 py-2.5 sm:py-3">Status do Setup</th>
-                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Semáforo de Timing</th>
+                  <th class="px-2 sm:px-3 py-2.5 sm:py-3 text-center">Timing</th>
                   <th class="px-3 sm:px-4 py-2.5 sm:py-3">Distância (%)</th>
-                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Preço Gatilho</th>
-                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Histórico (N / Win Rate)</th>
-                  <th class="px-3 sm:px-4 py-2.5 sm:py-3 text-right">Ação</th>
+                  <th class="px-3 sm:px-4 py-2.5 sm:py-3 cursor-pointer hover:text-cyan-400 select-none text-right" id="th-sort-n" title="Clique para ordenar por Quantidade de Sinais">
+                    <div class="inline-flex items-center gap-1 justify-end">
+                      <span>Qtd Sinais</span>
+                      <span id="sort-icon-n" class="text-[10px] text-gray-500">↕</span>
+                    </div>
+                  </th>
+                  <th class="px-3 sm:px-4 py-2.5 sm:py-3 cursor-pointer hover:text-cyan-400 select-none text-right" id="th-sort-winrate" title="Clique para ordenar por Taxa de Acerto (Win Rate)">
+                    <div class="inline-flex items-center gap-1 justify-end">
+                      <span>Win Rate (%)</span>
+                      <span id="sort-icon-winrate" class="text-[10px] text-gray-500">↕</span>
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody id="radar-table-body" class="divide-y divide-fintech-border whitespace-nowrap">
@@ -627,7 +637,57 @@
           </div>
         </div>
         </div>
-      </aside>
+                <!-- 5. Indicadores Quantitativos de Fundo (10) -->
+          <div class="border border-fintech-border rounded overflow-hidden strategy-group-wrapper" data-direction="BUY">
+            <div class="accordion-header bg-fintech-bg px-2.5 py-1.5 flex items-center justify-between text-gray-200 font-semibold cursor-pointer" data-accordion="acc-quant-buy">
+              <div class="flex items-center space-x-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                <span class="text-xs">Indicadores Quantitativos - Fundo (10)</span>
+              </div>
+              <span class="accordion-arrow text-gray-400 text-xs transition-transform transform">&#9660;</span>
+            </div>
+            <div id="acc-quant-buy" class="accordion-content p-2 bg-fintech-surface space-y-1.5 border-t border-fintech-border hidden">
+              <div class="grid grid-cols-1 gap-1 text-[11px] text-gray-300">
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bollinger_close_in" data-dir="BUY"><span>Bollinger Fechou Fora/Dentro</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="keltner_squeeze" data-dir="BUY"><span>Keltner Squeeze (Compressão/Alta)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="zscore_extreme" data-dir="BUY"><span>Z-Score Fundo Extremo (&lt;-2.0)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="rsi_divergence" data-dir="BUY"><span>Divergência Regular IFR/RSI</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="stochastic_extreme" data-dir="BUY"><span>Estocástico Lento em Sobrevenda (&lt;25)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="macd_momentum" data-dir="BUY"><span>MACD Histogram Momentum (Alta)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="vwap_bands" data-dir="BUY"><span>Bandas de VWAP (Retorno à Média)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="mfi_extreme" data-dir="BUY"><span>Money Flow Index (MFI) Sobrevenda (&lt;20)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="volume_climax_vsa" data-dir="BUY"><span>Volume Clímax / VSA Absorção</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="supertrend_trailing" data-dir="BUY"><span>SuperTrend Virada Compradora</span></label>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Indicadores Quantitativos de Topo (10) -->
+          <div class="border border-fintech-border rounded overflow-hidden strategy-group-wrapper" data-direction="SELL">
+            <div class="accordion-header bg-fintech-bg px-2.5 py-1.5 flex items-center justify-between text-gray-200 font-semibold cursor-pointer" data-accordion="acc-quant-sell">
+              <div class="flex items-center space-x-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+                <span class="text-xs">Indicadores Quantitativos - Topo (10)</span>
+              </div>
+              <span class="accordion-arrow text-gray-400 text-xs transition-transform transform">&#9660;</span>
+            </div>
+            <div id="acc-quant-sell" class="accordion-content p-2 bg-fintech-surface space-y-1.5 border-t border-fintech-border hidden">
+              <div class="grid grid-cols-1 gap-1 text-[11px] text-gray-300">
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bollinger_close_in" data-dir="SELL"><span>Bollinger Fechou Fora/Dentro</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="keltner_squeeze" data-dir="SELL"><span>Keltner Squeeze (Compressão/Baixa)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="zscore_extreme" data-dir="SELL"><span>Z-Score Topo Extremo (&gt;+2.0)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="rsi_divergence" data-dir="SELL"><span>Divergência Regular IFR/RSI</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="stochastic_extreme" data-dir="SELL"><span>Estocástico Lento em Sobrecompra (&gt;75)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="macd_momentum" data-dir="SELL"><span>MACD Histogram Momentum (Baixa)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="vwap_bands" data-dir="SELL"><span>Bandas de VWAP (Retorno à Média)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="mfi_extreme" data-dir="SELL"><span>Money Flow Index (MFI) Sobrecompra (&gt;80)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="volume_climax_vsa" data-dir="SELL"><span>Volume Clímax / VSA Distribuição</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="supertrend_trailing" data-dir="SELL"><span>SuperTrend Virada Vendedora</span></label>
+              </div>
+            </div>
+          </div>
+
+</aside>
 
       <!-- Center & Right: 60fps Chart & Quantitative Panels -->
       <div class="flex-1 flex flex-col min-h-0 lg:h-full overflow-visible lg:overflow-y-auto">
@@ -870,7 +930,19 @@
                   <option value="bullish_kicker">Kicker de Alta</option>
                   <option value="climactic_pinbar">Pinbar Climático de Exaustão</option>
                 </optgroup>
-              </select>
+                              <optgroup label="Indicadores Quantitativos - Fundos">
+                  <option value="bollinger_close_in">Bandas de Bollinger (Fechou Fora/Dentro)</option>
+                  <option value="keltner_squeeze">Keltner Squeeze (Compressão/Expansão)</option>
+                  <option value="zscore_extreme">Z-Score de Preço em Extremos (<-2.0)</option>
+                  <option value="rsi_divergence">Divergência Regular de IFR/RSI</option>
+                  <option value="stochastic_extreme">Estocástico Lento em Extremos (<25)</option>
+                  <option value="macd_momentum">MACD Histogram Momentum (Inflexão)</option>
+                  <option value="vwap_bands">Bandas de VWAP (Retorno à Média)</option>
+                  <option value="mfi_extreme">Money Flow Index (MFI) Extremo (<20)</option>
+                  <option value="volume_climax_vsa">Volume Clímax / VSA Absorção</option>
+                  <option value="supertrend_trailing">SuperTrend / ATR Trailing</option>
+                </optgroup>
+</select>
             </div>
 
             <!-- Sell Strategy Dropdown -->
@@ -913,7 +985,19 @@
                   <option value="bearish_kicker">Kicker de Baixa</option>
                   <option value="climactic_bearish_pinbar">Pinbar Climático de Topo</option>
                 </optgroup>
-              </select>
+                              <optgroup label="Indicadores Quantitativos - Topos">
+                  <option value="bollinger_close_in">Bandas de Bollinger (Fechou Fora/Dentro)</option>
+                  <option value="keltner_squeeze">Keltner Squeeze (Compressão/Expansão)</option>
+                  <option value="zscore_extreme">Z-Score de Preço em Extremos (>+2.0)</option>
+                  <option value="rsi_divergence">Divergência Regular de IFR/RSI</option>
+                  <option value="stochastic_extreme">Estocástico Lento em Extremos (>75)</option>
+                  <option value="macd_momentum">MACD Histogram Momentum (Inflexão)</option>
+                  <option value="vwap_bands">Bandas de VWAP (Retorno à Média)</option>
+                  <option value="mfi_extreme">Money Flow Index (MFI) Extremo (>80)</option>
+                  <option value="volume_climax_vsa">Volume Clímax / VSA Distribuição</option>
+                  <option value="supertrend_trailing">SuperTrend / ATR Trailing</option>
+                </optgroup>
+</select>
             </div>
 
             <!-- Run Button -->
@@ -945,9 +1029,9 @@
                   <span id="opt-champ-mode-badge" class="px-1.5 py-0.5 rounded bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 font-mono text-[10px]"></span>
                   <span class="text-xs text-gray-400" id="opt-champ-tested-count">Testadas centenas de combinações</span>
                 </div>
-                <div class="text-base font-bold text-white flex flex-wrap items-center gap-2 pt-1">
+                                <div class="text-base font-bold text-white flex flex-wrap items-center gap-2 pt-1" id="opt-champ-title-container">
                   <span class="text-emerald-400 font-semibold" id="opt-champ-buy-label">Varredura de Liquidez (Wyckoff Spring)</span>
-                  <span class="text-gray-400">-></span>
+                  <span class="text-gray-400" id="opt-champ-arrow">-&gt;</span>
                   <span class="text-rose-400 font-semibold" id="opt-champ-sell-label">Doji Lápide (Gravestone)</span>
                 </div>
               </div>
@@ -1167,6 +1251,335 @@
           <p class="text-xs text-gray-300 leading-relaxed">
             14 padrões de velas de fundo filtrados por tendência de baixa prévia (<code class="text-cyan-400">Close < SMA(20)</code>) e 14 padrões de velas de topo filtrados por tendência de alta prévia (<code class="text-cyan-400">Close >SMA(20)</code>), com execução estrita em Open[t+1].
           </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 5: GESTOR E SIMULADOR DE CARTEIRA      -->
+    <!-- ========================================== -->
+    <section id="tab-portfolio" class="tab-view hidden h-full p-2.5 sm:p-4 overflow-y-auto">
+      <div class="max-w-7xl mx-auto space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+              <span>💼</span>Gestor, Consultor de Rebalanceamento & Simulador Multiativos de Carteira
+            </h2>
+            <p class="text-[11px] sm:text-xs text-gray-400">
+              Alocação inteligente de capital nas estratégias campeãs de cada ativo, plano de ordens de hoje (comprar, vender e rebalancear) e backtest histórico multiativos.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="btn-run-portfolio" class="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold px-4 py-2 rounded shadow-lg transition flex items-center gap-1.5 cursor-pointer">
+              <span>⚡</span>Gerar Plano de Hoje & Simular Carteira
+            </button>
+          </div>
+        </div>
+
+        <!-- Top Configuration & Current Portfolio Editor Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          <!-- Left Card: Parâmetros & Universo Alvo (5 cols) -->
+          <div class="lg:col-span-5 card-surface p-3.5 sm:p-4 space-y-3 text-xs">
+            <div class="flex items-center justify-between border-b border-fintech-border pb-2">
+              <h3 class="font-bold text-fintech-cyan uppercase tracking-wider text-[11px]">1. Caixa & Parâmetros de Alocação</h3>
+              <span class="text-[10px] text-gray-400 font-mono">Salvo automaticamente</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="text-gray-400 font-semibold block mb-1">Caixa Disponível / Capital (R$)</label>
+                <input id="portfolio-cash-input" type="number" value="10000" min="0" step="500" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-mono focus:border-fintech-cyan focus:outline-none">
+              </div>
+              <div>
+                <label class="text-gray-400 font-semibold block mb-1">Teto Máx. por Ativo (%)</label>
+                <input id="portfolio-max-weight-input" type="number" value="25" min="10" max="100" step="5" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-mono focus:border-fintech-cyan focus:outline-none">
+              </div>
+              <div>
+                <label class="text-gray-400 font-semibold block mb-1">Universo de Oportunidades</label>
+                <select id="portfolio-universe-select" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-sans focus:border-fintech-cyan focus:outline-none">
+                  <option value="featured" selected>Destaques Multi-Mercado (14)</option>
+                  <option value="acoes_br">Ações Brasil B3 (30)</option>
+                  <option value="fiis">FIIs Brasil (23)</option>
+                  <option value="usa">Ações EUA Top Liquidez (24)</option>
+                  <option value="commodities">Commodities (14)</option>
+                  <option value="crypto">Criptomoedas (3)</option>
+                  <option value="custom">Lista Personalizada de Tickers</option>
+                </select>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="text-gray-400 font-semibold block mb-1">Tempo</label>
+                  <select id="portfolio-interval-select" class="w-full bg-fintech-bg border border-fintech-border rounded px-2 py-1.5 text-white font-sans focus:border-fintech-cyan focus:outline-none">
+                    <option value="1d" selected>1D (Diário)</option>
+                    <option value="1wk">1S (Semanal)</option>
+                    <option value="1h">1h (Horário)</option>
+                    <option value="15m">15m</option>
+                    <option value="5m">5m</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-gray-400 font-semibold block mb-1">Período</label>
+                  <select id="portfolio-period-select" class="w-full bg-fintech-bg border border-fintech-border rounded px-2 py-1.5 text-white font-sans focus:border-fintech-cyan focus:outline-none">
+                    <option value="1y">1 Ano</option>
+                    <option value="2y" selected>2 Anos</option>
+                    <option value="5y">5 Anos</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div id="portfolio-custom-tickers-wrapper" class="hidden">
+              <label class="text-gray-400 font-semibold block mb-1">Tickers Personalizados (separados por vírgula)</label>
+              <input id="portfolio-custom-tickers-input" type="text" placeholder="Ex: PETR4.SA, VALE3.SA, ITUB4.SA, WEGE3.SA, BTC-USD" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-mono uppercase focus:border-fintech-cyan focus:outline-none">
+            </div>
+          </div>
+
+          <!-- Right Card: Editor de Posições Atuais da Carteira (7 cols) -->
+          <div class="lg:col-span-7 card-surface p-3.5 sm:p-4 space-y-3 text-xs">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-fintech-border pb-2">
+              <div>
+                <h3 class="font-bold text-emerald-400 uppercase tracking-wider text-[11px]">2. Minhas Posições Atuais (Opcional)</h3>
+                <p class="text-[10px] text-gray-400">Deixe vazio para simular começando 100% em caixa (ex: R$ 10.000,00) ou cadastre seus ativos atuais para rebalancear.</p>
+              </div>
+              <button id="btn-portfolio-clear-holdings" class="text-[11px] px-2.5 py-1 rounded bg-fintech-bg hover:bg-rose-950/60 text-gray-300 hover:text-rose-300 border border-fintech-border transition cursor-pointer">
+                Limpar (100% em Caixa)
+              </button>
+            </div>
+
+            <!-- Add Holding Inline Form -->
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-end">
+              <div class="sm:col-span-4">
+                <label class="text-[10px] text-gray-400 block mb-0.5">Ativo (Ticker)</label>
+                <input id="portfolio-add-ticker" list="asset-datalist" type="text" placeholder="Ex: PETR4.SA" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1 text-xs text-white font-mono uppercase focus:border-fintech-cyan focus:outline-none">
+              </div>
+              <div class="sm:col-span-3">
+                <label class="text-[10px] text-gray-400 block mb-0.5">Quantidade (Cotas)</label>
+                <input id="portfolio-add-shares" type="number" step="any" min="0.0001" placeholder="Ex: 100" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1 text-xs text-white font-mono focus:border-fintech-cyan focus:outline-none">
+              </div>
+              <div class="sm:col-span-3">
+                <label class="text-[10px] text-gray-400 block mb-0.5">Preço Médio (R$)</label>
+                <input id="portfolio-add-avgprice" type="number" step="any" min="0.01" placeholder="Ex: 36.50" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1 text-xs text-white font-mono focus:border-fintech-cyan focus:outline-none">
+              </div>
+              <div class="sm:col-span-2">
+                <button id="btn-portfolio-add-holding" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-1 px-2 rounded transition text-xs cursor-pointer">
+                  + Adicionar
+                </button>
+              </div>
+            </div>
+
+            <!-- Current Holdings Mini Table -->
+            <div class="overflow-x-auto max-h-36 border border-fintech-border/60 rounded">
+              <table class="w-full text-left text-[11px] text-gray-300">
+                <thead class="bg-fintech-bg text-gray-400 uppercase text-[10px] sticky top-0">
+                  <tr>
+                    <th class="px-2.5 py-1.5">Ativo</th>
+                    <th class="px-2.5 py-1.5 font-mono">Qtd Cotas</th>
+                    <th class="px-2.5 py-1.5 font-mono">Preço Médio</th>
+                    <th class="px-2.5 py-1.5 font-mono">Custo Investido</th>
+                    <th class="px-2.5 py-1.5 text-right">Remover</th>
+                  </tr>
+                </thead>
+                <tbody id="portfolio-holdings-list" class="divide-y divide-fintech-border font-mono">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ======================================================= -->
+        <!-- SECTION A: CONSULTOR DE REBALANCEAMENTO HOJE            -->
+        <!-- ======================================================= -->
+        <div class="card-surface p-4 space-y-3 border-l-4 border-l-cyan-400">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div>
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <span>🎯</span>Plano de Ação & Rebalanceamento Hoje (Boleta de Recomendações)
+              </h3>
+              <p class="text-[11px] text-gray-400">
+                O que comprar, quanto comprar, o que vender, quanto vender e como rebalancear sua carteira agora segundo a estratégia campeã de cada ativo.
+              </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-3 text-xs">
+              <div class="bg-fintech-bg px-3 py-1.5 rounded border border-fintech-border">
+                <span class="text-gray-400 text-[10px] block">Patrimônio Atual</span>
+                <span id="advise-total-equity" class="font-bold text-white font-mono">R$ 10.000,00</span>
+              </div>
+              <div class="bg-fintech-bg px-3 py-1.5 rounded border border-fintech-border">
+                <span class="text-gray-400 text-[10px] block">Caixa Atual → Pós-Ordens</span>
+                <span id="advise-cash-transition" class="font-bold text-fintech-cyan font-mono">R$ 10.000,00 → R$ 0,00</span>
+              </div>
+              <button id="btn-apply-portfolio-orders" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-2 rounded shadow transition cursor-pointer hidden">
+                ✓ Aplicar Ordens na Minha Carteira
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto touch-scroll">
+            <table class="w-full text-left text-xs text-gray-300">
+              <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[10px] border-b border-fintech-border whitespace-nowrap">
+                <tr>
+                  <th class="px-3 py-2.5">Ação Recomendada</th>
+                  <th class="px-3 py-2.5">Ativo</th>
+                  <th class="px-3 py-2.5">Estratégia Campeã Acionada</th>
+                  <th class="px-3 py-2.5 text-center">Score Potencial</th>
+                  <th class="px-3 py-2.5 text-center">Timing</th>
+                  <th class="px-3 py-2.5 font-mono">Preço Ref.</th>
+                  <th class="px-3 py-2.5 font-mono">Qtd (Comprar/Vender)</th>
+                  <th class="px-3 py-2.5 font-mono">Valor da Ordem (R$)</th>
+                  <th class="px-3 py-2.5 font-mono text-center">Peso (Atual → Alvo)</th>
+                  <th class="px-3 py-2.5">Justificativa Quantitativa</th>
+                </tr>
+              </thead>
+              <tbody id="portfolio-recommendations-tbody" class="divide-y divide-fintech-border whitespace-nowrap text-[11px]">
+                <tr>
+                  <td colspan="10" class="px-4 py-6 text-center text-gray-400 font-mono">
+                    Clique em "Gerar Plano de Hoje & Simular Carteira" para calcular as ordens ideais de compra, venda e rebalanceamento.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ======================================================= -->
+        <!-- SECTION B: SIMULADOR HISTÓRICO MULTIATIVOS (BACKTEST)   -->
+        <!-- ======================================================= -->
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <span>📈</span>Simulador Histórico da Carteira (Backtest Multiativos Zero Look-Ahead)
+              </h3>
+              <p class="text-[11px] text-gray-400">
+                Simula como o motor teria gerenciado e rebalanceado o capital ao longo do período, comparando contra o Buy & Hold em pesos iguais da cesta.
+              </p>
+            </div>
+          </div>
+
+          <!-- 6 Institutional KPI Cards -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3" id="portfolio-kpi-grid">
+            <div class="card-surface p-2.5 sm:p-3">
+              <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Capital Inicial</div>
+              <div class="text-base sm:text-lg font-bold text-white font-mono" id="port-kpi-initial">R$ 10.000,00</div>
+              <div class="text-[9px] text-gray-400 font-mono" id="port-kpi-cash-sub">Caixa final: R$ 0,00</div>
+            </div>
+            <div class="card-surface p-2.5 sm:p-3">
+              <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Patrimônio Final</div>
+              <div class="text-base sm:text-lg font-bold text-fintech-green font-mono" id="port-kpi-final">R$ 10.000,00</div>
+              <div class="text-[9px] text-gray-400 font-mono" id="port-kpi-profit-sub">Lucro: R$ 0,00</div>
+            </div>
+            <div class="card-surface p-2.5 sm:p-3">
+              <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Retorno Carteira</div>
+              <div class="text-base sm:text-lg font-bold text-fintech-cyan font-mono" id="port-kpi-return">+0.0%</div>
+              <div class="text-[9px] text-gray-400 font-mono" id="port-kpi-bench-sub">B&H Cesta: 0.0% (Alfa: 0.0%)</div>
+            </div>
+            <div class="card-surface p-2.5 sm:p-3">
+              <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Taxa de Acerto (Saídas)</div>
+              <div class="text-base sm:text-lg font-bold text-emerald-400 font-mono" id="port-kpi-winrate">0.0%</div>
+              <div class="text-[9px] text-gray-400 font-mono" id="port-kpi-exits-sub">0 saídas fechadas</div>
+            </div>
+            <div class="card-surface p-2.5 sm:p-3">
+              <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Fator de Lucro</div>
+              <div class="text-base sm:text-lg font-bold text-amber-400 font-mono" id="port-kpi-pf">0.00</div>
+              <div class="text-[9px] text-gray-400 font-mono" id="port-kpi-rotations-sub">0 rebalanceamentos/rotações</div>
+            </div>
+            <div class="card-surface p-2.5 sm:p-3">
+              <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Max Drawdown Carteira</div>
+              <div class="text-base sm:text-lg font-bold text-rose-400 font-mono" id="port-kpi-dd">0.0%</div>
+              <div class="text-[9px] text-gray-400 font-mono" id="port-kpi-events-sub">0 ordens totais</div>
+            </div>
+          </div>
+
+          <!-- Charts Row: Equity Curve (8 cols) + Allocation Breakdown (4 cols) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            <div class="lg:col-span-8 card-surface p-3.5 sm:p-4">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-xs font-bold text-gray-200">Evolução Patrimonial: Carteira Gerenciada vs. Buy & Hold Cesta vs. Caixa</h3>
+                <span class="text-[10px] text-gray-400 font-mono">Zero Look-Ahead Bias</span>
+              </div>
+              <div id="portfolio-equity-chart" class="w-full h-72"></div>
+            </div>
+            <div class="lg:col-span-4 card-surface p-3.5 sm:p-4">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-xs font-bold text-gray-200">Distribuição Alvo da Carteira (%)</h3>
+                <span class="text-[10px] text-gray-400 font-mono">Ativos + Caixa</span>
+              </div>
+              <div id="portfolio-allocation-chart" class="w-full h-72"></div>
+            </div>
+          </div>
+
+          <!-- Universe Opportunity Score Ranking Table -->
+          <div class="card-surface p-3.5 sm:p-4 overflow-hidden">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+                <span>🏆</span>Ranking de Potencial do Universo & Par de Estratégias Campeão por Ativo
+              </h3>
+              <span class="text-[10px] text-gray-400 font-mono">Ordenado por Score de Potencial (0–100)</span>
+            </div>
+            <div class="overflow-x-auto touch-scroll max-h-64">
+              <table class="w-full text-left text-xs text-gray-300">
+                <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[10px] sticky top-0 whitespace-nowrap">
+                  <tr>
+                    <th class="px-2.5 py-2 text-center">Rank</th>
+                    <th class="px-2.5 py-2">Ativo</th>
+                    <th class="px-2.5 py-2 text-center font-mono">Score (0–100)</th>
+                    <th class="px-2.5 py-2">Estratégia Compra Campeã</th>
+                    <th class="px-2.5 py-2">Estratégia Venda Campeã</th>
+                    <th class="px-2.5 py-2 text-center font-mono">Win Rate</th>
+                    <th class="px-2.5 py-2 font-mono">Retorno Hist.</th>
+                    <th class="px-2.5 py-2 font-mono text-center">Max DD</th>
+                    <th class="px-2.5 py-2 text-center">Sinal / Timing</th>
+                  </tr>
+                </thead>
+                <tbody id="portfolio-ranking-tbody" class="divide-y divide-fintech-border font-mono whitespace-nowrap text-[11px]">
+                  <tr>
+                    <td colspan="9" class="px-4 py-4 text-center text-gray-500">
+                      Clique em "Gerar Plano de Hoje & Simular Carteira" para ranquear os ativos do universo.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Chronological Ledger of Portfolio Trades & Rebalances -->
+          <div class="card-surface p-3.5 sm:p-4 overflow-hidden">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-xs font-bold text-gray-200 flex items-center gap-1.5">
+                <span>📜</span>Histórico Cronológico de Compras, Vendas e Rebalanceamentos da Carteira
+              </h3>
+              <span class="text-[10px] text-gray-400 font-mono" id="portfolio-ledger-count-badge">0 eventos</span>
+            </div>
+            <div class="overflow-x-auto touch-scroll max-h-80">
+              <table class="w-full text-left text-xs text-gray-300">
+                <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[10px] sticky top-0 whitespace-nowrap">
+                  <tr>
+                    <th class="px-2.5 py-2 text-center">#</th>
+                    <th class="px-2.5 py-2 font-mono">Data</th>
+                    <th class="px-2.5 py-2">Operação</th>
+                    <th class="px-2.5 py-2">Ativo</th>
+                    <th class="px-2.5 py-2">Estratégia Acionada</th>
+                    <th class="px-2.5 py-2 text-center font-mono">Score</th>
+                    <th class="px-2.5 py-2 font-mono">Preço Exec.</th>
+                    <th class="px-2.5 py-2 font-mono">Cotas</th>
+                    <th class="px-2.5 py-2 font-mono">Valor Ordem</th>
+                    <th class="px-2.5 py-2 font-mono">Lucro/Prej. Realizado</th>
+                    <th class="px-2.5 py-2 font-mono text-center">Peso (Antes → Depois)</th>
+                    <th class="px-2.5 py-2 font-mono">Caixa Restante</th>
+                    <th class="px-2.5 py-2 font-mono">Patrimônio Total</th>
+                  </tr>
+                </thead>
+                <tbody id="portfolio-ledger-tbody" class="divide-y divide-fintech-border font-mono whitespace-nowrap text-[11px]">
+                  <tr>
+                    <td colspan="13" class="px-4 py-6 text-center text-gray-500">
+                      Execute a simulação da carteira para visualizar o histórico barra a barra de alocações e rotações.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </section>

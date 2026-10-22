@@ -286,3 +286,166 @@ class OptimizeCombinationsResponse(BaseModel):
     total_combinations_tested: int
     champion: Optional[StrategyPairRankItemModel] = None
     top_combinations: List[StrategyPairRankItemModel] = []
+
+
+# 5. Models for /api/portfolio/advise and /api/portfolio/simulate
+
+class PortfolioHoldingInput(BaseModel):
+    ticker: str
+    shares: float = Field(..., gt=0.0)
+    average_buy_price: float = Field(..., gt=0.0)
+
+
+class PortfolioHoldingEvaluatedModel(BaseModel):
+    ticker: str
+    asset_name: str
+    shares: float
+    average_buy_price: float
+    current_price: float
+    market_value: float
+    invested_value: float
+    unrealized_pnl_value: float
+    unrealized_pnl_pct: float
+    current_weight_pct: float
+    entry_bar_index: int = 0
+
+
+class AssetOpportunityProfileModel(BaseModel):
+    ticker: str
+    asset_name: str
+    category: str
+    current_price: float
+    champion_buy_id: str
+    champion_buy_label: str
+    champion_sell_id: str
+    champion_sell_label: str
+    win_rate_pct: float
+    historical_return_pct: float
+    max_drawdown_pct: float
+    closed_trades: int
+    active_direction: str
+    timing_category: str
+    timing_label: str
+    distance_pct: float
+    recommended_price: float
+    potential_score: float
+
+
+class PortfolioActionRecommendationModel(BaseModel):
+    ticker: str
+    asset_name: str
+    action_type: str  # "BUY" | "SELL_FULL" | "SELL_PARTIAL_REBALANCE" | "ROTATE_OUT" | "ROTATE_IN" | "HOLD"
+    action_label: str
+    reason_text: str
+    strategy_sub_id: str
+    strategy_label: str
+    potential_score: float
+    timing_category: str
+    current_price: float
+    reference_price: float
+    current_shares: float
+    recommended_shares_delta: float
+    target_shares: float
+    order_value: float
+    current_weight_pct: float
+    target_weight_pct: float
+
+
+class PortfolioAdviseRequest(BaseModel):
+    available_cash: float = Field(10000.0, ge=0.0)
+    holdings: List[PortfolioHoldingInput] = []
+    universe_category: str = "featured"
+    custom_tickers: List[str] = []
+    interval: str = "1d"
+    period: str = "2y"
+    max_weight_pct: float = Field(25.0, ge=5.0, le=100.0)
+    rebalance_band_pct: float = Field(5.0, ge=1.0, le=50.0)
+    min_rotation_score_delta: float = Field(15.0, ge=5.0, le=80.0)
+
+
+class PortfolioAdviseResponse(BaseModel):
+    universe_category: str
+    interval: str
+    period: str
+    current_cash: float
+    current_holdings_value: float
+    total_portfolio_equity: float
+    projected_cash_after: float
+    projected_invested_after: float
+    max_weight_pct: float
+    holdings_evaluated: List[PortfolioHoldingEvaluatedModel] = []
+    recommendations: List[PortfolioActionRecommendationModel] = []
+    opportunity_ranking: List[AssetOpportunityProfileModel] = []
+
+
+class PortfolioLedgerEventModel(BaseModel):
+    event_id: int
+    date: str
+    ticker: str
+    asset_name: str
+    event_type: str
+    event_label: str
+    strategy_sub_id: str
+    strategy_label: str
+    potential_score: float
+    execution_price: float
+    shares_delta: float
+    trade_value: float
+    realized_pnl_value: Optional[float] = None
+    realized_pnl_pct: Optional[float] = None
+    weight_before_pct: float
+    weight_after_pct: float
+    cash_after: float
+    portfolio_equity_after: float
+
+
+class PortfolioCurvePointModel(BaseModel):
+    date: str
+    portfolio_equity: float
+    cash_balance: float
+    invested_equity: float
+    benchmark_equity: float
+    drawdown_pct: float
+
+
+class PortfolioSimulationMetricsModel(BaseModel):
+    initial_capital: float
+    final_equity: float
+    final_cash: float
+    final_invested_value: float
+    net_profit: float
+    total_return_pct: float
+    benchmark_return_pct: float
+    alpha_vs_benchmark_pct: float
+    max_drawdown_pct: float
+    win_rate_pct: float
+    profit_factor: float
+    total_events_count: int
+    closed_exits_count: int
+    winning_exits_count: int
+    losing_exits_count: int
+    rebalance_rotations_count: int
+
+
+class PortfolioSimulateRequest(BaseModel):
+    initial_capital: float = Field(10000.0, gt=0.0)
+    universe_category: str = "featured"
+    custom_tickers: List[str] = []
+    interval: str = "1d"
+    period: str = "2y"
+    max_weight_pct: float = Field(25.0, ge=5.0, le=100.0)
+    rebalance_band_pct: float = Field(5.0, ge=1.0, le=50.0)
+    min_rotation_score_delta: float = Field(15.0, ge=5.0, le=80.0)
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+
+
+class PortfolioSimulateResponse(BaseModel):
+    universe_category: str
+    interval: str
+    period: str
+    metrics: PortfolioSimulationMetricsModel
+    final_holdings: List[PortfolioHoldingEvaluatedModel] = []
+    curve: List[PortfolioCurvePointModel] = []
+    ledger_events: List[PortfolioLedgerEventModel] = []
+    opportunity_ranking: List[AssetOpportunityProfileModel] = []
