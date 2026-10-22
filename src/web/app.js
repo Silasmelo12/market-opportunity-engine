@@ -293,6 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupGranularStrategyCheckboxes();
   initTradingViewChart();
   setupSimulationTab();
+  setupPortfolioTab();
 
 
   window.addEventListener('hashchange', () => {
@@ -384,6 +385,8 @@ const TAB_HASH_MAP = {
   '#simulator': 'tab-simulator',
   '#simulador': 'tab-simulator',
   '#playbook': 'tab-playbook',
+  '#portfolio': 'tab-portfolio',
+  '#carteira': 'tab-portfolio',
 };
 
 const TAB_TO_HASH_MAP = {
@@ -391,6 +394,7 @@ const TAB_TO_HASH_MAP = {
   'tab-terminal': '#terminal',
   'tab-simulator': '#simulator',
   'tab-playbook': '#playbook',
+  'tab-portfolio': '#portfolio',
 };
 
 function getTabFromHash() {
@@ -613,7 +617,7 @@ function switchTab(tabId, updateHash = true) {
   // Toggle Global Direction Selector visibility: only displayed in Radar and Gráfico (Terminal)
   const dirSelector = document.getElementById('global-direction-selector');
   if (dirSelector) {
-    if (tabId === 'tab-simulator' || tabId === 'tab-playbook') {
+    if (tabId === 'tab-simulator' || tabId === 'tab-playbook' || tabId === 'tab-portfolio') {
       dirSelector.classList.add('hidden');
     } else {
       dirSelector.classList.remove('hidden');
@@ -2301,7 +2305,7 @@ function hideLoading() {
 }
 
 // UI: Radar Strategy Multi-Select Dropdown Filter
-async 
+
 // UI: Setup Radar Table Column Sorting
 function setupRadarTableSorting() {
   const thN = document.getElementById('th-sort-n');
@@ -2347,7 +2351,7 @@ function setupRadarTableSorting() {
   }
 }
 
-function setupRadarStrategyFilter() {
+async function setupRadarStrategyFilter() {
   const toggleBtn = document.getElementById('btn-radar-strat-toggle');
   const menu = document.getElementById('radar-strat-menu');
   const container = document.getElementById('radar-strat-checkbox-container');
@@ -2450,4 +2454,410 @@ function updateRadarStratCheckboxes() {
     cb.checked = state.radarStrategies.has(id);
   });
   updateRadarStratBadge();
+}
+
+
+// =========================================================
+// TAB 5: GESTOR E SIMULADOR MULTIATIVOS DE CARTEIRA (016)
+// =========================================================
+const PORTFOLIO_STORAGE_KEY = 'market_engine_portfolio_v1';
+
+state.portfolioState = {
+  availableCash: 10000.0,
+  holdings: [],
+  universeCategory: 'featured',
+  customTickers: '',
+  interval: '1d',
+  period: '2y',
+  maxWeightPct: 25.0,
+  lastAdviseResponse: null,
+  lastSimulateResponse: null,
+};
+
+function loadPortfolioStorage() {
+  try {
+    const raw = localStorage.getItem(PORTFOLIO_STORAGE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object') {
+      if (parsed.availableCash !== undefined) state.portfolioState.availableCash = Number(parsed.availableCash) || 0;
+      if (Array.isArray(parsed.holdings)) state.portfolioState.holdings = parsed.holdings;
+      if (parsed.universeCategory) state.portfolioState.universeCategory = parsed.universeCategory;
+      if (parsed.customTickers !== undefined) state.portfolioState.customTickers = String(parsed.customTickers);
+      if (parsed.interval) state.portfolioState.interval = parsed.interval;
+      if (parsed.period) state.portfolioState.period = parsed.period;
+      if (parsed.maxWeightPct !== undefined) state.portfolioState.maxWeightPct = Number(parsed.maxWeightPct) || 25;
+    }
+  } catch (err) {
+    console.warn('Erro ao carregar carteira do localStorage:', err);
+  }
+}
+
+function savePortfolioStorage() {
+  try {
+    const payload = {
+      availableCash: state.portfolioState.availableCash,
+      holdings: state.portfolioState.holdings,
+      universeCategory: state.portfolioState.universeCategory,
+      customTickers: state.portfolioState.customTickers,
+      interval: state.portfolioState.interval,
+      period: state.portfolioState.period,
+      maxWeightPct: state.portfolioState.maxWeightPct,
+    };
+    localStorage.setItem(PORTFOLIO_STORAGE_KEY, JSON.stringify(payload));
+  } catch (err) {
+    console.warn('Erro ao salvar carteira no localStorage:', err);
+  }
+}
+
+function syncPortfolioInputsFromState() {
+  const cashEl = document.getElementById('portfolio-cash-input');
+  const maxWEl = document.getElementById('portfolio-max-weight-input');
+  const univEl = document.getElementById('portfolio-universe-select');
+  const customWrap = document.getElementById('portfolio-custom-tickers-wrapper');
+  const customEl = document.getElementById('portfolio-custom-tickers-input');
+  const intEl = document.getElementById('portfolio-interval-select');
+  const perEl = document.getElementById('portfolio-period-select');
+
+  if (cashEl) cashEl.value = state.portfolioState.availableCash;
+  if (maxWEl) maxWEl.value = state.portfolioState.maxWeightPct;
+  if (univEl) univEl.value = state.portfolioState.universeCategory;
+  if (customEl) customEl.value = state.portfolioState.customTickers;
+  if (intEl) intEl.value = state.portfolioState.interval;
+  if (perEl) perEl.value = state.portfolioState.period;
+  if (customWrap) {
+    if (state.portfolioState.universeCategory === 'custom') customWrap.classList.remove('hidden');
+    else customWrap.classList.add('hidden');
+  }
+}
+
+function readPortfolioInputsToState() {
+  const cashEl = document.getElementById('portfolio-cash-input');
+  const maxWEl = document.getElementById('portfolio-max-weight-input');
+  const univEl = document.getElementById('portfolio-universe-select');
+  const customEl = document.getElementById('portfolio-custom-tickers-input');
+  const intEl = document.getElementById('portfolio-interval-select');
+  const perEl = document.getElementById('portfolio-period-select');
+
+  if (cashEl) state.portfolioState.availableCash = Math.max(0, Number(cashEl.value) || 0);
+  if (maxWEl) state.portfolioState.maxWeightPct = Math.min(100, Math.max(5, Number(maxWEl.value) || 25));
+  if (univEl) state.portfolioState.universeCategory = univEl.value || 'featured';
+  if (customEl) state.portfolioState.customTickers = customEl.value || '';
+  if (intEl) state.portfolioState.interval = intEl.value || '1d';
+  if (perEl) state.portfolioState.period = perEl.value || '2y';
+
+  savePortfolioStorage();
+}
+
+function renderPortfolioHoldingsEditor() {
+  const tbody = document.getElementById('portfolio-holdings-list');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const holdings = state.portfolioState.holdings || [];
+  if (holdings.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" class="px-3 py-3 text-center text-gray-500 font-sans text-[11px]">
+          Nenhuma posição cadastrada (100% em Caixa). Adicione ativos acima se já possuir carteira montada.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  holdings.forEach((h, idx) => {
+    const tr = document.createElement('tr');
+    tr.className = 'hover:bg-fintech-surface-hover';
+    const cost = (Number(h.shares) || 0) * (Number(h.average_buy_price) || 0);
+    const name = stripCorporateSuffix(getAssetName(h.ticker));
+    tr.innerHTML = `
+      <td class="px-2.5 py-1.5 font-bold text-white">
+        ${name} <span class="text-[10px] text-gray-400">(${h.ticker})</span>
+      </td>
+      <td class="px-2.5 py-1.5 text-amber-300 font-bold">${Number(h.shares).toLocaleString('pt-BR')}</td>
+      <td class="px-2.5 py-1.5 text-gray-200">R$ ${Number(h.average_buy_price).toFixed(2)}</td>
+      <td class="px-2.5 py-1.5 text-cyan-300">R$ ${cost.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td class="px-2.5 py-1.5 text-right">
+        <button class="btn-remove-holding text-rose-400 hover:text-rose-300 text-xs font-bold px-1.5 cursor-pointer" data-idx="${idx}" title="Remover ativo">✕</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  tbody.querySelectorAll('.btn-remove-holding').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = parseInt(btn.getAttribute('data-idx'), 10);
+      if (!isNaN(i)) {
+        state.portfolioState.holdings.splice(i, 1);
+        savePortfolioStorage();
+        renderPortfolioHoldingsEditor();
+      }
+    });
+  });
+}
+
+function setupPortfolioTab() {
+  loadPortfolioStorage();
+  syncPortfolioInputsFromState();
+  renderPortfolioHoldingsEditor();
+
+  const univEl = document.getElementById('portfolio-universe-select');
+  if (univEl) {
+    univEl.addEventListener('change', () => {
+      readPortfolioInputsToState();
+      syncPortfolioInputsFromState();
+    });
+  }
+
+  ['portfolio-cash-input', 'portfolio-max-weight-input', 'portfolio-custom-tickers-input', 'portfolio-interval-select', 'portfolio-period-select'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('change', () => readPortfolioInputsToState());
+    }
+  });
+
+  const btnAdd = document.getElementById('btn-portfolio-add-holding');
+  if (btnAdd) {
+    btnAdd.addEventListener('click', () => {
+      const tEl = document.getElementById('portfolio-add-ticker');
+      const sEl = document.getElementById('portfolio-add-shares');
+      const pEl = document.getElementById('portfolio-add-avgprice');
+      const ticker = resolveTicker((tEl ? tEl.value : '').trim().toUpperCase());
+      const shares = Number(sEl ? sEl.value : 0);
+      const avgPrice = Number(pEl ? pEl.value : 0);
+      if (!ticker || shares <= 0 || avgPrice <= 0) return;
+
+      const existingIdx = state.portfolioState.holdings.findIndex(x => x.ticker.toUpperCase() === ticker);
+      if (existingIdx >= 0) {
+        const prev = state.portfolioState.holdings[existingIdx];
+        const totShares = Number(prev.shares) + shares;
+        const newAvg = ((Number(prev.shares) * Number(prev.average_buy_price)) + (shares * avgPrice)) / totShares;
+        state.portfolioState.holdings[existingIdx] = {
+          ticker,
+          shares: Number(totShares.toFixed(4)),
+          average_buy_price: Number(newAvg.toFixed(4)),
+        };
+      } else {
+        state.portfolioState.holdings.push({
+          ticker,
+          shares: Number(shares.toFixed(4)),
+          average_buy_price: Number(avgPrice.toFixed(4)),
+        });
+      }
+      if (tEl) tEl.value = '';
+      if (sEl) sEl.value = '';
+      if (pEl) pEl.value = '';
+      savePortfolioStorage();
+      renderPortfolioHoldingsEditor();
+    });
+  }
+
+  const btnClear = document.getElementById('btn-portfolio-clear-holdings');
+  if (btnClear) {
+    btnClear.addEventListener('click', () => {
+      state.portfolioState.holdings = [];
+      savePortfolioStorage();
+      renderPortfolioHoldingsEditor();
+    });
+  }
+
+  const btnRun = document.getElementById('btn-run-portfolio');
+  if (btnRun) {
+    btnRun.addEventListener('click', () => {
+      runPortfolioAdviseAndSimulate();
+    });
+  }
+
+  const btnApplyOrders = document.getElementById('btn-apply-portfolio-orders');
+  if (btnApplyOrders) {
+    btnApplyOrders.addEventListener('click', () => {
+      applyRecommendedPortfolioOrders();
+    });
+  }
+}
+
+function getActionBadgeHtml(actionType, actionLabel) {
+  if (actionType === 'BUY') {
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">🟢 ${actionLabel}</span>`;
+  }
+  if (actionType === 'SELL_FULL') {
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/40">🔴 ${actionLabel}</span>`;
+  }
+  if (actionType === 'SELL_PARTIAL_REBALANCE') {
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-amber-500/20 text-amber-400 border border-amber-500/40">⚖️ ${actionLabel}</span>`;
+  }
+  if (actionType === 'ROTATE_OUT' || actionType === 'ROTATE_IN') {
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">🔄 ${actionLabel}</span>`;
+  }
+  return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-700/50 text-gray-300 border border-gray-600">⏸️ ${actionLabel}</span>`;
+}
+
+function renderPortfolioAdviseSection(data) {
+  state.portfolioState.lastAdviseResponse = data;
+  const eqEl = document.getElementById('advise-total-equity');
+  const cashTransEl = document.getElementById('advise-cash-transition');
+  const btnApply = document.getElementById('btn-apply-portfolio-orders');
+  const tbody = document.getElementById('portfolio-recommendations-tbody');
+
+  if (eqEl) {
+    eqEl.textContent = `R$ ${(Number(data.total_portfolio_equity) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+  if (cashTransEl) {
+    const cBefore = (Number(data.current_cash) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const cAfter = (Number(data.projected_cash_after) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    cashTransEl.textContent = `R$ ${cBefore} → R$ ${cAfter}`;
+  }
+
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const recs = data.recommendations || [];
+  const hasExecutableOrders = recs.some(r => r.action_type !== 'HOLD' && Math.abs(Number(r.recommended_shares_delta) || 0) > 0);
+  if (btnApply) {
+    if (hasExecutableOrders) btnApply.classList.remove('hidden');
+    else btnApply.classList.add('hidden');
+  }
+
+  if (recs.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="10" class="px-4 py-6 text-center text-gray-400 font-mono">
+          Nenhuma oportunidade ativa em zona de compra no momento. Recomendação: manter saldo em Caixa aguardando novo fundo estatístico.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  recs.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.className = 'hover:bg-fintech-surface-hover';
+
+    const delta = Number(r.recommended_shares_delta) || 0;
+    const deltaSign = delta > 0 ? '+' : '';
+    const deltaColor = delta > 0 ? 'text-emerald-400' : (delta < 0 ? 'text-rose-400' : 'text-gray-400');
+    const score = Number(r.potential_score) || 0;
+    const scoreBarColor = score >= 75 ? 'bg-emerald-400' : (score >= 55 ? 'bg-cyan-400' : 'bg-amber-400');
+
+    let timingDot = '<span class="inline-block w-2.5 h-2.5 rounded-full bg-rose-400" title="Atrasado"></span>';
+    if (r.timing_category === 'IDEAL') {
+      timingDot = '<span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-emerald-500/30" title="Timing Ideal"></span>';
+    } else if (r.timing_category === 'EXTENDED') {
+      timingDot = '<span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-400 ring-2 ring-amber-500/30" title="Timing Estendido"></span>';
+    }
+
+    tr.innerHTML = `
+      <td class="px-3 py-2.5">${getActionBadgeHtml(r.action_type, r.action_label)}</td>
+      <td class="px-3 py-2.5">
+        <div class="font-bold text-white">${stripCorporateSuffix(r.asset_name || r.ticker)}</div>
+        <div class="text-[10px] text-gray-400 font-mono">${r.ticker}</div>
+      </td>
+      <td class="px-3 py-2.5 text-cyan-300 font-medium">${r.strategy_label}</td>
+      <td class="px-3 py-2.5 text-center font-mono">
+        <div class="font-bold text-white">${score.toFixed(1)}</div>
+        <div class="w-16 h-1.5 bg-gray-800 rounded overflow-hidden mx-auto mt-0.5">
+          <div class="h-full ${scoreBarColor}" style="width: ${Math.min(100, Math.max(0, score))}%"></div>
+        </div>
+      </td>
+      <td class="px-3 py-2.5 text-center">${timingDot} <span class="text-[10px] text-gray-300 ml-1">${r.timing_category}</span></td>
+      <td class="px-3 py-2.5 font-mono text-white">R$ ${(Number(r.current_price) || 0).toFixed(2)}</td>
+      <td class="px-3 py-2.5 font-mono font-bold ${deltaColor}">
+        ${delta !== 0 ? `${deltaSign}${delta.toLocaleString('pt-BR')} cotas` : '0 (Manter)'}
+        <div class="text-[10px] text-gray-400 font-normal">Final: ${(Number(r.target_shares) || 0).toLocaleString('pt-BR')} cotas</div>
+      </td>
+      <td class="px-3 py-2.5 font-mono font-bold text-white">
+        ${r.order_value > 0 ? `R$ ${Number(r.order_value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '-'}
+      </td>
+      <td class="px-3 py-2.5 font-mono text-center">
+        <span class="text-gray-400">${(Number(r.current_weight_pct) || 0).toFixed(1)}%</span>
+        <span class="text-gray-500 mx-1">→</span>
+        <span class="font-bold text-cyan-300">${(Number(r.target_weight_pct) || 0).toFixed(1)}%</span>
+      </td>
+      <td class="px-3 py-2.5 text-gray-300 text-[11px] max-w-xs truncate" title="${r.reason_text}">${r.reason_text}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function applyRecommendedPortfolioOrders() {
+  const adviseData = state.portfolioState.lastAdviseResponse;
+  if (!adviseData || !Array.isArray(adviseData.recommendations)) return;
+
+  const newHoldings = [];
+  adviseData.recommendations.forEach(r => {
+    const targetSh = Number(r.target_shares) || 0;
+    if (targetSh > 0) {
+      const existing = state.portfolioState.holdings.find(h => h.ticker.toUpperCase() === r.ticker.toUpperCase());
+      let avgP = Number(r.current_price) || 0;
+      if (existing && Number(r.recommended_shares_delta) > 0) {
+        const oldSh = Number(existing.shares) || 0;
+        const oldAvg = Number(existing.average_buy_price) || avgP;
+        const addSh = Number(r.recommended_shares_delta) || 0;
+        avgP = ((oldSh * oldAvg) + (addSh * Number(r.current_price))) / (oldSh + addSh);
+      } else if (existing) {
+        avgP = Number(existing.average_buy_price) || avgP;
+      }
+      newHoldings.push({
+        ticker: r.ticker,
+        shares: Number(targetSh.toFixed(4)),
+        average_buy_price: Number(avgP.toFixed(4)),
+      });
+    }
+  });
+
+  state.portfolioState.holdings = newHoldings;
+  state.portfolioState.availableCash = Number((Number(adviseData.projected_cash_after) || 0).toFixed(2));
+  syncPortfolioInputsFromState();
+  savePortfolioStorage();
+  renderPortfolioHoldingsEditor();
+  runPortfolioAdviseAndSimulate();
+}
+
+async function runPortfolioAdviseAndSimulate() {
+  readPortfolioInputsToState();
+  const customList = (state.portfolioState.customTickers || '')
+    .split(',')
+    .map(s => resolveTicker(s.trim().toUpperCase()))
+    .filter(Boolean);
+
+  showLoading('Otimizando estratégias campeãs por ativo e calculando rebalanceamento da carteira...');
+  try {
+    const advisePayload = {
+      available_cash: state.portfolioState.availableCash,
+      holdings: state.portfolioState.holdings,
+      universe_category: state.portfolioState.universeCategory,
+      custom_tickers: customList,
+      interval: state.portfolioState.interval,
+      period: state.portfolioState.period,
+      max_weight_pct: state.portfolioState.maxWeightPct,
+      rebalance_band_pct: 5.0,
+      min_rotation_score_delta: 15.0,
+    };
+
+    const resAdvise = await fetch('/api/portfolio/advise', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(advisePayload),
+    });
+
+    if (resAdvise.ok) {
+      const adviseData = await resAdvise.json();
+      renderPortfolioAdviseSection(adviseData);
+      if (typeof renderPortfolioOpportunityRanking === 'function') {
+        renderPortfolioOpportunityRanking(adviseData.opportunity_ranking || []);
+      }
+      if (typeof renderPortfolioAllocationChart === 'function') {
+        renderPortfolioAllocationChart(adviseData);
+      }
+    }
+
+    if (typeof runPortfolioHistoricalSimulation === 'function') {
+      await runPortfolioHistoricalSimulation(customList);
+    }
+  } catch (err) {
+    console.error('Erro ao processar carteira:', err);
+  } finally {
+    hideLoading();
+  }
 }
