@@ -90,6 +90,9 @@
         <button class="nav-tab-btn" data-tab="tab-simulator">
           <span></span>Simulador
         </button>
+        <button class="nav-tab-btn" data-tab="tab-portfolio">
+          <span></span>Carteira
+        </button>
         <button class="nav-tab-btn" data-tab="tab-playbook">
           <span></span>Playbook
         </button>
@@ -1249,6 +1252,197 @@
             14 padrões de velas de fundo filtrados por tendência de baixa prévia (<code class="text-cyan-400">Close < SMA(20)</code>) e 14 padrões de velas de topo filtrados por tendência de alta prévia (<code class="text-cyan-400">Close >SMA(20)</code>), com execução estrita em Open[t+1].
           </p>
         </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 5: GESTOR E SIMULADOR DE CARTEIRA      -->
+    <!-- ========================================== -->
+    <section id="tab-portfolio" class="tab-view hidden h-full p-2.5 sm:p-4 overflow-y-auto">
+      <div class="max-w-7xl mx-auto space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+              <span>💼</span>Gestor, Consultor de Rebalanceamento & Simulador Multiativos de Carteira
+            </h2>
+            <p class="text-[11px] sm:text-xs text-gray-400">
+              Alocação inteligente de capital nas estratégias campeãs de cada ativo, plano de ordens de hoje (comprar, vender e rebalancear) e backtest histórico multiativos.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="btn-run-portfolio" class="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold px-4 py-2 rounded shadow-lg transition flex items-center gap-1.5 cursor-pointer">
+              <span>⚡</span>Gerar Plano de Hoje & Simular Carteira
+            </button>
+          </div>
+        </div>
+
+        <!-- Top Configuration & Current Portfolio Editor Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          <!-- Left Card: Parâmetros & Universo Alvo (5 cols) -->
+          <div class="lg:col-span-5 card-surface p-3.5 sm:p-4 space-y-3 text-xs">
+            <div class="flex items-center justify-between border-b border-fintech-border pb-2">
+              <h3 class="font-bold text-fintech-cyan uppercase tracking-wider text-[11px]">1. Caixa & Parâmetros de Alocação</h3>
+              <span class="text-[10px] text-gray-400 font-mono">Salvo automaticamente</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="text-gray-400 font-semibold block mb-1">Caixa Disponível / Capital (R$)</label>
+                <input id="portfolio-cash-input" type="number" value="10000" min="0" step="500" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-mono focus:border-fintech-cyan focus:outline-none">
+              </div>
+              <div>
+                <label class="text-gray-400 font-semibold block mb-1">Teto Máx. por Ativo (%)</label>
+                <input id="portfolio-max-weight-input" type="number" value="25" min="10" max="100" step="5" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-mono focus:border-fintech-cyan focus:outline-none">
+              </div>
+              <div>
+                <label class="text-gray-400 font-semibold block mb-1">Universo de Oportunidades</label>
+                <select id="portfolio-universe-select" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-sans focus:border-fintech-cyan focus:outline-none">
+                  <option value="featured" selected>Destaques Multi-Mercado (14)</option>
+                  <option value="acoes_br">Ações Brasil B3 (30)</option>
+                  <option value="fiis">FIIs Brasil (23)</option>
+                  <option value="usa">Ações EUA Top Liquidez (24)</option>
+                  <option value="commodities">Commodities (14)</option>
+                  <option value="crypto">Criptomoedas (3)</option>
+                  <option value="custom">Lista Personalizada de Tickers</option>
+                </select>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="text-gray-400 font-semibold block mb-1">Tempo</label>
+                  <select id="portfolio-interval-select" class="w-full bg-fintech-bg border border-fintech-border rounded px-2 py-1.5 text-white font-sans focus:border-fintech-cyan focus:outline-none">
+                    <option value="1d" selected>1D (Diário)</option>
+                    <option value="1wk">1S (Semanal)</option>
+                    <option value="1h">1h (Horário)</option>
+                    <option value="15m">15m</option>
+                    <option value="5m">5m</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-gray-400 font-semibold block mb-1">Período</label>
+                  <select id="portfolio-period-select" class="w-full bg-fintech-bg border border-fintech-border rounded px-2 py-1.5 text-white font-sans focus:border-fintech-cyan focus:outline-none">
+                    <option value="1y">1 Ano</option>
+                    <option value="2y" selected>2 Anos</option>
+                    <option value="5y">5 Anos</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div id="portfolio-custom-tickers-wrapper" class="hidden">
+              <label class="text-gray-400 font-semibold block mb-1">Tickers Personalizados (separados por vírgula)</label>
+              <input id="portfolio-custom-tickers-input" type="text" placeholder="Ex: PETR4.SA, VALE3.SA, ITUB4.SA, WEGE3.SA, BTC-USD" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-mono uppercase focus:border-fintech-cyan focus:outline-none">
+            </div>
+          </div>
+
+          <!-- Right Card: Editor de Posições Atuais da Carteira (7 cols) -->
+          <div class="lg:col-span-7 card-surface p-3.5 sm:p-4 space-y-3 text-xs">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-fintech-border pb-2">
+              <div>
+                <h3 class="font-bold text-emerald-400 uppercase tracking-wider text-[11px]">2. Minhas Posições Atuais (Opcional)</h3>
+                <p class="text-[10px] text-gray-400">Deixe vazio para simular começando 100% em caixa (ex: R$ 10.000,00) ou cadastre seus ativos atuais para rebalancear.</p>
+              </div>
+              <button id="btn-portfolio-clear-holdings" class="text-[11px] px-2.5 py-1 rounded bg-fintech-bg hover:bg-rose-950/60 text-gray-300 hover:text-rose-300 border border-fintech-border transition cursor-pointer">
+                Limpar (100% em Caixa)
+              </button>
+            </div>
+
+            <!-- Add Holding Inline Form -->
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-end">
+              <div class="sm:col-span-4">
+                <label class="text-[10px] text-gray-400 block mb-0.5">Ativo (Ticker)</label>
+                <input id="portfolio-add-ticker" list="asset-datalist" type="text" placeholder="Ex: PETR4.SA" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1 text-xs text-white font-mono uppercase focus:border-fintech-cyan focus:outline-none">
+              </div>
+              <div class="sm:col-span-3">
+                <label class="text-[10px] text-gray-400 block mb-0.5">Quantidade (Cotas)</label>
+                <input id="portfolio-add-shares" type="number" step="any" min="0.0001" placeholder="Ex: 100" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1 text-xs text-white font-mono focus:border-fintech-cyan focus:outline-none">
+              </div>
+              <div class="sm:col-span-3">
+                <label class="text-[10px] text-gray-400 block mb-0.5">Preço Médio (R$)</label>
+                <input id="portfolio-add-avgprice" type="number" step="any" min="0.01" placeholder="Ex: 36.50" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1 text-xs text-white font-mono focus:border-fintech-cyan focus:outline-none">
+              </div>
+              <div class="sm:col-span-2">
+                <button id="btn-portfolio-add-holding" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-1 px-2 rounded transition text-xs cursor-pointer">
+                  + Adicionar
+                </button>
+              </div>
+            </div>
+
+            <!-- Current Holdings Mini Table -->
+            <div class="overflow-x-auto max-h-36 border border-fintech-border/60 rounded">
+              <table class="w-full text-left text-[11px] text-gray-300">
+                <thead class="bg-fintech-bg text-gray-400 uppercase text-[10px] sticky top-0">
+                  <tr>
+                    <th class="px-2.5 py-1.5">Ativo</th>
+                    <th class="px-2.5 py-1.5 font-mono">Qtd Cotas</th>
+                    <th class="px-2.5 py-1.5 font-mono">Preço Médio</th>
+                    <th class="px-2.5 py-1.5 font-mono">Custo Investido</th>
+                    <th class="px-2.5 py-1.5 text-right">Remover</th>
+                  </tr>
+                </thead>
+                <tbody id="portfolio-holdings-list" class="divide-y divide-fintech-border font-mono">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ======================================================= -->
+        <!-- SECTION A: CONSULTOR DE REBALANCEAMENTO HOJE            -->
+        <!-- ======================================================= -->
+        <div class="card-surface p-4 space-y-3 border-l-4 border-l-cyan-400">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div>
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <span>🎯</span>Plano de Ação & Rebalanceamento Hoje (Boleta de Recomendações)
+              </h3>
+              <p class="text-[11px] text-gray-400">
+                O que comprar, quanto comprar, o que vender, quanto vender e como rebalancear sua carteira agora segundo a estratégia campeã de cada ativo.
+              </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-3 text-xs">
+              <div class="bg-fintech-bg px-3 py-1.5 rounded border border-fintech-border">
+                <span class="text-gray-400 text-[10px] block">Patrimônio Atual</span>
+                <span id="advise-total-equity" class="font-bold text-white font-mono">R$ 10.000,00</span>
+              </div>
+              <div class="bg-fintech-bg px-3 py-1.5 rounded border border-fintech-border">
+                <span class="text-gray-400 text-[10px] block">Caixa Atual → Pós-Ordens</span>
+                <span id="advise-cash-transition" class="font-bold text-fintech-cyan font-mono">R$ 10.000,00 → R$ 0,00</span>
+              </div>
+              <button id="btn-apply-portfolio-orders" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-2 rounded shadow transition cursor-pointer hidden">
+                ✓ Aplicar Ordens na Minha Carteira
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto touch-scroll">
+            <table class="w-full text-left text-xs text-gray-300">
+              <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[10px] border-b border-fintech-border whitespace-nowrap">
+                <tr>
+                  <th class="px-3 py-2.5">Ação Recomendada</th>
+                  <th class="px-3 py-2.5">Ativo</th>
+                  <th class="px-3 py-2.5">Estratégia Campeã Acionada</th>
+                  <th class="px-3 py-2.5 text-center">Score Potencial</th>
+                  <th class="px-3 py-2.5 text-center">Timing</th>
+                  <th class="px-3 py-2.5 font-mono">Preço Ref.</th>
+                  <th class="px-3 py-2.5 font-mono">Qtd (Comprar/Vender)</th>
+                  <th class="px-3 py-2.5 font-mono">Valor da Ordem (R$)</th>
+                  <th class="px-3 py-2.5 font-mono text-center">Peso (Atual → Alvo)</th>
+                  <th class="px-3 py-2.5">Justificativa Quantitativa</th>
+                </tr>
+              </thead>
+              <tbody id="portfolio-recommendations-tbody" class="divide-y divide-fintech-border whitespace-nowrap text-[11px]">
+                <tr>
+                  <td colspan="10" class="px-4 py-6 text-center text-gray-400 font-mono">
+                    Clique em "Gerar Plano de Hoje & Simular Carteira" para calcular as ordens ideais de compra, venda e rebalanceamento.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="portfolio-simulation-sections-anchor"></div>
       </div>
     </section>
 
