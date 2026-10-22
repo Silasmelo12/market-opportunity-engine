@@ -1453,6 +1453,123 @@ def _load_and_profile_single_asset(
     return bundle
 
 
+@app.post("/api/portfolio/advise", response_model=PortfolioAdviseResponse)
+def advise_portfolio_endpoint(req: PortfolioAdviseRequest):
+    holdings_tickers = [h.ticker for h in req.holdings if h.ticker]
+    basket = _resolve_portfolio_universe_tickers(
+        universe_category=req.universe_category,
+        custom_tickers=req.custom_tickers,
+        holdings_tickers=holdings_tickers,
+        max_assets=24,
+    )
+
+    bundles: List[Dict[str, Any]] = []
+    max_workers = min(10, max(1, len(basket)))
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = [
+            executor.submit(_load_and_profile_single_asset, t, cat, req.interval, req.period)
+            for t, cat in basket
+        ]
+        for f in futures:
+            res = f.result()
+            if res is not None:
+                bundles.append(res)
+
+    profiles = [b["profile"] for b in bundles]
+    holdings_dicts = [
+        {"ticker": h.ticker, "shares": h.shares, "average_buy_price": h.average_buy_price}
+        for h in req.holdings
+    ]
+
+    advise_res = advise_portfolio_rebalance(
+        available_cash=req.available_cash,
+        holdings_input=holdings_dicts,
+        opportunity_profiles=profiles,
+        max_weight_pct=req.max_weight_pct,
+        rebalance_band_pct=req.rebalance_band_pct,
+        min_rotation_score_delta=req.min_rotation_score_delta,
+    )
+
+    holdings_models = [
+        PortfolioHoldingEvaluatedModel(
+            ticker=h.ticker,
+            asset_name=h.asset_name,
+            shares=h.shares,
+            average_buy_price=h.average_buy_price,
+            current_price=h.current_price,
+            market_value=h.market_value,
+            invested_value=h.invested_value,
+            unrealized_pnl_value=h.unrealized_pnl_value,
+            unrealized_pnl_pct=h.unrealized_pnl_pct,
+            current_weight_pct=h.current_weight_pct,
+            entry_bar_index=h.entry_bar_index,
+        )
+        for h in advise_res["holdings_evaluated"]
+    ]
+
+    rec_models = [
+        PortfolioActionRecommendationModel(
+            ticker=r.ticker,
+            asset_name=r.asset_name,
+            action_type=r.action_type,
+            action_label=r.action_label,
+            reason_text=r.reason_text,
+            strategy_sub_id=r.strategy_sub_id,
+            strategy_label=r.strategy_label,
+            potential_score=r.potential_score,
+            timing_category=r.timing_category,
+            current_price=r.current_price,
+            reference_price=r.reference_price,
+            current_shares=r.current_shares,
+            recommended_shares_delta=r.recommended_shares_delta,
+            target_shares=r.target_shares,
+            order_value=r.order_value,
+            current_weight_pct=r.current_weight_pct,
+            target_weight_pct=r.target_weight_pct,
+        )
+        for r in advise_res["recommendations"]
+    ]
+
+    ranking_models = [
+        AssetOpportunityProfileModel(
+            ticker=p.ticker,
+            asset_name=p.asset_name,
+            category=p.category,
+            current_price=p.current_price,
+            champion_buy_id=p.champion_buy_id,
+            champion_buy_label=p.champion_buy_label,
+            champion_sell_id=p.champion_sell_id,
+            champion_sell_label=p.champion_sell_label,
+            win_rate_pct=p.win_rate_pct,
+            historical_return_pct=p.historical_return_pct,
+            max_drawdown_pct=p.max_drawdown_pct,
+            closed_trades=p.closed_trades,
+            active_direction=p.active_direction,
+            timing_category=p.timing_category,
+            timing_label=p.timing_label,
+            distance_pct=p.distance_pct,
+            recommended_price=p.recommended_price,
+            potential_score=p.potential_score,
+        )
+        for p in advise_res["opportunity_ranking"]
+    ]
+
+    return PortfolioAdviseResponse(
+        universe_category=req.universe_category,
+        interval=req.interval,
+        period=req.period,
+        current_cash=advise_res["current_cash"],
+        current_holdings_value=advise_res["current_holdings_value"],
+        total_portfolio_equity=advise_res["total_portfolio_equity"],
+        projected_cash_after=advise_res["projected_cash_after"],
+        projected_invested_after=advise_res["projected_invested_after"],
+        max_weight_pct=advise_res["max_weight_pct"],
+        holdings_evaluated=holdings_models,
+        recommendations=rec_models,
+        opportunity_ranking=ranking_models,
+    )
+
+
 # Mount Web Terminal Static Assets at Root
 static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "web")
 if os.path.exists(static_dir):
