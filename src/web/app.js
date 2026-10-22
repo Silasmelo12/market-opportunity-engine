@@ -1669,10 +1669,15 @@ function setupSimulationTab() {
     elements.btnApplyChampion.addEventListener('click', () => {
       if (state.lastChampion) {
         if (elements.simBuyStrategy) elements.simBuyStrategy.value = state.lastChampion.buy_sub_id;
-        if (elements.simSellStrategy) elements.simSellStrategy.value = state.lastChampion.sell_sub_id;
-        const cycleModeEl = document.getElementById('sim-cycle-mode');
-        if (cycleModeEl && state.lastChampion.cycle_entry_mode) {
-          cycleModeEl.value = state.lastChampion.cycle_entry_mode;
+        const currentMode = (elements.simMode && elements.simMode.value) || 'cycle_trade';
+        if (currentMode === 'cycle_trade') {
+          if (elements.simSellStrategy && state.lastChampion.sell_sub_id) {
+            elements.simSellStrategy.value = state.lastChampion.sell_sub_id;
+          }
+          const cycleModeEl = document.getElementById('sim-cycle-mode');
+          if (cycleModeEl && state.lastChampion.cycle_entry_mode) {
+            cycleModeEl.value = state.lastChampion.cycle_entry_mode;
+          }
         }
         runSimulation();
       }

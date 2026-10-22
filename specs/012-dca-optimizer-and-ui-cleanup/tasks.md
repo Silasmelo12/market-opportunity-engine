@@ -27,7 +27,7 @@ description: "Tasks for feature 012: Suporte ao Otimizador Mais Lucrativa para A
 - [X] T004 [US1] Atualizar o endpoint `/api/simulate/optimize` em `src/api/server.py` para rotear chamadas com `simulation_mode == 'accumulation'` para `optimize_dca_strategies`.
 - [X] T005 [US1] Criar teste unitário em `tests/unit/test_api_endpoints.py` (`test_api_simulate_optimize_accumulation`) validando a rota `/api/simulate/optimize` no modo DCA.
 - [X] T006 [US1] Atualizar `runOptimizer()` e `renderTopCombinationsTable` em `src/web/app.js` para enviar `simulation_mode` e adaptar o card da Campeã e tabela de ranking para métricas de acumulação (Total Aportado, Patrimônio, Preço Médio e Aportes).
-- [ ] T007 [US1] Ajustar o listener de `btnApplyChampion` em `src/web/app.js` para, no modo DCA, selecionar a estratégia de compra campeã e disparar `runSimulation()` mantendo consistência exata dos KPIs.
+- [X] T007 [US1] Ajustar o listener de `btnApplyChampion` em `src/web/app.js` para, no modo DCA, selecionar a estratégia de compra campeã e disparar `runSimulation()` mantendo consistência exata dos KPIs.
 
 ---
 
