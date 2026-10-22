@@ -1,26 +1,137 @@
 {
-  "generated": "2026-10-21T22:54:15-03:00",
+  "generated": "2026-10-22T06:56:45-03:00",
   "project": "Market Opportunity & Bottom Statistical Engine",
   "summary": {
-    "specs_analyzed": 12,
-    "requirements_checked": 104,
-    "aligned": 104,
+    "specs_analyzed": 16,
+    "requirements_checked": 139,
+    "aligned": 139,
     "drifted": 0,
     "not_implemented": 0,
     "unspecced_features": 0
   },
   "specs": [
     {
+      "id": "016-portfolio-manager-simulator",
+      "title": "Gestor, Consultor de Rebalanceamento e Simulador Multiativos de Carteira",
+      "aligned": [
+        "FR-001",
+        "FR-002",
+        "FR-003",
+        "FR-004",
+        "FR-005",
+        "FR-006",
+        "FR-007",
+        "FR-008",
+        "FR-009",
+        "FR-010",
+        "FR-011",
+        "SC-001",
+        "SC-002",
+        "SC-003",
+        "SC-004",
+        "SC-005"
+      ],
+      "drifted": [],
+      "not_implemented": []
+    },
+    {
+      "id": "015-radar-table-ux-refactor",
+      "title": "Refatoração da Tabela do Radar com Ocultação de Colunas, Semáforo Minimalista, Direção Compacta e Ordenação de Histórico por Quantidade e Win Rate",
+      "aligned": [
+        "FR-001",
+        "FR-002",
+        "FR-003",
+        "FR-004",
+        "FR-005",
+        "FR-006",
+        "FR-007",
+        "SC-001",
+        "SC-002",
+        "SC-003",
+        "SC-004",
+        "SC-005"
+      ],
+      "drifted": [],
+      "not_implemented": []
+    },
+    {
+      "id": "014-chart-indicators-filter-tab-persistence",
+      "title": "Correção de Exibição dos Novos Indicadores na Aba Gráfico, Filtragem Inicial por Direção e Persistência de Aba Ativa ao Atualizar Página",
+      "aligned": [
+        "FR-001",
+        "FR-002",
+        "FR-003",
+        "FR-004",
+        "FR-005",
+        "FR-006",
+        "FR-007",
+        "SC-001",
+        "SC-002",
+        "SC-003",
+        "SC-004",
+        "SC-005"
+      ],
+      "drifted": [],
+      "not_implemented": []
+    },
+    {
+      "id": "013-quantitative-indicators-package",
+      "title": "Pacote de Estratégias Quantitativas com Indicadores Técnicos",
+      "aligned": [
+        "FR-001",
+        "FR-002",
+        "FR-003",
+        "FR-004",
+        "FR-005",
+        "FR-006",
+        "FR-007",
+        "FR-008",
+        "FR-009",
+        "SC-001",
+        "SC-002",
+        "SC-003",
+        "SC-004",
+        "SC-005"
+      ],
+      "drifted": [],
+      "not_implemented": []
+    },
+    {
       "id": "012-dca-optimizer-and-ui-cleanup",
       "title": "Suporte ao Otimizador 'Mais Lucrativa' para Acumulação DCA com Ranking de Estratégias de Compra e Ocultação de Venda no Frontend",
-      "aligned": ["FR-001", "FR-002", "FR-003", "FR-004", "FR-005", "FR-006", "FR-007", "SC-001", "SC-002", "SC-003"],
+      "aligned": [
+        "FR-001",
+        "FR-002",
+        "FR-003",
+        "FR-004",
+        "FR-005",
+        "FR-006",
+        "FR-007",
+        "SC-001",
+        "SC-002",
+        "SC-003"
+      ],
       "drifted": [],
       "not_implemented": []
     },
     {
       "id": "011-hourly-timeframe-and-direction-cleanup",
       "title": "Suporte ao Timeframe 1h sem Erro 400 e Ocultação do Seletor de Direção",
-      "aligned": ["FR-001", "FR-002", "FR-003", "SC-001", "SC-002"],
+      "aligned": [
+        "FR-001",
+        "FR-002",
+        "FR-003"
+      ],
+      "drifted": [],
+      "not_implemented": []
+    },
+    {
+      "id": "010-radar-direction-and-simulator-fixes",
+      "title": "Seletor de Modo de Ciclo no Simulador e Correções de Direção do Radar",
+      "aligned": [
+        "FR-001",
+        "FR-002"
+      ],
       "drifted": [],
       "not_implemented": []
     }

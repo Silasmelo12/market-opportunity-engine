@@ -1064,13 +1064,13 @@ function renderRadarTable(pageOrItems) {
   }
   elements.radarTableBody.innerHTML = '';
   if (!items || items.length === 0) {
-    elements.radarTableBody.innerHTML = 
+    elements.radarTableBody.innerHTML = `
       <tr>
         <td colspan="8" class="text-center py-8 text-gray-500">
           Nenhuma oportunidade com sinal ativo ou reteste pendente no momento.
         </td>
       </tr>
-    ;
+    `;
     return;
   }
 
@@ -1090,13 +1090,13 @@ function renderRadarTable(pageOrItems) {
   });
 
   if (filtered.length === 0) {
-    elements.radarTableBody.innerHTML = 
+    elements.radarTableBody.innerHTML = `
       <tr>
         <td colspan="8" class="text-center py-8 text-gray-500">
-          Nenhuma oportunidade encontrada para a direção selecionada ().
+          Nenhuma oportunidade encontrada para a direção selecionada (${state.activeDirection || 'BUY'}).
         </td>
       </tr>
-    ;
+    `;
     return;
   }
 
@@ -1123,32 +1123,32 @@ function renderRadarTable(pageOrItems) {
 
     const friendlyName = stripCorporateSuffix(item.asset_name || getAssetName(item.ticker));
 
-    tr.innerHTML = 
+    tr.innerHTML = `
       <td class="px-3 sm:px-4 py-2.5 sm:py-3">
-        <button class="text-left group btn-open-ticker focus:outline-none cursor-pointer" data-ticker="" data-strategy="" data-direction="">
+        <button class="text-left group btn-open-ticker focus:outline-none cursor-pointer" data-ticker="${item.ticker}" data-strategy="${item.strategy_sub_id}" data-direction="${item.direction}">
           <div class="font-bold text-cyan-400 group-hover:text-cyan-200 group-hover:underline flex items-center gap-1.5 transition">
-            <span></span>
+            <span>${friendlyName}</span>
             <span class="text-xs text-cyan-500/70 group-hover:text-cyan-300">↗</span>
           </div>
-          <div class="text-[11px] text-gray-500 font-mono tracking-wide"></div>
+          <div class="text-[11px] text-gray-500 font-mono tracking-wide">${item.ticker}</div>
         </button>
       </td>
-      <td class="px-2 sm:px-3 py-2.5 sm:py-3 text-center"></td>
-      <td class="px-3 sm:px-4 py-2.5 sm:py-3  font-medium"></td>
-      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono text-gray-300"></td>
+      <td class="px-2 sm:px-3 py-2.5 sm:py-3 text-center">${dirBadge}</td>
+      <td class="px-3 sm:px-4 py-2.5 sm:py-3 ${isBuy ? 'text-emerald-300' : 'text-rose-300'} font-medium">${item.strategy_label}</td>
+      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono text-gray-300">${item.status_signal}</td>
       <td class="px-2 sm:px-3 py-2.5 sm:py-3 text-center">
-        <span class="inline-block w-3 h-3 rounded-full cursor-help " title=""></span>
+        <span class="inline-block w-3 h-3 rounded-full cursor-help ${dotClass}" title="${item.timing_label}"></span>
       </td>
-      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono font-bold ">
-        %
+      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono font-bold ${item.distance_pct >= 0 ? 'text-amber-400' : 'text-cyan-400'}">
+        ${item.distance_pct >= 0 ? '+' : ''}${item.distance_pct.toFixed(1)}%
       </td>
       <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono text-right text-gray-200 font-semibold">
-        
+        ${item.historical_n !== undefined && item.historical_n !== null ? item.historical_n : '-'}
       </td>
-      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono text-right font-semibold ">
-        
+      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono text-right font-semibold ${item.historical_win_rate >= 60 ? 'text-emerald-400' : 'text-gray-300'}">
+        ${item.historical_win_rate !== undefined && item.historical_win_rate !== null ? item.historical_win_rate.toFixed(1) + '%' : '-'}
       </td>
-    ;
+    `;
     elements.radarTableBody.appendChild(tr);
   });
 
@@ -1171,23 +1171,35 @@ function renderRadarTable(pageOrItems) {
           b.classList.remove('active-buy', 'active-sell', 'active-both');
           b.classList.add('text-gray-400');
         });
-        const activeBtn = document.querySelector(#global-direction-selector .dir-seg-btn[data-dir=""]);
+        const activeBtn = document.querySelector(`#global-direction-selector .dir-seg-btn[data-dir="${dir}"]`);
         if (activeBtn) {
-          activeBtn.classList.add(dir === 'BUY' ? 'active-buy' : 'active-sell');
+          if (dir === 'BUY') activeBtn.classList.add('active-buy');
+          else if (dir === 'SELL') activeBtn.classList.add('active-sell');
+          else activeBtn.classList.add('active-both');
           activeBtn.classList.remove('text-gray-400');
         }
         updateSidebarDirectionFilter();
       }
 
-      // Automatically select and isolate this strategy in chart sidebar
-      if (strat) {
-        state.activeStrategies.clear();
-        document.querySelectorAll('.strategy-cb').forEach(cb => cb.checked = false);
+      if (state.radarTimeframe && state.radarTimeframe !== state.currentTimeframe) {
+        state.currentTimeframe = state.radarTimeframe;
+        document.querySelectorAll('#timeframe-buttons .tf-btn').forEach(b => {
+          if (b.getAttribute('data-tf') === state.currentTimeframe) {
+            b.classList.add('active', 'bg-fintech-cyan/20', 'text-fintech-cyan', 'border', 'border-fintech-cyan/40', 'font-bold');
+            b.classList.remove('bg-fintech-bg', 'text-gray-300');
+          } else {
+            b.classList.remove('active', 'bg-fintech-cyan/20', 'text-fintech-cyan', 'border', 'border-fintech-cyan/40', 'font-bold');
+            b.classList.add('bg-fintech-bg', 'text-gray-300');
+          }
+        });
+      }
 
+      // If user opened a specific strategy from radar, ensure it's selected and active
+      if (strat) {
         state.activeStrategies.add(strat);
         const aliases = STRATEGY_ALIASES[strat] || [];
         aliases.forEach(a => state.activeStrategies.add(a));
-        const cb = document.querySelector(.strategy-cb[data-id=""]);
+        const cb = document.querySelector(`.strategy-cb[data-id="${strat}"]`);
         if (cb) cb.checked = true;
       }
 
@@ -1197,102 +1209,6 @@ function renderRadarTable(pageOrItems) {
   });
 }
 
-
-// API: Load Analysis Data (/api/analyze)
-async function loadAnalysisData(forceRefresh = false) {
-  showLoading(`Analisando ${state.currentTicker} (${state.currentTimeframe})...`);
-  try {
-    const params = new URLSearchParams({
-      ticker: state.currentTicker,
-      interval: state.currentTimeframe,
-      period: state.currentPeriod,
-      lookback_n: state.lookbackN,
-      retest_m: state.retestM,
-      retest_tol: 0.005,
-      horizon_x: state.horizonX,
-      refresh: forceRefresh
-    });
-
-    const res = await fetch(`/api/analyze?${params.toString()}`);
-    if (!res.ok) {
-      const errJson = await res.json().catch(() => ({}));
-      throw new Error(errJson.detail || `HTTP ${res.status}`);
-    }
-
-    state.analysisData = await res.json();
-
-    if (state.candleSeries && state.analysisData.candles) {
-      const rawCandles = state.analysisData.candles || [];
-      const parsedCandles = [];
-      const seenTimes = new Set();
-
-      for (const c of rawCandles) {
-        if (!c || c.open == null || c.high == null || c.low == null || c.close == null) continue;
-        const o = Number(c.open);
-        const h = Number(c.high);
-        const l = Number(c.low);
-        const cl = Number(c.close);
-        if (isNaN(o) || isNaN(h) || isNaN(l) || isNaN(cl)) continue;
-
-        let timeVal;
-        if (!isNaN(c.time) && !isNaN(parseFloat(c.time)) && typeof c.time !== 'boolean') {
-          timeVal = parseInt(c.time, 10);
-        } else {
-          timeVal = String(c.time).trim();
-        }
-
-        if (!timeVal) continue;
-
-        parsedCandles.push({
-          time: timeVal,
-          open: o,
-          high: h,
-          low: l,
-          close: cl
-        });
-      }
-
-      parsedCandles.sort((a, b) => {
-        if (typeof a.time === 'number' && typeof b.time === 'number') {
-          return a.time - b.time;
-        }
-        return String(a.time).localeCompare(String(b.time));
-      });
-
-      const validCandles = [];
-      for (const candle of parsedCandles) {
-        const key = String(candle.time);
-        if (!seenTimes.has(key)) {
-          seenTimes.add(key);
-          validCandles.push(candle);
-        }
-      }
-
-      try {
-        state.candleSeries.setData(validCandles);
-        if (state.chart) {
-          state.chart.timeScale().fitContent();
-        }
-      } catch (err) {
-        console.error("Erro ao aplicar candles no Lightweight Charts:", err);
-      }
-    }
-
-    const assetTitleEl = document.getElementById('active-asset-title');
-    if (assetTitleEl) {
-      assetTitleEl.textContent = `${state.currentTicker} • ${stripCorporateSuffix(getAssetName(state.currentTicker))}`;
-    }
-    updateHeaderTimingBadge(state.analysisData.timing_status);
-    applyClientSideFiltering();
-
-  } catch (err) {
-    alert(`Erro na análise: ${err.message}`);
-  } finally {
-    hideLoading();
-  }
-}
-
-// 0ms CLIENT-SIDE FILTERING ENGINE (Direction & Strategy Selective)
 function applyClientSideFiltering() {
   if (!state.analysisData) return;
 
