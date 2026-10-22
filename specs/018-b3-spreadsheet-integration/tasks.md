@@ -66,4 +66,4 @@
 
 - [x] T014 Executar suite completa de testes com `pytest` (100 testes passando)
 - [x] T015 Teste manual ponta a ponta com a planilha oficial `B3/movimentacao-2026-10-22-13-32-52.xlsx`
-- [ ] T016 Commit final na branch `018-b3-spreadsheet-integration`
+- [x] T016 Commit final na branch `018-b3-spreadsheet-integration`
