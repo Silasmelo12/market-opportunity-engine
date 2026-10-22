@@ -17,6 +17,34 @@ from .statistical_engine import evaluate_all_strategies
 from .timing_classifier import classify_timing_status
 
 
+def is_integer_lot_ticker(ticker: str) -> bool:
+    """
+    Returns True for Brazilian B3 equities and FIIs (.SA) or indices (^BVSP)
+    where standard/fractional shares are whole integers (>= 1 share).
+    Cryptocurrencies (-USD) and international assets support up to 4 decimals.
+    """
+    t = (ticker or "").strip().upper()
+    return t.endswith(".SA") or t.startswith("^")
+
+
+def round_shares_for_ticker(ticker: str, raw_shares: float, mode: str = "floor") -> float:
+    """
+    Rounds share count according to market convention:
+    - .SA tickers: integer shares (floor for BUY so we never exceed cash; floor/round for partial sell).
+    - Fractional tickers (-USD, US equities, etc.): 4 decimal places.
+    """
+    if raw_shares <= 0.0:
+        return 0.0
+    if is_integer_lot_ticker(ticker):
+        if mode == "round":
+            return float(max(0, int(round(raw_shares))))
+        return float(max(0, int(math.floor(raw_shares + 1e-9))))
+    factor = 10000.0
+    if mode == "round":
+        return round(raw_shares, 4)
+    return math.floor(raw_shares * factor + 1e-9) / factor
+
+
 @dataclass
 class PortfolioHolding:
     ticker: str
@@ -30,6 +58,26 @@ class PortfolioHolding:
     unrealized_pnl_pct: float = 0.0
     current_weight_pct: float = 0.0
     entry_bar_index: int = 0
+
+    def __post_init__(self):
+        self.ticker = (self.ticker or "").strip().upper()
+        self.shares = max(0.0, float(self.shares))
+        self.average_buy_price = max(0.0, float(self.average_buy_price))
+        self.current_price = max(0.0, float(self.current_price))
+        self.entry_bar_index = max(0, int(self.entry_bar_index))
+        self.recalculate(total_portfolio_equity=0.0)
+
+    def recalculate(self, total_portfolio_equity: float = 0.0) -> None:
+        self.market_value = round(self.shares * self.current_price, 2)
+        self.invested_value = round(self.shares * self.average_buy_price, 2)
+        self.unrealized_pnl_value = round(self.market_value - self.invested_value, 2)
+        if self.average_buy_price > 0:
+            self.unrealized_pnl_pct = round(((self.current_price / self.average_buy_price) - 1.0) * 100.0, 2)
+        else:
+            self.unrealized_pnl_pct = 0.0
+        if total_portfolio_equity > 0:
+            w = (self.market_value / total_portfolio_equity) * 100.0
+            self.current_weight_pct = round(max(0.0, min(100.0, w)), 2)
 
 
 @dataclass
@@ -52,6 +100,14 @@ class AssetOpportunityProfile:
     distance_pct: float = 0.0
     recommended_price: float = 0.0
     potential_score: float = 0.0
+
+    def __post_init__(self):
+        self.ticker = (self.ticker or "").strip().upper()
+        self.potential_score = round(max(0.0, min(100.0, float(self.potential_score))), 1)
+        if self.active_direction not in ("BUY", "SELL", "NEUTRAL"):
+            self.active_direction = "NEUTRAL"
+        if self.timing_category not in ("IDEAL", "EXTENDED", "LATE"):
+            self.timing_category = "LATE"
 
 
 @dataclass
