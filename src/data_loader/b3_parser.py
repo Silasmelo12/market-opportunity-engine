@@ -15,7 +15,7 @@ from typing import List, Dict, Any, Optional, Tuple, Union
 import pandas as pd
 import numpy as np
 
-from ..api.schemas import B3MovementRecord, B3Holding, B3MonthlyIncome, B3ParseResult
+from ..api.schemas import B3MovementRecord, B3Holding, B3MonthlyIncome, B3ParseResult, B3TimelinePoint
 
 
 def _normalize_str(text: Any) -> str:
@@ -211,6 +211,45 @@ def parse_b3_negociacao_detalhada_df(df: pd.DataFrame, filename: str = "negociac
 
     active_holdings.sort(key=lambda x: x.total_invested, reverse=True)
 
+    # Build timeline points from monthly flow
+    monthly_flow: Dict[str, Dict[str, Any]] = {}
+    if "data" in col_map:
+        for _, row in df_sorted.iterrows():
+            raw_code = str(row.get(col_map["codigo"], "")).strip().upper()
+            if not raw_code or "WIN" in raw_code or "WDO" in raw_code or "FUTURO" in raw_code or "DI1" in raw_code:
+                continue
+            dt = row.get("__parsed_date")
+            if pd.isna(dt):
+                continue
+            m_key = dt.strftime("%Y-%m")
+            lbl = dt.strftime("%m/%y")
+            mov_type = _normalize_str(row.get(col_map["tipo"], "")).lower()
+            qty = _parse_numeric(row.get(col_map["quantidade"], 0))
+            val = _parse_numeric(row.get(col_map.get("valor", 0)))
+            price = _parse_numeric(row.get(col_map.get("preco", 0)))
+            op_cost = val if val > 0 else (qty * price)
+
+            if m_key not in monthly_flow:
+                monthly_flow[m_key] = {"label": lbl, "cashflow": 0.0}
+            if "compra" in mov_type:
+                monthly_flow[m_key]["cashflow"] += op_cost
+            elif "venda" in mov_type:
+                monthly_flow[m_key]["cashflow"] -= op_cost
+
+    timeline: List[B3TimelinePoint] = []
+    cum_invested = 0.0
+    for m in sorted(monthly_flow.keys()):
+        flow = monthly_flow[m]["cashflow"]
+        cum_invested = max(0.0, cum_invested + flow)
+        timeline.append(
+            B3TimelinePoint(
+                date=m,
+                label=monthly_flow[m]["label"],
+                invested=round(cum_invested, 2),
+                cashflow=round(flow, 2),
+            )
+        )
+
     return B3ParseResult(
         filename=filename,
         total_movements=len(df),
@@ -218,6 +257,7 @@ def parse_b3_negociacao_detalhada_df(df: pd.DataFrame, filename: str = "negociac
         total_invested=round(total_invested, 2),
         total_income=0.0,
         monthly_income=[],
+        timeline=timeline,
     )
 
 
@@ -416,6 +456,50 @@ def parse_b3_movimentacao_df(df: pd.DataFrame, filename: str = "movimentacao.xls
 
     total_income = round(total_dividends + total_jcp + total_rendimentos, 2)
 
+    # Build timeline points from custody movements
+    monthly_flow_mov: Dict[str, Dict[str, Any]] = {}
+    for _, row in df_sorted.iterrows():
+        prod = row.get(col_map["produto"])
+        raw_ticker, clean_ticker, sa_ticker = _clean_ticker_from_product(prod)
+        if not clean_ticker or "FUTURO" in clean_ticker or "DI1" in clean_ticker:
+            continue
+        dt = row.get("__parsed_date")
+        if pd.isna(dt):
+            continue
+        m_key = dt.strftime("%Y-%m")
+        lbl = dt.strftime("%m/%y")
+        mov_norm = _normalize_str(row.get(col_map["movimentacao"], "")).lower()
+        es_norm = _normalize_str(row.get(col_map.get("entrada_saida", ""), "")).lower()
+        qty = _parse_numeric(row.get(col_map.get("quantidade", 0)))
+        price = _parse_numeric(row.get(col_map.get("preco_unitario", 0)))
+        val = _parse_numeric(row.get(col_map.get("valor_operacao", 0)))
+        op_cost = val if val > 0 else (qty * price)
+
+        is_buy = "compra" in mov_norm or (es_norm == "credito" and "transferencia" in mov_norm and qty > 0)
+        is_sell = "venda" in mov_norm or (es_norm == "debito" and "transferencia" in mov_norm and qty > 0)
+
+        if is_buy or is_sell:
+            if m_key not in monthly_flow_mov:
+                monthly_flow_mov[m_key] = {"label": lbl, "cashflow": 0.0}
+            if is_buy:
+                monthly_flow_mov[m_key]["cashflow"] += op_cost
+            elif is_sell:
+                monthly_flow_mov[m_key]["cashflow"] -= op_cost
+
+    timeline_mov: List[B3TimelinePoint] = []
+    cum_inv_mov = 0.0
+    for m in sorted(monthly_flow_mov.keys()):
+        flow = monthly_flow_mov[m]["cashflow"]
+        cum_inv_mov = max(0.0, cum_inv_mov + flow)
+        timeline_mov.append(
+            B3TimelinePoint(
+                date=m,
+                label=monthly_flow_mov[m]["label"],
+                invested=round(cum_inv_mov, 2),
+                cashflow=round(flow, 2),
+            )
+        )
+
     return B3ParseResult(
         filename=filename,
         total_movements=total_movements,
@@ -423,6 +507,7 @@ def parse_b3_movimentacao_df(df: pd.DataFrame, filename: str = "movimentacao.xls
         total_invested=round(total_invested, 2),
         total_income=total_income,
         monthly_income=monthly_income,
+        timeline=timeline_mov,
     )
 
 
@@ -555,6 +640,28 @@ def parse_multiple_b3_files(files_data: List[Tuple[str, bytes]]) -> B3ParseResul
     final_holdings.sort(key=lambda x: x.total_invested, reverse=True)
     total_invested = round(sum(h.total_invested for h in final_holdings), 2)
 
+    # Consolidate timeline flows
+    flow_combined: Dict[str, Dict[str, Any]] = {}
+    for r in parsed_results:
+        for pt in getattr(r, "timeline", []):
+            if pt.date not in flow_combined:
+                flow_combined[pt.date] = {"label": pt.label, "cashflow": 0.0}
+            flow_combined[pt.date]["cashflow"] += pt.cashflow
+
+    combined_timeline: List[B3TimelinePoint] = []
+    cum_comb = 0.0
+    for m in sorted(flow_combined.keys()):
+        fl = flow_combined[m]["cashflow"]
+        cum_comb = max(0.0, cum_comb + fl)
+        combined_timeline.append(
+            B3TimelinePoint(
+                date=m,
+                label=flow_combined[m]["label"],
+                invested=round(cum_comb, 2),
+                cashflow=round(fl, 2),
+            )
+        )
+
     return B3ParseResult(
         filename=combined_names,
         total_movements=total_movements,
@@ -562,4 +669,5 @@ def parse_multiple_b3_files(files_data: List[Tuple[str, bytes]]) -> B3ParseResul
         total_invested=total_invested,
         total_income=total_income,
         monthly_income=combined_monthly,
+        timeline=combined_timeline,
     )

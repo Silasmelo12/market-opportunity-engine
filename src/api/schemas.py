@@ -501,6 +501,13 @@ class B3MonthlyIncome(BaseModel):
     total: float
 
 
+class B3TimelinePoint(BaseModel):
+    date: str           # "YYYY-MM" or "DD/MM/YYYY"
+    label: str          # "MM/YY"
+    invested: float     # Cumulative invested amount at that point in time
+    cashflow: float     # Net buys minus sells in that period
+
+
 class B3ParseResult(BaseModel):
     filename: str
     total_movements: int
@@ -508,4 +515,5 @@ class B3ParseResult(BaseModel):
     total_invested: float
     total_income: float
     monthly_income: List[B3MonthlyIncome]
+    timeline: List[B3TimelinePoint] = Field(default_factory=list)
 

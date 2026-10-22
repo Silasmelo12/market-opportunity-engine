@@ -1266,15 +1266,30 @@ function renderOverviewStackedBarChart(totalInvested, totalProfit) {
   const textColor = isLight ? '#334155' : '#8B98A5';
   const gridColor = isLight ? 'rgba(226, 232, 240, 0.8)' : 'rgba(38, 43, 56, 0.5)';
 
-  // Build 12 mock/recent monthly checkpoints ending at current
-  const months = ['11/25', '12/25', '01/26', '02/26', '03/26', '04/26', '05/26', '06/26', '07/26', '08/26', '09/26', '10/26'];
-  const baseInv = Math.max(1000, totalInvested);
-  const investedSteps = months.map((m, idx) => Number((baseInv * (0.65 + (idx * 0.032))).toFixed(2)));
-  investedSteps[investedSteps.length - 1] = totalInvested;
+  const timeline = state.portfolioState.b3Timeline || [];
+  let months = [];
+  let investedSteps = [];
+  let profitSteps = [];
 
-  const profitVal = Math.max(0, totalProfit);
-  const profitSteps = months.map((m, idx) => Number((profitVal * (idx / (months.length - 1))).toFixed(2)));
-  profitSteps[profitSteps.length - 1] = profitVal;
+  if (Array.isArray(timeline) && timeline.length >= 2) {
+    // Real B3 chronological data
+    months = timeline.map(pt => pt.label || pt.date);
+    investedSteps = timeline.map(pt => Number(pt.invested) || 0);
+
+    const profitVal = Math.max(0, totalProfit);
+    profitSteps = months.map((m, idx) => Number((profitVal * (idx / Math.max(1, months.length - 1))).toFixed(2)));
+    profitSteps[profitSteps.length - 1] = profitVal;
+  } else {
+    // Default 12 checkpoints ending at current total
+    months = ['11/25', '12/25', '01/26', '02/26', '03/26', '04/26', '05/26', '06/26', '07/26', '08/26', '09/26', '10/26'];
+    const baseInv = Math.max(100, totalInvested);
+    investedSteps = months.map((m, idx) => Number((baseInv * (0.65 + (idx * 0.032))).toFixed(2)));
+    investedSteps[investedSteps.length - 1] = totalInvested;
+
+    const profitVal = Math.max(0, totalProfit);
+    profitSteps = months.map((m, idx) => Number((profitVal * (idx / (months.length - 1))).toFixed(2)));
+    profitSteps[profitSteps.length - 1] = profitVal;
+  }
 
   const trace1 = {
     x: months,
@@ -3402,6 +3417,7 @@ state.portfolioState = {
   previousBackup: null,
   b3TotalIncome: 0,
   b3MonthlyIncome: [],
+  b3Timeline: [],
   b3Filename: null,
 };
 
@@ -3421,6 +3437,7 @@ function loadPortfolioStorage() {
       if (parsed.previousBackup && typeof parsed.previousBackup === 'object') state.portfolioState.previousBackup = parsed.previousBackup;
       if (parsed.b3TotalIncome !== undefined) state.portfolioState.b3TotalIncome = Number(parsed.b3TotalIncome) || 0;
       if (Array.isArray(parsed.b3MonthlyIncome)) state.portfolioState.b3MonthlyIncome = parsed.b3MonthlyIncome;
+      if (Array.isArray(parsed.b3Timeline)) state.portfolioState.b3Timeline = parsed.b3Timeline;
       if (parsed.b3Filename !== undefined) state.portfolioState.b3Filename = parsed.b3Filename;
     }
   } catch (err) {
@@ -3441,6 +3458,7 @@ function savePortfolioStorage() {
       previousBackup: state.portfolioState.previousBackup,
       b3TotalIncome: state.portfolioState.b3TotalIncome || 0,
       b3MonthlyIncome: state.portfolioState.b3MonthlyIncome || [],
+      b3Timeline: state.portfolioState.b3Timeline || [],
       b3Filename: state.portfolioState.b3Filename || null,
     };
     localStorage.setItem(PORTFOLIO_STORAGE_KEY, JSON.stringify(payload));
@@ -3715,6 +3733,7 @@ function applyB3ParsedResult(data) {
   state.portfolioState.holdings = importedHoldings;
   state.portfolioState.b3TotalIncome = Number(data.total_income) || 0;
   state.portfolioState.b3MonthlyIncome = Array.isArray(data.monthly_income) ? data.monthly_income : [];
+  state.portfolioState.b3Timeline = Array.isArray(data.timeline) ? data.timeline : [];
   state.portfolioState.b3Filename = data.filename || null;
 
   savePortfolioStorage();
