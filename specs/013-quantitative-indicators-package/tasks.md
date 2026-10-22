@@ -77,7 +77,7 @@
 - [x] T018 [US4] Integrar a classe `QuantitativeIndicatorsEngine` dentro de `src/strategies/__init__.py` no `StrategyCatalog`.
 - [x] T019 [US4] Atualizar o catálogo de estratégias exposto na API em `src/api/server.py` e schemas pydantic para incluir os 10 novos IDs e metadados.
 - [x] T020 [US4] Atualizar as listas e seletores suspensos no frontend `src/web/app.js` para organizar e exibir as novas estratégias no Radar e no Simulador.
-- [ ] T021 [US4] Garantir que o otimizador clássico e o otimizador DCA em `src/evaluator/accumulation_simulator.py` e `src/evaluator/trade_simulator.py` suportem a avaliação dos novos IDs.
+- [x] T021 [US4] Garantir que o otimizador clássico e o otimizador DCA em `src/evaluator/accumulation_simulator.py` e `src/evaluator/trade_simulator.py` suportem a avaliação dos novos IDs.
 
 ---
 
