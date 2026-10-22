@@ -763,5 +763,625 @@ def advise_portfolio_rebalance(
     }
 
 
-def simulate_portfolio_multi_asset(*args, **kwargs) -> PortfolioSimulationResult:
-    raise NotImplementedError
+def _compute_causal_score_at_bar(
+    signals: List[SignalRecord],
+    up_to_bar: int,
+    strategy_sub_id: str,
+) -> float:
+    """
+    Computes a strictly causal Potential Score (0-100) for an asset/strategy at `up_to_bar`,
+    using ONLY signals with `execution_bar_index <= up_to_bar`.
+    Guarantees 100% Zero Look-Ahead Bias under series truncation tests.
+    """
+    past_sigs = [s for s in signals if 0 <= s.execution_bar_index <= up_to_bar]
+    if not past_sigs:
+        return 68.0
+
+    buys = [s for s in past_sigs if s.direction == "BUY" and (strategy_sub_id in ("ALL", s.strategy_sub_id))]
+    if not buys:
+        buys = [s for s in past_sigs if s.direction == "BUY"]
+    sells = [s for s in past_sigs if s.direction == "SELL"]
+
+    merged = sorted(buys + sells, key=lambda x: (x.execution_bar_index, 0 if x.direction == "BUY" else 1))
+    in_pos = False
+    entry_p = 0.0
+    entry_bar = -1
+    closed = 0
+    wins = 0
+    cum_ret = 0.0
+    worst_loss = 0.0
+
+    for s in merged:
+        p = float(s.execution_price)
+        if p <= 0:
+            continue
+        if not in_pos and s.direction == "BUY":
+            in_pos = True
+            entry_p = p
+            entry_bar = s.execution_bar_index
+        elif in_pos and s.direction == "SELL" and s.execution_bar_index > entry_bar:
+            ret_pct = ((p - entry_p) / entry_p) * 100.0
+            closed += 1
+            if ret_pct > 0:
+                wins += 1
+            else:
+                worst_loss = min(worst_loss, ret_pct)
+            cum_ret += ret_pct
+            in_pos = False
+
+    if closed == 0:
+        # Prior score for confirmed bottom signal with no prior closed cycles yet
+        return 72.0
+
+    win_rate = (wins / closed) * 100.0
+    return calculate_potential_score(
+        win_rate_pct=win_rate,
+        historical_return_pct=max(0.0, cum_ret),
+        max_drawdown_pct=worst_loss,
+        timing_category="IDEAL",
+        active_direction="BUY",
+    )
+
+
+def simulate_portfolio_multi_asset(
+    asset_bundles: List[Dict[str, Any]],
+    initial_capital: float = 10000.0,
+    max_weight_pct: float = 25.0,
+    rebalance_band_pct: float = 5.0,
+    min_rotation_score_delta: float = 15.0,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    strategy_labels_map: Optional[Dict[str, str]] = None,
+) -> PortfolioSimulationResult:
+    """
+    Executes a strictly causal (Zero Look-Ahead Bias) bar-by-bar multi-asset portfolio simulation:
+    - Unifies timestamps across all assets in `asset_bundles`.
+    - Applies 4-step bar precedence:
+      1. SELL_FULL on confirmed SELL signals for held assets.
+      2. SELL_PARTIAL_REBALANCE when a held asset's weight exceeds max_weight_pct + rebalance_band_pct.
+      3. ROTATE_OUT / ROTATE_IN when cash < 10% of equity and an IDEAL BUY signal at bar t
+         outscores a stagnant holding (held >= 3 bars, unrealized_pnl_pct <= 3.0%) by >= min_rotation_score_delta.
+      4. Score-weighted BUY allocation of available cash into confirmed BUY signals at bar t, capped at max_weight_pct.
+    - Computes Equal-Weight Buy & Hold basket benchmark and institutional KPIs.
+    """
+    init_cap = max(100.0, float(initial_capital))
+    max_w = max(5.0, min(100.0, float(max_weight_pct)))
+    band_w = max(1.0, min(50.0, float(rebalance_band_pct)))
+    rot_delta = max(5.0, float(min_rotation_score_delta))
+    labels_map = strategy_labels_map or {}
+
+    valid_bundles = [
+        b for b in (asset_bundles or [])
+        if b and b.get("series") is not None and b["series"].length > 0
+    ]
+
+    if not valid_bundles:
+        return PortfolioSimulationResult(
+            initial_capital=round(init_cap, 2),
+            final_equity=round(init_cap, 2),
+            final_cash=round(init_cap, 2),
+            final_invested_value=0.0,
+            net_profit=0.0,
+            total_return_pct=0.0,
+            benchmark_return_pct=0.0,
+            alpha_vs_benchmark_pct=0.0,
+            max_drawdown_pct=0.0,
+            win_rate_pct=0.0,
+            profit_factor=0.0,
+            total_events_count=0,
+            closed_exits_count=0,
+            winning_exits_count=0,
+            losing_exits_count=0,
+            rebalance_rotations_count=0,
+        )
+
+    # 1. Build unified chronological date/timestamp index across all assets
+    all_ts_list = []
+    asset_data_map: Dict[str, Dict[str, Any]] = {}
+
+    start_dt = pd.to_datetime(start_date) if start_date else None
+    end_dt = pd.to_datetime(end_date) if end_date else None
+
+    for b in valid_bundles:
+        series: OHLCVSeries = b["series"]
+        t_code = str(b.get("ticker") or series.ticker).strip().upper()
+        a_name = str(b.get("asset_name") or t_code)
+        sigs: List[SignalRecord] = b.get("signals") or []
+        prof: Optional[AssetOpportunityProfile] = b.get("profile")
+
+        ts_pd = pd.to_datetime(series.timestamps)
+        mask = np.ones(series.length, dtype=bool)
+        if start_dt is not None:
+            mask &= (ts_pd >= start_dt)
+        if end_dt is not None:
+            mask &= (ts_pd <= end_dt)
+
+        valid_idx = np.flatnonzero(mask)
+        if len(valid_idx) == 0:
+            continue
+
+        norm_dates = [pd.to_datetime(series.timestamps[idx]).strftime("%Y-%m-%d %H:%M") if series.interval in ("5m", "15m", "30m", "60m", "1h", "2h", "4h", "12h") else pd.to_datetime(series.timestamps[idx]).strftime("%Y-%m-%d") for idx in valid_idx]
+        date_to_orig_bar = {d_str: int(orig_i) for d_str, orig_i in zip(norm_dates, valid_idx)}
+        all_ts_list.extend(norm_dates)
+
+        sigs_by_bar: Dict[int, List[SignalRecord]] = {}
+        for s in sigs:
+            if 0 <= s.execution_bar_index < series.length and mask[s.execution_bar_index]:
+                sigs_by_bar.setdefault(int(s.execution_bar_index), []).append(s)
+
+        asset_data_map[t_code] = {
+            "ticker": t_code,
+            "asset_name": a_name,
+            "series": series,
+            "signals": sigs,
+            "signals_by_bar": sigs_by_bar,
+            "date_to_bar": date_to_orig_bar,
+            "first_close": float(series.close[valid_idx[0]]),
+            "last_known_close": float(series.close[valid_idx[0]]),
+            "last_known_bar": int(valid_idx[0]),
+            "profile": prof,
+        }
+
+    master_dates = sorted(set(all_ts_list))
+    if not master_dates or not asset_data_map:
+        return PortfolioSimulationResult(
+            initial_capital=round(init_cap, 2),
+            final_equity=round(init_cap, 2),
+            final_cash=round(init_cap, 2),
+            final_invested_value=0.0,
+            net_profit=0.0,
+            total_return_pct=0.0,
+            benchmark_return_pct=0.0,
+            alpha_vs_benchmark_pct=0.0,
+            max_drawdown_pct=0.0,
+            win_rate_pct=0.0,
+            profit_factor=0.0,
+            total_events_count=0,
+            closed_exits_count=0,
+            winning_exits_count=0,
+            losing_exits_count=0,
+            rebalance_rotations_count=0,
+        )
+
+    # 2. Equal-Weight Buy & Hold Benchmark initialization at t=0
+    n_bench = len(asset_data_map)
+    bench_alloc_per_asset = init_cap / n_bench
+    bench_shares: Dict[str, float] = {}
+    for t_code, info in asset_data_map.items():
+        p0 = info["first_close"]
+        bench_shares[t_code] = (bench_alloc_per_asset / p0) if p0 > 0 else 0.0
+
+    # 3. Portfolio State Machine variables
+    cash = float(init_cap)
+    holdings_map: Dict[str, PortfolioHolding] = {}
+    holding_scores_map: Dict[str, float] = {}
+    ledger_events: List[PortfolioLedgerEvent] = []
+    curve_points: List[PortfolioCurvePoint] = []
+
+    event_counter = 0
+    closed_exits = 0
+    winning_exits = 0
+    losing_exits = 0
+    rebalance_rotations = 0
+    gross_profit_sum = 0.0
+    gross_loss_sum = 0.0
+
+    peak_equity = float(init_cap)
+    max_drawdown_pct = 0.0
+
+    def _calc_total_equity() -> float:
+        inv = sum(h.shares * h.current_price for h in holdings_map.values() if h.shares > 0)
+        return cash + inv
+
+    # 4. Chronological Bar-by-Bar Simulation Loop (Zero Look-Ahead Bias)
+    for t_idx, d_str in enumerate(master_dates):
+        # Update causal prices for assets trading on this bar
+        for t_code, info in asset_data_map.items():
+            orig_bar = info["date_to_bar"].get(d_str)
+            if orig_bar is not None:
+                c_p = float(info["series"].close[orig_bar])
+                if c_p > 0:
+                    info["last_known_close"] = c_p
+                    info["last_known_bar"] = orig_bar
+            if t_code in holdings_map:
+                holdings_map[t_code].current_price = info["last_known_close"]
+
+        total_eq_start = _calc_total_equity()
+        for h in holdings_map.values():
+            h.recalculate(total_portfolio_equity=total_eq_start)
+
+        sold_today: set = set()
+
+        # STEP 1: SELL_FULL on confirmed SELL signals at this bar
+        for t_code in list(holdings_map.keys()):
+            h = holdings_map.get(t_code)
+            if not h or h.shares <= 0:
+                continue
+            info = asset_data_map[t_code]
+            orig_bar = info["date_to_bar"].get(d_str)
+            if orig_bar is None or t_idx <= h.entry_bar_index:
+                continue
+            bar_sigs = info["signals_by_bar"].get(orig_bar, [])
+            sell_sigs = [s for s in bar_sigs if s.direction == "SELL" and float(s.execution_price) > 0]
+            if sell_sigs:
+                s_sig = sell_sigs[0]
+                p_sell = float(s_sig.execution_price)
+                proceeds = round(h.shares * p_sell, 2)
+                cost_basis = h.shares * h.average_buy_price
+                pnl_val = round(proceeds - cost_basis, 2)
+                pnl_pct = round(((p_sell - h.average_buy_price) / h.average_buy_price) * 100.0, 2) if h.average_buy_price > 0 else 0.0
+
+                w_before = h.current_weight_pct
+                cash = round(cash + proceeds, 2)
+                del holdings_map[t_code]
+                holding_scores_map.pop(t_code, None)
+                sold_today.add(t_code)
+
+                closed_exits += 1
+                if pnl_val > 0:
+                    winning_exits += 1
+                    gross_profit_sum += pnl_val
+                else:
+                    losing_exits += 1
+                    gross_loss_sum += abs(pnl_val)
+
+                eq_after = _calc_total_equity()
+                event_counter += 1
+                ledger_events.append(
+                    PortfolioLedgerEvent(
+                        event_id=event_counter,
+                        date=d_str,
+                        ticker=t_code,
+                        asset_name=h.asset_name,
+                        event_type="SELL_FULL",
+                        event_label="VENDA TOTAL (TOPO)",
+                        strategy_sub_id=s_sig.strategy_sub_id,
+                        strategy_label=labels_map.get(s_sig.strategy_sub_id, s_sig.strategy_sub_id),
+                        potential_score=holding_scores_map.get(t_code, 65.0),
+                        execution_price=round(p_sell, 2),
+                        shares_delta=round(-h.shares, 4),
+                        trade_value=proceeds,
+                        realized_pnl_value=pnl_val,
+                        realized_pnl_pct=pnl_pct,
+                        weight_before_pct=round(w_before, 2),
+                        weight_after_pct=0.0,
+                        cash_after=round(cash, 2),
+                        portfolio_equity_after=round(eq_after, 2),
+                    )
+                )
+
+        # STEP 2: SELL_PARTIAL_REBALANCE when weight > max_weight_pct + rebalance_band_pct
+        total_eq_mid = _calc_total_equity()
+        for t_code in list(holdings_map.keys()):
+            h = holdings_map[t_code]
+            h.recalculate(total_portfolio_equity=total_eq_mid)
+            if t_idx > h.entry_bar_index and h.current_weight_pct > (max_w + band_w) and h.current_price > 0:
+                target_val = (max_w / 100.0) * total_eq_mid
+                excess_val = max(0.0, h.market_value - target_val)
+                trim_sh = min(h.shares, round_shares_for_ticker(t_code, excess_val / h.current_price, mode="round"))
+                if trim_sh > 0 and trim_sh < h.shares:
+                    p_exec = h.current_price
+                    proceeds = round(trim_sh * p_exec, 2)
+                    cost_part = trim_sh * h.average_buy_price
+                    pnl_val = round(proceeds - cost_part, 2)
+                    pnl_pct = round(((p_exec - h.average_buy_price) / h.average_buy_price) * 100.0, 2) if h.average_buy_price > 0 else 0.0
+                    w_before = h.current_weight_pct
+
+                    h.shares = round(h.shares - trim_sh, 4)
+                    cash = round(cash + proceeds, 2)
+                    eq_after = _calc_total_equity()
+                    h.recalculate(total_portfolio_equity=eq_after)
+                    sold_today.add(t_code)
+
+                    closed_exits += 1
+                    rebalance_rotations += 1
+                    if pnl_val > 0:
+                        winning_exits += 1
+                        gross_profit_sum += pnl_val
+                    else:
+                        losing_exits += 1
+                        gross_loss_sum += abs(pnl_val)
+
+                    event_counter += 1
+                    ledger_events.append(
+                        PortfolioLedgerEvent(
+                            event_id=event_counter,
+                            date=d_str,
+                            ticker=t_code,
+                            asset_name=h.asset_name,
+                            event_type="SELL_PARTIAL_REBALANCE",
+                            event_label="REBALANCEAMENTO PARCIAL",
+                            strategy_sub_id="sell_rebal_rv_rf",
+                            strategy_label=labels_map.get("sell_rebal_rv_rf", "Rebalanceamento de Banda"),
+                            potential_score=holding_scores_map.get(t_code, 65.0),
+                            execution_price=round(p_exec, 2),
+                            shares_delta=round(-trim_sh, 4),
+                            trade_value=proceeds,
+                            realized_pnl_value=pnl_val,
+                            realized_pnl_pct=pnl_pct,
+                            weight_before_pct=round(w_before, 2),
+                            weight_after_pct=round(h.current_weight_pct, 2),
+                            cash_after=round(cash, 2),
+                            portfolio_equity_after=round(eq_after, 2),
+                        )
+                    )
+
+        # Gather confirmed BUY signals executing at this bar across all assets
+        buy_candidates_today: List[Tuple[float, str, SignalRecord]] = []
+        for t_code, info in asset_data_map.items():
+            if t_code in sold_today:
+                continue
+            orig_bar = info["date_to_bar"].get(d_str)
+            if orig_bar is None:
+                continue
+            bar_sigs = info["signals_by_bar"].get(orig_bar, [])
+            b_sigs = [s for s in bar_sigs if s.direction == "BUY" and float(s.execution_price) > 0]
+            if b_sigs:
+                best_sig = b_sigs[0]
+                c_score = _compute_causal_score_at_bar(info["signals"], orig_bar, best_sig.strategy_sub_id)
+                buy_candidates_today.append((c_score, t_code, best_sig))
+
+        buy_candidates_today.sort(key=lambda x: (-x[0], x[1]))
+
+        # STEP 3: Tactical Opportunity-Cost Rotation (ROTATE_OUT -> ROTATE_IN) when cash is low
+        total_eq_rot = _calc_total_equity()
+        unheld_buy_cands = [c for c in buy_candidates_today if c[1] not in holdings_map]
+        if cash < (0.10 * total_eq_rot) and unheld_buy_cands and holdings_map:
+            best_cand_score, best_cand_ticker, best_cand_sig = unheld_buy_cands[0]
+            stagnant_list = []
+            for t_code, h in holdings_map.items():
+                bars_held = t_idx - h.entry_bar_index
+                h_score = holding_scores_map.get(t_code, 55.0)
+                if bars_held >= 3 and h.unrealized_pnl_pct <= 3.0:
+                    stagnant_list.append((h_score, t_code, h))
+            stagnant_list.sort(key=lambda x: (x[0], x[2].unrealized_pnl_pct))
+
+            if stagnant_list:
+                weak_score, weak_ticker, weak_h = stagnant_list[0]
+                if (best_cand_score - weak_score) >= rot_delta and weak_h.current_price > 0:
+                    # Execute ROTATE_OUT
+                    p_out = weak_h.current_price
+                    proceeds = round(weak_h.shares * p_out, 2)
+                    cost_basis = weak_h.shares * weak_h.average_buy_price
+                    pnl_val = round(proceeds - cost_basis, 2)
+                    pnl_pct = round(((p_out - weak_h.average_buy_price) / weak_h.average_buy_price) * 100.0, 2) if weak_h.average_buy_price > 0 else 0.0
+                    w_before = weak_h.current_weight_pct
+                    sh_out = weak_h.shares
+
+                    cash = round(cash + proceeds, 2)
+                    del holdings_map[weak_ticker]
+                    holding_scores_map.pop(weak_ticker, None)
+                    sold_today.add(weak_ticker)
+
+                    closed_exits += 1
+                    rebalance_rotations += 1
+                    if pnl_val > 0:
+                        winning_exits += 1
+                        gross_profit_sum += pnl_val
+                    else:
+                        losing_exits += 1
+                        gross_loss_sum += abs(pnl_val)
+
+                    eq_after_out = _calc_total_equity()
+                    event_counter += 1
+                    ledger_events.append(
+                        PortfolioLedgerEvent(
+                            event_id=event_counter,
+                            date=d_str,
+                            ticker=weak_ticker,
+                            asset_name=weak_h.asset_name,
+                            event_type="ROTATE_OUT",
+                            event_label="ROTAÇÃO (SAÍDA)",
+                            strategy_sub_id="sell_rebal_relative_strength",
+                            strategy_label=labels_map.get("sell_rebal_relative_strength", "Rotação por Custo de Oportunidade"),
+                            potential_score=weak_score,
+                            execution_price=round(p_out, 2),
+                            shares_delta=round(-sh_out, 4),
+                            trade_value=proceeds,
+                            realized_pnl_value=pnl_val,
+                            realized_pnl_pct=pnl_pct,
+                            weight_before_pct=round(w_before, 2),
+                            weight_after_pct=0.0,
+                            cash_after=round(cash, 2),
+                            portfolio_equity_after=round(eq_after_out, 2),
+                        )
+                    )
+
+                    # Execute paired ROTATE_IN on best_cand_ticker
+                    p_in = float(best_cand_sig.execution_price)
+                    max_cap_val = (max_w / 100.0) * eq_after_out
+                    alloc_val = min(cash, proceeds, max_cap_val)
+                    buy_sh = round_shares_for_ticker(best_cand_ticker, alloc_val / p_in, mode="floor")
+                    if buy_sh > 0:
+                        cost_in = round(buy_sh * p_in, 2)
+                        cash = max(0.0, round(cash - cost_in, 2))
+                        c_info = asset_data_map[best_cand_ticker]
+                        new_h = PortfolioHolding(
+                            ticker=best_cand_ticker,
+                            asset_name=c_info["asset_name"],
+                            shares=buy_sh,
+                            average_buy_price=p_in,
+                            current_price=c_info["last_known_close"],
+                            entry_bar_index=t_idx,
+                        )
+                        holdings_map[best_cand_ticker] = new_h
+                        holding_scores_map[best_cand_ticker] = best_cand_score
+                        eq_after_in = _calc_total_equity()
+                        new_h.recalculate(total_portfolio_equity=eq_after_in)
+
+                        event_counter += 1
+                        ledger_events.append(
+                            PortfolioLedgerEvent(
+                                event_id=event_counter,
+                                date=d_str,
+                                ticker=best_cand_ticker,
+                                asset_name=c_info["asset_name"],
+                                event_type="ROTATE_IN",
+                                event_label="ROTAÇÃO (ENTRADA)",
+                                strategy_sub_id=best_cand_sig.strategy_sub_id,
+                                strategy_label=labels_map.get(best_cand_sig.strategy_sub_id, best_cand_sig.strategy_sub_id),
+                                potential_score=best_cand_score,
+                                execution_price=round(p_in, 2),
+                                shares_delta=round(buy_sh, 4),
+                                trade_value=cost_in,
+                                realized_pnl_value=None,
+                                realized_pnl_pct=None,
+                                weight_before_pct=0.0,
+                                weight_after_pct=round(new_h.current_weight_pct, 2),
+                                cash_after=round(cash, 2),
+                                portfolio_equity_after=round(eq_after_in, 2),
+                            )
+                        )
+                        buy_candidates_today = [c for c in buy_candidates_today if c[1] != best_cand_ticker]
+
+        # STEP 4: Score-Weighted BUY Allocation of Available Cash
+        if cash > 1.0 and buy_candidates_today:
+            total_eq_buy = _calc_total_equity()
+            max_cap_val = (max_w / 100.0) * total_eq_buy
+            score_sum = sum(max(1.0, c[0]) for c in buy_candidates_today)
+            cash_pool = cash
+
+            for c_score, t_code, b_sig in buy_candidates_today:
+                if cash <= 1.0:
+                    break
+                p_buy = float(b_sig.execution_price)
+                if p_buy <= 0:
+                    continue
+                c_info = asset_data_map[t_code]
+                existing_h = holdings_map.get(t_code)
+                cur_val = (existing_h.shares * p_buy) if existing_h else 0.0
+                w_before = ((existing_h.shares * existing_h.current_price) / total_eq_buy * 100.0) if existing_h and total_eq_buy > 0 else 0.0
+                room_val = max(0.0, max_cap_val - cur_val)
+                if room_val < min(10.0, p_buy):
+                    continue
+
+                w_prop = max(1.0, c_score) / score_sum if score_sum > 0 else (1.0 / len(buy_candidates_today))
+                desired_val = max(cash_pool * w_prop, room_val)
+                alloc_val = min(cash, room_val, desired_val)
+                buy_sh = round_shares_for_ticker(t_code, alloc_val / p_buy, mode="floor")
+                if buy_sh <= 0.0:
+                    continue
+
+                cost = round(buy_sh * p_buy, 2)
+                if cost > cash + 1e-6 or (cur_val + cost) > max_cap_val + 1e-2:
+                    continue
+
+                cash = max(0.0, round(cash - cost, 2))
+                if existing_h is None:
+                    new_h = PortfolioHolding(
+                        ticker=t_code,
+                        asset_name=c_info["asset_name"],
+                        shares=buy_sh,
+                        average_buy_price=p_buy,
+                        current_price=c_info["last_known_close"],
+                        entry_bar_index=t_idx,
+                    )
+                    holdings_map[t_code] = new_h
+                    holding_scores_map[t_code] = c_score
+                else:
+                    tot_sh = existing_h.shares + buy_sh
+                    avg_p = ((existing_h.shares * existing_h.average_buy_price) + cost) / tot_sh
+                    existing_h.shares = round(tot_sh, 4)
+                    existing_h.average_buy_price = round(avg_p, 4)
+                    existing_h.current_price = c_info["last_known_close"]
+                    holding_scores_map[t_code] = max(holding_scores_map.get(t_code, 0.0), c_score)
+
+                eq_after_b = _calc_total_equity()
+                holdings_map[t_code].recalculate(total_portfolio_equity=eq_after_b)
+
+                event_counter += 1
+                ledger_events.append(
+                    PortfolioLedgerEvent(
+                        event_id=event_counter,
+                        date=d_str,
+                        ticker=t_code,
+                        asset_name=c_info["asset_name"],
+                        event_type="BUY",
+                        event_label="COMPRA",
+                        strategy_sub_id=b_sig.strategy_sub_id,
+                        strategy_label=labels_map.get(b_sig.strategy_sub_id, b_sig.strategy_sub_id),
+                        potential_score=c_score,
+                        execution_price=round(p_buy, 2),
+                        shares_delta=round(buy_sh, 4),
+                        trade_value=cost,
+                        realized_pnl_value=None,
+                        realized_pnl_pct=None,
+                        weight_before_pct=round(w_before, 2),
+                        weight_after_pct=round(holdings_map[t_code].current_weight_pct, 2),
+                        cash_after=round(cash, 2),
+                        portfolio_equity_after=round(eq_after_b, 2),
+                    )
+                )
+
+        # End-of-Bar Mark-to-Market Equity & Benchmark Calculation
+        invested_eq = sum(h.shares * asset_data_map[t_code]["last_known_close"] for t_code, h in holdings_map.items() if h.shares > 0)
+        port_eq = cash + invested_eq
+        if port_eq > peak_equity:
+            peak_equity = port_eq
+        dd_pct = ((port_eq - peak_equity) / peak_equity) * 100.0 if peak_equity > 0 else 0.0
+        if dd_pct < max_drawdown_pct:
+            max_drawdown_pct = dd_pct
+
+        bench_eq = sum(bench_shares[t_code] * info["last_known_close"] for t_code, info in asset_data_map.items())
+
+        curve_points.append(
+            PortfolioCurvePoint(
+                date=d_str,
+                portfolio_equity=round(port_eq, 2),
+                cash_balance=round(cash, 2),
+                invested_equity=round(invested_eq, 2),
+                benchmark_equity=round(bench_eq, 2),
+                drawdown_pct=round(dd_pct, 2),
+            )
+        )
+
+    final_eq = curve_points[-1].portfolio_equity if curve_points else init_cap
+    final_bench = curve_points[-1].benchmark_equity if curve_points else init_cap
+    final_inv = curve_points[-1].invested_equity if curve_points else 0.0
+
+    for h in holdings_map.values():
+        h.recalculate(total_portfolio_equity=final_eq)
+
+    net_profit = round(final_eq - init_cap, 2)
+    tot_ret_pct = round(((final_eq / init_cap) - 1.0) * 100.0, 2) if init_cap > 0 else 0.0
+    bench_ret_pct = round(((final_bench / init_cap) - 1.0) * 100.0, 2) if init_cap > 0 else 0.0
+    alpha_pct = round(tot_ret_pct - bench_ret_pct, 2)
+    win_rate = round((winning_exits / closed_exits) * 100.0, 2) if closed_exits > 0 else 0.0
+    if gross_loss_sum > 0:
+        pf = round(gross_profit_sum / gross_loss_sum, 2)
+    elif gross_profit_sum > 0:
+        pf = 99.99
+    else:
+        pf = 0.0
+
+    final_holdings_list = sorted(
+        [h for h in holdings_map.values() if h.shares > 0],
+        key=lambda x: -x.market_value,
+    )
+    opp_profiles = [
+        info["profile"] for info in asset_data_map.values() if info.get("profile") is not None
+    ]
+    opp_profiles.sort(key=lambda x: (-x.potential_score, -x.win_rate_pct, x.ticker))
+
+    return PortfolioSimulationResult(
+        initial_capital=round(init_cap, 2),
+        final_equity=round(final_eq, 2),
+        final_cash=round(cash, 2),
+        final_invested_value=round(final_inv, 2),
+        net_profit=net_profit,
+        total_return_pct=tot_ret_pct,
+        benchmark_return_pct=bench_ret_pct,
+        alpha_vs_benchmark_pct=alpha_pct,
+        max_drawdown_pct=round(max_drawdown_pct, 2),
+        win_rate_pct=win_rate,
+        profit_factor=pf,
+        total_events_count=len(ledger_events),
+        closed_exits_count=closed_exits,
+        winning_exits_count=winning_exits,
+        losing_exits_count=losing_exits,
+        rebalance_rotations_count=rebalance_rotations,
+        current_holdings=final_holdings_list,
+        opportunity_profiles=opp_profiles,
+        ledger_events=ledger_events,
+        curve=curve_points,
+    )
