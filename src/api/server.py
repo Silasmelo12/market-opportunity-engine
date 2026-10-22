@@ -144,6 +144,19 @@ def _get_group_id(sub_id: str) -> str:
         "sell_overbought_stat", "sell_value_proxy", "sell_rebal_rv_rf", "sell_rebal_relative_strength"
     ):
         return "allocation"
+    if sub_id in (
+        "bollinger_close_in", "bb_reversal_buy", "bb_reversal_sell",
+        "keltner_squeeze", "squeeze_breakout_buy", "squeeze_breakout_sell",
+        "zscore_extreme", "zscore_bottom_buy", "zscore_top_sell",
+        "rsi_divergence", "rsi_bullish_div", "rsi_bearish_div",
+        "stochastic_extreme", "stoch_oversold_cross", "stoch_overbought_cross",
+        "macd_momentum", "macd_bottom_turn", "macd_top_turn",
+        "vwap_bands", "vwap_band_buy", "vwap_band_sell",
+        "mfi_extreme", "mfi_bottom_buy", "mfi_top_sell",
+        "volume_climax_vsa", "vsa_absorption_buy", "vsa_climax_sell",
+        "supertrend_trailing", "supertrend_bull_flip", "supertrend_bear_flip"
+    ):
+        return "quant"
     return "mql5"
 
 
@@ -236,6 +249,38 @@ def get_strategy_catalog():
                 {"id": "abandoned_baby_bullish", "label": STRATEGY_LABELS_PT["abandoned_baby_bullish"], "direction": "BUY"},
                 {"id": "bullish_kicker", "label": STRATEGY_LABELS_PT["bullish_kicker"], "direction": "BUY"},
                 {"id": "climactic_pinbar", "label": STRATEGY_LABELS_PT["climactic_pinbar"], "direction": "BUY"},
+            ],
+        },
+        "quant_buy": {
+            "name": "Indicadores Quantitativos - Compra (Fundos)",
+            "direction": "BUY",
+            "strategies": [
+                {"id": "bollinger_close_in", "label": STRATEGY_LABELS_PT["bollinger_close_in"], "direction": "BUY"},
+                {"id": "keltner_squeeze", "label": STRATEGY_LABELS_PT["keltner_squeeze"], "direction": "BUY"},
+                {"id": "zscore_extreme", "label": STRATEGY_LABELS_PT["zscore_extreme"], "direction": "BUY"},
+                {"id": "rsi_divergence", "label": STRATEGY_LABELS_PT["rsi_divergence"], "direction": "BUY"},
+                {"id": "stochastic_extreme", "label": STRATEGY_LABELS_PT["stochastic_extreme"], "direction": "BUY"},
+                {"id": "macd_momentum", "label": STRATEGY_LABELS_PT["macd_momentum"], "direction": "BUY"},
+                {"id": "vwap_bands", "label": STRATEGY_LABELS_PT["vwap_bands"], "direction": "BUY"},
+                {"id": "mfi_extreme", "label": STRATEGY_LABELS_PT["mfi_extreme"], "direction": "BUY"},
+                {"id": "volume_climax_vsa", "label": STRATEGY_LABELS_PT["volume_climax_vsa"], "direction": "BUY"},
+                {"id": "supertrend_trailing", "label": STRATEGY_LABELS_PT["supertrend_trailing"], "direction": "BUY"},
+            ],
+        },
+        "quant_sell": {
+            "name": "Indicadores Quantitativos - Venda (Topos)",
+            "direction": "SELL",
+            "strategies": [
+                {"id": "bollinger_close_in", "label": STRATEGY_LABELS_PT["bollinger_close_in"], "direction": "SELL"},
+                {"id": "keltner_squeeze", "label": STRATEGY_LABELS_PT["keltner_squeeze"], "direction": "SELL"},
+                {"id": "zscore_extreme", "label": STRATEGY_LABELS_PT["zscore_extreme"], "direction": "SELL"},
+                {"id": "rsi_divergence", "label": STRATEGY_LABELS_PT["rsi_divergence"], "direction": "SELL"},
+                {"id": "stochastic_extreme", "label": STRATEGY_LABELS_PT["stochastic_extreme"], "direction": "SELL"},
+                {"id": "macd_momentum", "label": STRATEGY_LABELS_PT["macd_momentum"], "direction": "SELL"},
+                {"id": "vwap_bands", "label": STRATEGY_LABELS_PT["vwap_bands"], "direction": "SELL"},
+                {"id": "mfi_extreme", "label": STRATEGY_LABELS_PT["mfi_extreme"], "direction": "SELL"},
+                {"id": "volume_climax_vsa", "label": STRATEGY_LABELS_PT["volume_climax_vsa"], "direction": "SELL"},
+                {"id": "supertrend_trailing", "label": STRATEGY_LABELS_PT["supertrend_trailing"], "direction": "SELL"},
             ],
         },
         "mql5_sell": {
