@@ -15,6 +15,7 @@ from .accumulation_simulator import (
     simulate_cycle_trade,
     StrategyPairRankItem,
     optimize_strategy_pairs,
+    optimize_dca_strategies,
 )
 from .timing_classifier import (
     TimingStatus,
@@ -32,6 +33,7 @@ __all__ = [
     "simulate_cycle_trade",
     "StrategyPairRankItem",
     "optimize_strategy_pairs",
+    "optimize_dca_strategies",
     "TimingStatus",
     "classify_timing_status",
 ]

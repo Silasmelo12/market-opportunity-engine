@@ -98,17 +98,22 @@ class StrategyPairRankItem:
     rank: int
     buy_sub_id: str
     buy_label: str
-    sell_sub_id: str
-    sell_label: str
-    closed_trades: int
-    winning_trades: int
-    win_rate_pct: float
-    total_return_pct: float
-    net_profit: float
-    max_drawdown_pct: float
-    has_open_trade: bool
-    final_equity: float
-    cycle_entry_mode: str = "multi_buy"
+    sell_sub_id: Optional[str] = None
+    sell_label: Optional[str] = None
+    closed_trades: int = 0
+    winning_trades: int = 0
+    win_rate_pct: float = 0.0
+    total_return_pct: float = 0.0
+    net_profit: float = 0.0
+    max_drawdown_pct: float = 0.0
+    has_open_trade: bool = False
+    final_equity: float = 0.0
+    cycle_entry_mode: Optional[str] = "multi_buy"
+    simulation_mode: str = "cycle_trade"
+    total_invested: Optional[float] = None
+    average_buy_price: Optional[float] = None
+    total_shares: Optional[float] = None
+    total_contributions: Optional[int] = None
 
 
 def simulate_cycle_trade(
@@ -687,6 +692,92 @@ def optimize_strategy_pairs(
                 has_open_trade=r["has_open_trade"],
                 final_equity=r["final_equity"],
                 cycle_entry_mode=cycle_entry_mode,
+            )
+        )
+
+    champion = ranked_items[0] if ranked_items else None
+    return champion, ranked_items
+
+
+def optimize_dca_strategies(
+    series: OHLCVSeries,
+    signals: List[SignalRecord],
+    contribution_amount: float = 1000.0,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    strategy_labels_map: Optional[Dict[str, str]] = None,
+    top_n: int = 15,
+) -> Tuple[Optional[StrategyPairRankItem], List[StrategyPairRankItem]]:
+    """
+    Evaluates each individual BUY strategy under DCA fixed-capital accumulation.
+    Ranks them by return_on_capital_pct descending (and current_equity).
+    Returns (champion, top_strategies).
+    """
+    n_bars = series.length
+    if n_bars == 0 or not signals:
+        return None, []
+
+    labels_map = strategy_labels_map or {}
+    ts_series = pd.to_datetime(series.timestamps)
+
+    mask_date = np.ones(n_bars, dtype=bool)
+    if start_date:
+        mask_date &= (ts_series >= pd.to_datetime(start_date))
+    if end_date:
+        mask_date &= (ts_series <= pd.to_datetime(end_date))
+
+    # Strictly filter for BUY signals within the date window
+    buy_signals = [
+        s for s in signals
+        if s.direction == "BUY" and 0 <= s.execution_bar_index < n_bars and mask_date[s.execution_bar_index]
+    ]
+
+    if not buy_signals:
+        return None, []
+
+    # Run simulate_accumulation for all buy signals
+    sim_results = simulate_accumulation(
+        series=series,
+        signals=buy_signals,
+        contribution_amount=contribution_amount,
+        start_date=start_date,
+        end_date=end_date,
+        strategy_labels_map=strategy_labels_map,
+    )
+
+    # Filter out strategies with 0 contributions
+    valid_items = [
+        res for res in sim_results.values()
+        if res.num_contributions > 0
+    ]
+
+    # Sort descending by return_on_capital_pct, then net_profit
+    valid_items.sort(key=lambda x: (x.return_on_capital_pct, x.net_profit), reverse=True)
+
+    ranked_items: List[StrategyPairRankItem] = []
+    for idx, item in enumerate(valid_items[:top_n], start=1):
+        label = labels_map.get(item.strategy_sub_id, item.strategy_label)
+        ranked_items.append(
+            StrategyPairRankItem(
+                rank=idx,
+                buy_sub_id=item.strategy_sub_id,
+                buy_label=label,
+                sell_sub_id=None,
+                sell_label="-",
+                closed_trades=item.num_contributions,
+                winning_trades=item.num_contributions if item.net_profit > 0 else 0,
+                win_rate_pct=100.0 if item.net_profit > 0 else 0.0,
+                total_return_pct=item.return_on_capital_pct,
+                net_profit=item.net_profit,
+                max_drawdown_pct=0.0,
+                has_open_trade=True,
+                final_equity=item.current_equity,
+                cycle_entry_mode=None,
+                simulation_mode="accumulation",
+                total_invested=item.total_invested,
+                average_buy_price=item.average_buy_price,
+                total_shares=item.total_shares,
+                total_contributions=item.num_contributions,
             )
         )
 
