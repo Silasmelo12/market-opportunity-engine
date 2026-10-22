@@ -103,7 +103,7 @@ description: "Task list for Gestor, Consultor de Rebalanceamento e Simulador Mul
 **Purpose**: Final validation across all stories and quickstart verification.
 
 - [X] T022 Run full `pytest` test suite to verify 100% pass rate with zero regressions across existing and new tests
-- [ ] T023 Validate all end-to-end scenarios defined in `specs/016-portfolio-manager-simulator/quickstart.md`
+- [X] T023 Validate all end-to-end scenarios defined in `specs/016-portfolio-manager-simulator/quickstart.md`
 
 ---
 
