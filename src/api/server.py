@@ -614,6 +614,17 @@ TICKERS_CRYPTO = [
     'BTC-USD', 'ETH-USD', 'SOL-USD',
 ]
 
+TICKERS_BDRS = [
+    'NVDC34.SA', 'AAPL34.SA', 'MSFT34.SA', 'GOGL34.SA', 'AMZO34.SA',
+    'M1TA34.SA', 'TSLA34.SA', 'AVGO34.SA', 'TSMC34.SA', 'A1MD34.SA',
+    'TMCO34.SA', 'BERK34.SA', 'JPMC34.SA', 'VISA34.SA', 'MSCD34.SA',
+    'BOAC34.SA', 'GSGI34.SA', 'WALM34.SA', 'COCA34.SA', 'PEPB34.SA',
+    'MCDC34.SA', 'DISB34.SA', 'NFLX34.SA', 'NIKE34.SA', 'COWC34.SA',
+    'LILY34.SA', 'N1VO34.SA', 'JNJB34.SA', 'UNHH34.SA', 'PFIZ34.SA',
+    'EXXO34.SA', 'CHVX34.SA', 'CATP34.SA', 'BOEI34.SA', 'IVVB11.SA',
+    'BIVB39.SA', 'NASD11.SA', 'BNDA39.SA', 'ACWI11.SA', 'BACW39.SA',
+]
+
 TICKERS_FEATURED = [
     ('^BVSP', 'Ações Brasil'),
     ('USDBRL=X', 'Forex'),
@@ -637,6 +648,7 @@ TICKERS_FEATURED = [
 DEFAULT_SCANNER_BASKET = (
     [(t, "Ações Brasil") for t in TICKERS_BR_ACOES] +
     [(t, "FIIs Brasil") for t in TICKERS_FIIS] +
+    [(t, "BDRs") for t in TICKERS_BDRS] +
     [(t, "Ações EUA") for t in TICKERS_USA] +
     [(t, "Commodities") for t in TICKERS_COMMODITIES] +
     [(t, "Forex") for t in TICKERS_FX] +
@@ -660,6 +672,8 @@ def _normalize_category(cat: Optional[str]) -> str:
         return "commodities"
     if "forex" in c or "fx" in c:
         return "forex"
+    if "bdr" in c:
+        return "bdrs"
     if "cripto" in c or "crypto" in c:
         return "crypto"
     if "all" in c or "todo" in c:
@@ -893,6 +907,8 @@ def scan_radar(
         basket = [(t, "Commodities") for t in TICKERS_COMMODITIES]
     elif norm_cat == "forex":
         basket = [(t, "Forex") for t in TICKERS_FX]
+    elif norm_cat == "bdrs":
+        basket = [(t, "BDRs") for t in TICKERS_BDRS]
     elif norm_cat == "crypto":
         basket = [(t, "Criptomoedas") for t in TICKERS_CRYPTO]
     else:
@@ -969,6 +985,7 @@ def get_all_tickers():
         "commodities": TICKERS_COMMODITIES,
         "forex": TICKERS_FX,
         "crypto": TICKERS_CRYPTO,
+        "bdrs": TICKERS_BDRS,
         "total": len(DEFAULT_SCANNER_BASKET),
         "all": [t[0] for t in DEFAULT_SCANNER_BASKET],
     }
@@ -1359,6 +1376,8 @@ def _resolve_portfolio_universe_tickers(
         raw_basket = [(t, "Commodities") for t in TICKERS_COMMODITIES]
     elif norm_cat == "forex":
         raw_basket = [(t, "Forex") for t in TICKERS_FX]
+    elif norm_cat == "bdrs":
+        raw_basket = [(t, "BDRs") for t in TICKERS_BDRS[:max_assets]]
     elif norm_cat == "crypto":
         raw_basket = [(t, "Criptomoedas") for t in TICKERS_CRYPTO]
     elif custom_tickers:
