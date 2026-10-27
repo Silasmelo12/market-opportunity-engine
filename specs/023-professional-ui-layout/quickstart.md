@@ -194,3 +194,9 @@ A feature é considerada validada quando:
   - `PYTHONPATH=. python -m pytest tests/unit -q` → **95 passed, 2 skipped**.
   - `PYTHONPATH=. python -m pytest tests/e2e -q` → **18 passed**.
 - Conclusão: linha de base verde; qualquer falha nova é regressão da feature.
+
+### T002 — Baseline visual
+
+- Captura automatizada das 8 áreas × 4 larguras (375/768/1366/1920) × 2 temas = **64 imagens**.
+- Destino: `/tmp/023-ui-before/` (fora do repositório, conforme plano).
+- Carteira sintética (PETR4.SA, TGAR11.SA, caixa e proventos) e respostas de `/api/radar`, `/api/analyze` e `/api/portfolio/quotes` mockadas para determinismo.
