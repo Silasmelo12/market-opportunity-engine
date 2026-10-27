@@ -1381,8 +1381,8 @@ async function renderOverviewDashboard() {
   if (varEl) {
     varEl.textContent = formatPercent(totalProfitPct, 2, true);
     varEl.className = totalProfitPct >= 0
-      ? 'text-emerald-400 font-bold font-mono text-[11px] bg-emerald-500/10 px-1.5 py-0.5 rounded'
-      : 'text-rose-400 font-bold font-mono text-[11px] bg-rose-500/10 px-1.5 py-0.5 rounded';
+      ? 'text-positive font-bold font-mono text-[11px] bg-success-soft px-1.5 py-0.5 rounded'
+      : 'text-negative font-bold font-mono text-[11px] bg-danger-soft px-1.5 py-0.5 rounded';
   }
 
   // 3. Populate Card 2: Lucro Total & Destaques
@@ -1395,13 +1395,13 @@ async function renderOverviewDashboard() {
   if (profitEl) {
     const sign = totalProfit >= 0 ? '+' : '';
     profitEl.textContent = `${sign}R$ ${totalProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    profitEl.className = totalProfit >= 0 ? 'font-bold font-mono text-emerald-400' : 'font-bold font-mono text-rose-400';
+    profitEl.className = totalProfit >= 0 ? 'font-bold font-mono text-positive' : 'font-bold font-mono text-negative';
   }
   if (bestTickerEl) bestTickerEl.textContent = bestAsset.ticker !== '--' ? bestAsset.ticker : '--';
   if (bestPctEl) {
     if (bestAsset.ticker !== '--') {
       bestPctEl.textContent = `${formatPercent(bestAsset.pct, 2, true)} ↗`;
-      bestPctEl.className = 'text-[11px] font-bold font-mono text-emerald-400 bg-emerald-500/10 px-1 rounded inline-block mt-0.5';
+      bestPctEl.className = 'text-[11px] font-bold font-mono text-positive bg-success-soft px-1 rounded inline-block mt-0.5';
     } else {
       bestPctEl.textContent = '--';
     }
@@ -1410,7 +1410,7 @@ async function renderOverviewDashboard() {
   if (worstPctEl) {
     if (worstAsset.ticker !== '--') {
       worstPctEl.textContent = `${formatPercent(worstAsset.pct, 2, true)} ↘`;
-      worstPctEl.className = 'text-[11px] font-bold font-mono text-rose-400 bg-rose-500/10 px-1 rounded inline-block mt-0.5';
+      worstPctEl.className = 'text-[11px] font-bold font-mono text-negative bg-danger-soft px-1 rounded inline-block mt-0.5';
     } else {
       worstPctEl.textContent = '--';
     }
@@ -1711,7 +1711,7 @@ function renderOverviewGroupedHoldings(holdings, adviseData, totalEquity) {
 
   if (holdings.length === 0) {
     container.innerHTML = `
-      <div class="card-surface p-6 text-center text-gray-500 font-mono text-xs">
+      <div class="card-surface p-6 text-center text-subtle font-mono text-xs">
         Nenhum ativo cadastrado na carteira. Importe seu CSV ou adicione posições para visualizar a análise por classes.
       </div>
     `;
@@ -1764,26 +1764,26 @@ function renderOverviewGroupedHoldings(holdings, adviseData, totalEquity) {
     accDiv.innerHTML = `
       <div class="accordion-header category-header p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 cursor-pointer transition" data-accordion="${accordionId}">
         <div class="flex items-center gap-2.5">
-          <span class="w-7 h-7 rounded bg-fintech-bg border border-fintech-border flex items-center justify-center text-sm category-icon">${group.icon}</span>
+          <span class="w-7 h-7 rounded surface-canvas border border-default flex items-center justify-center text-sm category-icon">${group.icon}</span>
           <span class="font-bold text-sm category-title">${group.name}</span>
-          <span class="text-[11px] text-gray-400 font-mono">(${group.items.length} ${group.items.length === 1 ? 'ativo' : 'ativos'})</span>
+          <span class="text-[11px] text-muted font-mono">(${group.items.length} ${group.items.length === 1 ? 'ativo' : 'ativos'})</span>
         </div>
         <div class="flex items-center gap-4 text-xs font-mono">
           <div>
-            <span class="text-gray-400 text-[11px] block font-sans">Valor total</span>
-            <span class="font-bold text-white">R$ ${groupTotalVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+            <span class="text-muted text-[11px] block font-sans">Valor total</span>
+            <span class="font-bold text-strong">R$ ${groupTotalVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
           </div>
           <div>
-            <span class="text-gray-400 text-[11px] block font-sans">% na carteira / % Ideal</span>
-            <span class="font-bold text-cyan-300">${currentWeightPct.toFixed(1)}% <span class="text-gray-500 font-normal">/ ${group.idealPct}%</span></span>
+            <span class="text-muted text-[11px] block font-sans">% na carteira / % Ideal</span>
+            <span class="font-bold text-info">${currentWeightPct.toFixed(1)}% <span class="text-subtle font-normal">/ ${group.idealPct}%</span></span>
           </div>
-          <span class="text-gray-400 text-xs">▶</span>
+          <span class="text-muted text-xs">▶</span>
         </div>
       </div>
 
       <div id="${accordionId}" class="table-scroll overflow-x-auto touch-scroll hidden">
-        <table class="table-standard w-full text-left text-xs text-gray-300">
-          <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[11px] border-b border-fintech-border whitespace-nowrap font-mono">
+        <table class="table-standard w-full text-left text-xs text-muted">
+          <thead class="surface-canvas text-muted font-semibold uppercase text-[11px] border-b border-default whitespace-nowrap font-mono">
             <tr>
               <th class="px-3 py-2">Ativo</th>
               <th class="px-3 py-2 text-right">Quant.</th>
@@ -1797,7 +1797,7 @@ function renderOverviewGroupedHoldings(holdings, adviseData, totalEquity) {
               <th class="px-3 py-2 text-center">Comprar Hoje?</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-fintech-border font-mono text-[11px] whitespace-nowrap">
+          <tbody class="divide-y divide-default font-mono text-[11px] whitespace-nowrap">
             ${(() => {
               let grpCost = 0;
               let grpSaldo = 0;
@@ -1815,7 +1815,7 @@ function renderOverviewGroupedHoldings(holdings, adviseData, totalEquity) {
                 grpSaldo += saldo;
                 const profit = saldo - cost;
                 const retPct = cost > 0 ? (profit / cost) * 100 : 0;
-                const retColor = profit >= 0 ? 'text-emerald-400' : 'text-rose-400';
+                const retColor = profit >= 0 ? 'text-positive' : 'text-negative';
 
                 const w = totalEquity > 0 ? (saldo / totalEquity) * 100 : 0;
                 const idealW = rec && Number(rec.target_weight_pct) > 0 ? Number(rec.target_weight_pct) : 5.0;
@@ -1824,27 +1824,27 @@ function renderOverviewGroupedHoldings(holdings, adviseData, totalEquity) {
                 const isBuy = delta > 0;
 
                 const buyBadge = isBuy
-                  ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 inline-flex items-center gap-1"><svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg> Sim (+${delta})</span>`
-                  : `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-gray-700/40 text-gray-400 inline-flex items-center gap-1"><svg class="icon" aria-hidden="true"><use href="#icon-x"></use></svg> Não</span>`;
+                  ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-success-soft text-positive border border-default inline-flex items-center gap-1"><svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg> Sim (+${delta})</span>`
+                  : `<span class="px-2 py-0.5 rounded text-[11px] font-bold surface-subtle text-muted inline-flex items-center gap-1"><svg class="icon" aria-hidden="true"><use href="#icon-x"></use></svg> Não</span>`;
 
                 return `
-                  <tr class="hover:bg-fintech-surface-hover">
+                  <tr class="hover-surface">
                     <td class="px-3 py-2.5">
-                      <span class="font-bold text-white">${h.ticker}</span>
-                      <span class="text-[11px] text-gray-400 block">${stripCorporateSuffix(h.ticker)}</span>
+                      <span class="font-bold text-strong">${h.ticker}</span>
+                      <span class="text-[11px] text-muted block">${stripCorporateSuffix(h.ticker)}</span>
                     </td>
-                    <td class="px-3 py-2.5 text-right font-bold text-gray-200">${Number(h.shares).toLocaleString('pt-BR')}</td>
-                    <td class="px-3 py-2.5 text-right text-gray-400">${formatCurrency(h.average_buy_price)}</td>
-                    <td class="px-3 py-2.5 text-right font-bold text-white">${formatCurrency(currentP)}</td>
-                    <td class="px-3 py-2.5 text-right font-bold text-white">R$ ${saldo.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="px-3 py-2.5 text-right font-bold text-strong">${Number(h.shares).toLocaleString('pt-BR')}</td>
+                    <td class="px-3 py-2.5 text-right text-muted">${formatCurrency(h.average_buy_price)}</td>
+                    <td class="px-3 py-2.5 text-right font-bold text-strong">${formatCurrency(currentP)}</td>
+                    <td class="px-3 py-2.5 text-right font-bold text-strong">R$ ${saldo.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td class="px-3 py-2.5 text-right font-bold ${retColor}">
                       ${profit >= 0 ? '+' : ''}R$ ${profit.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </td>
                     <td class="px-3 py-2.5 text-right font-bold ${retColor}">
                       ${formatPercent(retPct, 2, true)}
                     </td>
-                    <td class="px-3 py-2.5 text-right text-cyan-300 font-bold">${formatPercent(w, 1)}</td>
-                    <td class="px-3 py-2.5 text-right text-gray-400" title="Calculado com base no Score de Oportunidade e peso teto de alocação">${formatPercent(idealW, 1)}</td>
+                    <td class="px-3 py-2.5 text-right text-info font-bold">${formatPercent(w, 1)}</td>
+                    <td class="px-3 py-2.5 text-right text-muted" title="Calculado com base no Score de Oportunidade e peso teto de alocação">${formatPercent(idealW, 1)}</td>
                     <td class="px-3 py-2.5 text-center">${buyBadge}</td>
                   </tr>
                 `;
@@ -1852,21 +1852,21 @@ function renderOverviewGroupedHoldings(holdings, adviseData, totalEquity) {
 
               const grpProfit = grpSaldo - grpCost;
               const grpRetPct = grpCost > 0 ? (grpProfit / grpCost) * 100 : 0;
-              const grpRetColor = grpProfit >= 0 ? 'text-emerald-400' : 'text-rose-400';
+              const grpRetColor = grpProfit >= 0 ? 'text-positive' : 'text-negative';
               const grpWeight = totalEquity > 0 ? (grpSaldo / totalEquity) * 100 : 0;
 
               return rowsHtml + `
-                <tr class="bg-fintech-surface/80 font-bold text-gray-200 border-t-2 border-fintech-border">
-                  <td class="px-3 py-2 text-white">SUBTOTAL ${group.name.toUpperCase()}</td>
-                  <td class="px-3 py-2 text-right text-gray-400">${group.items.length} ativos</td>
-                  <td class="px-3 py-2 text-right text-gray-400">--</td>
-                  <td class="px-3 py-2 text-right text-gray-400">--</td>
-                  <td class="px-3 py-2 text-right text-white">R$ ${grpSaldo.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                <tr class="surface font-bold text-strong border-t-2 border-default">
+                  <td class="px-3 py-2 text-strong">SUBTOTAL ${group.name.toUpperCase()}</td>
+                  <td class="px-3 py-2 text-right text-muted">${group.items.length} ativos</td>
+                  <td class="px-3 py-2 text-right text-muted">--</td>
+                  <td class="px-3 py-2 text-right text-muted">--</td>
+                  <td class="px-3 py-2 text-right text-strong">R$ ${grpSaldo.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   <td class="px-3 py-2 text-right ${grpRetColor}">${grpProfit >= 0 ? '+' : ''}R$ ${grpProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   <td class="px-3 py-2 text-right ${grpRetColor}">${formatPercent(grpRetPct, 2, true)}</td>
-                  <td class="px-3 py-2 text-right text-cyan-300">${formatPercent(grpWeight, 1)}</td>
-                  <td class="px-3 py-2 text-right text-gray-400">${group.idealPct}%</td>
-                  <td class="px-3 py-2 text-center text-gray-500">--</td>
+                  <td class="px-3 py-2 text-right text-info">${formatPercent(grpWeight, 1)}</td>
+                  <td class="px-3 py-2 text-right text-muted">${group.idealPct}%</td>
+                  <td class="px-3 py-2 text-center text-subtle">--</td>
                 </tr>
               `;
             })()}
@@ -3786,7 +3786,7 @@ function renderPortfolioHoldingsEditor() {
   if (holdings.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="5" class="px-3 py-3 text-center text-gray-500 font-sans text-[11px]">
+        <td colspan="5" class="px-3 py-3 text-center text-subtle font-sans text-[11px]">
           Nenhuma posição cadastrada (100% em Caixa). Adicione ativos acima se já possuir carteira montada.
         </td>
       </tr>
@@ -3796,21 +3796,21 @@ function renderPortfolioHoldingsEditor() {
 
   holdings.forEach((h, idx) => {
     const tr = document.createElement('tr');
-    tr.className = 'hover:bg-fintech-surface-hover';
+    tr.className = 'hover-surface';
     const cost = (Number(h.shares) || 0) * (Number(h.average_buy_price) || 0);
     const name = stripCorporateSuffix(getAssetName(h.ticker));
     tr.innerHTML = `
-      <td class="px-2.5 py-1.5 font-bold text-white">
-        ${name} <span class="text-[11px] text-gray-400">(${h.ticker})</span>
+      <td class="px-2.5 py-1.5 font-bold text-strong">
+        ${name} <span class="text-[11px] text-muted">(${h.ticker})</span>
       </td>
-      <td class="px-2.5 py-1.5 text-right font-mono text-amber-300 font-bold">${Number(h.shares).toLocaleString('pt-BR')}</td>
-      <td class="px-2.5 py-1.5 text-right font-mono text-gray-200">R$ ${Number(h.average_buy_price).toFixed(2)}</td>
-      <td class="px-2.5 py-1.5 text-right font-mono text-cyan-300">R$ ${cost.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td class="px-2.5 py-1.5 text-right font-mono text-warning font-bold">${Number(h.shares).toLocaleString('pt-BR')}</td>
+      <td class="px-2.5 py-1.5 text-right font-mono text-strong">R$ ${Number(h.average_buy_price).toFixed(2)}</td>
+      <td class="px-2.5 py-1.5 text-right font-mono text-info">R$ ${cost.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
       <td class="px-2.5 py-1.5 text-right whitespace-nowrap">
-        <button class="btn-holding-open-chart btn-contextual text-cyan-400 hover:text-cyan-300 text-xs font-semibold px-2 py-0.5 mr-2 rounded bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-800/50 transition cursor-pointer" data-ticker="${h.ticker}" title="Abrir ativo no Gráfico Interativo">
+        <button class="btn-holding-open-chart btn-contextual text-info hover-primary text-xs font-semibold px-2 py-0.5 mr-2 rounded surface-subtle hover-surface border border-default transition cursor-pointer" data-ticker="${h.ticker}" title="Abrir ativo no Gráfico Interativo">
           Abrir gráfico
         </button>
-        <button class="btn-remove-holding text-rose-400 hover:text-rose-300 text-xs font-bold px-1.5 cursor-pointer" data-idx="${idx}" title="Remover ativo" aria-label="Remover ativo"><svg class="icon" aria-hidden="true"><use href="#icon-x"></use></svg></button>
+        <button class="btn-remove-holding text-negative hover-danger text-xs font-bold px-1.5 cursor-pointer" data-idx="${idx}" title="Remover ativo" aria-label="Remover ativo"><svg class="icon" aria-hidden="true"><use href="#icon-x"></use></svg></button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -4128,20 +4128,20 @@ function importPortfolioHoldingsFromCsv(file) {
 
 function getActionBadgeHtml(actionType, actionLabel) {
   const badge = (tone, icon) =>
-    `<span class="px-2 py-0.5 rounded text-[11px] font-extrabold inline-flex items-center gap-1 ${tone}"><svg class="icon" aria-hidden="true"><use href="#${icon}"></use></svg> ${actionLabel}</span>`;
+    `<span class="badge ${tone} font-extrabold"><svg class="icon" aria-hidden="true"><use href="#${icon}"></use></svg> ${actionLabel}</span>`;
   if (actionType === 'BUY') {
-    return badge('bg-emerald-500/20 text-emerald-400 border border-emerald-500/40', 'icon-plus');
+    return badge('badge-success', 'icon-plus');
   }
   if (actionType === 'SELL_FULL') {
-    return badge('bg-rose-500/20 text-rose-400 border border-rose-500/40', 'icon-minus');
+    return badge('badge-danger', 'icon-minus');
   }
   if (actionType === 'SELL_PARTIAL_REBALANCE') {
-    return badge('bg-amber-500/20 text-amber-400 border border-amber-500/40', 'icon-scale');
+    return badge('badge-warning', 'icon-scale');
   }
   if (actionType === 'ROTATE_OUT' || actionType === 'ROTATE_IN') {
-    return badge('bg-cyan-500/20 text-cyan-300 border border-cyan-500/40', 'icon-refresh');
+    return badge('badge-info', 'icon-refresh');
   }
-  return badge('bg-gray-700/50 text-gray-300 border border-gray-600', 'icon-pause');
+  return badge('badge-neutral', 'icon-pause');
 }
 
 function renderPortfolioAdviseSection(data) {
@@ -4173,7 +4173,7 @@ function renderPortfolioAdviseSection(data) {
   if (recs.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="10" class="px-4 py-6 text-center text-gray-400 font-mono">
+        <td colspan="10" class="px-4 py-6 text-center text-muted font-mono">
           Nenhuma oportunidade ativa em zona de compra no momento. Recomendação: manter saldo em Caixa aguardando novo fundo estatístico.
         </td>
       </tr>
@@ -4183,11 +4183,11 @@ function renderPortfolioAdviseSection(data) {
 
   recs.forEach(r => {
     const tr = document.createElement('tr');
-    tr.className = 'hover:bg-fintech-surface-hover';
+    tr.className = 'hover-surface';
 
     const delta = Number(r.recommended_shares_delta) || 0;
     const deltaSign = delta > 0 ? '+' : '';
-    const deltaColor = delta > 0 ? 'text-emerald-400' : (delta < 0 ? 'text-rose-400' : 'text-gray-400');
+    const deltaColor = delta > 0 ? 'text-positive' : (delta < 0 ? 'text-negative' : 'text-muted');
     const score = Number(r.potential_score) || 0;
     const scoreBarColor = score >= 75 ? 'bg-emerald-400' : (score >= 55 ? 'bg-cyan-400' : 'bg-amber-400');
 
@@ -4201,31 +4201,31 @@ function renderPortfolioAdviseSection(data) {
     tr.innerHTML = `
       <td class="px-3 py-2.5">${getActionBadgeHtml(r.action_type, r.action_label)}</td>
       <td class="px-3 py-2.5">
-        <div class="font-bold text-white">${stripCorporateSuffix(r.asset_name || r.ticker)}</div>
-        <div class="text-[11px] text-gray-400 font-mono">${r.ticker}</div>
+        <div class="font-bold text-strong">${stripCorporateSuffix(r.asset_name || r.ticker)}</div>
+        <div class="text-[11px] text-muted font-mono">${r.ticker}</div>
       </td>
-      <td class="px-3 py-2.5 text-cyan-300 font-medium">${r.strategy_label}</td>
+      <td class="px-3 py-2.5 text-info font-medium">${r.strategy_label}</td>
       <td class="px-3 py-2.5 text-center font-mono">
-        <div class="font-bold text-white">${score.toFixed(1)}</div>
-        <div class="w-16 h-1.5 bg-gray-800 rounded overflow-hidden mx-auto mt-0.5">
+        <div class="font-bold text-strong">${score.toFixed(1)}</div>
+        <div class="w-16 h-1.5 surface-subtle rounded overflow-hidden mx-auto mt-0.5">
           <div class="h-full ${scoreBarColor}" style="width: ${Math.min(100, Math.max(0, score))}%"></div>
         </div>
       </td>
-      <td class="px-3 py-2.5 text-center">${timingDot} <span class="text-[11px] text-gray-300 ml-1">${r.timing_category}</span></td>
-      <td class="px-3 py-2.5 font-mono text-white text-right">R$ ${(Number(r.current_price) || 0).toFixed(2)}</td>
+      <td class="px-3 py-2.5 text-center">${timingDot} <span class="text-[11px] text-muted ml-1">${r.timing_category}</span></td>
+      <td class="px-3 py-2.5 font-mono text-strong text-right">R$ ${(Number(r.current_price) || 0).toFixed(2)}</td>
       <td class="px-3 py-2.5 font-mono font-bold ${deltaColor} text-right">
         ${delta !== 0 ? `${deltaSign}${delta.toLocaleString('pt-BR')} cotas` : '0 (Manter)'}
-        <div class="text-[11px] text-gray-400 font-normal">Final: ${(Number(r.target_shares) || 0).toLocaleString('pt-BR')} cotas</div>
+        <div class="text-[11px] text-muted font-normal">Final: ${(Number(r.target_shares) || 0).toLocaleString('pt-BR')} cotas</div>
       </td>
-      <td class="px-3 py-2.5 font-mono font-bold text-white text-right">
+      <td class="px-3 py-2.5 font-mono font-bold text-strong text-right">
         ${r.order_value > 0 ? `R$ ${Number(r.order_value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '--'}
       </td>
       <td class="px-3 py-2.5 font-mono text-center">
-        <span class="text-gray-400">${(Number(r.current_weight_pct) || 0).toFixed(1)}%</span>
-        <span class="text-gray-500 mx-1">→</span>
-        <span class="font-bold text-cyan-300">${(Number(r.target_weight_pct) || 0).toFixed(1)}%</span>
+        <span class="text-muted">${(Number(r.current_weight_pct) || 0).toFixed(1)}%</span>
+        <span class="text-subtle mx-1">→</span>
+        <span class="font-bold text-info">${(Number(r.target_weight_pct) || 0).toFixed(1)}%</span>
       </td>
-      <td class="px-3 py-2.5 text-gray-300 text-[11px] max-w-xs truncate" title="${r.reason_text}">${r.reason_text}</td>
+      <td class="px-3 py-2.5 text-muted text-[11px] max-w-xs truncate" title="${r.reason_text}">${r.reason_text}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -4257,17 +4257,17 @@ function openPreFlightOrderModal() {
   tbody.innerHTML = '';
   recs.forEach(r => {
     const tr = document.createElement('tr');
-    tr.className = 'hover:bg-fintech-surface-hover';
+    tr.className = 'hover-surface';
     const delta = Number(r.recommended_shares_delta) || 0;
     const isBuy = delta > 0;
-    const actionColor = isBuy ? 'text-emerald-400' : 'text-rose-400';
+    const actionColor = isBuy ? 'text-positive' : 'text-negative';
     const actionLabel = isBuy ? 'COMPRA' : 'VENDA';
 
     tr.innerHTML = `
-      <td class="px-2.5 py-1.5 font-bold text-white">${r.ticker}</td>
+      <td class="px-2.5 py-1.5 font-bold text-strong">${r.ticker}</td>
       <td class="px-2.5 py-1.5 font-bold ${actionColor}">${actionLabel}</td>
-      <td class="px-2.5 py-1.5 text-right text-gray-200">${Math.abs(delta).toLocaleString('pt-BR')} cotas</td>
-      <td class="px-2.5 py-1.5 text-right font-bold text-white">R$ ${(Number(r.order_value) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td class="px-2.5 py-1.5 text-right text-strong">${Math.abs(delta).toLocaleString('pt-BR')} cotas</td>
+      <td class="px-2.5 py-1.5 text-right font-bold text-strong">R$ ${(Number(r.order_value) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -4431,14 +4431,14 @@ function renderPortfolioSimulationKPIs(m) {
   if (elCashSub) elCashSub.textContent = `Caixa final: R$ ${finalCash.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   if (elFinal) {
     elFinal.textContent = `R$ ${finalEq.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    elFinal.className = `text-base sm:text-lg font-bold font-mono ${netProfit >= 0 ? 'text-fintech-green' : 'text-rose-400'}`;
+    elFinal.className = `text-base sm:text-lg font-bold font-mono ${netProfit >= 0 ? 'text-positive' : 'text-negative'}`;
   }
   if (elProfitSub) {
     elProfitSub.textContent = `Lucro: ${netProfit >= 0 ? '+' : ''}R$ ${netProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   }
   if (elRet) {
     elRet.textContent = `${totRet >= 0 ? '+' : ''}${totRet.toFixed(1)}%`;
-    elRet.className = `text-base sm:text-lg font-bold font-mono ${totRet >= 0 ? 'text-fintech-cyan' : 'text-rose-400'}`;
+    elRet.className = `text-base sm:text-lg font-bold font-mono ${totRet >= 0 ? 'text-info' : 'text-negative'}`;
   }
   if (elBenchSub) {
     elBenchSub.textContent = `B&H Cesta: ${benchRet >= 0 ? '+' : ''}${benchRet.toFixed(1)}% (Alfa: ${alpha >= 0 ? '+' : ''}${alpha.toFixed(1)}%)`;
@@ -4462,7 +4462,7 @@ function renderPortfolioLedgerTable(events) {
   if (!events || events.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="13" class="px-4 py-6 text-center text-gray-500">
+        <td colspan="13" class="px-4 py-6 text-center text-subtle">
           Nenhuma operação executada no período selecionado.
         </td>
       </tr>
@@ -4472,35 +4472,35 @@ function renderPortfolioLedgerTable(events) {
 
   events.forEach(ev => {
     const tr = document.createElement('tr');
-    tr.className = 'hover:bg-fintech-surface-hover';
+    tr.className = 'hover-surface';
 
     const delta = Number(ev.shares_delta) || 0;
     const deltaSign = delta > 0 ? '+' : '';
-    const deltaColor = delta > 0 ? 'text-emerald-400' : 'text-rose-400';
+    const deltaColor = delta > 0 ? 'text-positive' : 'text-negative';
 
-    let pnlHtml = '<span class="text-gray-500">-</span>';
+    let pnlHtml = '<span class="text-subtle">-</span>';
     if (ev.realized_pnl_value !== null && ev.realized_pnl_value !== undefined) {
       const pVal = Number(ev.realized_pnl_value) || 0;
       const pPct = Number(ev.realized_pnl_pct) || 0;
-      const pClass = pVal >= 0 ? 'text-emerald-400' : 'text-rose-400';
+      const pClass = pVal >= 0 ? 'text-positive' : 'text-negative';
       const pSign = pVal >= 0 ? '+' : '';
       pnlHtml = `<span class="font-bold ${pClass}">${pSign}R$ ${pVal.toFixed(2)} (${pSign}${pPct.toFixed(1)}%)</span>`;
     }
 
     tr.innerHTML = `
-      <td class="px-2.5 py-2 text-center text-gray-400 font-bold">${ev.event_id}</td>
-      <td class="px-2.5 py-2 text-gray-300">${ev.date}</td>
+      <td class="px-2.5 py-2 text-center text-muted font-bold">${ev.event_id}</td>
+      <td class="px-2.5 py-2 text-muted">${ev.date}</td>
       <td class="px-2.5 py-2">${getActionBadgeHtml(ev.event_type, ev.event_label)}</td>
-      <td class="px-2.5 py-2 font-bold text-white">${ev.ticker}</td>
-      <td class="px-2.5 py-2 text-cyan-300 font-sans">${ev.strategy_label}</td>
-      <td class="px-2.5 py-2 text-center text-amber-300 font-bold">${(Number(ev.potential_score) || 0).toFixed(1)}</td>
-      <td class="px-2.5 py-2 font-mono text-right text-white">R$ ${(Number(ev.execution_price) || 0).toFixed(2)}</td>
+      <td class="px-2.5 py-2 font-bold text-strong">${ev.ticker}</td>
+      <td class="px-2.5 py-2 text-info font-sans">${ev.strategy_label}</td>
+      <td class="px-2.5 py-2 text-center text-warning font-bold">${(Number(ev.potential_score) || 0).toFixed(1)}</td>
+      <td class="px-2.5 py-2 font-mono text-right text-strong">R$ ${(Number(ev.execution_price) || 0).toFixed(2)}</td>
       <td class="px-2.5 py-2 font-mono text-right font-bold ${deltaColor}">${deltaSign}${delta.toLocaleString('pt-BR')}</td>
-      <td class="px-2.5 py-2 font-mono text-right text-white">R$ ${(Number(ev.trade_value) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td class="px-2.5 py-2 font-mono text-right text-strong">R$ ${(Number(ev.trade_value) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
       <td class="px-2.5 py-2 font-mono text-right">${pnlHtml}</td>
-      <td class="px-2.5 py-2 font-mono text-center text-gray-300">${(Number(ev.weight_before_pct) || 0).toFixed(1)}% → ${(Number(ev.weight_after_pct) || 0).toFixed(1)}%</td>
-      <td class="px-2.5 py-2 font-mono text-right text-gray-300">R$ ${(Number(ev.cash_after) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-      <td class="px-2.5 py-2 font-mono text-right font-bold text-white">R$ ${(Number(ev.portfolio_equity_after) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td class="px-2.5 py-2 font-mono text-center text-muted">${(Number(ev.weight_before_pct) || 0).toFixed(1)}% → ${(Number(ev.weight_after_pct) || 0).toFixed(1)}%</td>
+      <td class="px-2.5 py-2 font-mono text-right text-muted">R$ ${(Number(ev.cash_after) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td class="px-2.5 py-2 font-mono text-right font-bold text-strong">R$ ${(Number(ev.portfolio_equity_after) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -4513,7 +4513,7 @@ function renderPortfolioEquityChart(curve) {
 
   if (!curve || curve.length === 0) {
     Plotly.purge(container);
-    container.innerHTML = '<div class="flex items-center justify-center h-full text-xs text-gray-500 font-mono">Execute a análise/simulação para gerar a curva patrimonial.</div>';
+    container.innerHTML = '<div class="flex items-center justify-center h-full text-xs text-subtle font-mono">Execute a análise/simulação para gerar a curva patrimonial.</div>';
     return;
   }
   container.innerHTML = '';
@@ -4590,7 +4590,7 @@ function renderPortfolioAllocationChart(adviseData) {
 
   if (!adviseData) {
     Plotly.purge(container);
-    container.innerHTML = '<div class="flex items-center justify-center h-full text-xs text-gray-500 font-mono">Execute a análise para visualizar os pesos por ativo.</div>';
+    container.innerHTML = '<div class="flex items-center justify-center h-full text-xs text-subtle font-mono">Execute a análise para visualizar os pesos por ativo.</div>';
     return;
   }
   container.innerHTML = '';
@@ -4665,7 +4665,7 @@ function renderPortfolioOpportunityRanking(ranking) {
   if (list.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="10" class="px-4 py-6 text-center text-gray-500">
+        <td colspan="10" class="px-4 py-6 text-center text-subtle">
           Nenhum ativo avaliado no universo selecionado.
         </td>
       </tr>
@@ -4675,40 +4675,40 @@ function renderPortfolioOpportunityRanking(ranking) {
 
   list.forEach((p, idx) => {
     const tr = document.createElement('tr');
-    tr.className = 'hover:bg-fintech-surface-hover';
+    tr.className = 'hover-surface';
 
     const score = Number(p.potential_score) || 0;
     const scoreBarColor = score >= 75 ? 'bg-emerald-400' : (score >= 55 ? 'bg-cyan-400' : 'bg-amber-400');
 
-    let sigBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-gray-700/50 text-gray-400">NEUTRO</span>';
+    let sigBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-bold surface-subtle text-muted">NEUTRO</span>';
     if (p.active_direction === 'BUY') {
-      sigBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 inline-flex items-center gap-1"><svg class="icon" aria-hidden="true"><use href="#icon-trending-up"></use></svg> ZONA DE COMPRA</span>';
+      sigBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-extrabold bg-success-soft text-positive border border-default inline-flex items-center gap-1"><svg class="icon" aria-hidden="true"><use href="#icon-trending-up"></use></svg> ZONA DE COMPRA</span>';
     } else if (p.active_direction === 'SELL') {
-      sigBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/40 inline-flex items-center gap-1"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-down"></use></svg> ZONA DE VENDA</span>';
+      sigBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-extrabold bg-danger-soft text-negative border border-default inline-flex items-center gap-1"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-down"></use></svg> ZONA DE VENDA</span>';
     }
 
     const retPct = Number(p.historical_return_pct) || 0;
-    const retColor = retPct >= 0 ? 'text-emerald-400' : 'text-rose-400';
+    const retColor = retPct >= 0 ? 'text-positive' : 'text-negative';
 
     tr.innerHTML = `
-      <td class="px-3 py-2 text-center font-bold text-gray-400">#${idx + 1}</td>
+      <td class="px-3 py-2 text-center font-bold text-muted">#${idx + 1}</td>
       <td class="px-3 py-2">
-        <span class="font-bold text-white">${stripCorporateSuffix(p.asset_name || p.ticker)}</span>
-        <span class="text-[11px] text-gray-400 ml-1">(${p.ticker})</span>
+        <span class="font-bold text-strong">${stripCorporateSuffix(p.asset_name || p.ticker)}</span>
+        <span class="text-[11px] text-muted ml-1">(${p.ticker})</span>
       </td>
-      <td class="px-3 py-2 text-cyan-300 font-sans">${p.champion_buy_label}</td>
-      <td class="px-3 py-2 text-amber-300 font-sans">${p.champion_sell_label}</td>
+      <td class="px-3 py-2 text-info font-sans">${p.champion_buy_label}</td>
+      <td class="px-3 py-2 text-warning font-sans">${p.champion_sell_label}</td>
       <td class="px-3 py-2 text-center">
-        <div class="font-bold text-white">${score.toFixed(1)}</div>
-        <div class="w-16 h-1.5 bg-gray-800 rounded overflow-hidden mx-auto mt-0.5">
+        <div class="font-bold text-strong">${score.toFixed(1)}</div>
+        <div class="w-16 h-1.5 surface-subtle rounded overflow-hidden mx-auto mt-0.5">
           <div class="h-full ${scoreBarColor}" style="width: ${Math.min(100, Math.max(0, score))}%"></div>
         </div>
       </td>
       <td class="px-3 py-2 text-center">${sigBadge}</td>
-      <td class="px-3 py-2 text-center text-gray-300">${p.timing_label || p.timing_category} (${(Number(p.distance_pct) || 0).toFixed(1)}%)</td>
-      <td class="px-3 py-2 text-right font-mono font-bold text-emerald-400">${(Number(p.win_rate_pct) || 0).toFixed(1)}%</td>
+      <td class="px-3 py-2 text-center text-muted">${p.timing_label || p.timing_category} (${(Number(p.distance_pct) || 0).toFixed(1)}%)</td>
+      <td class="px-3 py-2 text-right font-mono font-bold text-positive">${(Number(p.win_rate_pct) || 0).toFixed(1)}%</td>
       <td class="px-3 py-2 text-right font-mono font-bold ${retColor}">${retPct >= 0 ? '+' : ''}${retPct.toFixed(1)}%</td>
-      <td class="px-3 py-2 text-right font-mono text-rose-400">${(Number(p.max_drawdown_pct) || 0).toFixed(1)}%</td>
+      <td class="px-3 py-2 text-right font-mono text-negative">${(Number(p.max_drawdown_pct) || 0).toFixed(1)}%</td>
     `;
     tbody.appendChild(tr);
   });
@@ -4731,9 +4731,9 @@ function switchOverviewSubTab(subId) {
   const subBtns = document.querySelectorAll('#overview-sub-nav .overview-sub-btn');
   subBtns.forEach(b => {
     if (b.getAttribute('data-sub') === subId) {
-      b.className = 'overview-sub-btn active px-3 py-1.5 rounded-md text-xs font-bold text-white bg-fintech-surface border border-fintech-border shadow-sm';
+      b.className = 'overview-sub-btn active px-3 py-1.5 rounded-md text-xs font-bold text-strong surface border border-default shadow-sm';
     } else {
-      b.className = 'overview-sub-btn px-3 py-1.5 rounded-md text-xs font-semibold text-gray-400 hover:text-white hover:bg-fintech-surface/60 transition';
+      b.className = 'overview-sub-btn px-3 py-1.5 rounded-md text-xs font-semibold text-muted hover-text hover-surface transition';
     }
   });
 

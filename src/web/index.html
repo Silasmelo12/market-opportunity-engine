@@ -1685,7 +1685,7 @@
       </div>
     </section>
 
-        <section id="tab-portfolio" data-legacy-id="tab-pane-posicoes" data-tab-pane="posicoes" class="tab-pane tab-view hidden h-full p-4 sm:p-6 overflow-y-auto bg-slate-50 area-posicoes">
+        <section id="tab-portfolio" data-legacy-id="tab-pane-posicoes" data-tab-pane="posicoes" class="tab-pane tab-view hidden h-full p-4 sm:p-6 overflow-y-auto area-posicoes">
       <div class="max-w-7xl mx-auto space-y-6">
 
         <!-- Header da Seção de Posições (Investidor10 Style) -->
@@ -1693,7 +1693,7 @@
           <div>
             <h2 class="section-title flex items-center gap-2">
               Meus Ativos & Diagnóstico Estatístico
-              <span id="pos-total-count-badge" class="text-xs bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded-full">0</span>
+              <span id="pos-total-count-badge" class="text-xs surface-subtle text-muted font-bold px-2 py-0.5 rounded-full">0</span>
             </h2>
             <p class="section-subtitle mt-0.5">Custódia categorizada por classe com sinais em tempo real de Fundo 2x2 e nota estatística</p>
           </div>
@@ -1713,7 +1713,7 @@
           <div class="card-surface category-card overflow-hidden">
             <div class="category-header p-4 flex items-center justify-between cursor-pointer">
               <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center font-bold text-slate-700 text-xs">S</div>
+                <div class="w-8 h-8 rounded-lg surface-subtle flex items-center justify-center font-bold text-muted text-xs">S</div>
                 <div>
                   <h3 class="category-title font-bold text-sm">Ações Brasileiras</h3>
                   <span class="section-subtitle">Custódia B3</span>
@@ -1721,14 +1721,14 @@
               </div>
               <div class="flex items-center gap-6 text-xs">
                 <div class="text-right">
-                  <span class="text-[11px] text-slate-400 font-semibold block uppercase">Valor Total</span>
-                  <span class="font-bold text-slate-900 text-xs">R$ 0,00</span>
+                  <span class="text-[11px] text-subtle font-semibold block uppercase">Valor Total</span>
+                  <span class="font-bold text-strong text-xs">R$ 0,00</span>
                 </div>
                 <div class="text-right">
-                  <span class="text-[11px] text-slate-400 font-semibold block uppercase">Variação</span>
-                  <span class="font-bold text-emerald-600 text-xs">0,00% ▲</span>
+                  <span class="text-[11px] text-subtle font-semibold block uppercase">Variação</span>
+                  <span class="font-bold text-positive text-xs">0,00% ▲</span>
                 </div>
-                <span class="text-slate-400">▲</span>
+                <span class="text-subtle">▲</span>
               </div>
             </div>
           </div>
@@ -1736,20 +1736,20 @@
         </div>
 
         <!-- Seção de Simulador e Rebalanceamento Quantitativo Preservada -->
-        <div class="mt-8 pt-6 border-t border-slate-200">
+        <div class="mt-8 pt-6 border-t border-default">
       <div class="max-w-7xl mx-auto space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+            <h2 class="text-base sm:text-lg font-bold text-strong flex items-center gap-2">
               <span></span>Gestor, Consultor de Rebalanceamento & Simulador Multiativos de Carteira
             </h2>
-            <p class="text-[11px] sm:text-xs text-gray-400">
+            <p class="text-[11px] sm:text-xs text-muted">
               Alocação inteligente de capital nas estratégias campeãs de cada ativo, plano de ordens de hoje (comprar, vender e rebalancear) e backtest histórico multiativos.
             </p>
           </div>
           <div class="flex items-center gap-2">
-            <button id="btn-run-portfolio" class="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold px-4 py-2 rounded shadow-lg transition flex items-center gap-1.5 cursor-pointer">
-              <span class="text-black font-extrabold">▶</span> Gerar Plano de Hoje & Simular Carteira
+            <button id="btn-run-portfolio" class="btn-primary">
+              <span class="text-[var(--primary-text)] font-extrabold">▶</span> Gerar Plano de Hoje & Simular Carteira
             </button>
           </div>
         </div>
@@ -1758,23 +1758,23 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
           <!-- Left Card: Parâmetros & Universo Alvo (5 cols) -->
           <div class="lg:col-span-5 card-surface p-3.5 sm:p-4 space-y-3 text-xs">
-            <div class="flex items-center justify-between border-b border-fintech-border pb-2">
-              <h3 class="font-bold text-fintech-cyan uppercase tracking-wider text-[11px]">1. Caixa & Parâmetros de Alocação</h3>
-              <span class="text-[11px] text-gray-400 font-mono">Salvo automaticamente</span>
+            <div class="flex items-center justify-between border-b border-default pb-2">
+              <h3 class="font-bold text-info uppercase tracking-wider text-[11px]">1. Caixa & Parâmetros de Alocação</h3>
+              <span class="text-[11px] text-muted font-mono">Salvo automaticamente</span>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label class="text-gray-400 font-semibold block mb-1">Caixa Disponível / Capital (R$)</label>
-                <input id="portfolio-cash-input" type="number" value="10000" min="0" step="500" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-mono focus:border-fintech-cyan focus:outline-none">
+                <label class="text-muted font-semibold block mb-1">Caixa Disponível / Capital (R$)</label>
+                <input id="portfolio-cash-input" type="number" value="10000" min="0" step="500" class="input font-mono">
               </div>
               <div>
-                <label class="text-gray-400 font-semibold block mb-1">Teto Máx. por Ativo (%)</label>
-                <input id="portfolio-max-weight-input" type="number" value="25" min="10" max="100" step="5" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-mono focus:border-fintech-cyan focus:outline-none">
+                <label class="text-muted font-semibold block mb-1">Teto Máx. por Ativo (%)</label>
+                <input id="portfolio-max-weight-input" type="number" value="25" min="10" max="100" step="5" class="input font-mono">
               </div>
               <div>
-                <label class="text-gray-400 font-semibold block mb-1">Universo de Oportunidades</label>
-                <select id="portfolio-universe-select" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-sans focus:border-fintech-cyan focus:outline-none">
+                <label class="text-muted font-semibold block mb-1">Universo de Oportunidades</label>
+                <select id="portfolio-universe-select" class="select">
                   <option value="featured" selected>Destaques Multi-Mercado (14)</option>
                   <option value="acoes_br">Ações Brasil B3 (30)</option>
                   <option value="fiis">FIIs Brasil (23)</option>
@@ -1787,8 +1787,8 @@
               </div>
               <div class="grid grid-cols-2 gap-2">
                 <div>
-                  <label class="text-gray-400 font-semibold block mb-1">Tempo</label>
-                  <select id="portfolio-interval-select" class="w-full bg-fintech-bg border border-fintech-border rounded px-2 py-1.5 text-white font-sans focus:border-fintech-cyan focus:outline-none">
+                  <label class="text-muted font-semibold block mb-1">Tempo</label>
+                  <select id="portfolio-interval-select" class="select">
                     <option value="1d" selected>1D (Diário)</option>
                     <option value="1wk">1S (Semanal)</option>
                     <option value="1h">1h (Horário)</option>
@@ -1797,8 +1797,8 @@
                   </select>
                 </div>
                 <div>
-                  <label class="text-gray-400 font-semibold block mb-1">Período</label>
-                  <select id="portfolio-period-select" class="w-full bg-fintech-bg border border-fintech-border rounded px-2 py-1.5 text-white font-sans focus:border-fintech-cyan focus:outline-none">
+                  <label class="text-muted font-semibold block mb-1">Período</label>
+                  <select id="portfolio-period-select" class="select">
                     <option value="1y">1 Ano</option>
                     <option value="2y" selected>2 Anos</option>
                     <option value="5y">5 Anos</option>
@@ -1808,28 +1808,28 @@
             </div>
 
             <div id="portfolio-custom-tickers-wrapper" class="hidden">
-              <label class="text-gray-400 font-semibold block mb-1">Tickers Personalizados (separados por vírgula)</label>
-              <input id="portfolio-custom-tickers-input" type="text" placeholder="Ex: PETR4.SA, VALE3.SA, ITUB4.SA, WEGE3.SA, BTC-USD" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-mono uppercase focus:border-fintech-cyan focus:outline-none">
+              <label class="text-muted font-semibold block mb-1">Tickers Personalizados (separados por vírgula)</label>
+              <input id="portfolio-custom-tickers-input" type="text" placeholder="Ex: PETR4.SA, VALE3.SA, ITUB4.SA, WEGE3.SA, BTC-USD" class="input font-mono uppercase">
             </div>
           </div>
 
           <!-- Right Card: Editor de Posições Atuais da Carteira (7 cols) -->
           <div class="lg:col-span-7 card-surface p-3.5 sm:p-4 space-y-3 text-xs">
-            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-fintech-border pb-2">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-default pb-2">
               <div>
-                <h3 class="font-bold text-emerald-400 uppercase tracking-wider text-[11px]">2. Minhas Posições Atuais (Opcional)</h3>
-                <p class="text-[11px] text-gray-400">Deixe vazio para 100% em caixa ou importe/cadastre seus ativos atuais para rebalancear.</p>
+                <h3 class="font-bold text-positive uppercase tracking-wider text-[11px]">2. Minhas Posições Atuais (Opcional)</h3>
+                <p class="text-[11px] text-muted">Deixe vazio para 100% em caixa ou importe/cadastre seus ativos atuais para rebalancear.</p>
               </div>
               <div class="flex items-center gap-1.5">
                 <input type="file" id="portfolio-csv-file-input" accept=".xlsx,.xls,.csv,.txt" multiple class="hidden">
                 <input type="file" id="b3-multi-file-input" accept=".xlsx,.xls,.csv,.txt" multiple class="hidden" aria-hidden="true" tabindex="-1">
-                <button id="btn-portfolio-import-csv" type="button" class="text-[11px] px-2.5 py-1 rounded bg-cyan-950/50 hover:bg-cyan-900/60 text-cyan-300 hover:text-cyan-200 border border-cyan-800/60 transition cursor-pointer flex items-center gap-1 font-semibold" title="Importar uma ou múltiplas planilhas oficiais B3 (.xlsx) ou arquivo CSV">
+                <button id="btn-portfolio-import-csv" type="button" class="btn-secondary" title="Importar uma ou múltiplas planilhas oficiais B3 (.xlsx) ou arquivo CSV">
                   <svg class="icon" aria-hidden="true"><use href="#icon-import"></use></svg>Importar B3 / CSV
                 </button>
-                <button id="btn-portfolio-undo-apply" type="button" class="hidden text-[11px] px-2.5 py-1 rounded bg-amber-950/50 hover:bg-amber-900/60 text-amber-300 hover:text-amber-200 border border-amber-800/60 transition cursor-pointer flex items-center gap-1" title="Desfazer aplicação de ordens e restaurar carteira anterior">
+                <button id="btn-portfolio-undo-apply" type="button" class="btn-contextual hidden" title="Desfazer aplicação de ordens e restaurar carteira anterior">
                   <svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"></use></svg>Desfazer Aplicação
                 </button>
-                <button id="btn-portfolio-clear-holdings" class="text-[11px] px-2.5 py-1 rounded bg-fintech-bg hover:bg-rose-950/60 text-gray-300 hover:text-rose-300 border border-fintech-border transition cursor-pointer">
+                <button id="btn-portfolio-clear-holdings" class="btn-ghost">
                   Limpar (100% Caixa)
                 </button>
               </div>
@@ -1838,28 +1838,28 @@
             <!-- Add Holding Inline Form -->
             <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-end">
               <div class="sm:col-span-4">
-                <label class="text-[11px] text-gray-400 block mb-0.5">Ativo (Ticker)</label>
-                <input id="portfolio-add-ticker" list="asset-datalist" type="text" placeholder="Ex: PETR4.SA" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1 text-xs text-white font-mono uppercase focus:border-fintech-cyan focus:outline-none">
+                <label class="text-[11px] text-muted block mb-0.5">Ativo (Ticker)</label>
+                <input id="portfolio-add-ticker" list="asset-datalist" type="text" placeholder="Ex: PETR4.SA" class="input font-mono uppercase">
               </div>
               <div class="sm:col-span-3">
-                <label class="text-[11px] text-gray-400 block mb-0.5">Quantidade (Cotas)</label>
-                <input id="portfolio-add-shares" type="number" step="any" min="0.0001" placeholder="Ex: 100" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1 text-xs text-white font-mono focus:border-fintech-cyan focus:outline-none">
+                <label class="text-[11px] text-muted block mb-0.5">Quantidade (Cotas)</label>
+                <input id="portfolio-add-shares" type="number" step="any" min="0.0001" placeholder="Ex: 100" class="input font-mono">
               </div>
               <div class="sm:col-span-3">
-                <label class="text-[11px] text-gray-400 block mb-0.5">Preço Médio (R$)</label>
-                <input id="portfolio-add-avgprice" type="number" step="any" min="0.01" placeholder="Ex: 36.50" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1 text-xs text-white font-mono focus:border-fintech-cyan focus:outline-none">
+                <label class="text-[11px] text-muted block mb-0.5">Preço Médio (R$)</label>
+                <input id="portfolio-add-avgprice" type="number" step="any" min="0.01" placeholder="Ex: 36.50" class="input font-mono">
               </div>
               <div class="sm:col-span-2">
-                <button id="btn-portfolio-add-holding" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-1 px-2 rounded transition text-xs cursor-pointer">
+                <button id="btn-portfolio-add-holding" class="btn-primary w-full">
                   + Adicionar
                 </button>
               </div>
             </div>
 
             <!-- Current Holdings Mini Table -->
-            <div class="overflow-x-auto max-h-36 border border-fintech-border/60 rounded">
-              <table class="w-full text-left text-[11px] text-gray-300">
-                <thead class="bg-fintech-bg text-gray-400 uppercase text-[11px] sticky top-0">
+            <div class="table-scroll max-h-36 border border-default rounded">
+              <table class="table-standard text-[11px]">
+                <thead class="surface-canvas text-muted uppercase text-[11px] sticky top-0">
                   <tr>
                     <th class="px-2.5 py-1.5">Ativo</th>
                     <th class="px-2.5 py-1.5 font-mono">Qtd Cotas</th>
@@ -1868,7 +1868,7 @@
                     <th class="px-2.5 py-1.5 text-right">Remover</th>
                   </tr>
                 </thead>
-                <tbody id="portfolio-holdings-list" class="divide-y divide-fintech-border font-mono">
+                <tbody id="portfolio-holdings-list" class="divide-y divide-default font-mono">
                   <!-- Populated by JS -->
                 </tbody>
               </table>
@@ -1882,31 +1882,31 @@
         <div class="card-surface p-4 space-y-3 border-l-4 border-l-cyan-400">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div>
-              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <h3 class="text-sm font-bold text-strong flex items-center gap-2">
                 <span></span>Plano de Ação & Rebalanceamento Hoje (Boleta de Recomendações)
               </h3>
-              <p class="text-[11px] text-gray-400">
+              <p class="text-[11px] text-muted">
                 O que comprar, quanto comprar, o que vender, quanto vender e como rebalancear sua carteira agora segundo a estratégia campeã de cada ativo.
               </p>
             </div>
             <div class="flex flex-wrap items-center gap-3 text-xs">
-              <div class="bg-fintech-bg px-3 py-1.5 rounded border border-fintech-border">
-                <span class="text-gray-400 text-[11px] block">Patrimônio Atual</span>
-                <span id="advise-total-equity" class="font-bold text-white font-mono">R$ 10.000,00</span>
+              <div class="surface-canvas px-3 py-1.5 rounded border border-default">
+                <span class="text-muted text-[11px] block">Patrimônio Atual</span>
+                <span id="advise-total-equity" class="font-bold text-strong font-mono">R$ 10.000,00</span>
               </div>
-              <div class="bg-fintech-bg px-3 py-1.5 rounded border border-fintech-border">
-                <span class="text-gray-400 text-[11px] block">Caixa Atual → Pós-Ordens</span>
-                <span id="advise-cash-transition" class="font-bold text-fintech-cyan font-mono">R$ 10.000,00 → R$ 0,00</span>
+              <div class="surface-canvas px-3 py-1.5 rounded border border-default">
+                <span class="text-muted text-[11px] block">Caixa Atual → Pós-Ordens</span>
+                <span id="advise-cash-transition" class="font-bold text-info font-mono">R$ 10.000,00 → R$ 0,00</span>
               </div>
-              <button id="btn-apply-portfolio-orders" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-2 rounded shadow transition cursor-pointer hidden">
+              <button id="btn-apply-portfolio-orders" class="btn-primary hidden">
                 Aplicar Ordens na Minha Carteira
               </button>
             </div>
           </div>
 
           <div class="overflow-x-auto touch-scroll">
-            <table class="w-full text-left text-xs text-gray-300">
-              <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[11px] border-b border-fintech-border whitespace-nowrap">
+            <table class="w-full text-left text-xs text-muted">
+              <thead class="surface-canvas text-muted font-semibold uppercase text-[11px] border-b border-default whitespace-nowrap">
                 <tr>
                   <th class="px-3 py-2.5">Ação Recomendada</th>
                   <th class="px-3 py-2.5">Ativo</th>
@@ -1920,9 +1920,9 @@
                   <th class="px-3 py-2.5">Justificativa Quantitativa</th>
                 </tr>
               </thead>
-              <tbody id="portfolio-recommendations-tbody" class="divide-y divide-fintech-border whitespace-nowrap text-[11px]">
+              <tbody id="portfolio-recommendations-tbody" class="divide-y divide-default whitespace-nowrap text-[11px]">
                 <tr>
-                  <td colspan="10" class="px-4 py-6 text-center text-gray-400 font-mono">
+                  <td colspan="10" class="px-4 py-6 text-center text-muted font-mono">
                     Clique em "Gerar Plano de Hoje & Simular Carteira" para calcular as ordens ideais de compra, venda e rebalanceamento.
                   </td>
                 </tr>
@@ -1937,10 +1937,10 @@
         <div class="space-y-4">
           <div class="flex items-center justify-between">
             <div>
-              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <h3 class="text-sm font-bold text-strong flex items-center gap-2">
                 <span></span>Simulador Histórico da Carteira (Backtest Multiativos Zero Look-Ahead)
               </h3>
-              <p class="text-[11px] text-gray-400">
+              <p class="text-[11px] text-muted">
                 Simula como o motor teria gerenciado e rebalanceado o capital ao longo do período, comparando contra o Buy & Hold em pesos iguais da cesta.
               </p>
             </div>
@@ -1949,34 +1949,34 @@
           <!-- 6 Institutional KPI Cards -->
           <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3" id="portfolio-kpi-grid">
             <div class="card-surface p-2.5 sm:p-3">
-              <div class="text-[11px] sm:text-[11px] text-gray-400 font-semibold">Capital Inicial</div>
-              <div class="text-base sm:text-lg font-bold text-white font-mono" id="port-kpi-initial">R$ 10.000,00</div>
-              <div class="text-[11px] text-gray-400 font-mono" id="port-kpi-cash-sub">Caixa final: R$ 0,00</div>
+              <div class="text-[11px] sm:text-[11px] text-muted font-semibold">Capital Inicial</div>
+              <div class="text-base sm:text-lg font-bold text-strong font-mono" id="port-kpi-initial">R$ 10.000,00</div>
+              <div class="text-[11px] text-muted font-mono" id="port-kpi-cash-sub">Caixa final: R$ 0,00</div>
             </div>
             <div class="card-surface p-2.5 sm:p-3">
-              <div class="text-[11px] sm:text-[11px] text-gray-400 font-semibold">Patrimônio Final</div>
-              <div class="text-base sm:text-lg font-bold text-fintech-green font-mono" id="port-kpi-final">R$ 10.000,00</div>
-              <div class="text-[11px] text-gray-400 font-mono" id="port-kpi-profit-sub">Lucro: R$ 0,00</div>
+              <div class="text-[11px] sm:text-[11px] text-muted font-semibold">Patrimônio Final</div>
+              <div class="text-base sm:text-lg font-bold text-positive font-mono" id="port-kpi-final">R$ 10.000,00</div>
+              <div class="text-[11px] text-muted font-mono" id="port-kpi-profit-sub">Lucro: R$ 0,00</div>
             </div>
             <div class="card-surface p-2.5 sm:p-3">
-              <div class="text-[11px] sm:text-[11px] text-gray-400 font-semibold">Retorno Carteira</div>
-              <div class="text-base sm:text-lg font-bold text-fintech-cyan font-mono" id="port-kpi-return">+0.0%</div>
-              <div class="text-[11px] text-gray-400 font-mono" id="port-kpi-bench-sub">B&H Cesta: 0.0% (Alfa: 0.0%)</div>
+              <div class="text-[11px] sm:text-[11px] text-muted font-semibold">Retorno Carteira</div>
+              <div class="text-base sm:text-lg font-bold text-info font-mono" id="port-kpi-return">+0.0%</div>
+              <div class="text-[11px] text-muted font-mono" id="port-kpi-bench-sub">B&H Cesta: 0.0% (Alfa: 0.0%)</div>
             </div>
             <div class="card-surface p-2.5 sm:p-3">
-              <div class="text-[11px] sm:text-[11px] text-gray-400 font-semibold">Taxa de Acerto (Saídas)</div>
-              <div class="text-base sm:text-lg font-bold text-emerald-400 font-mono" id="port-kpi-winrate">0.0%</div>
-              <div class="text-[11px] text-gray-400 font-mono" id="port-kpi-exits-sub">0 saídas fechadas</div>
+              <div class="text-[11px] sm:text-[11px] text-muted font-semibold">Taxa de Acerto (Saídas)</div>
+              <div class="text-base sm:text-lg font-bold text-positive font-mono" id="port-kpi-winrate">0.0%</div>
+              <div class="text-[11px] text-muted font-mono" id="port-kpi-exits-sub">0 saídas fechadas</div>
             </div>
             <div class="card-surface p-2.5 sm:p-3">
-              <div class="text-[11px] sm:text-[11px] text-gray-400 font-semibold">Fator de Lucro</div>
-              <div class="text-base sm:text-lg font-bold text-amber-400 font-mono" id="port-kpi-pf">0.00</div>
-              <div class="text-[11px] text-gray-400 font-mono" id="port-kpi-rotations-sub">0 rebalanceamentos/rotações</div>
+              <div class="text-[11px] sm:text-[11px] text-muted font-semibold">Fator de Lucro</div>
+              <div class="text-base sm:text-lg font-bold text-warning font-mono" id="port-kpi-pf">0.00</div>
+              <div class="text-[11px] text-muted font-mono" id="port-kpi-rotations-sub">0 rebalanceamentos/rotações</div>
             </div>
             <div class="card-surface p-2.5 sm:p-3">
-              <div class="text-[11px] sm:text-[11px] text-gray-400 font-semibold">Max Drawdown Carteira</div>
-              <div class="text-base sm:text-lg font-bold text-rose-400 font-mono" id="port-kpi-dd">0.0%</div>
-              <div class="text-[11px] text-gray-400 font-mono" id="port-kpi-events-sub">0 ordens totais</div>
+              <div class="text-[11px] sm:text-[11px] text-muted font-semibold">Max Drawdown Carteira</div>
+              <div class="text-base sm:text-lg font-bold text-negative font-mono" id="port-kpi-dd">0.0%</div>
+              <div class="text-[11px] text-muted font-mono" id="port-kpi-events-sub">0 ordens totais</div>
             </div>
           </div>
 
@@ -1984,15 +1984,15 @@
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
             <div class="lg:col-span-8 card-surface p-3.5 sm:p-4">
               <div class="flex items-center justify-between mb-2">
-                <h3 class="text-xs font-bold text-gray-200">Evolução Patrimonial: Carteira Gerenciada vs. Buy & Hold Cesta vs. Caixa</h3>
-                <span class="text-[11px] text-gray-400 font-mono">Zero Look-Ahead Bias</span>
+                <h3 class="text-xs font-bold text-strong">Evolução Patrimonial: Carteira Gerenciada vs. Buy & Hold Cesta vs. Caixa</h3>
+                <span class="text-[11px] text-muted font-mono">Zero Look-Ahead Bias</span>
               </div>
               <div id="portfolio-equity-chart" class="w-full h-72"></div>
             </div>
             <div class="lg:col-span-4 card-surface p-3.5 sm:p-4">
               <div class="flex items-center justify-between mb-2">
-                <h3 class="text-xs font-bold text-gray-200">Distribuição Alvo da Carteira (%)</h3>
-                <span class="text-[11px] text-gray-400 font-mono">Ativos + Caixa</span>
+                <h3 class="text-xs font-bold text-strong">Distribuição Alvo da Carteira (%)</h3>
+                <span class="text-[11px] text-muted font-mono">Ativos + Caixa</span>
               </div>
               <div id="portfolio-allocation-chart" class="w-full h-72"></div>
             </div>
@@ -2001,14 +2001,14 @@
           <!-- Universe Opportunity Score Ranking Table -->
           <div class="card-surface p-3.5 sm:p-4 overflow-hidden">
             <div class="flex items-center justify-between mb-2">
-              <h3 class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+              <h3 class="text-xs font-bold text-warning flex items-center gap-1.5">
                 <span></span>Ranking de Potencial do Universo & Par de Estratégias Campeão por Ativo
               </h3>
-              <span class="text-[11px] text-gray-400 font-mono">Ordenado por Score de Potencial (0–100)</span>
+              <span class="text-[11px] text-muted font-mono">Ordenado por Score de Potencial (0–100)</span>
             </div>
             <div class="overflow-x-auto touch-scroll max-h-64">
-              <table class="w-full text-left text-xs text-gray-300">
-                <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[11px] sticky top-0 whitespace-nowrap">
+              <table class="w-full text-left text-xs text-muted">
+                <thead class="surface-canvas text-muted font-semibold uppercase text-[11px] sticky top-0 whitespace-nowrap">
                   <tr>
                     <th class="px-2.5 py-2 text-center">Rank</th>
                     <th class="px-2.5 py-2">Ativo</th>
@@ -2021,9 +2021,9 @@
                     <th class="px-2.5 py-2 text-center">Sinal / Timing</th>
                   </tr>
                 </thead>
-                <tbody id="portfolio-ranking-tbody" class="divide-y divide-fintech-border font-mono whitespace-nowrap text-[11px]">
+                <tbody id="portfolio-ranking-tbody" class="divide-y divide-default font-mono whitespace-nowrap text-[11px]">
                   <tr>
-                    <td colspan="9" class="px-4 py-4 text-center text-gray-500">
+                    <td colspan="9" class="px-4 py-4 text-center text-subtle">
                       Clique em "Gerar Plano de Hoje & Simular Carteira" para ranquear os ativos do universo.
                     </td>
                   </tr>
@@ -2035,14 +2035,14 @@
           <!-- Chronological Ledger of Portfolio Trades & Rebalances -->
           <div class="card-surface p-3.5 sm:p-4 overflow-hidden">
             <div class="flex items-center justify-between mb-2">
-              <h3 class="text-xs font-bold text-gray-200 flex items-center gap-1.5">
+              <h3 class="text-xs font-bold text-strong flex items-center gap-1.5">
                 <span></span>Histórico Cronológico de Compras, Vendas e Rebalanceamentos da Carteira
               </h3>
-              <span class="text-[11px] text-gray-400 font-mono" id="portfolio-ledger-count-badge">0 eventos</span>
+              <span class="text-[11px] text-muted font-mono" id="portfolio-ledger-count-badge">0 eventos</span>
             </div>
             <div class="overflow-x-auto touch-scroll max-h-80">
-              <table class="w-full text-left text-xs text-gray-300">
-                <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[11px] sticky top-0 whitespace-nowrap">
+              <table class="w-full text-left text-xs text-muted">
+                <thead class="surface-canvas text-muted font-semibold uppercase text-[11px] sticky top-0 whitespace-nowrap">
                   <tr>
                     <th class="px-2.5 py-2 text-center">#</th>
                     <th class="px-2.5 py-2 font-mono">Data</th>
@@ -2059,9 +2059,9 @@
                     <th class="px-2.5 py-2 font-mono">Patrimônio Total</th>
                   </tr>
                 </thead>
-                <tbody id="portfolio-ledger-tbody" class="divide-y divide-fintech-border font-mono whitespace-nowrap text-[11px]">
+                <tbody id="portfolio-ledger-tbody" class="divide-y divide-default font-mono whitespace-nowrap text-[11px]">
                   <tr>
-                    <td colspan="13" class="px-4 py-6 text-center text-gray-500">
+                    <td colspan="13" class="px-4 py-6 text-center text-subtle">
                       Execute a simulação da carteira para visualizar o histórico barra a barra de alocações e rotações.
                     </td>
                   </tr>
@@ -2076,34 +2076,34 @@
   </main>
 
   <!-- Confirmation Pre-flight Modal for Applying Orders -->
-  <div id="modal-apply-orders" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden">
-    <div class="bg-fintech-surface max-w-lg w-full p-4 sm:p-6 space-y-4 border border-fintech-border shadow-2xl rounded-lg">
-      <div class="flex items-center justify-between border-b border-fintech-border pb-3">
+  <div id="modal-apply-orders" class="fixed inset-0 z-50 surface-canvas/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="surface max-w-lg w-full p-4 sm:p-6 space-y-4 border border-default shadow-2xl rounded-lg">
+      <div class="flex items-center justify-between border-b border-default pb-3">
         <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm"><svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg></div>
+          <div class="w-8 h-8 rounded surface-subtle text-positive flex items-center justify-center font-bold text-sm"><svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg></div>
           <div>
-            <h3 class="text-sm sm:text-base font-bold text-white">Revisão Prévia de Execução de Ordens</h3>
-            <p class="text-[11px] text-gray-400">Confirme a aplicação das ordens recomendadas na sua carteira.</p>
+            <h3 class="text-sm sm:text-base font-bold text-strong">Revisão Prévia de Execução de Ordens</h3>
+            <p class="text-[11px] text-muted">Confirme a aplicação das ordens recomendadas na sua carteira.</p>
           </div>
         </div>
-        <button id="btn-modal-close" class="text-gray-400 hover:text-white text-lg font-bold p-1" aria-label="Fechar modal"><svg class="icon" aria-hidden="true"><use href="#icon-x"></use></svg></button>
+        <button id="btn-modal-close" class="text-muted hover:text-strong text-lg font-bold p-1" aria-label="Fechar modal"><svg class="icon" aria-hidden="true"><use href="#icon-x"></use></svg></button>
       </div>
 
       <div class="space-y-2">
-        <div class="flex justify-between items-center text-xs bg-fintech-bg/60 p-2.5 rounded">
-          <span class="text-gray-400">Total de Ordens Propostas:</span>
-          <span id="modal-orders-count" class="font-bold font-mono text-white">0</span>
+        <div class="flex justify-between items-center text-xs surface-subtle p-2.5 rounded">
+          <span class="text-muted">Total de Ordens Propostas:</span>
+          <span id="modal-orders-count" class="font-bold font-mono text-strong">0</span>
         </div>
-        <div class="flex justify-between items-center text-xs bg-fintech-bg/60 p-2.5 rounded">
-          <span class="text-gray-400">Transição de Caixa:</span>
-          <span id="modal-cash-transition" class="font-bold font-mono text-fintech-cyan">R$ 0,00 → R$ 0,00</span>
+        <div class="flex justify-between items-center text-xs surface-subtle p-2.5 rounded">
+          <span class="text-muted">Transição de Caixa:</span>
+          <span id="modal-cash-transition" class="font-bold font-mono text-info">R$ 0,00 → R$ 0,00</span>
         </div>
       </div>
 
       <!-- Compact Table of orders to confirm -->
-      <div class="max-h-48 overflow-y-auto overflow-x-auto touch-scroll text-xs divide-y divide-fintech-border">
-        <table class="w-full text-left text-gray-300">
-          <thead class="bg-fintech-bg text-gray-400 uppercase text-[11px] sticky top-0 font-mono">
+      <div class="max-h-48 overflow-y-auto overflow-x-auto touch-scroll text-xs divide-y divide-default">
+        <table class="w-full text-left text-muted">
+          <thead class="surface-canvas text-muted uppercase text-[11px] sticky top-0 font-mono">
             <tr>
               <th class="px-2.5 py-1.5">Ativo</th>
               <th class="px-2.5 py-1.5">Ação</th>
@@ -2111,22 +2111,22 @@
               <th class="px-2.5 py-1.5 font-mono text-right">Valor Estimado</th>
             </tr>
           </thead>
-          <tbody id="modal-orders-tbody" class="divide-y divide-fintech-border font-mono text-[11px]">
+          <tbody id="modal-orders-tbody" class="divide-y divide-default font-mono text-[11px]">
             <!-- Injected dynamically -->
           </tbody>
         </table>
       </div>
 
-      <div class="bg-amber-500/10 rounded p-2.5 text-[11px] text-amber-300 flex items-start gap-2">
+      <div class="surface-subtle rounded p-2.5 text-[11px] text-warning flex items-start gap-2">
         <span class="text-base leading-none">Aviso:</span>
         <span>As alterações atualizarão a sua custódia e recalcularão os pesos ideais. Você poderá desfazer a qualquer momento pelo botão <strong>Desfazer Aplicação</strong>.</span>
       </div>
 
       <div class="flex items-center justify-end gap-2.5 pt-2">
-        <button id="btn-modal-cancel" class="px-3.5 py-2 text-xs font-semibold text-gray-300 hover:text-white bg-fintech-bg border border-fintech-border rounded hover:bg-fintech-surface-hover transition">
+        <button id="btn-modal-cancel" class="px-3.5 py-2 text-xs font-semibold text-muted hover:text-strong surface-canvas border border-default rounded hover:surface-hover transition">
           Cancelar
         </button>
-        <button id="btn-modal-confirm" class="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded shadow-lg transition">
+        <button id="btn-modal-confirm" class="btn-primary">
           Confirmar Execução
         </button>
       </div>
@@ -2136,7 +2136,7 @@
   <!-- Toast Notification System for High-Stakes Actions -->
   <div id="toast-notification" class="fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-2xl border text-xs font-medium transition-all duration-300 transform translate-y-16 opacity-0 pointer-events-none">
     <span id="toast-icon" class="text-base inline-flex items-center"><svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg></span>
-    <span id="toast-message" class="text-white">Ação concluída com sucesso.</span>
+    <span id="toast-message" class="text-strong">Ação concluída com sucesso.</span>
     <button id="toast-action-btn" class="ml-2 font-bold underline hover:opacity-80 hidden">Desfazer</button>
   </div>
 
@@ -2148,32 +2148,32 @@
   <script src="app.js"></script>
 
   <!-- Modal de Configuração de Metas -->
-  <div id="modal-overview-metas" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden">
-    <div class="bg-fintech-surface max-w-md w-full p-4 sm:p-6 space-y-4 border border-fintech-border shadow-2xl rounded-lg">
-      <div class="flex items-center justify-between border-b border-fintech-border pb-3">
+  <div id="modal-overview-metas" class="fixed inset-0 z-50 surface-canvas/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="surface max-w-md w-full p-4 sm:p-6 space-y-4 border border-default shadow-2xl rounded-lg">
+      <div class="flex items-center justify-between border-b border-default pb-3">
         <div>
-          <h3 class="text-sm sm:text-base font-bold text-white">Configurar Metas de Longo Prazo</h3>
-          <p class="text-[11px] text-gray-400">Defina seus objetivos financeiros patrimoniais e de proventos.</p>
+          <h3 class="text-sm sm:text-base font-bold text-strong">Configurar Metas de Longo Prazo</h3>
+          <p class="text-[11px] text-muted">Defina seus objetivos financeiros patrimoniais e de proventos.</p>
         </div>
-        <button id="btn-modal-metas-close" class="text-gray-400 hover:text-white text-lg font-bold p-1" aria-label="Fechar metas"><svg class="icon" aria-hidden="true"><use href="#icon-x"></use></svg></button>
+        <button id="btn-modal-metas-close" class="text-muted hover:text-strong text-lg font-bold p-1" aria-label="Fechar metas"><svg class="icon" aria-hidden="true"><use href="#icon-x"></use></svg></button>
       </div>
 
       <div class="space-y-3">
         <div>
-          <label class="text-xs text-gray-300 block mb-1">Meta de Patrimônio Total (R$)</label>
-          <input id="input-meta-patrimonio" type="number" step="1000" min="1000" placeholder="Ex: 100000" class="w-full bg-fintech-bg border border-fintech-border rounded px-3 py-1.5 text-xs text-white font-mono focus:border-fintech-cyan focus:outline-none">
+          <label class="text-xs text-muted block mb-1">Meta de Patrimônio Total (R$)</label>
+          <input id="input-meta-patrimonio" type="number" step="1000" min="1000" placeholder="Ex: 100000" class="input font-mono">
         </div>
         <div>
-          <label class="text-xs text-gray-300 block mb-1">Meta de FIIs & Proventos (R$)</label>
-          <input id="input-meta-renda" type="number" step="1000" min="1000" placeholder="Ex: 30000" class="w-full bg-fintech-bg border border-fintech-border rounded px-3 py-1.5 text-xs text-white font-mono focus:border-fintech-cyan focus:outline-none">
+          <label class="text-xs text-muted block mb-1">Meta de FIIs & Proventos (R$)</label>
+          <input id="input-meta-renda" type="number" step="1000" min="1000" placeholder="Ex: 30000" class="input font-mono">
         </div>
       </div>
 
       <div class="flex items-center justify-end gap-2.5 pt-2">
-        <button id="btn-modal-metas-cancel" class="px-3.5 py-2 text-xs font-semibold text-gray-300 hover:text-white bg-fintech-bg border border-fintech-border rounded hover:bg-fintech-surface-hover transition">
+        <button id="btn-modal-metas-cancel" class="px-3.5 py-2 text-xs font-semibold text-muted hover:text-strong surface-canvas border border-default rounded hover:surface-hover transition">
           Cancelar
         </button>
-        <button id="btn-modal-metas-save" class="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded shadow-lg transition">
+        <button id="btn-modal-metas-save" class="btn-primary">
           Salvar Metas
         </button>
       </div>

@@ -1099,149 +1099,50 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
    mode their Tailwind utilities are remapped locally so cards, borders and
    text keep the same hierarchy instead of leaving white islands.
    ========================================================================= */
-[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio, #tab-portfolio) {
+[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio) {
   color: var(--text);
   background-color: var(--canvas) !important;
 }
-[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio, #tab-portfolio) :is(.bg-white, .bg-slate-50) {
+[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio) :is(.bg-white, .bg-slate-50) {
   background-color: var(--surface) !important;
 }
-[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio, #tab-portfolio) :is(.bg-slate-100, .bg-slate-200) {
+[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio) :is(.bg-slate-100, .bg-slate-200) {
   background-color: var(--surface-3) !important;
 }
-[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio, #tab-portfolio) :is(
+[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio) :is(
   .text-slate-900, .text-slate-800, .text-slate-700, .text-gray-900, .text-gray-800, .text-black
 ) {
   color: var(--text) !important;
 }
-[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio, #tab-portfolio) :is(
+[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio) :is(
   .text-slate-600, .text-slate-500, .text-gray-600, .text-gray-500
 ) {
   color: var(--text-2) !important;
 }
-[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio, #tab-portfolio) :is(.text-slate-400, .text-gray-400) {
+[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio) :is(.text-slate-400, .text-gray-400) {
   color: var(--text-3) !important;
 }
-[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio, #tab-portfolio) :is(
+[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio) :is(
   .border-slate-100, .border-slate-200, .border-slate-300, .border-gray-100, .border-gray-200
 ) {
   border-color: var(--border) !important;
 }
-[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio, #tab-portfolio) .text-sky-600 {
+[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio) .text-sky-600 {
   color: var(--primary) !important;
 }
-[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio, #tab-portfolio) :is(.bg-slate-900, .bg-slate-800) {
+[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio) :is(.bg-slate-900, .bg-slate-800) {
   background-color: var(--surface-4) !important;
 }
-[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio, #tab-portfolio) :is(.text-emerald-600, .text-emerald-500) {
+[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio) :is(.text-emerald-600, .text-emerald-500) {
   color: var(--success) !important;
 }
-[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio, #tab-portfolio) :is(.text-rose-600, .text-rose-500) {
+[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio) :is(.text-rose-600, .text-rose-500) {
   color: var(--danger) !important;
 }
-[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio, #tab-portfolio) .shadow-sm {
+[data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio) .shadow-sm {
   box-shadow: var(--shadow-sm) !important;
 }
 
-/* =========================================================================
-   Legacy terminal panes → light counter-theme
-   Portfolio, Radar, TradingView, Simulator and Playbook were authored for a
-   dark canvas. In light mode every dark utility is remapped to a light
-   hierarchy, while coloured actions keep their white label.
-   ========================================================================= */
-[data-theme="light"] :is(#tab-portfolio, #tab-pane-radar, #tab-terminal, #tab-simulator, #tab-playbook) {
-  background: var(--canvas) !important;
-  color: var(--text) !important;
-}
-[data-theme="light"] :is(#tab-portfolio, #tab-pane-radar, #tab-terminal, #tab-simulator, #tab-playbook) :is(
-  .card-surface, .bg-fintech-surface, .bg-fintech-bg, .bg-black, .bg-gray-900, .bg-gray-800, .bg-gray-850
-) {
-  background-color: var(--surface) !important;
-  border-color: var(--border) !important;
-  color: var(--text) !important;
-}
-[data-theme="light"] :is(#tab-portfolio, #tab-pane-radar, #tab-terminal, #tab-simulator, #tab-playbook) :is(
-  .bg-fintech-bg\/40, .bg-fintech-bg\/50, .bg-fintech-bg\/60, .bg-fintech-bg\/80,
-  .bg-fintech-surface\/40, .bg-fintech-surface\/50, .bg-fintech-surface\/60, .bg-fintech-surface\/80,
-  .bg-gray-700\/40, .bg-gray-700\/50, .bg-gray-800\/50, .bg-gray-800\/80
-) {
-  background-color: var(--surface-2) !important;
-  color: var(--text) !important;
-  border: 1px solid var(--border);
-}
-[data-theme="light"] :is(#tab-portfolio, #tab-pane-radar, #tab-terminal, #tab-simulator, #tab-playbook) :is(
-  .text-fintech-cyan, .text-cyan-300, .text-cyan-400, .text-sky-400
-) {
-  color: #0b62c4 !important;
-}
-[data-theme="light"] :is(#tab-portfolio, #tab-pane-radar, #tab-terminal, #tab-simulator, #tab-playbook) :is(
-  .text-fintech-green, .text-emerald-400, .text-emerald-300, .text-green-400
-) {
-  color: #067a55 !important;
-}
-[data-theme="light"] :is(#tab-portfolio, #tab-pane-radar, #tab-terminal, #tab-simulator, #tab-playbook) :is(
-  .text-fintech-red, .text-rose-400, .text-rose-300, .text-red-400
-) {
-  color: #b42318 !important;
-}
-[data-theme="light"] :is(#tab-portfolio, #tab-pane-radar, #tab-terminal, #tab-simulator, #tab-playbook) :is(
-  .text-white, .text-gray-100, .text-gray-200, .text-gray-300
-) {
-  color: var(--text) !important;
-}
-[data-theme="light"] :is(#tab-portfolio, #tab-pane-radar, #tab-terminal, #tab-simulator, #tab-playbook) :is(
-  .text-gray-400, .text-gray-500
-) {
-  color: var(--text-2) !important;
-}
-[data-theme="light"] :is(#tab-portfolio, #tab-pane-radar, #tab-terminal, #tab-simulator, #tab-playbook) :is(
-  .text-cyan-300, .text-cyan-400, .text-sky-400
-) {
-  color: #0b62c4 !important;
-}
-[data-theme="light"] :is(#tab-portfolio, #tab-pane-radar, #tab-terminal, #tab-simulator, #tab-playbook) :is(
-  .text-emerald-400, .text-emerald-300, .text-green-400
-) {
-  color: #067a55 !important;
-}
-[data-theme="light"] :is(#tab-portfolio, #tab-pane-radar, #tab-terminal, #tab-simulator, #tab-playbook) :is(
-  .text-amber-300, .text-amber-400, .text-yellow-400
-) {
-  color: #9a5b00 !important;
-}
-[data-theme="light"] :is(#tab-portfolio, #tab-pane-radar, #tab-terminal, #tab-simulator, #tab-playbook) :is(
-  .text-rose-400, .text-rose-300, .text-red-400
-) {
-  color: #b42318 !important;
-}
-[data-theme="light"] :is(#tab-portfolio, #tab-pane-radar, #tab-terminal, #tab-simulator, #tab-playbook) :is(
-  .border-fintech-border, .border-gray-700, .border-gray-800
-) {
-  border-color: var(--border) !important;
-}
-[data-theme="light"] :is(#tab-portfolio, #tab-pane-radar, #tab-terminal, #tab-simulator, #tab-playbook) :is(
-  .bg-fintech-surface-hover, .hover\:bg-fintech-surface-hover:hover, .bg-gray-700\/40, .bg-gray-700\/50, .bg-gray-800\/50, .bg-gray-800\/80
-) {
-  background-color: var(--surface-2) !important;
-}
-[data-theme="light"] :is(#tab-portfolio, #tab-pane-radar, #tab-terminal, #tab-simulator, #tab-playbook) :is(
-  .divide-fintech-border > * + *, .divide-gray-700 > * + *, .divide-gray-800 > * + *
-) {
-  border-color: var(--border) !important;
-}
-/* Coloured actions keep white labels in both themes */
-[data-theme="light"] :is(#tab-portfolio, #tab-pane-radar, #tab-terminal, #tab-simulator, #tab-playbook) :is(
-  button.bg-cyan-600, button.bg-emerald-600, button.bg-rose-600, button.bg-blue-600, .btn-primary, .btn-solid
-) {
-  color: #ffffff !important;
-}
-[data-theme="light"] :is(#tab-portfolio, #tab-pane-radar, #tab-terminal, #tab-simulator, #tab-playbook) .portfolio-score-bar-track {
-  background-color: var(--surface-3) !important;
-}
-[data-theme="light"] #global-direction-selector {
-  background-color: var(--surface-2) !important;
-  border-color: var(--border) !important;
-}
 
 /* Legacy nav tabs (hidden shell) */
 .nav-tab-btn {

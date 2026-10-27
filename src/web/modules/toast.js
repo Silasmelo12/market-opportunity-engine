@@ -15,8 +15,8 @@ function showToastNotification(message, isSuccess = true, onUndo = null) {
 
   toast.className = `fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-2xl border text-xs font-medium transition-all duration-300 transform translate-y-0 opacity-100 pointer-events-auto ${
     isSuccess
-      ? 'bg-fintech-surface border-emerald-500/50 text-white'
-      : 'bg-fintech-surface border-amber-500/50 text-white'
+      ? 'surface border-success text-strong'
+      : 'surface border-warning text-strong'
   }`;
 
   if (undoBtn) {

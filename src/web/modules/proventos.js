@@ -94,8 +94,8 @@ function setupProventosControls() {
   btnAnual.addEventListener('click', () => {
     btnAnual.setAttribute('aria-pressed', 'true');
     btnMensal.setAttribute('aria-pressed', 'false');
-    btnAnual.className = 'px-3 py-1 text-xs font-semibold rounded-lg bg-slate-900 text-white shadow-sm';
-    btnMensal.className = 'px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200';
+    btnAnual.className = 'btn-primary';
+    btnMensal.className = 'btn-secondary';
     renderProventosTabChart('anual');
   });
 }
