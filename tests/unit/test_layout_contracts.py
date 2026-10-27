@@ -256,6 +256,25 @@ def test_javascript_sources_have_no_functional_emoji(app_js: str):
         assert emojis == [], f"Emojis funcionais encontrados em {name}: {emojis[:10]}"
 
 
+SUBFLOOR_SIZE_PATTERN = re.compile(r"text-\[(?:[0-9]|10)px\]|font-size:\s*(?:[0-9]|10)px")
+
+
+def test_sources_do_not_declare_text_below_the_floor():
+    sources = {"index.html": INDEX, "app.js": APP}
+    for module in sorted((WEB / "modules").glob("*.js")):
+        sources[module.name] = module
+    for name, path in sources.items():
+        source = read(path)
+        offenders = SUBFLOOR_SIZE_PATTERN.findall(source)
+        assert offenders == [], f"Tamanhos abaixo de 11px em {name}: {offenders[:10]}"
+
+
+def test_typography_floor_contract_is_active(styles_css: str):
+    assert "--font-size-floor: 11px" in styles_css
+    assert ".text-\\[10px\\]" in styles_css
+    assert "font-variant-numeric: tabular-nums" in styles_css
+
+
 def test_icon_sprite_replaces_functional_emoji(index_html: str):
     sprite_ids = re.findall(r'<g id="(icon-[^"]+)"', index_html)
     assert len(sprite_ids) >= 20, f"Sprite SVG insuficiente: {sprite_ids}"
