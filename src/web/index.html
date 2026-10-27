@@ -145,40 +145,40 @@
 
   <!-- Top Institutional Header (Responsive Mobile & Desktop) -->
   <!-- Top Global Header (Investidor10 Style) -->
-  <header class="app-header bg-white border-b border-slate-200 px-4 py-3 shrink-0 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <div class="brand-group flex items-center gap-3">
-        <div class="brand-icon w-9 h-9 bg-gradient-to-tr from-sky-600 to-blue-700 rounded-lg flex items-center justify-center text-white font-extrabold shadow-sm">
-          <svg class="icon w-5 h-5" aria-hidden="true"><use href="#icon-trending-up"></use></svg>
+  <header class="app-header bg-white border-b border-slate-200 px-3 sm:px-4 py-2.5 sm:py-3 shrink-0 sticky top-0 z-50">
+    <div class="app-header-inner max-w-7xl mx-auto flex flex-wrap items-center gap-2 sm:gap-3">
+      <div class="brand-group flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+        <div class="brand-icon w-8 h-8 sm:w-9 sm:h-9 shrink-0 bg-gradient-to-tr from-sky-600 to-blue-700 rounded-lg flex items-center justify-center text-white font-extrabold shadow-sm" aria-hidden="true">
+          <svg class="icon w-4 h-4 sm:w-5 sm:h-5"><use href="#icon-trending-up"></use></svg>
         </div>
-        <div>
-          <div class="brand-title font-extrabold text-slate-900 tracking-tight text-base sm:text-lg flex items-center gap-2">
-            Market Opportunity Engine
-            <span class="brand-tag text-[11px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full border border-slate-200">Quantitative Pro</span>
+        <div class="min-w-0">
+          <div class="brand-title font-extrabold text-slate-900 tracking-tight text-sm sm:text-base lg:text-lg flex items-center gap-2 min-w-0">
+            <span class="truncate">Market Opportunity Engine</span>
+            <span class="brand-tag hidden md:inline text-[11px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full border border-slate-200 shrink-0">Quantitative Pro</span>
           </div>
         </div>
       </div>
 
       <!-- Seletor dos Dois Ambientes Principais (Fase 2A - Spec 021) -->
-      <div class="pillar-nav-group flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200" id="global-pillar-selector" role="tablist" aria-label="Ambientes da Plataforma">
-        <button id="pillar-btn-carteira" class="pillar-btn active flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold text-slate-900 bg-white shadow-sm transition" data-pillar="carteira" role="tab" aria-selected="true" aria-controls="subnav-group-carteira">
+      <div class="pillar-nav-group order-3 sm:order-none w-full sm:w-auto flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200" id="global-pillar-selector" role="tablist" aria-label="Ambientes da Plataforma">
+        <button id="pillar-btn-carteira" class="pillar-btn active flex-1 sm:flex-none justify-center flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold text-slate-900 bg-white shadow-sm transition" data-pillar="carteira" role="tab" aria-selected="true" aria-controls="subnav-group-carteira" aria-label="Ambiente Minha Carteira">
           <svg class="icon" aria-hidden="true"><use href="#icon-wallet"></use></svg> Minha Carteira
         </button>
-        <button id="pillar-btn-quant" class="pillar-btn flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-900 transition" data-pillar="quant" role="tab" aria-selected="false" aria-controls="subnav-group-quant">
+        <button id="pillar-btn-quant" class="pillar-btn flex-1 sm:flex-none justify-center flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-900 transition" data-pillar="quant" role="tab" aria-selected="false" aria-controls="subnav-group-quant" aria-label="Ambiente Análise Quantitativa">
           <svg class="icon" aria-hidden="true"><use href="#icon-target"></use></svg> Análise Quantitativa
         </button>
       </div>
 
-      <div class="header-actions flex items-center gap-2.5">
-        <button id="btn-header-b3-status" class="btn-b3 bg-white text-slate-800 border border-slate-300 hover:bg-slate-50 text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition">
-          <span class="text-sky-600 font-extrabold">[B]³</span> <span id="b3-import-label">Planilhas Importadas</span>
+      <div class="header-actions flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+        <button id="btn-header-b3-status" class="btn-b3 bg-white text-slate-800 border border-slate-300 hover:bg-slate-50 text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition" aria-label="Gerenciar planilhas B3 importadas">
+          <span class="text-sky-600 font-extrabold" aria-hidden="true">[B]³</span> <span id="b3-import-label" class="hidden sm:inline">Planilhas Importadas</span>
         </button>
-        <button id="btn-header-add-trade" class="btn-primary bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition">
-          + Lançamento
+        <button id="btn-header-add-trade" class="btn-primary bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition" aria-label="Adicionar lançamento">
+          <svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg><span class="hidden sm:inline">Lançamento</span>
         </button>
-        <button id="btn-theme-toggle" title="Alternar Tema Claro / Escuro" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs px-2.5 py-1.5 rounded-lg transition flex items-center gap-1">
+        <button id="btn-theme-toggle" title="Alternar Tema Claro / Escuro" aria-label="Alternar tema claro e escuro" aria-pressed="false" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs px-2.5 py-1.5 rounded-lg transition flex items-center gap-1">
           <span id="theme-toggle-icon" class="inline-flex items-center">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="#icon-moon"></use></svg>
+            <svg class="icon" aria-hidden="true"><use href="#icon-moon"></use></svg>
           </span>
         </button>
       </div>
@@ -190,32 +190,32 @@
     <div class="subnav-container max-w-7xl mx-auto px-4 flex gap-2 overflow-x-auto" id="main-subnav-pills">
       <!-- Subnavegação Contextual: Minha Carteira -->
       <div id="subnav-group-carteira" class="subnav-group flex gap-2 w-full" role="tablist" aria-label="Subnavegação Minha Carteira">
-        <div class="nav-tab active flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-slate-900 text-slate-900 whitespace-nowrap transition" data-tab="resumo" role="tab" tabindex="0" aria-selected="true">
+        <div class="nav-tab active flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-slate-900 text-slate-900 whitespace-nowrap transition" data-tab="resumo" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-overview">
           <svg class="icon" aria-hidden="true"><use href="#icon-chart"></use></svg> Resumo
         </div>
-        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="posicoes" role="tab" tabindex="0" aria-selected="false">
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="posicoes" role="tab" tabindex="0" aria-selected="false" aria-controls="tab-portfolio">
           <svg class="icon" aria-hidden="true"><use href="#icon-wallet"></use></svg> Posições &amp; Ativos
         </div>
-        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="proventos" role="tab" tabindex="0" aria-selected="false">
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="proventos" role="tab" tabindex="0" aria-selected="false" aria-controls="tab-pane-proventos">
           <svg class="icon" aria-hidden="true"><use href="#icon-coins"></use></svg> Proventos
         </div>
-        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="patrimonio" role="tab" tabindex="0" aria-selected="false">
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="patrimonio" role="tab" tabindex="0" aria-selected="false" aria-controls="tab-pane-patrimonio">
           <svg class="icon" aria-hidden="true"><use href="#icon-trending-up"></use></svg> Evolução Patrimonial
         </div>
       </div>
 
       <!-- Subnavegação Contextual: Análise Quantitativa -->
       <div id="subnav-group-quant" class="subnav-group hidden flex gap-2 w-full" role="tablist" aria-label="Subnavegação Análise Quantitativa">
-        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="radar" role="tab" tabindex="0" aria-selected="false">
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="radar" role="tab" tabindex="0" aria-selected="false" aria-controls="tab-pane-radar">
           <svg class="icon" aria-hidden="true"><use href="#icon-target"></use></svg> Radar Estatístico (Fundo 2x2)
         </div>
-        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="tradingview" role="tab" tabindex="0" aria-selected="false">
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="tradingview" role="tab" tabindex="0" aria-selected="false" aria-controls="tab-terminal">
           <svg class="icon" aria-hidden="true"><use href="#icon-candlestick"></use></svg> Gráfico TradingView
         </div>
-        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="simulador" role="tab" tabindex="0" aria-selected="false">
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="simulador" role="tab" tabindex="0" aria-selected="false" aria-controls="tab-simulator">
           <svg class="icon" aria-hidden="true"><use href="#icon-bolt"></use></svg> Simulador &amp; Backtest
         </div>
-        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="playbook" role="tab" tabindex="0" aria-selected="false">
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="playbook" role="tab" tabindex="0" aria-selected="false" aria-controls="tab-playbook">
           <svg class="icon" aria-hidden="true"><use href="#icon-book"></use></svg> Playbook de Estratégias
         </div>
       </div>
