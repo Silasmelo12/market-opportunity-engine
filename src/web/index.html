@@ -343,7 +343,7 @@
                 <p class="section-subtitle">Valor aplicado acumulado versus ganho de capital</p>
               </div>
               <div class="flex items-center gap-2">
-                <a id="link-overview-ver-patrimonio" href="#carteira/patrimonio" class="text-xs text-sky-600 font-semibold hover:underline mr-1">Ver série completa →</a>
+                <a id="link-overview-ver-patrimonio" href="#carteira/patrimonio" class="touch-target text-xs text-sky-600 font-semibold hover:underline mr-1">Ver série completa →</a>
                 <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg">
                   <button class="px-2.5 py-1 text-xs font-semibold rounded bg-white text-slate-900 shadow-sm">12M</button>
                   <button class="px-2.5 py-1 text-xs font-semibold rounded text-slate-600 hover:text-slate-900">Tudo</button>
@@ -359,7 +359,7 @@
           <div class="card-surface chart-card flex flex-col justify-between">
             <div class="pb-3 border-b border-slate-100 flex items-center justify-between">
               <h3 class="section-title">Alocação por Classe</h3>
-              <button id="btn-overview-config-ideal" class="text-xs text-sky-600 font-semibold hover:underline">Configurar %</button>
+              <button id="btn-overview-config-ideal" class="touch-target text-xs text-sky-600 font-semibold hover:underline">Configurar %</button>
             </div>
             <div id="overview-donut-chart" class="w-full h-56 my-auto relative overflow-hidden block">
               Carregando alocação...
@@ -400,7 +400,7 @@
       <div class="max-w-7xl mx-auto space-y-3 sm:space-y-4">
 
         <!-- Executive Command Deck / Macro KPI Summary -->
-        <div id="radar-executive-deck" class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
+        <div id="radar-executive-deck" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
           <div class="kpi-card border-l-2 border-l-emerald-500">
             <span class="kpi-label uppercase tracking-wider">Oportunidades em Compra</span>
             <div class="flex items-baseline justify-between mt-1">
@@ -1470,7 +1470,8 @@
               </h3>
               <span class="kpi-sub font-mono">Ordenado por Retorno Total (%)</span>
             </div>
-            <div class="overflow-x-auto max-h-72">
+            <div class="table-scroll-hint">← Deslize para os lados para ver detalhes →</div>
+            <div class="table-scroll touch-scroll max-h-72">
               <table class="table-standard">
                 <thead class="surface-canvas text-muted font-semibold uppercase text-[11px] sticky top-0">
                   <tr>
@@ -1904,7 +1905,8 @@
             </div>
           </div>
 
-          <div class="overflow-x-auto touch-scroll">
+          <div class="table-scroll-hint">← Deslize para os lados para ver detalhes →</div>
+          <div class="table-scroll touch-scroll">
             <table class="w-full text-left text-xs text-muted">
               <thead class="surface-canvas text-muted font-semibold uppercase text-[11px] border-b border-default whitespace-nowrap">
                 <tr>
@@ -2006,7 +2008,8 @@
               </h3>
               <span class="text-[11px] text-muted font-mono">Ordenado por Score de Potencial (0–100)</span>
             </div>
-            <div class="overflow-x-auto touch-scroll max-h-64">
+            <div class="table-scroll-hint">← Deslize para os lados para ver detalhes →</div>
+            <div class="table-scroll touch-scroll max-h-64">
               <table class="w-full text-left text-xs text-muted">
                 <thead class="surface-canvas text-muted font-semibold uppercase text-[11px] sticky top-0 whitespace-nowrap">
                   <tr>
@@ -2040,7 +2043,8 @@
               </h3>
               <span class="text-[11px] text-muted font-mono" id="portfolio-ledger-count-badge">0 eventos</span>
             </div>
-            <div class="overflow-x-auto touch-scroll max-h-80">
+            <div class="table-scroll-hint">← Deslize para os lados para ver detalhes →</div>
+            <div class="table-scroll touch-scroll max-h-80">
               <table class="w-full text-left text-xs text-muted">
                 <thead class="surface-canvas text-muted font-semibold uppercase text-[11px] sticky top-0 whitespace-nowrap">
                   <tr>
@@ -2101,7 +2105,8 @@
       </div>
 
       <!-- Compact Table of orders to confirm -->
-      <div class="max-h-48 overflow-y-auto overflow-x-auto touch-scroll text-xs divide-y divide-default">
+      <div class="table-scroll-hint">← Deslize para os lados para ver detalhes →</div>
+      <div class="table-scroll touch-scroll max-h-48 overflow-y-auto text-xs divide-y divide-default">
         <table class="w-full text-left text-muted">
           <thead class="surface-canvas text-muted uppercase text-[11px] sticky top-0 font-mono">
             <tr>
