@@ -1614,14 +1614,15 @@ function renderOverviewStackedBarChart(totalInvested, totalProfit) {
     height: 250,
     paper_bgcolor: bgColor,
     plot_bgcolor: bgColor,
-    font: { family: 'Plus Jakarta Sans, sans-serif', size: 10, color: textColor },
+    font: { family: 'Plus Jakarta Sans, sans-serif', size: 11, color: textColor },
     margin: { t: 15, r: 15, b: 30, l: 55 },
     showlegend: false,
-    xaxis: { gridcolor: gridColor, tickfont: { size: 9 } },
-    yaxis: { gridcolor: gridColor, tickprefix: 'R$ ', tickfont: { size: 9 } }
+    xaxis: { gridcolor: gridColor, tickfont: { size: 11 } },
+    yaxis: { gridcolor: gridColor, tickprefix: 'R$ ', tickfont: { size: 11 } }
   };
 
   Plotly.newPlot(container, [trace1, trace2], layout, { responsive: true, displayModeBar: false });
+  requestAnimationFrame(() => { if (window.Plotly && container.data) Plotly.Plots.resize(container); });
 }
 
 function renderOverviewDonutChart(holdings, cash, totalEquity) {
