@@ -1766,13 +1766,13 @@ function renderOverviewGroupedHoldings(holdings, adviseData, totalEquity) {
     const accordionId = `overview-acc-group-${groupIdx}`;
 
     const accDiv = document.createElement('div');
-    accDiv.className = 'category-card bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm mb-4';
+    accDiv.className = 'category-card card-surface overflow-hidden mb-4';
 
     accDiv.innerHTML = `
-      <div class="accordion-header bg-fintech-surface hover:bg-fintech-surface-hover p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 cursor-pointer transition border-b border-fintech-border/40" data-accordion="${accordionId}">
+      <div class="accordion-header category-header p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 cursor-pointer transition" data-accordion="${accordionId}">
         <div class="flex items-center gap-2.5">
-          <span class="w-7 h-7 rounded bg-fintech-bg border border-fintech-border flex items-center justify-center text-sm">${group.icon}</span>
-          <span class="font-bold text-white text-sm">${group.name}</span>
+          <span class="w-7 h-7 rounded bg-fintech-bg border border-fintech-border flex items-center justify-center text-sm category-icon">${group.icon}</span>
+          <span class="font-bold text-sm category-title">${group.name}</span>
           <span class="text-[11px] text-gray-400 font-mono">(${group.items.length} ${group.items.length === 1 ? 'ativo' : 'ativos'})</span>
         </div>
         <div class="flex items-center gap-4 text-xs font-mono">
@@ -1788,7 +1788,7 @@ function renderOverviewGroupedHoldings(holdings, adviseData, totalEquity) {
         </div>
       </div>
 
-      <div id="${accordionId}" class="overflow-x-auto touch-scroll hidden">
+      <div id="${accordionId}" class="table-scroll overflow-x-auto touch-scroll hidden">
         <table class="table-standard w-full text-left text-xs text-gray-300">
           <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[11px] border-b border-fintech-border whitespace-nowrap font-mono">
             <tr>

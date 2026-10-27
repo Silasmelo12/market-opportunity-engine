@@ -72,6 +72,7 @@ function renderProventosTabChart(mode = 'mensal') {
 
   container.innerHTML = '';
   Plotly.newPlot(container, [trace], layout, { responsive: true, displayModeBar: false });
+  requestAnimationFrame(() => { if (window.Plotly && container.data) Plotly.Plots.resize(container); });
 }
 
 /**
@@ -85,8 +86,8 @@ function setupProventosControls() {
   btnMensal.addEventListener('click', () => {
     btnMensal.setAttribute('aria-pressed', 'true');
     btnAnual.setAttribute('aria-pressed', 'false');
-    btnMensal.className = 'px-3 py-1 text-xs font-semibold rounded-lg bg-slate-900 text-white shadow-sm';
-    btnAnual.className = 'px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200';
+    btnMensal.className = 'btn-primary';
+    btnAnual.className = 'btn-secondary';
     renderProventosTabChart('mensal');
   });
 
