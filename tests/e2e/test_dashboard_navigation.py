@@ -519,6 +519,51 @@ def test_keyboard_navigation_and_responsiveness(app_page):
     assert page.is_visible("#tab-simulator")
 
 
+def test_shell_arrow_navigation_and_sticky_offset(app_page):
+    """Valida navegação por setas nos tablists e o offset sticky do shell."""
+    page = app_page
+
+    page.focus("#pillar-btn-carteira")
+    page.keyboard.press("ArrowRight")
+    page.wait_for_selector("#subnav-group-quant", state="visible")
+    assert page.get_attribute("#pillar-btn-quant", "aria-selected") == "true"
+    assert page.get_attribute("#pillar-btn-carteira", "tabindex") == "-1"
+    assert page.get_attribute("#pillar-btn-quant", "tabindex") == "0"
+
+    page.focus('#subnav-group-quant [data-tab="radar"]')
+    page.keyboard.press("ArrowRight")
+    page.wait_for_selector("#tab-terminal", state="visible")
+    assert page.get_attribute('#subnav-group-quant [data-tab="tradingview"]', "aria-selected") == "true"
+
+    page.keyboard.press("End")
+    page.wait_for_selector("#tab-playbook", state="visible")
+    assert page.get_attribute('#subnav-group-quant [data-tab="playbook"]', "aria-selected") == "true"
+
+    page.keyboard.press("Home")
+    page.wait_for_selector("#tab-pane-radar", state="visible")
+    assert page.get_attribute('#subnav-group-quant [data-tab="radar"]', "aria-selected") == "true"
+
+    # O seletor de direção acompanha as áreas quantitativas.
+    assert page.is_visible("#global-direction-selector")
+
+    # O offset sticky da subnavegação acompanha a altura real do header.
+    header_height = page.evaluate(
+        "() => Math.round(document.querySelector('.app-header').getBoundingClientRect().height)"
+    )
+    subnav_top = page.evaluate(
+        "() => Math.round(parseFloat(getComputedStyle(document.querySelector('.subnav-bar')).top))"
+    )
+    assert subnav_top == header_height
+
+    page.set_viewport_size({"width": 768, "height": 900})
+    page.wait_for_timeout(250)
+    assert page.evaluate(
+        "() => Math.round(parseFloat(getComputedStyle(document.querySelector('.subnav-bar')).top))"
+    ) == page.evaluate(
+        "() => Math.round(document.querySelector('.app-header').getBoundingClientRect().height)"
+    )
+
+
 def test_unknown_hash_falls_back_to_overview_ignoring_localstorage(server_url):
     """
     Valida o comportamento de URL com hash desconhecido quando o localStorage contem uma rota valida:

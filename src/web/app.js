@@ -739,6 +739,13 @@ function syncHeaderOffset() {
 
 if (typeof window !== 'undefined') {
   window.addEventListener('resize', syncHeaderOffset);
+  window.addEventListener('load', syncHeaderOffset);
+  if (typeof ResizeObserver !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => {
+      const header = document.querySelector('.app-header');
+      if (header) new ResizeObserver(syncHeaderOffset).observe(header);
+    });
+  }
 }
 
 function initTheme() {
@@ -908,11 +915,13 @@ function setupNavigationTabs() {
 }
 
 function setupTablistKeyboard(containerSelector, itemSelector) {
-  const items = Array.from(document.querySelectorAll(`${containerSelector} ${itemSelector}`))
-    .filter(item => item.offsetParent !== null || item.getAttribute('aria-selected') === 'true');
-  if (!items.length) return;
-  items.forEach((item, index) => {
+  const allItems = Array.from(document.querySelectorAll(`${containerSelector} ${itemSelector}`));
+  if (!allItems.length) return;
+  allItems.forEach((item) => {
     item.addEventListener('keydown', (event) => {
+      const items = allItems.filter(el => el.offsetParent !== null);
+      const index = items.indexOf(item);
+      if (index === -1) return;
       let nextIndex = null;
       if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
         nextIndex = (index + 1) % items.length;
