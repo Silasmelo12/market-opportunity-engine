@@ -305,7 +305,7 @@
             </div>
           </div>
           <div class="flex items-center gap-3 shrink-0">
-            <button id="btn-banner-import-b3" onclick="document.getElementById('b3-multi-file-input') ? document.getElementById('b3-multi-file-input').click() : null" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-lg transition flex items-center gap-2 cursor-pointer">
+            <button id="btn-banner-import-b3" onclick="document.getElementById('portfolio-csv-file-input').click()" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-lg transition flex items-center gap-2 cursor-pointer">
               <span>+ Importar Extratos B3</span>
             </button>
           </div>
@@ -1867,6 +1867,7 @@
               </div>
               <div class="flex items-center gap-1.5">
                 <input type="file" id="portfolio-csv-file-input" accept=".xlsx,.xls,.csv,.txt" multiple class="hidden">
+                <input type="file" id="b3-multi-file-input" accept=".xlsx,.xls,.csv,.txt" multiple class="hidden" aria-hidden="true" tabindex="-1">
                 <button id="btn-portfolio-import-csv" type="button" class="text-[11px] px-2.5 py-1 rounded bg-cyan-950/50 hover:bg-cyan-900/60 text-cyan-300 hover:text-cyan-200 border border-cyan-800/60 transition cursor-pointer flex items-center gap-1 font-semibold" title="Importar uma ou mÃºltiplas planilhas oficiais B3 (.xlsx) ou arquivo CSV">
                   <span>ðŸ“</span>Importar B3 / CSV
                 </button>
