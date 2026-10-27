@@ -986,8 +986,7 @@ tbody tr:hover { background: var(--surface-2); }
   margin: var(--space-4) 0;
 }
 
-/* Wide tables scroll only inside their own container */
-.table-scroll {
+/* Wide tables scroll only inside their own container */.table-scroll {
   position: relative;
   width: 100%;
   max-width: 100%;
@@ -2371,3 +2370,55 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
   color: var(--text-main);
 }
 
+
+/* =========================================================================
+   Responsive shell — header wraps instead of overflowing on small screens
+   ========================================================================= */
+@media (max-width: 640px) {
+  .app-header > div {
+    flex-wrap: wrap;
+    row-gap: 8px;
+    gap: 8px;
+  }
+  .brand-group {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .brand-title {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 46vw;
+  }
+  .brand-tag { display: none !important; }
+  .pillar-nav-group {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+  .pillar-btn { flex: 1 1 0; justify-content: center; }
+  .header-actions { margin-left: auto; gap: 6px; }
+  #b3-import-label { display: none; }
+  .header-actions .btn-b3 { padding: 6px 8px; }
+  #btn-header-add-trade { padding: 6px 8px; }
+  .subnav-container { padding: 0 12px; }
+}
+
+@media (max-width: 1023px) {
+  .app-header > div {
+    flex-wrap: wrap;
+    row-gap: 8px;
+    gap: 8px;
+  }
+  .brand-group { flex: 1 1 auto; min-width: 0; }
+  .pillar-nav-group {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+  .pillar-btn { flex: 1 1 0; justify-content: center; }
+  .header-actions { margin-left: auto; }
+  #b3-import-label { display: none; }
+  .header-actions .btn-b3 { padding: 6px 8px; }
+}
