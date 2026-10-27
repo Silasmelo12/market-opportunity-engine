@@ -352,7 +352,7 @@ function renderPatrimonioDetailedChart() {
     return;
   }
 
-  const isDark = (document.documentElement.getAttribute('data-theme') || 'dark') === 'dark';
+  const isDark = (document.documentElement.getAttribute('data-theme') || 'light') === 'dark';
   const bgColor = isDark ? '#151924' : '#FFFFFF';
   const textColor = isDark ? '#8B98A5' : '#0F172A';
   const gridColor = isDark ? 'rgba(38, 43, 56, 0.5)' : '#F1F5F9';
@@ -724,13 +724,14 @@ function setupDirectionSelector() {
 
 // Theme Toggle & Synchronization Helper
 function initTheme() {
-  const savedTheme = localStorage.getItem('terminal_theme') || 'dark';
+  const stored = localStorage.getItem('terminal_theme');
+  const savedTheme = (stored === 'light' || stored === 'dark') ? stored : 'light';
   applyTheme(savedTheme, false);
 
   const btnToggle = document.getElementById('btn-theme-toggle');
   if (btnToggle) {
     btnToggle.addEventListener('click', () => {
-      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+      const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
       const next = current === 'dark' ? 'light' : 'dark';
       applyTheme(next, true);
     });
@@ -738,25 +739,28 @@ function initTheme() {
 }
 
 function applyTheme(theme, updateCharts = true) {
-  document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem('terminal_theme', theme);
+  const normalized = theme === 'dark' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', normalized);
+  try {
+    localStorage.setItem('terminal_theme', normalized);
+  } catch (e) {}
 
   const icon = document.getElementById('theme-toggle-icon');
   const text = document.getElementById('theme-toggle-text');
   if (icon) {
     const useEl = icon.querySelector('use');
     if (useEl) {
-      useEl.setAttribute('href', theme === 'light' ? '#icon-sun' : '#icon-moon');
+      useEl.setAttribute('href', normalized === 'light' ? '#icon-sun' : '#icon-moon');
     } else {
-      icon.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="${theme === 'light' ? '#icon-sun' : '#icon-moon'}"></use></svg>`;
+      icon.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="${normalized === 'light' ? '#icon-sun' : '#icon-moon'}"></use></svg>`;
     }
   }
   if (text) {
-    text.textContent = theme === 'light' ? 'Claro' : 'Escuro';
+    text.textContent = normalized === 'light' ? 'Claro' : 'Escuro';
   }
 
   if (updateCharts) {
-    updateChartsTheme(theme);
+    updateChartsTheme(normalized);
   }
 }
 
@@ -1615,7 +1619,7 @@ function renderOverviewDonutChart(holdings, cash, totalEquity) {
   if (topEl) topEl.textContent = topHolding.ticker !== '--' ? `${topHolding.ticker} (${topHolding.weightPct.toFixed(1)}%)` : '--';
 
   if (!container || !window.Plotly) return;
-  const isLight = (document.documentElement.getAttribute('data-theme') || 'dark') === 'light';
+  const isLight = (document.documentElement.getAttribute('data-theme') || 'light') === 'light';
   const bgColor = isLight ? '#FFFFFF' : '#151924';
   const textColor = isLight ? '#334155' : '#8B98A5';
 
@@ -1925,7 +1929,7 @@ function initTradingViewChart() {
   const width = container.clientWidth >0 ? container.clientWidth : Math.max(300, window.innerWidth - 32);
   const height = isMobile ? 340 : 480;
 
-  const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
   const isLight = currentTheme === 'light';
   const bgColor = isLight ? '#FFFFFF' : '#111827';
   const textColor = isLight ? '#334155' : '#8B98A5';
@@ -2606,7 +2610,7 @@ function renderPlotlyScatter(summaries = null) {
     const returns = dataList.map(s =>Number(s.mean_forward_return) || 0);
     const maes = dataList.map(s =>Number(s.mean_mae) || 0);
     const labels = dataList.map(s =>s.strategy_label || s.strategy_sub_id);
-    const isLight = (document.documentElement.getAttribute('data-theme') || 'dark') === 'light';
+    const isLight = (document.documentElement.getAttribute('data-theme') || 'light') === 'light';
     const chartFontColor = isLight ? '#0F172A' : '#F8FAFC';
     const chartGridColor = isLight ? 'rgba(203, 213, 225, 0.5)' : 'rgba(51, 65, 85, 0.4)';
     const buyColor = isLight ? '#059669' : '#10B981';
@@ -4456,7 +4460,7 @@ function renderPortfolioEquityChart(curve) {
   }
   container.innerHTML = '';
 
-  const isLight = (document.documentElement.getAttribute('data-theme') || 'dark') === 'light';
+  const isLight = (document.documentElement.getAttribute('data-theme') || 'light') === 'light';
   const bgColor = isLight ? '#FFFFFF' : '#111827';
   const textColor = isLight ? '#334155' : '#8B98A5';
   const gridColor = isLight ? 'rgba(226, 232, 240, 0.8)' : 'rgba(38, 43, 56, 0.5)';
@@ -4533,7 +4537,7 @@ function renderPortfolioAllocationChart(adviseData) {
   }
   container.innerHTML = '';
 
-  const isLight = (document.documentElement.getAttribute('data-theme') || 'dark') === 'light';
+  const isLight = (document.documentElement.getAttribute('data-theme') || 'light') === 'light';
   const bgColor = isLight ? '#FFFFFF' : '#111827';
   const textColor = isLight ? '#334155' : '#8B98A5';
   const gridColor = isLight ? 'rgba(226, 232, 240, 0.8)' : 'rgba(38, 43, 56, 0.5)';
