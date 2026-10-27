@@ -217,3 +217,34 @@ A feature é considerada validada quando:
 ### T005 — Backend intocado
 
 - `git diff --stat -- src/api` → saída vazia antes do início da implementação.
+
+### T015–T016 — Reparo de encoding
+
+- `src/web/index.html`: 399 sequências `cp1252 → UTF-8` reparadas.
+- `src/web/app.js`: 139 sequências reparadas; `src/web/modules/*.js` sem artefatos.
+- Reparo controlado por sequência UTF-8 válida, preservando acentos legítimos (ex.: `VISÃO`).
+- Contratos ativados em `tests/unit/test_layout_contracts.py`: `test_index_html_has_no_encoding_artifacts` e `test_javascript_sources_have_no_encoding_artifacts`.
+- `node --check` em `app.js` e módulos: OK.
+
+### T017–T018 — Ícones lineares
+
+- Emojis funcionais de `index.html` substituídos por `<use href="#icon-*">` do sprite (marca, ambientes, subnavegação, KPIs, importação, modais e toast).
+- Templates dinâmicos de `app.js` e `toast.js` migrados para SVG (`categorias`, badges de ação, ordenação do Radar, toast e botões de remoção).
+- Sprite ampliado com `icon-arrow-up`, `icon-arrow-down`, `icon-minus`, `icon-scale` e `icon-pause`.
+- Contratos: `test_index_html_has_no_functional_emoji` e `test_javascript_sources_have_no_functional_emoji`.
+
+### T019–T021 — Piso tipográfico e normalização
+
+- `text-[10px]` eliminado das fontes: 93 ocorrências em `index.html` e 7 em `app.js` migradas para `text-[11px]`.
+- Valores monetários e percentuais normalizados com `formatCurrency`, `formatNumber` e `formatPercent` (pt-BR, algarismos tabulares).
+- Placeholders visuais padronizados como `--`.
+- Contratos: `test_sources_do_not_declare_text_below_the_floor` e `test_typography_floor_contract_is_active`.
+
+### T022 — Validação da US1 nas 8 áreas
+
+- Data: 2026-10-27.
+- `venv/bin/python -m pytest tests/e2e/test_ui_layout.py -q` → **6 passed**.
+- `venv/bin/python -m pytest tests/unit/test_layout_contracts.py -q` → **18 passed**.
+- Matriz capturada em `/tmp/023-ui-us1/`: **64/64 imagens** (8 áreas × 375/768/1366/1920 × claro/escuro).
+- Verificação: zero artefatos de encoding, zero emojis funcionais, nenhum texto abaixo de 11px nas fontes, ícones consistentes.
+- Observação: em 375px o título da marca é truncado e a subnavegação exige rolagem horizontal; ajuste previsto na US2 (T023–T030).
