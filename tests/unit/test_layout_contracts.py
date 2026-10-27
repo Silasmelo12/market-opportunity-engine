@@ -247,6 +247,15 @@ def test_index_html_has_no_functional_emoji(index_html: str):
     assert emojis == [], f"Emojis funcionais encontrados em index.html: {emojis[:10]}"
 
 
+def test_javascript_sources_have_no_functional_emoji(app_js: str):
+    sources = {"app.js": app_js}
+    for module in sorted((WEB / "modules").glob("*.js")):
+        sources[module.name] = read(module)
+    for name, source in sources.items():
+        emojis = FUNCTIONAL_EMOJI_PATTERN.findall(source)
+        assert emojis == [], f"Emojis funcionais encontrados em {name}: {emojis[:10]}"
+
+
 def test_icon_sprite_replaces_functional_emoji(index_html: str):
     sprite_ids = re.findall(r'<g id="(icon-[^"]+)"', index_html)
     assert len(sprite_ids) >= 20, f"Sprite SVG insuficiente: {sprite_ids}"

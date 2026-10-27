@@ -9,7 +9,9 @@ function showToastNotification(message, isSuccess = true, onUndo = null) {
   if (!toast || !msgEl) return;
 
   msgEl.textContent = message;
-  if (iconEl) iconEl.textContent = isSuccess ? '✓' : '⚠️';
+  if (iconEl) iconEl.innerHTML = isSuccess
+    ? '<svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg>'
+    : '<svg class="icon" aria-hidden="true"><use href="#icon-warning"></use></svg>';
 
   toast.className = `fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-2xl border text-xs font-medium transition-all duration-300 transform translate-y-0 opacity-100 pointer-events-auto ${
     isSuccess

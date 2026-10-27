@@ -1668,10 +1668,10 @@ function renderOverviewGroupedHoldings(holdings, adviseData, totalEquity) {
 
   // Group holdings into 4 categories
   const groups = {
-    'Ações': { name: 'Ações Brasil (B3)', icon: '📈', items: [], idealPct: 30 },
-    'FIIs': { name: 'Fundos Imobiliários (FIIs)', icon: '🏢', items: [], idealPct: 20 },
-    'BDRs': { name: 'BDRs & Stocks Internacionais', icon: '🌐', items: [], idealPct: 30 },
-    'Macro': { name: 'Ouro & Macro Global', icon: '🪙', items: [], idealPct: 20 },
+    'Ações': { name: 'Ações Brasil (B3)', icon: '<svg class="icon" aria-hidden="true"><use href="#icon-trending-up"></use></svg>', items: [], idealPct: 30 },
+    'FIIs': { name: 'Fundos Imobiliários (FIIs)', icon: '<svg class="icon" aria-hidden="true"><use href="#icon-building"></use></svg>', items: [], idealPct: 20 },
+    'BDRs': { name: 'BDRs & Stocks Internacionais', icon: '<svg class="icon" aria-hidden="true"><use href="#icon-globe"></use></svg>', items: [], idealPct: 30 },
+    'Macro': { name: 'Ouro & Macro Global', icon: '<svg class="icon" aria-hidden="true"><use href="#icon-coin"></use></svg>', items: [], idealPct: 20 },
   };
 
   holdings.forEach(h => {
@@ -1772,8 +1772,8 @@ function renderOverviewGroupedHoldings(holdings, adviseData, totalEquity) {
                 const isBuy = delta > 0;
 
                 const buyBadge = isBuy
-                  ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">✓ Sim (+${delta})</span>`
-                  : `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-gray-700/40 text-gray-400">✕ Não</span>`;
+                  ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 inline-flex items-center gap-1"><svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg> Sim (+${delta})</span>`
+                  : `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-gray-700/40 text-gray-400 inline-flex items-center gap-1"><svg class="icon" aria-hidden="true"><use href="#icon-x"></use></svg> Não</span>`;
 
                 return `
                   <tr class="hover:bg-fintech-surface-hover">
@@ -3470,9 +3470,14 @@ function setupRadarTableSorting() {
   const iconN = document.getElementById('sort-icon-n');
   const iconWin = document.getElementById('sort-icon-winrate');
 
+  function sortIcon(direction) {
+    const icon = direction === 'asc' ? 'icon-arrow-up' : direction === 'desc' ? 'icon-arrow-down' : 'icon-sort';
+    return `<svg class="icon" aria-hidden="true"><use href="#${icon}"></use></svg>`;
+  }
+
   function updateIcons() {
-    if (iconN) iconN.textContent = state.radarSortField === 'historical_n' ? (state.radarSortOrder === 'asc' ? '▲' : '▼') : '↕';
-    if (iconWin) iconWin.textContent = state.radarSortField === 'historical_win_rate' ? (state.radarSortOrder === 'asc' ? '▲' : '▼') : '↕';
+    if (iconN) iconN.innerHTML = state.radarSortField === 'historical_n' ? sortIcon(state.radarSortOrder) : sortIcon(null);
+    if (iconWin) iconWin.innerHTML = state.radarSortField === 'historical_win_rate' ? sortIcon(state.radarSortOrder) : sortIcon(null);
     if (iconN) iconN.className = state.radarSortField === 'historical_n' ? 'text-[10px] text-cyan-400 font-bold' : 'text-[10px] text-gray-500';
     if (iconWin) iconWin.className = state.radarSortField === 'historical_win_rate' ? 'text-[10px] text-cyan-400 font-bold' : 'text-[10px] text-gray-500';
   }
@@ -3754,7 +3759,7 @@ function renderPortfolioHoldingsEditor() {
         <button class="btn-holding-open-chart btn-contextual text-cyan-400 hover:text-cyan-300 text-xs font-semibold px-2 py-0.5 mr-2 rounded bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-800/50 transition cursor-pointer" data-ticker="${h.ticker}" title="Abrir ativo no Gráfico Interativo">
           Abrir gráfico
         </button>
-        <button class="btn-remove-holding text-rose-400 hover:text-rose-300 text-xs font-bold px-1.5 cursor-pointer" data-idx="${idx}" title="Remover ativo">✕</button>
+        <button class="btn-remove-holding text-rose-400 hover:text-rose-300 text-xs font-bold px-1.5 cursor-pointer" data-idx="${idx}" title="Remover ativo" aria-label="Remover ativo"><svg class="icon" aria-hidden="true"><use href="#icon-x"></use></svg></button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -4071,19 +4076,21 @@ function importPortfolioHoldingsFromCsv(file) {
 }
 
 function getActionBadgeHtml(actionType, actionLabel) {
+  const badge = (tone, icon) =>
+    `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold inline-flex items-center gap-1 ${tone}"><svg class="icon" aria-hidden="true"><use href="#${icon}"></use></svg> ${actionLabel}</span>`;
   if (actionType === 'BUY') {
-    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">🟢 ${actionLabel}</span>`;
+    return badge('bg-emerald-500/20 text-emerald-400 border border-emerald-500/40', 'icon-plus');
   }
   if (actionType === 'SELL_FULL') {
-    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/40">🔴 ${actionLabel}</span>`;
+    return badge('bg-rose-500/20 text-rose-400 border border-rose-500/40', 'icon-minus');
   }
   if (actionType === 'SELL_PARTIAL_REBALANCE') {
-    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-amber-500/20 text-amber-400 border border-amber-500/40">⚖️ ${actionLabel}</span>`;
+    return badge('bg-amber-500/20 text-amber-400 border border-amber-500/40', 'icon-scale');
   }
   if (actionType === 'ROTATE_OUT' || actionType === 'ROTATE_IN') {
-    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">🔄 ${actionLabel}</span>`;
+    return badge('bg-cyan-500/20 text-cyan-300 border border-cyan-500/40', 'icon-refresh');
   }
-  return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-700/50 text-gray-300 border border-gray-600">⏸️ ${actionLabel}</span>`;
+  return badge('bg-gray-700/50 text-gray-300 border border-gray-600', 'icon-pause');
 }
 
 function renderPortfolioAdviseSection(data) {
@@ -4624,9 +4631,9 @@ function renderPortfolioOpportunityRanking(ranking) {
 
     let sigBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-gray-700/50 text-gray-400">NEUTRO</span>';
     if (p.active_direction === 'BUY') {
-      sigBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">🟢 ZONA DE COMPRA</span>';
+      sigBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 inline-flex items-center gap-1"><svg class="icon" aria-hidden="true"><use href="#icon-trending-up"></use></svg> ZONA DE COMPRA</span>';
     } else if (p.active_direction === 'SELL') {
-      sigBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/40">🔴 ZONA DE VENDA</span>';
+      sigBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/40 inline-flex items-center gap-1"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-down"></use></svg> ZONA DE VENDA</span>';
     }
 
     const retPct = Number(p.historical_return_pct) || 0;
