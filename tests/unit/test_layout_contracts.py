@@ -213,6 +213,19 @@ def test_reduced_motion_and_focus_contract(styles_css: str):
     assert "--border-focus:" in styles_css
 
 
+MOJIBAKE_PATTERN = re.compile(
+    r"Ã[\x80-\xff]|Â[\x80-\xff]|â€|â†|âœ|â–|â‰|âˆ|â•|ï¿½"
+)
+
+
+def test_index_html_has_no_encoding_artifacts(index_html: str):
+    artifacts = MOJIBAKE_PATTERN.findall(index_html)
+    assert artifacts == [], (
+        f"Artefatos de encoding encontrados em index.html: {artifacts[:10]}"
+    )
+    assert '<meta charset="UTF-8">' in index_html
+
+
 def test_icon_sprite_replaces_functional_emoji(index_html: str):
     sprite_ids = re.findall(r'<g id="(icon-[^"]+)"', index_html)
     assert len(sprite_ids) >= 20, f"Sprite SVG insuficiente: {sprite_ids}"
