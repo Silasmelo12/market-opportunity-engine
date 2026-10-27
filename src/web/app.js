@@ -1059,12 +1059,8 @@ function setupRadarTimeframeButtons() {
   const buttons = document.querySelectorAll('#radar-timeframe-buttons .radar-tf-btn');
   buttons.forEach(btn => {
     btn.addEventListener('click', () => {
-      buttons.forEach(b => {
-        b.classList.remove('active', 'bg-fintech-cyan/20', 'text-fintech-cyan', 'border', 'border-fintech-cyan/40', 'font-bold');
-        b.classList.add('bg-fintech-bg', 'text-gray-300');
-      });
-      btn.classList.add('active', 'bg-fintech-cyan/20', 'text-fintech-cyan', 'border', 'border-fintech-cyan/40', 'font-bold');
-      btn.classList.remove('bg-fintech-bg', 'text-gray-300');
+      buttons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
 
       state.radarTimeframe = btn.getAttribute('data-tf');
       state.radarCategoryCache = {}; // reset cache for new timeframe
@@ -1079,11 +1075,9 @@ function setupRadarCategoryPills() {
   pills.forEach(pill => {
     pill.addEventListener('click', () => {
       pills.forEach(p => {
-        p.classList.remove('bg-cyan-600/30', 'text-cyan-300', 'border-cyan-500/40', 'active-cat');
-        p.classList.add('bg-fintech-surface', 'text-gray-400', 'border-fintech-border');
+        p.classList.remove('active', 'active-cat');
       });
-      pill.classList.add('bg-cyan-600/30', 'text-cyan-300', 'border-cyan-500/40', 'active-cat');
-      pill.classList.remove('bg-fintech-surface', 'text-gray-400', 'border-fintech-border');
+      pill.classList.add('active', 'active-cat');
 
       const selectedCat = pill.getAttribute('data-cat') || 'featured';
       state.radarActiveCategory = selectedCat;
@@ -2200,13 +2194,13 @@ function updateRadarExecutiveDeck(items) {
   if (regimeEl) {
     if (buys.length > sells.length * 1.5) {
       regimeEl.textContent = 'Sobrevendido (Alta Assimetria)';
-      regimeEl.className = 'text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 truncate';
+      regimeEl.className = 'text-base sm:text-lg font-bold text-positive truncate';
     } else if (sells.length > buys.length * 1.5) {
       regimeEl.textContent = 'Sobrecomprado (Alerta Topo)';
-      regimeEl.className = 'text-base sm:text-lg font-bold text-rose-600 dark:text-rose-400 truncate';
+      regimeEl.className = 'text-base sm:text-lg font-bold text-negative truncate';
     } else {
       regimeEl.textContent = 'Equilibrado / Rotação';
-      regimeEl.className = 'text-base sm:text-lg font-bold text-amber-600 dark:text-amber-400 truncate';
+      regimeEl.className = 'text-base sm:text-lg font-bold text-warning truncate';
     }
   }
 
@@ -2227,7 +2221,7 @@ function renderRadarTable(pageOrItems) {
   if (!items || items.length === 0) {
     elements.radarTableBody.innerHTML = `
       <tr>
-        <td colspan="9" class="text-center py-8 text-gray-500">
+        <td colspan="9" class="text-center py-8 text-subtle">
           Nenhuma oportunidade com sinal ativo ou reteste pendente no momento.
         </td>
       </tr>
@@ -2253,7 +2247,7 @@ function renderRadarTable(pageOrItems) {
   if (filtered.length === 0) {
     elements.radarTableBody.innerHTML = `
       <tr>
-        <td colspan="9" class="text-center py-8 text-gray-500">
+        <td colspan="9" class="text-center py-8 text-subtle">
           Nenhuma oportunidade encontrada para a direção selecionada (${state.activeDirection || 'BUY'}).
         </td>
       </tr>
@@ -2266,7 +2260,7 @@ function renderRadarTable(pageOrItems) {
 
   filtered.forEach(item => {
     const tr = document.createElement('tr');
-    tr.className = 'hover:bg-fintech-surface-hover transition';
+    tr.className = 'hover-surface transition';
 
     // Minimalist Timing Indicator Dot
     let dotClass = 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)]';
@@ -2287,30 +2281,30 @@ function renderRadarTable(pageOrItems) {
     tr.innerHTML = `
       <td class="px-3 sm:px-4 py-2.5 sm:py-3">
         <button class="text-left group btn-open-ticker focus:outline-none cursor-pointer" data-ticker="${item.ticker}" data-strategy="${item.strategy_sub_id}" data-direction="${item.direction}">
-          <div class="font-bold text-cyan-400 group-hover:text-cyan-200 group-hover:underline flex items-center gap-1.5 transition">
+          <div class="font-bold text-info group-hover-primary group-hover:underline flex items-center gap-1.5 transition">
             <span>${friendlyName}</span>
-            <span class="text-xs text-cyan-500/70 group-hover:text-cyan-300">↗</span>
+            <span class="text-xs text-info group-hover-primary">↗</span>
           </div>
-          <div class="text-[11px] text-gray-500 font-mono tracking-wide">${item.ticker}</div>
+          <div class="text-[11px] text-subtle font-mono tracking-wide">${item.ticker}</div>
         </button>
       </td>
       <td class="px-2 sm:px-3 py-2.5 sm:py-3 text-center">${dirBadge}</td>
-      <td class="px-3 sm:px-4 py-2.5 sm:py-3 ${isBuy ? 'text-emerald-300' : 'text-rose-300'} font-medium">${item.strategy_label}</td>
-      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono text-gray-300">${item.status_signal}</td>
+      <td class="px-3 sm:px-4 py-2.5 sm:py-3 ${isBuy ? 'text-positive' : 'text-negative'} font-medium">${item.strategy_label}</td>
+      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono text-muted">${item.status_signal}</td>
       <td class="px-2 sm:px-3 py-2.5 sm:py-3 text-center">
         <span class="inline-block w-3 h-3 rounded-full cursor-help ${dotClass}" title="${item.timing_label}"></span>
       </td>
-      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono font-bold text-right ${item.distance_pct >= 0 ? 'text-amber-400' : 'text-cyan-400'}">
+      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono font-bold text-right ${item.distance_pct >= 0 ? 'text-warning' : 'text-info'}">
         ${formatPercent(item.distance_pct, 1, true)}
       </td>
-      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono text-right text-gray-200 font-semibold">
+      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono text-right text-strong font-semibold">
         ${item.historical_n !== undefined && item.historical_n !== null ? item.historical_n : '--'}
       </td>
-      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono text-right font-semibold ${item.historical_win_rate >= 60 ? 'text-emerald-400' : 'text-gray-300'}">
+      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono text-right font-semibold ${item.historical_win_rate >= 60 ? 'text-positive' : 'text-muted'}">
         ${item.historical_win_rate !== undefined && item.historical_win_rate !== null ? formatPercent(item.historical_win_rate, 1) : '--'}
       </td>
       <td class="px-3 sm:px-4 py-2.5 sm:py-3 text-right whitespace-nowrap">
-        <button class="btn-radar-open-chart btn-contextual text-cyan-400 hover:text-cyan-300 text-xs font-semibold px-2 py-0.5 rounded bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-800/50 transition cursor-pointer" data-ticker="${item.ticker}" data-strategy="${item.strategy_sub_id || ''}" data-direction="${item.direction || 'BUY'}" title="Abrir ativo no Gráfico Interativo">
+        <button class="btn-radar-open-chart btn-contextual text-info hover-primary text-xs font-semibold px-2 py-0.5 rounded surface-subtle hover-surface border border-default transition cursor-pointer" data-ticker="${item.ticker}" data-strategy="${item.strategy_sub_id || ''}" data-direction="${item.direction || 'BUY'}" title="Abrir ativo no Gráfico Interativo">
           Abrir gráfico
         </button>
       </td>
@@ -2329,14 +2323,14 @@ function renderRadarTable(pageOrItems) {
       const dirButtons = document.querySelectorAll('#global-direction-selector .dir-seg-btn');
       dirButtons.forEach(b => {
         b.classList.remove('active-buy', 'active-sell', 'active-both');
-        b.classList.add('text-gray-400');
+        b.classList.add('text-muted');
       });
       const activeBtn = document.querySelector(`#global-direction-selector .dir-seg-btn[data-dir="${dir}"]`);
       if (activeBtn) {
         if (dir === 'BUY') activeBtn.classList.add('active-buy');
         else if (dir === 'SELL') activeBtn.classList.add('active-sell');
         else activeBtn.classList.add('active-both');
-        activeBtn.classList.remove('text-gray-400');
+        activeBtn.classList.remove('text-muted');
       }
       updateSidebarDirectionFilter();
     }
@@ -2345,11 +2339,9 @@ function renderRadarTable(pageOrItems) {
       state.currentTimeframe = state.radarTimeframe;
       document.querySelectorAll('#timeframe-buttons .tf-btn').forEach(b => {
         if (b.getAttribute('data-tf') === state.currentTimeframe) {
-          b.classList.add('active', 'bg-fintech-cyan/20', 'text-fintech-cyan', 'border', 'border-fintech-cyan/40', 'font-bold');
-          b.classList.remove('bg-fintech-bg', 'text-gray-300');
+          b.classList.add('active');
         } else {
-          b.classList.remove('active', 'bg-fintech-cyan/20', 'text-fintech-cyan', 'border', 'border-fintech-cyan/40', 'font-bold');
-          b.classList.add('bg-fintech-bg', 'text-gray-300');
+          b.classList.remove('active');
         }
       });
     }
@@ -3541,8 +3533,8 @@ function setupRadarTableSorting() {
   function updateIcons() {
     if (iconN) iconN.innerHTML = state.radarSortField === 'historical_n' ? sortIcon(state.radarSortOrder) : sortIcon(null);
     if (iconWin) iconWin.innerHTML = state.radarSortField === 'historical_win_rate' ? sortIcon(state.radarSortOrder) : sortIcon(null);
-    if (iconN) iconN.className = state.radarSortField === 'historical_n' ? 'text-[11px] text-cyan-400 font-bold' : 'text-[11px] text-gray-500';
-    if (iconWin) iconWin.className = state.radarSortField === 'historical_win_rate' ? 'text-[11px] text-cyan-400 font-bold' : 'text-[11px] text-gray-500';
+    if (iconN) iconN.className = state.radarSortField === 'historical_n' ? 'text-[11px] text-info font-bold' : 'text-[11px] text-subtle';
+    if (iconWin) iconWin.className = state.radarSortField === 'historical_win_rate' ? 'text-[11px] text-info font-bold' : 'text-[11px] text-subtle';
   }
 
   if (thN) {
@@ -3633,16 +3625,16 @@ function renderRadarStratMenu() {
   });
 
   if (strats.length === 0) {
-    container.innerHTML = '<div class="text-gray-500 py-1">Nenhuma estratégia disponível.</div>';
+    container.innerHTML = '<div class="text-subtle py-1">Nenhuma estratégia disponível.</div>';
     return;
   }
 
   strats.forEach(st => {
     const label = document.createElement('label');
-    label.className = 'flex items-center space-x-2 cursor-pointer hover:text-white text-gray-300 py-0.5';
+    label.className = 'flex items-center space-x-2 cursor-pointer hover-text text-muted py-0.5';
     const isChecked = state.radarStrategies.has(st.id);
     label.innerHTML = `
-      <input type="checkbox" class="radar-strat-cb rounded bg-fintech-bg border-fintech-border text-fintech-cyan" data-id="${st.id}" ${isChecked ? 'checked' : ''}>
+      <input type="checkbox" class="radar-strat-cb rounded surface-canvas border-default text-info" data-id="${st.id}" ${isChecked ? 'checked' : ''}>
       <span class="truncate">${st.label}</span>
     `;
     const cb = label.querySelector('input');
