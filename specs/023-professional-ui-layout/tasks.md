@@ -112,17 +112,17 @@
 
 **Independent Test**: Percorrer as 4 áreas quantitativas nos dois temas e confirmar ausência de resíduos da estética escura legada.
 
-- [ ] T041 [US4] Refatorar o markup do Radar (filtros, tabela, paginação, ações) em `src/web/index.html`
-- [ ] T042 [US4] Refatorar o markup do Gráfico (sidebar, controles, retorno contextual) em `src/web/index.html`
-- [ ] T043 [US4] Refatorar o markup do Simulador (formulários, grids, resultados) em `src/web/index.html`
-- [ ] T044 [US4] Refatorar o markup do Playbook (grupos, blocos, destaques) em `src/web/index.html`
-- [ ] T045 [P] [US4] Implementar estilos unificados das áreas quantitativas em `src/web/styles.css`
-- [ ] T046 [P] [US4] Atualizar classes de renderização do Radar em `src/web/app.js`
-- [ ] T047 [US4] Atualizar classes dos controles e do gráfico TradingView em `src/web/app.js`
-- [ ] T048 [US4] Atualizar classes de renderização do Simulador e Playbook em `src/web/app.js`
-- [ ] T049 [US4] Remover os blocos de override de tema legado de `src/web/styles.css` após a migração completa
-- [ ] T050 [P] [US4] Adicionar testes E2E das áreas quantitativas em `tests/e2e/test_ui_layout.py`
-- [ ] T051 [US4] Validar as 4 áreas quantitativas nos dois temas e registrar evidências em `specs/023-professional-ui-layout/quickstart.md`
+- [X] T041 [US4] Refatorar o markup do Radar (filtros, tabela, paginação, ações) em `src/web/index.html`
+- [X] T042 [US4] Refatorar o markup do Gráfico (sidebar, controles, retorno contextual) em `src/web/index.html`
+- [X] T043 [US4] Refatorar o markup do Simulador (formulários, grids, resultados) em `src/web/index.html`
+- [X] T044 [US4] Refatorar o markup do Playbook (grupos, blocos, destaques) em `src/web/index.html`
+- [X] T045 [P] [US4] Implementar estilos unificados das áreas quantitativas em `src/web/styles.css`
+- [X] T046 [P] [US4] Atualizar classes de renderização do Radar em `src/web/app.js`
+- [X] T047 [US4] Atualizar classes dos controles e do gráfico TradingView em `src/web/app.js`
+- [X] T048 [US4] Atualizar classes de renderização do Simulador e Playbook em `src/web/app.js`
+- [X] T049 [US4] Remover os blocos de override de tema legado de `src/web/styles.css` após a migração completa
+- [X] T050 [P] [US4] Adicionar testes E2E das áreas quantitativas em `tests/e2e/test_ui_layout.py`
+- [X] T051 [US4] Validar as 4 áreas quantitativas nos dois temas e registrar evidências em `specs/023-professional-ui-layout/quickstart.md`
 
 **Checkpoint**: As 8 áreas compartilham a mesma identidade visual.
 

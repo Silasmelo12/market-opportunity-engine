@@ -281,3 +281,27 @@ A feature é considerada validada quando:
   - Contêineres de gráficos do Resumo/Patrimônio limpos antes de `Plotly.newPlot`, removendo os textos "Carregando…" sobre gráficos já renderizados.
 - Ajuste de teste: o E2E de importação agora valida o banner de primeiro uso no estado sem dados, coerente com a exibição condicional da T035.
 - Suítes: `tests/unit/test_layout_contracts.py` + `tests/e2e/test_ui_layout.py` + `tests/e2e/test_dashboard_navigation.py` → **43 passed** (19 unitários + 8 de layout + 16 de navegação).
+
+### T051 — Validação das 4 áreas quantitativas (US4)
+
+- Data: 2026-10-27.
+- Matriz capturada em `/tmp/023-ui-us4-validated/`: **64/64 imagens** (8 áreas × 375/768/1366/1920 × claro/escuro).
+- Áreas quantitativas conferidas nos dois temas (1366px como referência, com checagem em 375/768/1920px):
+  1. **Radar/claro** — KPIs executivos, filtros segmentados, tabela de oportunidades e paginação sobre superfícies claras.
+  2. **Radar/escuro** — cartões, tabela e chips com hierarquia de tokens e contraste AA.
+  3. **Gráfico/claro** — sidebar de estratégias, controles, banner de retorno contextual e área do Plotly coerentes com o restante do produto.
+  4. **Gráfico/escuro** — sidebar, grupos de estratégia e gráfico legíveis, sem ilhas claras.
+  5. **Simulador/claro** — formulários, grids de resultados, KPIs e tabela de trades usando `.card-surface`, `.input`, `.kpi-card` e `.table-standard`.
+  6. **Simulador/escuro** — mesmos componentes com tokens escuros e séries dos gráficos legíveis.
+  7. **Playbook/claro** — grupos, blocos e destaques com `.playbook-group-title`/`.playbook-block`.
+  8. **Playbook/escuro** — blocos e destaques com contraste preservado.
+- Migração concluída:
+  - Radar, Gráfico, Simulador e Playbook passaram a usar `.quant-area`, `.card-surface`, `.chart-card`, `.kpi-card`, `.section-title`, `.segmented`, `.filter-chip`, `.input`, `.table-standard` e utilitários semânticos (`surface*`, `text-*`, `bg-*-soft`).
+  - Renderizadores dinâmicos de `app.js` deixaram de emitir classes legadas (`fintech`/`gray`/`cyan`/`emerald`/`rose`/`amber`).
+  - Bloco `[data-theme="light"]` de contra-tema das áreas legadas removido; `#tab-portfolio` retirado do remapeamento escuro da carteira.
+  - Classes legadas residuais da cauda de Posições, do modal de metas, de Proventos e do toast migradas antes da remoção dos overrides.
+- Correções aplicadas durante a validação:
+  - KPIs do Radar reorganizados (`flex-wrap` para ativo/score e empilhamento do regime no mobile), eliminando sobreposição em 375px e 768px.
+  - Piso tipográfico mantido em 11px também nos KPIs do Radar (o contrato `test_sources_do_not_declare_text_below_the_floor` barra `text-[10px]`).
+- Testes: `tests/unit/test_layout_contracts.py` + `tests/e2e/test_ui_layout.py` + `tests/e2e/test_dashboard_navigation.py` → **45 passed** (19 unitários + 10 de layout + 16 de navegação).
+- Novos E2E: `test_quant_areas_use_shared_semantic_system` (presença dos componentes compartilhados e ausência de classes legadas nas 4 áreas) e `test_quant_areas_adapt_to_theme_tokens` (fundo do painel e dos cartões muda entre claro/escuro).
