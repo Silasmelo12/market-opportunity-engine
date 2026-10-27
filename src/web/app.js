@@ -1297,6 +1297,15 @@ async function renderOverviewDashboard() {
   const radarItems = state.lastRadarPage ? (state.lastRadarPage.items || []) : [];
   const holdings = state.portfolioState.holdings || [];
 
+  // Banner de primeiro uso: visível apenas quando não há dados importados.
+  const welcomeBanner = document.getElementById('investidor10-welcome-banner');
+  if (welcomeBanner) {
+    const hasImportedData = holdings.length > 0
+      || (Number(state.portfolioState.b3TotalIncome) || 0) > 0
+      || (state.portfolioState.b3Timeline || []).length > 0;
+    welcomeBanner.classList.toggle('hidden', hasImportedData);
+  }
+
   // 1. Calculate Core Financial Metrics
   let totalInvested = 0;
   let totalCurrentValue = 0;
