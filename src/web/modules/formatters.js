@@ -28,6 +28,28 @@ function getAssetName(ticker) {
   return names[ticker.toUpperCase()] || ticker;
 }
 
+function formatNumber(value, decimals = 2) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return '-';
+  return num.toLocaleString('pt-BR', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
+  });
+}
+
+function formatPercent(value, decimals = 1, withSign = false) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return '-';
+  const sign = withSign && num > 0 ? '+' : '';
+  return `${sign}${formatNumber(num, decimals)}%`;
+}
+
+function formatCurrency(value, decimals = 2) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return '-';
+  return `R$ ${formatNumber(num, decimals)}`;
+}
+
 function formatPrice(price, ticker = null, category = null) {
   if (price === null || price === undefined || isNaN(price)) return '-';
   const num = Number(price);
@@ -41,7 +63,7 @@ function formatPrice(price, ticker = null, category = null) {
     return `${Math.round(num).toLocaleString('pt-BR')} pts`;
   }
   if (t === 'USDBRL=X' || t === 'WDO') {
-    return `R$ ${num.toFixed(4)}`;
+    return `R$ ${num.toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}`;
   }
 
   const isForex = t.endsWith('=X') || c.includes('forex') || c.includes('fx');
@@ -72,6 +94,9 @@ if (typeof window !== 'undefined') {
   window.resolveTicker = resolveTicker;
   window.getAssetName = getAssetName;
   window.formatPrice = formatPrice;
+  window.formatNumber = formatNumber;
+  window.formatPercent = formatPercent;
+  window.formatCurrency = formatCurrency;
   window.sanitizeTickerParam = sanitizeTickerParam;
 }
 if (typeof module !== 'undefined' && module.exports) {
@@ -80,6 +105,9 @@ if (typeof module !== 'undefined' && module.exports) {
     resolveTicker,
     getAssetName,
     formatPrice,
+    formatNumber,
+    formatPercent,
+    formatCurrency,
     sanitizeTickerParam
   };
 }

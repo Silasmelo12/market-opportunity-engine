@@ -1328,8 +1328,7 @@ async function renderOverviewDashboard() {
   if (eqEl) eqEl.textContent = `R$ ${totalEquity.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   if (invEl) invEl.textContent = `R$ ${totalInvested.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   if (varEl) {
-    const sign = totalProfitPct >= 0 ? '+' : '';
-    varEl.textContent = `${sign}${totalProfitPct.toFixed(2)}%`;
+    varEl.textContent = formatPercent(totalProfitPct, 2, true);
     varEl.className = totalProfitPct >= 0
       ? 'text-emerald-400 font-bold font-mono text-[11px] bg-emerald-500/10 px-1.5 py-0.5 rounded'
       : 'text-rose-400 font-bold font-mono text-[11px] bg-rose-500/10 px-1.5 py-0.5 rounded';
@@ -1350,8 +1349,8 @@ async function renderOverviewDashboard() {
   if (bestTickerEl) bestTickerEl.textContent = bestAsset.ticker !== '--' ? bestAsset.ticker : '--';
   if (bestPctEl) {
     if (bestAsset.ticker !== '--') {
-      bestPctEl.textContent = `${bestAsset.pct >= 0 ? '+' : ''}${bestAsset.pct.toFixed(2)}% ↗`;
-      bestPctEl.className = 'text-[10px] font-bold font-mono text-emerald-400 bg-emerald-500/10 px-1 rounded inline-block mt-0.5';
+      bestPctEl.textContent = `${formatPercent(bestAsset.pct, 2, true)} ↗`;
+      bestPctEl.className = 'text-[11px] font-bold font-mono text-emerald-400 bg-emerald-500/10 px-1 rounded inline-block mt-0.5';
     } else {
       bestPctEl.textContent = '--';
     }
@@ -1359,8 +1358,8 @@ async function renderOverviewDashboard() {
   if (worstTickerEl) worstTickerEl.textContent = worstAsset.ticker !== '--' ? worstAsset.ticker : '--';
   if (worstPctEl) {
     if (worstAsset.ticker !== '--') {
-      worstPctEl.textContent = `${worstAsset.pct >= 0 ? '+' : ''}${worstAsset.pct.toFixed(2)}% ↘`;
-      worstPctEl.className = 'text-[10px] font-bold font-mono text-rose-400 bg-rose-500/10 px-1 rounded inline-block mt-0.5';
+      worstPctEl.textContent = `${formatPercent(worstAsset.pct, 2, true)} ↘`;
+      worstPctEl.className = 'text-[11px] font-bold font-mono text-rose-400 bg-rose-500/10 px-1 rounded inline-block mt-0.5';
     } else {
       worstPctEl.textContent = '--';
     }
@@ -1397,16 +1396,16 @@ async function renderOverviewDashboard() {
 
   // Proventos: sem metadados estritos de cobertura dos extratos, exibir histórico importado
   if (divTitleEl) {
-    divTitleEl.textContent = 'Proventos registrados no hist\u00f3rico importado';
+    divTitleEl.textContent = 'Proventos registrados no histórico importado';
   }
 
   if (divPeriodLabelEl) {
-    divPeriodLabelEl.textContent = 'Hist\u00f3rico total';
+    divPeriodLabelEl.textContent = 'Histórico total';
   }
 
   if (divMonthlyEl) {
     const entriesCount = Array.isArray(b3Monthly) ? b3Monthly.length : 0;
-    divMonthlyEl.textContent = entriesCount > 0 ? (entriesCount + ' ' + (entriesCount === 1 ? 'm\u00eas com registro' : 'meses com registros')) : 'Sem registros';
+    divMonthlyEl.textContent = entriesCount > 0 ? (entriesCount + ' ' + (entriesCount === 1 ? 'mês com registro' : 'meses com registros')) : 'Sem registros';
   }
 
 
@@ -1427,8 +1426,7 @@ async function renderOverviewDashboard() {
   }
   if (kpiLucroBadge) {
     if (totalInvested > 0) {
-      const sign = totalProfitPct >= 0 ? '+' : '';
-      kpiLucroBadge.textContent = sign + totalProfitPct.toFixed(2) + '%';
+      kpiLucroBadge.textContent = formatPercent(totalProfitPct, 2, true);
       kpiLucroBadge.className = totalProfitPct >= 0 ? 'badge-gain' : 'badge-loss';
     } else {
       kpiLucroBadge.textContent = 'N/A';
@@ -1436,7 +1434,7 @@ async function renderOverviewDashboard() {
     }
   }
   if (kpiLucroSub) {
-    kpiLucroSub.textContent = totalInvested > 0 ? ('Sobre custo: R$ ' + totalInvested.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) : 'Sem custo em cust\u00f3dia';
+    kpiLucroSub.textContent = totalInvested > 0 ? ('Sobre custo: R$ ' + totalInvested.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) : 'Sem custo em custódia';
   }
 
   const kpiPosCount = document.getElementById('kpi-posicoes-count');
@@ -1449,18 +1447,18 @@ async function renderOverviewDashboard() {
     const pctGain = (gainersCount / eligiblePositionsCount) * 100;
     if (kpiPosCount) kpiPosCount.textContent = gainersCount + ' de ' + eligiblePositionsCount;
     if (kpiPosPct) {
-      kpiPosPct.textContent = pctGain.toFixed(0) + '%';
+      kpiPosPct.textContent = formatPercent(pctGain, 0);
       kpiPosPct.className = 'badge-gain';
     }
     if (kpiProgGreen) kpiProgGreen.style.width = pctGain + '%';
     if (kpiProgRed) kpiProgRed.style.width = (100 - pctGain) + '%';
     if (kpiPosSub) {
       kpiPosSub.textContent = missingQuotesCount > 0
-        ? (missingQuotesCount + ' ' + (missingQuotesCount === 1 ? 'sem cota\u00e7\u00e3o v\u00e1lida' : 'sem cota\u00e7\u00e3o v\u00e1lida'))
-        : (eligiblePositionsCount + ' ' + (eligiblePositionsCount === 1 ? 'eleg\u00edvel' : 'eleg\u00edveis'));
+        ? (missingQuotesCount + ' ' + (missingQuotesCount === 1 ? 'sem cotação válida' : 'sem cotação válida'))
+        : (eligiblePositionsCount + ' ' + (eligiblePositionsCount === 1 ? 'elegível' : 'elegíveis'));
     }
   } else {
-    if (kpiPosCount) kpiPosCount.textContent = totalPositions === 0 ? 'Sem ativos' : 'Sem cota\u00e7\u00f5es v\u00e1lidas';
+    if (kpiPosCount) kpiPosCount.textContent = totalPositions === 0 ? 'Sem ativos' : 'Sem cotações válidas';
     if (kpiPosPct) {
       kpiPosPct.textContent = 'N/A';
       kpiPosPct.className = 'badge-neutral';
@@ -1469,12 +1467,12 @@ async function renderOverviewDashboard() {
     if (kpiProgRed) kpiProgRed.style.width = '0%';
     if (kpiPosSub) {
       kpiPosSub.textContent = missingQuotesCount > 0
-        ? (missingQuotesCount + ' sem cota\u00e7\u00e3o v\u00e1lida')
-        : 'Nenhuma posi\u00e7\u00e3o eleg\u00edvel';
+        ? (missingQuotesCount + ' sem cotação válida')
+        : 'Nenhuma posição elegível';
     }
   }
   const winRatio = totalPositions > 0 ? (gainersCount / totalPositions) * 100 : 0;
-  if (ratioBadge) ratioBadge.textContent = `${winRatio.toFixed(0)}%`;
+  if (ratioBadge) ratioBadge.textContent = formatPercent(winRatio, 0);
   if (ratioText) ratioText.textContent = `${gainersCount} de ${totalPositions}`;
   if (profitBar) profitBar.style.width = `${winRatio}%`;
   if (gainersEl) gainersEl.textContent = `${gainersCount} no lucro ▲`;
@@ -1782,17 +1780,17 @@ function renderOverviewGroupedHoldings(holdings, adviseData, totalEquity) {
                       <span class="text-[11px] text-gray-400 block">${stripCorporateSuffix(h.ticker)}</span>
                     </td>
                     <td class="px-3 py-2.5 text-right font-bold text-gray-200">${Number(h.shares).toLocaleString('pt-BR')}</td>
-                    <td class="px-3 py-2.5 text-right text-gray-400">R$ ${Number(h.average_buy_price).toFixed(2)}</td>
-                    <td class="px-3 py-2.5 text-right font-bold text-white">R$ ${currentP.toFixed(2)}</td>
+                    <td class="px-3 py-2.5 text-right text-gray-400">${formatCurrency(h.average_buy_price)}</td>
+                    <td class="px-3 py-2.5 text-right font-bold text-white">${formatCurrency(currentP)}</td>
                     <td class="px-3 py-2.5 text-right font-bold text-white">R$ ${saldo.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td class="px-3 py-2.5 text-right font-bold ${retColor}">
                       ${profit >= 0 ? '+' : ''}R$ ${profit.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </td>
                     <td class="px-3 py-2.5 text-right font-bold ${retColor}">
-                      ${retPct >= 0 ? '+' : ''}${retPct.toFixed(2)}%
+                      ${formatPercent(retPct, 2, true)}
                     </td>
-                    <td class="px-3 py-2.5 text-right text-cyan-300 font-bold">${w.toFixed(1)}%</td>
-                    <td class="px-3 py-2.5 text-right text-gray-400" title="Calculado com base no Score de Oportunidade e peso teto de alocação">${idealW.toFixed(1)}%</td>
+                    <td class="px-3 py-2.5 text-right text-cyan-300 font-bold">${formatPercent(w, 1)}</td>
+                    <td class="px-3 py-2.5 text-right text-gray-400" title="Calculado com base no Score de Oportunidade e peso teto de alocação">${formatPercent(idealW, 1)}</td>
                     <td class="px-3 py-2.5 text-center">${buyBadge}</td>
                   </tr>
                 `;
@@ -1811,8 +1809,8 @@ function renderOverviewGroupedHoldings(holdings, adviseData, totalEquity) {
                   <td class="px-3 py-2 text-right text-gray-400">--</td>
                   <td class="px-3 py-2 text-right text-white">R$ ${grpSaldo.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   <td class="px-3 py-2 text-right ${grpRetColor}">${grpProfit >= 0 ? '+' : ''}R$ ${grpProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                  <td class="px-3 py-2 text-right ${grpRetColor}">${grpRetPct >= 0 ? '+' : ''}${grpRetPct.toFixed(2)}%</td>
-                  <td class="px-3 py-2 text-right text-cyan-300">${grpWeight.toFixed(1)}%</td>
+                  <td class="px-3 py-2 text-right ${grpRetColor}">${formatPercent(grpRetPct, 2, true)}</td>
+                  <td class="px-3 py-2 text-right text-cyan-300">${formatPercent(grpWeight, 1)}</td>
                   <td class="px-3 py-2 text-right text-gray-400">${group.idealPct}%</td>
                   <td class="px-3 py-2 text-center text-gray-500">--</td>
                 </tr>
@@ -2239,13 +2237,13 @@ function renderRadarTable(pageOrItems) {
         <span class="inline-block w-3 h-3 rounded-full cursor-help ${dotClass}" title="${item.timing_label}"></span>
       </td>
       <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono font-bold text-right ${item.distance_pct >= 0 ? 'text-amber-400' : 'text-cyan-400'}">
-        ${item.distance_pct >= 0 ? '+' : ''}${item.distance_pct.toFixed(1)}%
+        ${formatPercent(item.distance_pct, 1, true)}
       </td>
       <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono text-right text-gray-200 font-semibold">
-        ${item.historical_n !== undefined && item.historical_n !== null ? item.historical_n : '-'}
+        ${item.historical_n !== undefined && item.historical_n !== null ? item.historical_n : '--'}
       </td>
       <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono text-right font-semibold ${item.historical_win_rate >= 60 ? 'text-emerald-400' : 'text-gray-300'}">
-        ${item.historical_win_rate !== undefined && item.historical_win_rate !== null ? item.historical_win_rate.toFixed(1) + '%' : '-'}
+        ${item.historical_win_rate !== undefined && item.historical_win_rate !== null ? formatPercent(item.historical_win_rate, 1) : '--'}
       </td>
       <td class="px-3 sm:px-4 py-2.5 sm:py-3 text-right whitespace-nowrap">
         <button class="btn-radar-open-chart btn-contextual text-cyan-400 hover:text-cyan-300 text-xs font-semibold px-2 py-0.5 rounded bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-800/50 transition cursor-pointer" data-ticker="${item.ticker}" data-strategy="${item.strategy_sub_id || ''}" data-direction="${item.direction || 'BUY'}" title="Abrir ativo no Gráfico Interativo">
@@ -2867,8 +2865,8 @@ function renderSignalsTable(signals) {
       <td class="px-3 py-2 font-mono text-right font-bold text-amber-300">${sig.sharesBought} cotas</td>
       <td class="px-3 py-2 font-mono text-right text-white">${formatPrice(sig.boughtVal, state.currentTicker)}</td>
       <td class="px-3 py-2 font-mono text-right text-gray-400">${formatPrice(sig.cashRemaining, state.currentTicker)}</td>
-      <td class="px-3 py-2 font-mono text-right font-bold ${retClass}">${sig.forward_return_pct !== null && sig.forward_return_pct !== undefined ? (sig.forward_return_pct >= 0 ? '+' : '') + sig.forward_return_pct.toFixed(1) + '%' : (sig.is_open ? 'Pendente' : '-')}</td>
-      <td class="px-3 py-2 font-mono text-right text-rose-400">${sig.mae_pct !== null && sig.mae_pct !== undefined ? sig.mae_pct.toFixed(1) + '%' : '-'}</td>
+      <td class="px-3 py-2 font-mono text-right font-bold ${retClass}">${sig.forward_return_pct !== null && sig.forward_return_pct !== undefined ? (sig.forward_return_pct >= 0 ? '+' : '') + sig.forward_return_pct.toFixed(1) + '%' : (sig.is_open ? 'Pendente' : '--')}</td>
+      <td class="px-3 py-2 font-mono text-right text-rose-400">${sig.mae_pct !== null && sig.mae_pct !== undefined ? sig.mae_pct.toFixed(1) + '%' : '--'}</td>
       <td class="px-3 py-2 font-mono text-center text-[11px]">${sig.is_open ? '<span class="text-amber-400 font-bold">ABERTO / PENDENTE</span>' : '<span class="text-gray-400">CONCLUÍDO</span>'}</td>
     `;
     elements.signalsTableBody.appendChild(tr);
@@ -3031,32 +3029,33 @@ async function runSimulation() {
     const isCycle = (mode === 'cycle_trade');
 
     // 1. Capital Investido & Patrimônio Final
-    document.getElementById('sim-kpi-invested').textContent = `R$ ${m.total_invested.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-    document.getElementById('sim-kpi-final').textContent = `R$ ${m.final_portfolio_value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+    document.getElementById('sim-kpi-invested').textContent = formatCurrency(m.total_invested);
+    document.getElementById('sim-kpi-final').textContent = formatCurrency(m.final_portfolio_value);
 
     // 2. Retorno Estratégia vs Buy & Hold
     const retEl = document.getElementById('sim-kpi-return');
     if (retEl) {
-      retEl.textContent = `${m.total_return_pct >= 0 ? '+' : ''}${m.total_return_pct.toFixed(1)}%`;
+      retEl.textContent = formatPercent(m.total_return_pct, 1, true);
       retEl.className = `text-base sm:text-lg font-bold font-mono ${m.total_return_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
     }
     const bnhSub = document.getElementById('sim-kpi-bnh-sub');
     if (bnhSub) {
-      const bnh = m.buy_and_hold_return_pct != null ? m.buy_and_hold_return_pct.toFixed(1) : '0.0';
-      const bnhDiff = (m.total_return_pct - (m.buy_and_hold_return_pct || 0)).toFixed(1);
-      bnhSub.textContent = `B&H: ${bnh}% (Alpha: ${bnhDiff >= 0 ? '+' : ''}${bnhDiff}%)`;
+      const bnh = m.buy_and_hold_return_pct != null ? formatPercent(m.buy_and_hold_return_pct, 1) : '0,0%';
+      const bnhDiff = m.total_return_pct - (m.buy_and_hold_return_pct || 0);
+      bnhSub.textContent = `B&H: ${bnh} (Alpha: ${formatPercent(bnhDiff, 1, true)})`;
     }
 
     // 3. Fator de Lucro & Lucro Líquido
     const pfEl = document.getElementById('sim-kpi-profit-factor');
     if (pfEl) {
-      const pf = m.profit_factor != null ? (m.profit_factor >= 999 ? '∞' : m.profit_factor.toFixed(2)) : '0.00';
+      const pfValue = m.profit_factor;
+      const pf = pfValue != null ? (pfValue >= 999 ? '∞' : formatNumber(pfValue, 2)) : '0,00';
       pfEl.textContent = pf;
-      pfEl.className = `text-base sm:text-lg font-bold font-mono ${parseFloat(pf) >= 1.5 || pf === '∞' ? 'text-amber-400' : (parseFloat(pf) >= 1.0 ? 'text-gray-200' : 'text-rose-400')}`;
+      pfEl.className = `text-base sm:text-lg font-bold font-mono ${pfValue >= 1.5 || pf === '∞' ? 'text-amber-400' : (pfValue >= 1.0 ? 'text-gray-200' : 'text-rose-400')}`;
     }
     const profitSub = document.getElementById('sim-kpi-profit-sub');
     if (profitSub) {
-      profitSub.textContent = `PnL: ${m.total_profit_loss >= 0 ? '+' : ''}R$ ${m.total_profit_loss.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+      profitSub.textContent = `PnL: ${m.total_profit_loss >= 0 ? '+' : ''}${formatCurrency(m.total_profit_loss)}`;
     }
 
     // 4. Win Rate / Acertos
@@ -3064,14 +3063,14 @@ async function runSimulation() {
     const tradesSub = document.getElementById('sim-kpi-trades-sub');
     if (auxEl) {
       if (isCycle) {
-        const wr = (m.win_rate_pct != null) ? m.win_rate_pct.toFixed(1) : '0.0';
+        const wr = (m.win_rate_pct != null) ? m.win_rate_pct : 0;
         const wins = m.winning_trades_count || 0;
         const total = (m.winning_trades_count || 0) + (m.losing_trades_count || 0);
-        auxEl.textContent = `${wr}%`;
-        auxEl.className = `text-base sm:text-lg font-bold font-mono ${parseFloat(wr) >= 50 ? 'text-emerald-400' : 'text-amber-400'}`;
+        auxEl.textContent = formatPercent(wr, 1);
+        auxEl.className = `text-base sm:text-lg font-bold font-mono ${wr >= 50 ? 'text-emerald-400' : 'text-amber-400'}`;
         if (tradesSub) tradesSub.textContent = `${wins}W / ${m.losing_trades_count || 0}L (${m.total_trades_count || 0} ciclos)`;
       } else {
-        auxEl.textContent = `${m.alpha_vs_dca_pct >= 0 ? '+' : ''}${m.alpha_vs_dca_pct.toFixed(1)}%`;
+        auxEl.textContent = formatPercent(m.alpha_vs_dca_pct, 1, true);
         auxEl.className = `text-base sm:text-lg font-bold font-mono ${m.alpha_vs_dca_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
         if (tradesSub) tradesSub.textContent = `Aportes: ${m.total_trades_count || 0}`;
       }
@@ -3080,14 +3079,14 @@ async function runSimulation() {
     // 5. Drawdown Máximo & Média de Compras
     const ddEl = document.getElementById('sim-kpi-drawdown');
     if (ddEl) {
-      ddEl.textContent = `${(m.max_drawdown_pct || 0).toFixed(1)}%`;
+      ddEl.textContent = formatPercent(m.max_drawdown_pct || 0, 1);
     }
     const avgEntriesSub = document.getElementById('sim-kpi-avg-entries-sub');
     if (avgEntriesSub) {
       if (isCycle && m.avg_entries_per_cycle != null) {
-        avgEntriesSub.textContent = `Média compras/ciclo: ${m.avg_entries_per_cycle.toFixed(1)}`;
+        avgEntriesSub.textContent = `Média compras/ciclo: ${formatNumber(m.avg_entries_per_cycle, 1)}`;
       } else {
-        avgEntriesSub.textContent = `Duração média: ${(m.avg_trade_bars || 0).toFixed(0)}b`;
+        avgEntriesSub.textContent = `Duração média: ${formatNumber(m.avg_trade_bars || 0, 0)}b`;
       }
     }
 
@@ -3173,7 +3172,7 @@ async function runOptimizer() {
         if (isDca) {
           titleContainer.innerHTML = '<span class="text-emerald-400 font-semibold" id="opt-champ-buy-label">' + c.buy_label + '</span> <span class="text-gray-400 font-normal text-xs">(Aportes Periódicos em Fundos)</span>';
         } else {
-          titleContainer.innerHTML = '<span class="text-emerald-400 font-semibold" id="opt-champ-buy-label">' + c.buy_label + '</span> <span class="text-gray-400" id="opt-champ-arrow">-&gt;</span> <span class="text-rose-400 font-semibold" id="opt-champ-sell-label">' + (c.sell_label || '-') + '</span>';
+          titleContainer.innerHTML = '<span class="text-emerald-400 font-semibold" id="opt-champ-buy-label">' + c.buy_label + '</span> <span class="text-gray-400" id="opt-champ-arrow">-&gt;</span> <span class="text-rose-400 font-semibold" id="opt-champ-sell-label">' + (c.sell_label || '--') + '</span>';
         }
       }
 
@@ -3183,7 +3182,7 @@ async function runOptimizer() {
       const winRateEl = document.getElementById('opt-champ-winrate');
       if (winRateEl) {
         if (isDca) {
-          const avgP = c.average_buy_price != null ? `R$ ${c.average_buy_price.toFixed(2)}` : '-';
+          const avgP = c.average_buy_price != null ? `R$ ${c.average_buy_price.toFixed(2)}` : '--';
           winRateEl.textContent = avgP;
           winRateEl.previousElementSibling.textContent = 'Preço Médio de Compra';
         } else {
@@ -3362,19 +3361,19 @@ function renderSimulationTradesTable(trades, mode) {
       }
 
       tr.innerHTML = `
-        <td class="px-2.5 py-2 text-center text-gray-400 font-bold">${t.trade_id || '-'}</td>
-        <td class="px-2.5 py-2 text-cyan-300 font-medium font-sans">${t.buy_strategy || '-'}</td>
+        <td class="px-2.5 py-2 text-center text-gray-400 font-bold">${t.trade_id || '--'}</td>
+        <td class="px-2.5 py-2 text-cyan-300 font-medium font-sans">${t.buy_strategy || '--'}</td>
         <td class="px-2.5 py-2 text-right font-mono font-bold ${numBuys > 1 ? 'text-amber-400' : 'text-gray-300'}">
           <span class="px-1.5 py-0.5 rounded ${numBuys > 1 ? 'bg-amber-500/20 border border-amber-500/40' : 'bg-gray-800'} text-[11px]">
             ${numBuys}x
           </span>
         </td>
-        <td class="px-2.5 py-2 text-gray-300">${t.buy_date || '-'}</td>
+        <td class="px-2.5 py-2 text-gray-300">${t.buy_date || '--'}</td>
         <td class="px-2.5 py-2 text-right font-mono text-white font-semibold">R$ ${avgPrice.toFixed(2)}</td>
-        <td class="px-2.5 py-2 text-rose-300 font-medium font-sans">${t.sell_strategy || '-'}</td>
-        <td class="px-2.5 py-2 text-gray-300">${t.sell_date || '-'}</td>
-        <td class="px-2.5 py-2 text-right font-mono text-white font-semibold">${t.sell_price ? 'R$ ' + t.sell_price.toFixed(2) : '-'}</td>
-        <td class="px-2.5 py-2 text-center text-gray-300">${t.duration_bars != null ? t.duration_bars + 'b' : '-'}</td>
+        <td class="px-2.5 py-2 text-rose-300 font-medium font-sans">${t.sell_strategy || '--'}</td>
+        <td class="px-2.5 py-2 text-gray-300">${t.sell_date || '--'}</td>
+        <td class="px-2.5 py-2 text-right font-mono text-white font-semibold">${t.sell_price ? 'R$ ' + t.sell_price.toFixed(2) : '--'}</td>
+        <td class="px-2.5 py-2 text-center text-gray-300">${t.duration_bars != null ? t.duration_bars + 'b' : '--'}</td>
         <td class="px-2.5 py-2 text-right font-mono font-bold ${retClass}">${(t.return_pct || 0) >= 0 ? '+' : ''}${(t.return_pct || 0).toFixed(1)}%</td>
         <td class="px-2.5 py-2 text-right font-mono font-bold ${pnlClass}">${(t.profit_loss || 0) >= 0 ? '+' : ''}R$ ${(t.profit_loss || 0).toFixed(2)}</td>
         <td class="px-2.5 py-2 text-center">${statusBadge}</td>
@@ -3382,9 +3381,9 @@ function renderSimulationTradesTable(trades, mode) {
     } else {
       tr.innerHTML = `
         <td class="px-2.5 py-2 text-center text-gray-400">-</td>
-        <td class="px-2.5 py-2 text-cyan-300 font-medium font-sans">${t.strategy || '-'}</td>
+        <td class="px-2.5 py-2 text-cyan-300 font-medium font-sans">${t.strategy || '--'}</td>
         <td class="px-2.5 py-2 text-right font-mono text-gray-300 font-bold">1x</td>
-        <td class="px-2.5 py-2 text-gray-300">${t.date || '-'}</td>
+        <td class="px-2.5 py-2 text-gray-300">${t.date || '--'}</td>
         <td class="px-2.5 py-2 text-right font-mono text-white font-semibold">R$ ${(t.execution_price || 0).toFixed(2)}</td>
         <td class="px-2.5 py-2 text-gray-500">-</td>
         <td class="px-2.5 py-2 text-gray-500">-</td>
@@ -3478,8 +3477,8 @@ function setupRadarTableSorting() {
   function updateIcons() {
     if (iconN) iconN.innerHTML = state.radarSortField === 'historical_n' ? sortIcon(state.radarSortOrder) : sortIcon(null);
     if (iconWin) iconWin.innerHTML = state.radarSortField === 'historical_win_rate' ? sortIcon(state.radarSortOrder) : sortIcon(null);
-    if (iconN) iconN.className = state.radarSortField === 'historical_n' ? 'text-[10px] text-cyan-400 font-bold' : 'text-[10px] text-gray-500';
-    if (iconWin) iconWin.className = state.radarSortField === 'historical_win_rate' ? 'text-[10px] text-cyan-400 font-bold' : 'text-[10px] text-gray-500';
+    if (iconN) iconN.className = state.radarSortField === 'historical_n' ? 'text-[11px] text-cyan-400 font-bold' : 'text-[11px] text-gray-500';
+    if (iconWin) iconWin.className = state.radarSortField === 'historical_win_rate' ? 'text-[11px] text-cyan-400 font-bold' : 'text-[11px] text-gray-500';
   }
 
   if (thN) {
@@ -4077,7 +4076,7 @@ function importPortfolioHoldingsFromCsv(file) {
 
 function getActionBadgeHtml(actionType, actionLabel) {
   const badge = (tone, icon) =>
-    `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold inline-flex items-center gap-1 ${tone}"><svg class="icon" aria-hidden="true"><use href="#${icon}"></use></svg> ${actionLabel}</span>`;
+    `<span class="px-2 py-0.5 rounded text-[11px] font-extrabold inline-flex items-center gap-1 ${tone}"><svg class="icon" aria-hidden="true"><use href="#${icon}"></use></svg> ${actionLabel}</span>`;
   if (actionType === 'BUY') {
     return badge('bg-emerald-500/20 text-emerald-400 border border-emerald-500/40', 'icon-plus');
   }
@@ -4167,7 +4166,7 @@ function renderPortfolioAdviseSection(data) {
         <div class="text-[11px] text-gray-400 font-normal">Final: ${(Number(r.target_shares) || 0).toLocaleString('pt-BR')} cotas</div>
       </td>
       <td class="px-3 py-2.5 font-mono font-bold text-white text-right">
-        ${r.order_value > 0 ? `R$ ${Number(r.order_value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '-'}
+        ${r.order_value > 0 ? `R$ ${Number(r.order_value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '--'}
       </td>
       <td class="px-3 py-2.5 font-mono text-center">
         <span class="text-gray-400">${(Number(r.current_weight_pct) || 0).toFixed(1)}%</span>
