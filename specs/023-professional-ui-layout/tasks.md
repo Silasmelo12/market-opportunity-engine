@@ -41,7 +41,7 @@
 - [X] T011 [P] Alterar o tema padrão para claro e preservar persistência/atualização de gráficos em `src/web/app.js`
 - [X] T012 [P] Criar contratos de layout (encoding, tipografia, IDs, rotas, temas) em `tests/unit/test_layout_contracts.py`
 - [X] T013 [P] Criar testes E2E de invariantes (painel único, temas, tabelas roláveis, teclado) em `tests/e2e/test_ui_layout.py`
-- [ ] T014 [P] Atualizar `DESIGN.md` com o mapeamento consolidado de tokens e componentes visuais
+- [X] T014 [P] Atualizar `DESIGN.md` com o mapeamento consolidado de tokens e componentes visuais
 
 **Checkpoint**: Fundação pronta; as histórias podem começar.
 

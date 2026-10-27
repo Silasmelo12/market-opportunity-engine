@@ -243,3 +243,106 @@ O **Market Opportunity & Bottom Statistical Engine** combina o melhor de dois mu
    - Venda / Prejuízo / Drawdown: `var(--danger)`.
    - Patrimônio / Valor de Mercado: `var(--primary)`.
    - Comparadores / Benchmarks: `var(--accent-teal)` e `var(--purple)`.
+
+---
+
+## 6. Mapeamento Consolidado de Tokens e Componentes (Feature 023)
+
+Esta seção é a referência única para implementar qualquer área da SPA. Toda
+tela deve consumir os tokens abaixo, sem cores hardcoded fora de `:root` e
+`[data-theme="dark"]`.
+
+### 6.1 Tokens semânticos
+
+| Papel | Token | Uso |
+| :--- | :--- | :--- |
+| Fundo da aplicação | `--canvas` | `<body>`, painéis de área, páginas |
+| Superfície principal | `--surface` | Cards, tabelas, header, subnav, modais |
+| Superfície secundária | `--surface-subtle` | Cabeçalho de tabela, pílulas, estados vazios |
+| Hover | `--surface-hover` | Linhas de tabela, botões secundários |
+| Borda padrão | `--border` | Cards, divisórias, tabelas |
+| Borda forte | `--border-strong` | Inputs, selects, contornos de ênfase |
+| Borda sutil | `--border-subtle` | Divisórias internas e cartões aninhados |
+| Texto principal | `--text-main` | Títulos, valores, células |
+| Texto secundário | `--text-muted` | Labels, cabeçalhos de coluna |
+| Texto terciário | `--text-subtle` | Metadados, notas, placeholders |
+| Ação primária | `--primary` / `--primary-hover` / `--primary-soft` | Botões, seleção, links |
+| Ganho / Compra | `--success` / `--success-soft` / `--success-border` | Variações positivas, badges de compra |
+| Perda / Venda | `--danger` / `--danger-soft` / `--danger-border` | Variações negativas, badges de venda |
+| Alerta / Neutro | `--warning` / `--warning-soft` / `--warning-border` | Timing estendido, avisos |
+| Foco | `--border-focus` / `--focus-ring` | `:focus-visible` e anel de foco |
+| Superfície inversa | `--inverse-surface` / `--inverse-text` | Botões escuros no tema claro e vice-versa |
+| Estados | `--state-loading`, `--state-empty`, `--state-error`, `--state-success` | Mensagens de estado |
+
+### 6.2 Escala tipográfica
+
+| Nível | Classe utilitária | Token | Tamanho |
+| :--- | :--- | :--- | :--- |
+| Display / Hero | `.type-display` | `--font-size-display` | 28px |
+| Seção | `.type-section` | `--font-size-section` | 18px |
+| Card | `.type-card` | `--font-size-card` | 14px |
+| Corpo | `.type-body` | `--font-size-body` | 13px |
+| Label | `.type-label` | `--font-size-label` | 12px |
+| Metadado | `.type-meta` | `--font-size-meta` | 11px |
+| Piso absoluto | `.text-\[10px\]` (clamp) | `--font-size-floor` | 11px |
+
+Valores financeiros, tickers e métricas quantitativas usam
+`.financial-value`, `.font-mono`, `.kpi-value` ou `[data-financial]` com
+`font-variant-numeric: tabular-nums`.
+
+### 6.3 Componentes compartilhados
+
+| Componente | Classes | Estados obrigatórios |
+| :--- | :--- | :--- |
+| Cartão | `.card`, `.card-header`, `.card-title`, `.card-subtitle`, `.card-body`, `.card-surface`, `.metric-card`, `.kpi-card` | default, hover (quando interativo) |
+| Botões | `.btn-primary`, `.btn-secondary`, `.btn-contextual`, `.btn-danger`, `.btn-ghost`, `.btn-icon` | default, hover, focus-visible, active, disabled, loading |
+| Campos | `.input`, `.select`, `.field-label`, `.field-help`, `.field-error` | default, focus, invalid, disabled |
+| Badges | `.badge`, `.badge-pill`, `.badge-success`, `.badge-danger`, `.badge-warning`, `.badge-info` | semânticos por tema |
+| Tabelas | `.table-standard`, `.table-scroll`, `.table-scroll-hint` | hover de linha, cabeçalho sticky, rolagem contida |
+| Acordeões | `.accordion`, `.accordion-header`, `.accordion-body` | default, hover, aberto/fechado |
+| Estados | `.state-empty`, `.state-error`, `.state-loading` | vazio, erro, carregando |
+
+### 6.4 Navegação e shell
+
+- Header: marca, seletor de ambientes (`#global-pillar-selector`), ações
+  (`#btn-header-b3-status`, `#btn-header-add-trade`) e tema (`#btn-theme-toggle`).
+- Subnavegação contextual: `#main-subnav-pills` com `#subnav-group-carteira`
+  e `#subnav-group-quant`; `[data-tab]` e `aria-selected` são estáveis.
+- Rotas canônicas: `#carteira/visao-geral`, `#carteira/posicoes`,
+  `#carteira/proventos`, `#carteira/patrimonio`, `#quant/radar`,
+  `#quant/grafico`, `#quant/simulador`, `#quant/playbook`.
+- Precedência: URL explícita > `localStorage` > `carteira/visao-geral`.
+- Exatamente um `.tab-view:not(.hidden)` e um `aria-selected="true"` por ambiente.
+
+### 6.5 Ícones
+
+O sprite inline em `src/web/index.html` é a única fonte de ícones funcionais.
+Ícones disponíveis: `icon-sun`, `icon-moon`, `icon-chart`, `icon-wallet`,
+`icon-coins`, `icon-trending-up`, `icon-target`, `icon-candlestick`,
+`icon-bolt`, `icon-book`, `icon-refresh`, `icon-check`, `icon-x`,
+`icon-warning`, `icon-import`, `icon-plus`, `icon-arrow-left`,
+`icon-arrow-right`, `icon-sort`, `icon-building`, `icon-globe`, `icon-coin`,
+`icon-layers`.
+
+Uso: `<svg class="icon" aria-hidden="true"><use href="#icon-target"></use></svg>`.
+Emojis não são permitidos como ícones de ação ou navegação.
+
+### 6.6 Temas
+
+- Padrão inicial: `light`.
+- Persistência: `localStorage['terminal_theme']` (`light` | `dark`).
+- Valor inválido ou ausente: `light`, sem erro visível.
+- Atributo: `document.documentElement.dataset.theme`.
+- Troca de tema atualiza gráficos Plotly/TradingView sem recarregar.
+- As oito áreas devem ser legíveis nos dois temas; nenhuma tela pode depender
+  de conversão de paleta em tempo de execução.
+
+### 6.7 Responsividade e acessibilidade
+
+- Larguras de referência: 375, 768, 1366 e 1920px.
+- Header quebra em duas linhas abaixo de 1024px; ações permanecem acessíveis.
+- Grid de KPIs: 4 colunas em desktop, 2 em tablet, 1 em mobile.
+- Tabelas largas usam `.table-scroll`; a página nunca rola horizontalmente.
+- Foco visível em todos os controles; ativação por Enter/Espaço.
+- `prefers-reduced-motion: reduce` suprime animações não essenciais.
+- Zoom de 200% preserva conteúdo e controles.
