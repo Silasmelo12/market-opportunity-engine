@@ -198,6 +198,21 @@ def test_shared_component_contracts(styles_css: str):
         assert selector in styles_css, f"Componente ausente: {selector}"
 
 
+def test_portfolio_areas_share_executive_components(index_html: str, styles_css: str, app_js: str):
+    assert 'area-posicoes' in index_html
+    assert 'area-proventos' in index_html
+    assert 'area-patrimonio' in index_html
+    assert index_html.count('kpi-card card-surface') == 4
+    assert index_html.count('card-surface chart-card') >= 3
+    assert 'section-title' in index_html and '.section-title {' in styles_css
+    assert 'section-subtitle' in index_html and '.section-subtitle {' in styles_css
+    assert "category-card card-surface" in app_js
+    assert "investidor10-welcome-banner" in app_js
+    assert "classList.toggle('hidden', hasImportedData)" in app_js
+    assert "chart-proventos-detailed" in index_html
+    assert "chart-patrimonio-detailed" in index_html
+
+
 def test_navigation_accessibility_markup(index_html: str):
     assert 'role="tablist"' in index_html
     assert 'role="tab"' in index_html
