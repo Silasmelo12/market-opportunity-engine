@@ -1573,48 +1573,48 @@
     <!-- ========================================== -->
     <!-- TAB 4: PLAYBOOK & GUIA EXECUTIVO           -->
     <!-- ========================================== -->
-    <section id="tab-playbook" class="tab-view hidden h-full p-3 sm:p-4 overflow-y-auto">
+    <section id="tab-playbook" class="tab-view hidden h-full p-3 sm:p-4 overflow-y-auto quant-area">
       <div class="max-w-5xl mx-auto space-y-4 sm:space-y-6">
         <div>
-          <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+          <h2 class="section-title flex items-center gap-2">
             <span></span>Playbook: Catálogo das 48 Estratégias
           </h2>
-          <p class="text-xs text-gray-400">Diretrizes quantitativas, lógica matemática de entrada e gestão de risco para compras e vendas.</p>
+          <p class="section-subtitle">Diretrizes quantitativas, lógica matemática de entrada e gestão de risco para compras e vendas.</p>
         </div>
 
         <div class="card-surface p-4 space-y-4">
-          <h3 class="text-sm font-bold text-fintech-cyan flex items-center gap-2 border-b border-fintech-border pb-2">
+          <h3 class="playbook-group-title is-info">
             <span></span>Grupo 1: Estratégias Proprietárias de Rompimento e Negação (2x2 Compra & Venda)
           </h3>
-          <p class="text-xs text-gray-300 leading-relaxed">
+          <p class="text-xs text-muted leading-relaxed">
             Monitora rompimentos de suporte ou resistência e executa na reversão com confirmação de fechamento (Zero Look-Ahead Bias).
           </p>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-            <div class="bg-fintech-bg/60 p-3 rounded">
-              <span class="font-bold text-fintech-green block mb-1">Compra (Negação de Fundo):</span>
+            <div class="playbook-block">
+              <span class="block-title font-bold text-positive block mb-1">Compra (Negação de Fundo):</span>
               Violação da mínima de T-1 ou mínima de N barras, fechando de volta acima. Execução na Abertura de T+1 ou no reteste.
             </div>
-            <div class="bg-fintech-bg/60 p-3 rounded">
-              <span class="font-bold text-fintech-red block mb-1">Venda (Negação de Topo):</span>
+            <div class="playbook-block">
+              <span class="block-title font-bold text-negative block mb-1">Venda (Negação de Topo):</span>
               Violação da máxima de T-1 ou máxima de N barras, fechando de volta abaixo. Execução na Abertura de T+1 ou no reteste.
             </div>
           </div>
         </div>
 
         <div class="card-surface p-4 space-y-4">
-          <h3 class="text-sm font-bold text-amber-400 flex items-center gap-2 border-b border-fintech-border pb-2">
+          <h3 class="playbook-group-title is-accent">
             <span></span>Grupo 2: Price Action Institucional (BOS & Wyckoff)
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-            <div class="bg-fintech-bg/60 p-3 rounded space-y-1.5">
-              <span class="font-bold text-white block">Fundo Duplo / Topo Duplo + BOS (Refinados):</span>
-              <p class="text-gray-300">
+            <div class="playbook-block space-y-1.5">
+              <span class="block-title font-bold block">Fundo Duplo / Topo Duplo + BOS (Refinados):</span>
+              <p>
                 Padrões de reversão estrutural com confirmação de rompimento do neckline (BOS). O Fundo Duplo exige tendência prévia de baixa (abaixo da SMA50 ou queda ≥ 6%), filtro anti-máxima de 60 barras, e IFR/RSI não exausto (< 45 nos fundos e ≤ 60 no rompimento).
               </p>
             </div>
-            <div class="bg-fintech-bg/60 p-3 rounded space-y-1.5">
-              <span class="font-bold text-white block">Wyckoff Spring & Upthrust (UTAD):</span>
-              <p class="text-gray-300">
+            <div class="playbook-block space-y-1.5">
+              <span class="block-title font-bold block">Wyckoff Spring & Upthrust (UTAD):</span>
+              <p>
                 Varredura de liquidez com rompimento falso de suporte (Spring) ou de resistência (Upthrust) com volume acima da média.
               </p>
             </div>
@@ -1622,27 +1622,27 @@
         </div>
 
         <div class="card-surface p-4 space-y-4">
-          <h3 class="text-sm font-bold text-blue-400 flex items-center gap-2 border-b border-fintech-border pb-2">
+          <h3 class="playbook-group-title is-info">
             <span></span>Grupo 3: Alocação Quantitativa & Rebalanceamento
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-            <div class="bg-fintech-bg/60 p-3 rounded space-y-1">
-              <span class="font-bold text-white block">DCA Dinâmico / Excesso Estatístico:</span>
-              <p class="text-gray-300">Aumenta compras quando o preço cai além de 2 desvios padrão da SMA(200) ou RSI < 30. Sinaliza venda/realização parcial quando sobe além de 2 desvios padrão ou RSI >70.</p>
+            <div class="playbook-block space-y-1">
+              <span class="block-title font-bold block">DCA Dinâmico / Excesso Estatístico:</span>
+              <p>Aumenta compras quando o preço cai além de 2 desvios padrão da SMA(200) ou RSI < 30. Sinaliza venda/realização parcial quando sobe além de 2 desvios padrão ou RSI >70.</p>
             </div>
-            <div class="bg-fintech-bg/60 p-3 rounded space-y-1">
-              <span class="font-bold text-white block">Rebalanceamento de Carteira:</span>
-              <p class="text-gray-300">Rebalanceia peso da carteira entre Renda Fixa e Renda Variável ao exceder a tolerância (+/- 5%), comprando na baixa e realizando no topo.</p>
+            <div class="playbook-block space-y-1">
+              <span class="block-title font-bold block">Rebalanceamento de Carteira:</span>
+              <p>Rebalanceia peso da carteira entre Renda Fixa e Renda Variável ao exceder a tolerância (+/- 5%), comprando na baixa e realizando no topo.</p>
             </div>
           </div>
         </div>
 
         <div class="card-surface p-4 space-y-4">
-          <h3 class="text-sm font-bold text-fintech-green flex items-center gap-2 border-b border-fintech-border pb-2">
+          <h3 class="playbook-group-title is-buy">
             <span></span>Grupo 4: 28 Padrões Clássicos de Velas (MQL5 Vectorized)
           </h3>
-          <p class="text-xs text-gray-300 leading-relaxed">
-            14 padrões de velas de fundo filtrados por tendência de baixa prévia (<code class="text-cyan-400">Close < SMA(20)</code>) e 14 padrões de velas de topo filtrados por tendência de alta prévia (<code class="text-cyan-400">Close >SMA(20)</code>), com execução estrita em Open[t+1].
+          <p class="text-xs text-muted leading-relaxed">
+            14 padrões de velas de fundo filtrados por tendência de baixa prévia (<code class="text-info">Close &lt; SMA(20)</code>) e 14 padrões de velas de topo filtrados por tendência de alta prévia (<code class="text-info">Close >SMA(20)</code>), com execução estrita em Open[t+1].
           </p>
         </div>
       </div>
