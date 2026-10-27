@@ -88,6 +88,28 @@
   --radius-lg: 12px;
   --radius-xl: 16px;
 
+  /* Superfícies inversas, estados e foco */
+  --border-subtle: #eef2f7;
+  --inverse-surface: #0f172a;
+  --inverse-text: #ffffff;
+  --overlay: rgba(15, 23, 42, 0.6);
+  --focus-ring: 0 0 0 3px rgba(2, 132, 199, 0.35);
+  --state-loading: var(--primary);
+  --state-empty: var(--text-subtle);
+  --state-error: var(--danger);
+  --state-success: var(--success);
+
+  /* Escala tipográfica (piso absoluto de 11px) */
+  --font-size-display: 28px;
+  --font-size-section: 18px;
+  --font-size-card: 14px;
+  --font-size-body: 13px;
+  --font-size-label: 12px;
+  --font-size-meta: 11px;
+  --font-size-floor: 11px;
+  --line-height-tight: 1.2;
+  --line-height-body: 1.5;
+
   /* Aliases retrocompatíveis para regras CSS existentes */
   --text: var(--text-main);
   --text-2: var(--text-muted);
@@ -173,6 +195,13 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
   --shadow-md: 0 6px 16px -2px rgba(0, 0, 0, 0.6);
   --shadow-lg: 0 14px 28px -4px rgba(0, 0, 0, 0.7);
+
+  /* Superfícies inversas, estados e foco */
+  --border-subtle: #16202f;
+  --inverse-surface: #f8fafc;
+  --inverse-text: #0f172a;
+  --overlay: rgba(0, 0, 0, 0.75);
+  --focus-ring: 0 0 0 3px rgba(56, 189, 248, 0.4);
 
   /* Aliases retrocompatíveis para dark mode */
   --text: var(--text-main);
