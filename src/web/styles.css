@@ -526,6 +526,162 @@ button:disabled, [aria-disabled="true"] {
   outline-offset: 2px !important;
 }
 
+/* =========================================================================
+   Unified control states — buttons, fields, selects and badges
+   Every control shares height, radius, focus ring and disabled semantics.
+   ========================================================================= */
+.btn-danger {
+  background-color: var(--danger) !important;
+  color: #ffffff !important;
+  border: 1px solid transparent !important;
+  font-size: 13px;
+  font-weight: 650;
+  border-radius: var(--radius-md);
+  padding: 6px 14px;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+}
+.btn-danger:hover:not(:disabled) { filter: brightness(1.08); }
+.btn-danger:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn-ghost {
+  background: transparent !important;
+  color: var(--text-muted) !important;
+  border: 1px solid transparent !important;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  padding: 6px 12px;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-ghost:hover:not(:disabled) {
+  background: var(--surface-subtle) !important;
+  color: var(--text-main) !important;
+}
+
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.btn-icon:hover:not(:disabled) { background: var(--surface-subtle); color: var(--text-main); }
+.btn-icon:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Loading state for any button */
+.btn-loading,
+button[aria-busy="true"] {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+}
+.btn-loading::after,
+button[aria-busy="true"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--surface);
+  border-top-color: transparent;
+  border-radius: 999px;
+  animation: mo-spin 700ms linear infinite;
+}
+@keyframes mo-spin { to { transform: rotate(360deg); } }
+
+/* Fields and selects */
+.field-label {
+  display: block;
+  font-size: var(--font-size-label);
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.field-help {
+  font-size: var(--font-size-meta);
+  color: var(--text-subtle);
+  margin-top: 4px;
+}
+.field-error {
+  font-size: var(--font-size-meta);
+  color: var(--state-error);
+  margin-top: 4px;
+  font-weight: 600;
+}
+.input,
+.select {
+  width: 100%;
+  min-height: 34px;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-body);
+  font-variant-numeric: tabular-nums;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+.input:focus-visible,
+.select:focus-visible {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: var(--focus-ring);
+}
+.input[aria-invalid="true"],
+.select[aria-invalid="true"] {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px var(--danger-soft);
+}
+.input:disabled,
+.select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: var(--surface-subtle);
+}
+
+/* Badge base (complements .badge-pill variants) */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 20px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-subtle);
+  color: var(--text-muted);
+  font-size: var(--font-size-meta);
+  font-weight: 650;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+.badge-success { background: var(--success-soft); border-color: var(--success-border); color: var(--success); }
+.badge-danger { background: var(--danger-soft); border-color: var(--danger-border); color: var(--danger); }
+.badge-warning { background: var(--warning-soft); border-color: var(--warning-border); color: var(--warning); }
+.badge-info { background: var(--primary-soft); border-color: var(--border); color: var(--primary); }
+
 .subnav-bar {
   background: var(--surface) !important;
   border-color: var(--border) !important;
