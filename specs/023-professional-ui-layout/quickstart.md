@@ -248,3 +248,16 @@ A feature é considerada validada quando:
 - Matriz capturada em `/tmp/023-ui-us1/`: **64/64 imagens** (8 áreas × 375/768/1366/1920 × claro/escuro).
 - Verificação: zero artefatos de encoding, zero emojis funcionais, nenhum texto abaixo de 11px nas fontes, ícones consistentes.
 - Observação: em 375px o título da marca é truncado e a subnavegação exige rolagem horizontal; ajuste previsto na US2 (T023–T030).
+
+### T030 — Validação de rotas e navegação (US2)
+
+- `venv/bin/python -m pytest tests/e2e/test_dashboard_navigation.py -q` → **16 passed**.
+- Cobertura confirmada:
+  - precedência URL > `localStorage` > padrão (`#quant/radar` sobre rota salva);
+  - rotas canônicas e legadas (`#terminal`, `#resumo`, `#simulador`);
+  - reload, `back` e `forward` sincronizando pilar, subnavegação e painel;
+  - exatamente um `.tab-view` visível e zero IDs duplicados;
+  - navegação por `Tab`/`Enter` e por setas (`ArrowLeft`/`ArrowRight`/`Home`/`End`);
+  - offset sticky da subnavegação igual à altura real do header em 1600px e 768px;
+  - seletor de direção visível apenas em Radar/Gráfico.
+- Ajuste de expectativa: percentuais visíveis agora usam vírgula decimal pt-BR (`+6,25%`), coerente com T020.

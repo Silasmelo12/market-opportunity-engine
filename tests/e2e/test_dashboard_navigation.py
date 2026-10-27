@@ -105,10 +105,10 @@ def test_dashboard_math_is_internally_coherent(app_page):
     # Caixa 1.000 + mercado 850 (400 + 450), custo 800, resultado não realizado 50 (sem somar proventos).
     assert text(page, "#overview-total-equity") == "R$ 1.850,00"
     assert text(page, "#overview-invested-val") == "R$ 800,00"
-    assert text(page, "#overview-card1-var") == "+6.25%"
+    assert text(page, "#overview-card1-var") == "+6,25%"
 
     assert text(page, "#kpi-lucro-val") == "+R$ 50,00"
-    assert text(page, "#kpi-lucro-badge") == "+6.25%"
+    assert text(page, "#kpi-lucro-badge") == "+6,25%"
     assert text(page, "#kpi-lucro-sub") == "Sobre custo: R$ 800,00"
 
     assert text(page, "#overview-dividends-total") == "R$ 120,00"
