@@ -307,3 +307,144 @@ def test_icon_sprite_replaces_functional_emoji(index_html: str):
     assert len(sprite_ids) >= 20, f"Sprite SVG insuficiente: {sprite_ids}"
     for required in ("icon-sun", "icon-moon", "icon-chart", "icon-wallet", "icon-coins", "icon-target"):
         assert required in sprite_ids, f"Ícone ausente no sprite: {required}"
+
+
+# =========================================================================
+# T057 / US5 — responsividade estrutural, overflow e contraste
+# =========================================================================
+from html.parser import HTMLParser  # noqa: E402
+
+VOID_TAGS = {
+    "area", "base", "br", "col", "embed", "hr", "img", "input",
+    "link", "meta", "param", "source", "track", "wbr",
+}
+
+
+class _ScrollableTableParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.stack: list[dict] = []
+        self.tables: list[dict] = []
+
+    def handle_starttag(self, tag: str, attrs) -> None:
+        attributes = dict(attrs)
+        classes = (attributes.get("class") or "").split()
+        is_scroll = "table-scroll" in classes
+        node = {
+            "tag": tag,
+            "scroll": is_scroll,
+            "tabindex": attributes.get("tabindex"),
+        }
+        self.stack.append(node)
+        if tag == "table":
+            scrollers = [item for item in self.stack if item["scroll"]]
+            self.tables.append({
+                "scroll": bool(scrollers),
+                "focusable": bool(scrollers and scrollers[-1]["tabindex"] == "0"),
+            })
+        if tag in VOID_TAGS:
+            self.stack.pop()
+
+    def handle_endtag(self, tag: str) -> None:
+        for index in range(len(self.stack) - 1, -1, -1):
+            if self.stack[index]["tag"] == tag:
+                del self.stack[index:]
+                break
+
+
+def test_wide_tables_have_focusable_scroll_wrappers(index_html: str):
+    parser = _ScrollableTableParser()
+    parser.feed(index_html)
+    assert len(parser.tables) >= 9, f"Tabelas encontradas: {len(parser.tables)}"
+    without_scroller = [table for table in parser.tables if not table["scroll"]]
+    assert without_scroller == [], "Tabelas sem contêiner .table-scroll"
+    without_focus = [table for table in parser.tables if not table["focusable"]]
+    assert without_focus == [], "Contêineres de tabela sem tabindex=\"0\""
+    assert index_html.count("table-scroll-hint") >= 5
+
+
+def test_responsive_breakpoints_and_overflow_contract(styles_css: str):
+    assert "overflow-x: auto" in styles_css
+    assert "overscroll-behavior-x: contain" in styles_css
+    assert "min-width: 0" in styles_css
+    assert ".table-scroll > table" in styles_css
+    assert "min-width: 100%" in styles_css
+    assert "@media (max-width: 767px)" in styles_css
+    assert "@media (min-width: 768px)" in styles_css
+    assert "@media (min-width: 1024px)" in styles_css
+    assert ".touch-target" in styles_css
+    assert ".btn-remove-holding" in styles_css
+    assert ".dir-seg-btn" in styles_css
+
+    # Nenhuma largura fixa maior que o maior viewport de referência.
+    fixed = [int(value) for value in re.findall(r"(?:^|\s)(?:min-)?width:\s*(\d{4,})px", styles_css)]
+    assert all(value <= 1920 for value in fixed), f"Larguras fixas excessivas: {fixed}"
+
+    reduced = re.search(r"@media \(prefers-reduced-motion: reduce\)\s*\{(.*?)\n\}", styles_css, re.S)
+    assert reduced is not None, "Bloco prefers-reduced-motion ausente"
+    block = reduced.group(1)
+    assert "animation-duration: 0.01ms !important" in block
+    assert "transition-duration: 0.01ms !important" in block
+    assert "scroll-behavior: auto !important" in block
+
+
+def test_kpi_grids_follow_one_two_four_columns(index_html: str):
+    for element_id in ("investidor10-hero-kpis", "radar-executive-deck"):
+        tag = re.search(rf'<div[^>]*id="{element_id}"[^>]*>', index_html)
+        assert tag is not None, f"Grid de KPIs ausente: {element_id}"
+        class_match = re.search(r'class="([^"]+)"', tag.group(0))
+        assert class_match is not None, f"Grid sem classe: {element_id}"
+        classes = class_match.group(1)
+        assert "grid-cols-1" in classes, f"{element_id}: mobile deve ter 1 coluna"
+        assert "sm:grid-cols-2" in classes, f"{element_id}: tablet deve ter 2 colunas"
+        assert "lg:grid-cols-4" in classes, f"{element_id}: desktop deve ter 4 colunas"
+    assert "grid-cols-2 md:grid-cols-4" not in index_html
+
+
+def _theme_tokens(css: str, selector: str) -> dict[str, str]:
+    match = re.search(re.escape(selector) + r"\s*\{(.*?)\n\}", css, re.S)
+    assert match is not None, f"Bloco de tokens ausente: {selector}"
+    return dict(re.findall(r"(--[\w-]+):\s*(#[0-9a-fA-F]{6})", match.group(1)))
+
+
+def _relative_luminance(color: str) -> float:
+    color = color.lstrip("#")
+    channels = [int(color[index:index + 2], 16) / 255 for index in (0, 2, 4)]
+    linear = [c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4 for c in channels]
+    return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
+
+
+def _contrast_ratio(foreground: str, background: str) -> float:
+    lighter, darker = sorted(
+        (_relative_luminance(foreground), _relative_luminance(background)),
+        reverse=True,
+    )
+    return (lighter + 0.05) / (darker + 0.05)
+
+
+def test_theme_tokens_meet_wcag_aa_contrast(styles_css: str):
+    pairs = [
+        ("--text-main", "--surface"),
+        ("--text-main", "--canvas"),
+        ("--text-muted", "--surface"),
+        ("--text-muted", "--surface-subtle"),
+        ("--text-subtle", "--surface"),
+        ("--text-subtle", "--canvas"),
+        ("--text-subtle", "--surface-subtle"),
+        ("--primary", "--surface"),
+        ("--primary", "--canvas"),
+        ("--success", "--surface"),
+        ("--danger", "--surface"),
+        ("--warning", "--surface"),
+        ("--warning", "--surface-subtle"),
+    ]
+    failures = []
+    for selector in (":root", '[data-theme="dark"]'):
+        tokens = _theme_tokens(styles_css, selector)
+        for foreground, background in pairs:
+            assert foreground in tokens, f"{selector}: token ausente {foreground}"
+            assert background in tokens, f"{selector}: token ausente {background}"
+            ratio = _contrast_ratio(tokens[foreground], tokens[background])
+            if ratio < 4.5:
+                failures.append((selector, foreground, background, round(ratio, 2)))
+    assert failures == [], f"Pares abaixo de WCAG AA (4.5:1): {failures}"
