@@ -237,6 +237,16 @@ def test_javascript_sources_have_no_encoding_artifacts(app_js: str):
         )
 
 
+FUNCTIONAL_EMOJI_PATTERN = re.compile(
+    r"[\U0001F300-\U0001FAFF\u2600-\u27BF\uFE0F]"
+)
+
+
+def test_index_html_has_no_functional_emoji(index_html: str):
+    emojis = FUNCTIONAL_EMOJI_PATTERN.findall(index_html)
+    assert emojis == [], f"Emojis funcionais encontrados em index.html: {emojis[:10]}"
+
+
 def test_icon_sprite_replaces_functional_emoji(index_html: str):
     sprite_ids = re.findall(r'<g id="(icon-[^"]+)"', index_html)
     assert len(sprite_ids) >= 20, f"Sprite SVG insuficiente: {sprite_ids}"

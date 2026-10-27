@@ -133,7 +133,9 @@
   <header class="app-header bg-white border-b border-slate-200 px-4 py-3 shrink-0 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
       <div class="brand-group flex items-center gap-3">
-        <div class="brand-icon w-9 h-9 bg-gradient-to-tr from-sky-600 to-blue-700 rounded-lg flex items-center justify-center text-white font-extrabold shadow-sm">📈</div>
+        <div class="brand-icon w-9 h-9 bg-gradient-to-tr from-sky-600 to-blue-700 rounded-lg flex items-center justify-center text-white font-extrabold shadow-sm">
+          <svg class="icon w-5 h-5" aria-hidden="true"><use href="#icon-trending-up"></use></svg>
+        </div>
         <div>
           <div class="brand-title font-extrabold text-slate-900 tracking-tight text-base sm:text-lg flex items-center gap-2">
             Market Opportunity Engine
@@ -145,10 +147,10 @@
       <!-- Seletor dos Dois Ambientes Principais (Fase 2A - Spec 021) -->
       <div class="pillar-nav-group flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200" id="global-pillar-selector" role="tablist" aria-label="Ambientes da Plataforma">
         <button id="pillar-btn-carteira" class="pillar-btn active flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold text-slate-900 bg-white shadow-sm transition" data-pillar="carteira" role="tab" aria-selected="true" aria-controls="subnav-group-carteira">
-          <span>💼</span> Minha Carteira
+          <svg class="icon" aria-hidden="true"><use href="#icon-wallet"></use></svg> Minha Carteira
         </button>
         <button id="pillar-btn-quant" class="pillar-btn flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-900 transition" data-pillar="quant" role="tab" aria-selected="false" aria-controls="subnav-group-quant">
-          <span>🎯</span> Análise Quantitativa
+          <svg class="icon" aria-hidden="true"><use href="#icon-target"></use></svg> Análise Quantitativa
         </button>
       </div>
 
@@ -174,32 +176,32 @@
       <!-- Subnavegação Contextual: Minha Carteira -->
       <div id="subnav-group-carteira" class="subnav-group flex gap-2 w-full" role="tablist" aria-label="Subnavegação Minha Carteira">
         <div class="nav-tab active flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-slate-900 text-slate-900 whitespace-nowrap transition" data-tab="resumo" role="tab" tabindex="0" aria-selected="true">
-          <span>📊</span> Resumo
+          <svg class="icon" aria-hidden="true"><use href="#icon-chart"></use></svg> Resumo
         </div>
         <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="posicoes" role="tab" tabindex="0" aria-selected="false">
-          <span>💼</span> Posições & Ativos
+          <svg class="icon" aria-hidden="true"><use href="#icon-wallet"></use></svg> Posições &amp; Ativos
         </div>
         <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="proventos" role="tab" tabindex="0" aria-selected="false">
-          <span>💰</span> Proventos
+          <svg class="icon" aria-hidden="true"><use href="#icon-coins"></use></svg> Proventos
         </div>
         <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="patrimonio" role="tab" tabindex="0" aria-selected="false">
-          <span>📈</span> Evolução Patrimonial
+          <svg class="icon" aria-hidden="true"><use href="#icon-trending-up"></use></svg> Evolução Patrimonial
         </div>
       </div>
 
       <!-- Subnavegação Contextual: Análise Quantitativa -->
       <div id="subnav-group-quant" class="subnav-group hidden flex gap-2 w-full" role="tablist" aria-label="Subnavegação Análise Quantitativa">
         <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="radar" role="tab" tabindex="0" aria-selected="false">
-          <span>🎯</span> Radar Estatístico (Fundo 2x2)
+          <svg class="icon" aria-hidden="true"><use href="#icon-target"></use></svg> Radar Estatístico (Fundo 2x2)
         </div>
         <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="tradingview" role="tab" tabindex="0" aria-selected="false">
-          <span>🕯️</span> Gráfico TradingView
+          <svg class="icon" aria-hidden="true"><use href="#icon-candlestick"></use></svg> Gráfico TradingView
         </div>
         <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="simulador" role="tab" tabindex="0" aria-selected="false">
-          <span>⚡</span> Simulador & Backtest
+          <svg class="icon" aria-hidden="true"><use href="#icon-bolt"></use></svg> Simulador &amp; Backtest
         </div>
         <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="playbook" role="tab" tabindex="0" aria-selected="false">
-          <span>📖</span> Playbook de Estratégias
+          <svg class="icon" aria-hidden="true"><use href="#icon-book"></use></svg> Playbook de Estratégias
         </div>
       </div>
     </div>
@@ -213,7 +215,7 @@
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-2.5">
           <div class="w-7 h-7 sm:w-8 sm:h-8 rounded bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-bold text-white shadow-lg text-sm shrink-0">
-            📈
+            <svg class="icon w-4 h-4" aria-hidden="true"><use href="#icon-trending-up"></use></svg>
           </div>
           <div>
             <h1 class="text-base sm:text-xl font-extrabold tracking-wider text-white uppercase flex items-center gap-1.5 sm:gap-2">
@@ -228,11 +230,11 @@
             <!-- Rendered dynamically -->
           </div>
           <button id="btn-theme-toggle-legacy" title="Alternar Tema Claro / Escuro" class="bg-fintech-border hover:bg-gray-700 text-xs text-gray-200 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded transition flex items-center gap-1.5 shrink-0 cursor-pointer">
-            <span id="theme-toggle-icon-legacy">🌙</span>
+            <span id="theme-toggle-icon-legacy" class="inline-flex items-center"><svg class="icon" aria-hidden="true"><use href="#icon-moon"></use></svg></span>
             <span id="theme-toggle-text-legacy" class="hidden sm:inline">Escuro</span>
           </button>
           <button id="btn-refresh-data" class="bg-fintech-border hover:bg-gray-700 text-xs text-gray-200 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded transition flex items-center gap-1 shrink-0">
-            <span>🔄</span> <span class="hidden sm:inline">Atualizar</span>
+            <svg class="icon" aria-hidden="true"><use href="#icon-refresh"></use></svg> <span class="hidden sm:inline">Atualizar</span>
           </button>
         </div>
       </div>
@@ -295,7 +297,7 @@
         <div id="investidor10-welcome-banner" class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-6 text-white shadow-md flex flex-col md:flex-row items-center justify-between gap-6 border border-slate-700">
           <div class="flex items-center gap-4">
             <div class="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center text-3xl shrink-0 shadow-inner">
-              📊
+              <svg class="icon w-7 h-7" aria-hidden="true"><use href="#icon-chart"></use></svg>
             </div>
             <div>
               <h2 class="text-lg font-bold text-white tracking-tight">Traga seus investimentos e extratos da B3</h2>
@@ -315,7 +317,7 @@
           <!-- Card 1: Patrimônio Total -->
           <div id="kpi-patrimonio-total" class="kpi-card bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
             <div class="flex justify-between items-center text-slate-500 text-xs font-semibold">
-              <span class="kpi-label flex items-center gap-1.5">💼 Patrimônio total</span>
+              <span class="kpi-label flex items-center gap-1.5"><svg class="icon" aria-hidden="true"><use href="#icon-wallet"></use></svg> Patrimônio total</span>
               <span id="overview-card1-var" class="badge-gain">0,00% ▲</span>
             </div>
             <div class="mt-2">
@@ -330,7 +332,7 @@
           <!-- Card 2: Lucro Total -->
           <div id="kpi-lucro-total" class="kpi-card bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
             <div class="flex justify-between items-center text-slate-500 text-xs font-semibold">
-              <span class="kpi-label flex items-center gap-1.5">📈 Lucro Líquido Total</span>
+              <span class="kpi-label flex items-center gap-1.5"><svg class="icon" aria-hidden="true"><use href="#icon-trending-up"></use></svg> Lucro Líquido Total</span>
               <span id="kpi-lucro-badge" class="badge-gain">0,00%</span>
             </div>
             <div class="mt-2">
@@ -360,7 +362,7 @@
           <!-- Card 4: Posições no Lucro -->
           <div id="kpi-posicoes-lucro" class="kpi-card bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
             <div class="flex justify-between items-center text-slate-500 text-xs font-semibold">
-              <span class="kpi-label flex items-center gap-1.5">🎯 Posições no Lucro</span>
+              <span class="kpi-label flex items-center gap-1.5"><svg class="icon" aria-hidden="true"><use href="#icon-target"></use></svg> Posições no Lucro</span>
               <span id="kpi-posicoes-percent" class="badge-gain">0%</span>
             </div>
             <div class="mt-2">
@@ -1869,10 +1871,10 @@
                 <input type="file" id="portfolio-csv-file-input" accept=".xlsx,.xls,.csv,.txt" multiple class="hidden">
                 <input type="file" id="b3-multi-file-input" accept=".xlsx,.xls,.csv,.txt" multiple class="hidden" aria-hidden="true" tabindex="-1">
                 <button id="btn-portfolio-import-csv" type="button" class="text-[11px] px-2.5 py-1 rounded bg-cyan-950/50 hover:bg-cyan-900/60 text-cyan-300 hover:text-cyan-200 border border-cyan-800/60 transition cursor-pointer flex items-center gap-1 font-semibold" title="Importar uma ou múltiplas planilhas oficiais B3 (.xlsx) ou arquivo CSV">
-                  <span>📁</span>Importar B3 / CSV
+                  <svg class="icon" aria-hidden="true"><use href="#icon-import"></use></svg>Importar B3 / CSV
                 </button>
                 <button id="btn-portfolio-undo-apply" type="button" class="hidden text-[11px] px-2.5 py-1 rounded bg-amber-950/50 hover:bg-amber-900/60 text-amber-300 hover:text-amber-200 border border-amber-800/60 transition cursor-pointer flex items-center gap-1" title="Desfazer aplicação de ordens e restaurar carteira anterior">
-                  <span>↩️</span>Desfazer Aplicação
+                  <svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"></use></svg>Desfazer Aplicação
                 </button>
                 <button id="btn-portfolio-clear-holdings" class="text-[11px] px-2.5 py-1 rounded bg-fintech-bg hover:bg-rose-950/60 text-gray-300 hover:text-rose-300 border border-fintech-border transition cursor-pointer">
                   Limpar (100% Caixa)
@@ -2125,13 +2127,13 @@
     <div class="bg-fintech-surface max-w-lg w-full p-4 sm:p-6 space-y-4 border border-fintech-border shadow-2xl rounded-lg">
       <div class="flex items-center justify-between border-b border-fintech-border pb-3">
         <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">✓</div>
+          <div class="w-8 h-8 rounded bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm"><svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg></div>
           <div>
             <h3 class="text-sm sm:text-base font-bold text-white">Revisão Prévia de Execução de Ordens</h3>
             <p class="text-[11px] text-gray-400">Confirme a aplicação das ordens recomendadas na sua carteira.</p>
           </div>
         </div>
-        <button id="btn-modal-close" class="text-gray-400 hover:text-white text-lg font-bold p-1">✕</button>
+        <button id="btn-modal-close" class="text-gray-400 hover:text-white text-lg font-bold p-1" aria-label="Fechar modal"><svg class="icon" aria-hidden="true"><use href="#icon-x"></use></svg></button>
       </div>
 
       <div class="space-y-2">
@@ -2180,7 +2182,7 @@
 
   <!-- Toast Notification System for High-Stakes Actions -->
   <div id="toast-notification" class="fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-2xl border text-xs font-medium transition-all duration-300 transform translate-y-16 opacity-0 pointer-events-none">
-    <span id="toast-icon" class="text-base">✓</span>
+    <span id="toast-icon" class="text-base inline-flex items-center"><svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg></span>
     <span id="toast-message" class="text-white">Ação concluída com sucesso.</span>
     <button id="toast-action-btn" class="ml-2 font-bold underline hover:opacity-80 hidden">Desfazer</button>
   </div>
@@ -2200,7 +2202,7 @@
           <h3 class="text-sm sm:text-base font-bold text-white">Configurar Metas de Longo Prazo</h3>
           <p class="text-[11px] text-gray-400">Defina seus objetivos financeiros patrimoniais e de proventos.</p>
         </div>
-        <button id="btn-modal-metas-close" class="text-gray-400 hover:text-white text-lg font-bold p-1">✕</button>
+        <button id="btn-modal-metas-close" class="text-gray-400 hover:text-white text-lg font-bold p-1" aria-label="Fechar metas"><svg class="icon" aria-hidden="true"><use href="#icon-x"></use></svg></button>
       </div>
 
       <div class="space-y-3">
