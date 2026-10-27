@@ -396,76 +396,76 @@
     </section>
 
     <!-- ========================================== -->
-    <section id="tab-pane-radar" data-tab-pane="radar" class="tab-pane tab-view hidden h-full p-2.5 sm:p-4 overflow-y-auto">
+    <section id="tab-pane-radar" data-tab-pane="radar" class="tab-pane tab-view hidden h-full p-2.5 sm:p-4 overflow-y-auto quant-area">
       <div class="max-w-7xl mx-auto space-y-3 sm:space-y-4">
 
         <!-- Executive Command Deck / Macro KPI Summary -->
         <div id="radar-executive-deck" class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
-          <div class="card-surface p-3 sm:p-3.5 flex flex-col justify-between border-l-2 border-l-emerald-500">
-            <span class="text-[11px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider">Oportunidades em Compra</span>
+          <div class="kpi-card border-l-2 border-l-emerald-500">
+            <span class="kpi-label uppercase tracking-wider">Oportunidades em Compra</span>
             <div class="flex items-baseline justify-between mt-1">
-              <span id="exec-kpi-buys" class="text-lg sm:text-2xl font-bold font-mono text-emerald-400">--</span>
-              <span class="text-[11px] text-gray-500 font-mono">Setup Ideal</span>
+              <span id="exec-kpi-buys" class="text-lg sm:text-2xl font-bold font-mono text-positive">--</span>
+              <span class="text-[11px] text-subtle font-mono">Setup Ideal</span>
             </div>
-            <div class="text-[11px] text-gray-400 mt-0.5 truncate" id="exec-kpi-buys-sub">Varrendo universo</div>
+            <div class="text-[11px] text-muted mt-0.5 truncate" id="exec-kpi-buys-sub">Varrendo universo</div>
           </div>
 
-          <div class="card-surface p-3 sm:p-3.5 flex flex-col justify-between border-l-2 border-l-rose-500">
-            <span class="text-[11px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider">Topos em Alerta (Venda)</span>
+          <div class="kpi-card border-l-2 border-l-rose-500">
+            <span class="kpi-label uppercase tracking-wider">Topos em Alerta (Venda)</span>
             <div class="flex items-baseline justify-between mt-1">
-              <span id="exec-kpi-sells" class="text-lg sm:text-2xl font-bold font-mono text-rose-400">--</span>
-              <span class="text-[11px] text-gray-500 font-mono">Exaustão</span>
+              <span id="exec-kpi-sells" class="text-lg sm:text-2xl font-bold font-mono text-negative">--</span>
+              <span class="text-[11px] text-subtle font-mono">Exaustão</span>
             </div>
-            <div class="text-[11px] text-gray-400 mt-0.5 truncate" id="exec-kpi-sells-sub">Risco de reversão</div>
+            <div class="text-[11px] text-muted mt-0.5 truncate" id="exec-kpi-sells-sub">Risco de reversão</div>
           </div>
 
-          <div class="card-surface p-3 sm:p-3.5 flex flex-col justify-between border-l-2 border-l-cyan-500">
-            <span class="text-[11px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider">Maior Assimetria Hoje</span>
-            <div class="flex items-baseline justify-between mt-1">
-              <span id="exec-kpi-top-asset" class="text-base sm:text-xl font-bold font-mono text-cyan-300 truncate">--</span>
-              <span id="exec-kpi-top-score" class="text-[11px] font-mono font-bold text-emerald-400">--</span>
+          <div class="kpi-card border-l-2 border-l-cyan-500">
+            <span class="kpi-label uppercase tracking-wider">Maior Assimetria Hoje</span>
+            <div class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 mt-1 min-w-0">
+              <span id="exec-kpi-top-asset" class="text-sm lg:text-lg font-bold font-mono text-info truncate min-w-0">--</span>
+              <span id="exec-kpi-top-score" class="text-[11px] font-mono font-bold text-positive shrink-0">--</span>
             </div>
-            <div class="text-[11px] text-gray-400 mt-0.5 truncate" id="exec-kpi-top-strat">Estratégia campeã</div>
+            <div class="text-[11px] text-muted mt-0.5 truncate" id="exec-kpi-top-strat">Estratégia campeã</div>
           </div>
 
-          <div class="card-surface p-3 sm:p-3.5 flex flex-col justify-between border-l-2 border-l-amber-500">
-            <span class="text-[11px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider">Regime do Mercado</span>
-            <div class="flex items-baseline justify-between mt-1">
-              <span id="exec-kpi-market-regime" class="text-base sm:text-xl font-bold text-amber-300 truncate">Equilibrado</span>
-              <span class="text-[11px] font-mono text-gray-400" id="exec-kpi-scan-time">--</span>
+          <div class="kpi-card border-l-2 border-l-amber-500">
+            <span class="kpi-label uppercase tracking-wider">Regime do Mercado</span>
+            <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-0.5 sm:gap-1 mt-1 min-w-0">
+              <span id="exec-kpi-market-regime" class="text-sm lg:text-lg font-bold text-warning leading-tight">Equilibrado</span>
+              <span class="text-[11px] font-mono text-muted shrink-0" id="exec-kpi-scan-time">--</span>
             </div>
-            <div class="text-[11px] text-gray-400 mt-0.5 truncate">Filtro Global Ativo</div>
+            <div class="text-[11px] text-muted mt-0.5 truncate">Filtro Global Ativo</div>
           </div>
         </div>
 
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
+        <div class="area-header">
           <div>
-            <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-              <span></span>Radar de Oportunidades & Timing
+            <h2 class="section-title flex items-center gap-2">
+              <span></span>Radar de Oportunidades &amp; Timing
             </h2>
-            <p class="text-[11px] sm:text-xs text-gray-400">Varredura multiativos identificando fundos estatísticos (Compra) e topos (Venda).</p>
+            <p class="section-subtitle">Varredura multiativos identificando fundos estatísticos (Compra) e topos (Venda).</p>
           </div>
-          <div class="flex flex-wrap items-center gap-2">
+          <div class="area-header-actions">
             <!-- Timeframe selector for Radar -->
-            <div class="flex items-center space-x-1 bg-fintech-surface border border-fintech-border rounded p-1 overflow-x-auto no-scrollbar touch-scroll" id="radar-timeframe-buttons">
-              <span class="text-[11px] sm:text-[11px] font-semibold text-gray-400 px-1.5 uppercase hidden xs:inline">Tempo:</span>
-              <button class="radar-tf-btn px-2 sm:px-2.5 py-1 text-xs rounded font-bold bg-fintech-cyan/20 text-fintech-cyan border border-fintech-cyan/40 active shrink-0" data-tf="1d">1D</button>
-              <button class="radar-tf-btn px-2 sm:px-2.5 py-1 text-xs rounded text-gray-300 hover:text-white bg-fintech-bg shrink-0" data-tf="1wk">1S</button>
-              <button class="radar-tf-btn px-2 sm:px-2.5 py-1 text-xs rounded text-gray-300 hover:text-white bg-fintech-bg shrink-0" data-tf="4h">4h</button>
-              <button class="radar-tf-btn px-2 sm:px-2.5 py-1 text-xs rounded text-gray-300 hover:text-white bg-fintech-bg shrink-0" data-tf="1h">1h</button>
+            <div class="segmented" id="radar-timeframe-buttons">
+              <span class="text-[11px] font-semibold text-muted px-1.5 uppercase hidden xs:inline">Tempo:</span>
+              <button class="radar-tf-btn segmented-btn active shrink-0" data-tf="1d">1D</button>
+              <button class="radar-tf-btn segmented-btn shrink-0" data-tf="1wk">1S</button>
+              <button class="radar-tf-btn segmented-btn shrink-0" data-tf="4h">4h</button>
+              <button class="radar-tf-btn segmented-btn shrink-0" data-tf="1h">1h</button>
             </div>
 
             <!-- Radar Strategy Multi-Select Dropdown (Starts all unchecked) -->
             <div class="relative" id="radar-strategy-dropdown-wrapper">
-              <button id="btn-radar-strat-toggle" class="bg-fintech-surface hover:bg-fintech-surface-hover text-gray-300 hover:text-white text-xs px-2.5 py-1.5 sm:py-2 rounded border border-fintech-border flex items-center gap-1.5 shrink-0">
+              <button id="btn-radar-strat-toggle" class="btn-secondary shrink-0">
                 <span>Filtro de Estratégias</span>
-                <span id="radar-strat-badge" class="bg-fintech-cyan/20 text-fintech-cyan text-[11px] px-1 rounded font-mono hidden">0</span>
-                <span class="text-xs text-gray-400">▼</span>
+                <span id="radar-strat-badge" class="badge badge-info font-mono hidden">0</span>
+                <span class="text-xs text-muted" aria-hidden="true">▼</span>
               </button>
-              <div id="radar-strat-menu" class="absolute left-0 mt-1 w-64 bg-fintech-surface border border-fintech-border rounded shadow-xl z-50 p-2 hidden max-h-60 overflow-y-auto text-xs space-y-1">
-                <div class="text-[11px] text-gray-400 border-b border-fintech-border pb-1 mb-1 flex justify-between items-center">
+              <div id="radar-strat-menu" class="menu-panel absolute left-0 mt-1 w-64 z-50 p-2 hidden max-h-60 overflow-y-auto text-xs space-y-1">
+                <div class="text-[11px] text-muted border-b border-default pb-1 mb-1 flex justify-between items-center">
                   <span>Todas desmarcadas = Todas ativas</span>
-                  <button id="btn-clear-radar-strat" class="text-fintech-cyan hover:underline text-[11px]">Limpar</button>
+                  <button id="btn-clear-radar-strat" class="text-info hover:underline text-[11px]">Limpar</button>
                 </div>
                 <div id="radar-strat-checkbox-container" class="space-y-1">
                   <!-- Populated dynamically based on catalog and active direction -->
@@ -473,7 +473,7 @@
               </div>
             </div>
 
-            <button id="btn-radar-rescan" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-3 py-1.5 sm:py-2 rounded shadow transition flex items-center gap-1.5 shrink-0">
+            <button id="btn-radar-rescan" class="btn-primary shrink-0">
               <span></span> <span class="hidden xs:inline">Atualizar</span>Radar
             </button>
           </div>
@@ -481,25 +481,23 @@
 
         <!-- Radar Asset Category Filter Pills -->
         <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar touch-scroll pb-1" id="radar-category-pills">
-          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 active-cat shrink-0" data-cat="featured">Destaques (14)</button>
-          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="Ações Brasil">Ações Brasil (31)</button>
-          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="FIIs Brasil">FIIs Brasil (23)</button>
-          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="BDRs">BDRs (41)</button>
-          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="Ações EUA">Ações EUA (71)</button>
-          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="Commodities">Commodities (14)</button>
-          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="Forex">Forex (11)</button>
-          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="Criptomoedas">Cripto (3)</button>
-          <button class="radar-cat-btn px-2.5 sm:px-3 py-1 rounded text-xs font-semibold bg-fintech-surface text-gray-400 hover:text-white border border-fintech-border shrink-0" data-cat="all">Todos (194)</button>
+          <button class="radar-cat-btn filter-chip active-cat active shrink-0" data-cat="featured">Destaques (14)</button>
+          <button class="radar-cat-btn filter-chip shrink-0" data-cat="Ações Brasil">Ações Brasil (31)</button>
+          <button class="radar-cat-btn filter-chip shrink-0" data-cat="FIIs Brasil">FIIs Brasil (23)</button>
+          <button class="radar-cat-btn filter-chip shrink-0" data-cat="BDRs">BDRs (41)</button>
+          <button class="radar-cat-btn filter-chip shrink-0" data-cat="Ações EUA">Ações EUA (71)</button>
+          <button class="radar-cat-btn filter-chip shrink-0" data-cat="Commodities">Commodities (14)</button>
+          <button class="radar-cat-btn filter-chip shrink-0" data-cat="Forex">Forex (11)</button>
+          <button class="radar-cat-btn filter-chip shrink-0" data-cat="Criptomoedas">Cripto (3)</button>
+          <button class="radar-cat-btn filter-chip shrink-0" data-cat="all">Todos (194)</button>
         </div>
 
         <!-- Radar Opportunities Table -->
-        <div class="card-surface overflow-hidden">
-          <div class="block sm:hidden text-[11px] text-gray-400 bg-fintech-bg/60 px-3 py-1 border-b border-fintech-border text-center font-mono">
-            ← Deslize para os lados para ver detalhes →
-          </div>
-          <div class="overflow-x-auto touch-scroll">
-            <table class="w-full text-left text-xs text-gray-300">
-                            <thead class="bg-fintech-bg/60 text-gray-400 font-semibold uppercase text-[11px] border-b border-fintech-border whitespace-nowrap">
+        <div class="card-surface overflow-hidden p-0">
+          <div class="table-scroll-hint">← Deslize para os lados para ver detalhes →</div>
+          <div class="table-scroll touch-scroll">
+            <table class="table-standard">
+              <thead class="whitespace-nowrap">
                 <tr>
                   <th class="px-3 sm:px-4 py-2.5 sm:py-3">Ativo</th>
                   <th class="px-2 sm:px-3 py-2.5 sm:py-3 text-center">Dir</th>
@@ -507,35 +505,35 @@
                   <th class="px-3 sm:px-4 py-2.5 sm:py-3">Status do Setup</th>
                   <th class="px-2 sm:px-3 py-2.5 sm:py-3 text-center">Timing</th>
                   <th class="px-3 sm:px-4 py-2.5 sm:py-3">Distância (%)</th>
-                  <th class="px-3 sm:px-4 py-2.5 sm:py-3 cursor-pointer hover:text-cyan-400 select-none text-right" id="th-sort-n" title="Clique para ordenar por Quantidade de Sinais">
+                  <th class="px-3 sm:px-4 py-2.5 sm:py-3 cursor-pointer hover:text-info select-none text-right" id="th-sort-n" title="Clique para ordenar por Quantidade de Sinais">
                     <div class="inline-flex items-center gap-1 justify-end">
                       <span>Qtd Sinais</span>
-                      <span id="sort-icon-n" class="text-[11px] text-gray-500">↕</span>
+                      <span id="sort-icon-n" class="text-[11px] text-subtle">↕</span>
                     </div>
                   </th>
-                  <th class="px-3 sm:px-4 py-2.5 sm:py-3 cursor-pointer hover:text-cyan-400 select-none text-right" id="th-sort-winrate" title="Clique para ordenar por Taxa de Acerto (Win Rate)">
+                  <th class="px-3 sm:px-4 py-2.5 sm:py-3 cursor-pointer hover:text-info select-none text-right" id="th-sort-winrate" title="Clique para ordenar por Taxa de Acerto (Win Rate)">
                     <div class="inline-flex items-center gap-1 justify-end">
                       <span>Win Rate (%)</span>
-                      <span id="sort-icon-winrate" class="text-[11px] text-gray-500">↕</span>
+                      <span id="sort-icon-winrate" class="text-[11px] text-subtle">↕</span>
                     </div>
                   </th>
                 </tr>
               </thead>
-              <tbody id="radar-table-body" class="divide-y divide-fintech-border whitespace-nowrap">
+              <tbody id="radar-table-body" class="divide-y divide-default whitespace-nowrap">
                 <!-- Dynamically populated -->
               </tbody>
             </table>
           </div>
           <!-- Radar Pagination Controls -->
-          <div id="radar-pagination-container" class="flex items-center justify-between px-3 py-2.5 bg-fintech-bg/80 border-t border-fintech-border text-xs">
-            <div class="text-gray-400 font-mono text-[11px]" id="radar-pagination-info">
+          <div id="radar-pagination-container" class="flex items-center justify-between px-3 py-2.5 surface-subtle border-t border-default text-xs">
+            <div class="text-muted font-mono text-[11px]" id="radar-pagination-info">
               Página 1 de 1 (0 ativos)
             </div>
             <div class="flex items-center gap-2">
-              <button id="btn-radar-prev" class="px-2.5 py-1 rounded bg-fintech-surface hover:bg-fintech-cyan/20 text-gray-300 hover:text-fintech-cyan border border-fintech-border transition disabled:opacity-30 disabled:cursor-not-allowed">
+              <button id="btn-radar-prev" class="btn-secondary">
                 ← Anterior
               </button>
-              <button id="btn-radar-next" class="px-2.5 py-1 rounded bg-fintech-surface hover:bg-fintech-cyan/20 text-gray-300 hover:text-fintech-cyan border border-fintech-border transition disabled:opacity-30 disabled:cursor-not-allowed">
+              <button id="btn-radar-next" class="btn-secondary">
                 Próxima →
               </button>
             </div>
