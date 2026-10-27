@@ -622,6 +622,7 @@ function navigateToRoute(targetKey, options = {}) {
     }, 60);
   }
 
+  requestAnimationFrame(() => setTimeout(resizeAllCharts, 60));
   _isNavigating = false;
 }
 
@@ -849,6 +850,8 @@ function updateChartsTheme(theme) {
       renderPlotlyScatter();
     }
   }
+
+  requestAnimationFrame(() => resizeAllCharts());
 }
 
 // UI: Navigation Tabs
@@ -1244,6 +1247,39 @@ function resizeChartResponsive() {
   const w = container.clientWidth;
   const h = isMobile ? 340 : 480;
   state.chart.applyOptions({ width: w, height: h });
+}
+
+// Resize every live chart (TradingView + Plotly) after layout changes.
+const PLOTLY_CHART_IDS = [
+  'plot-ranking',
+  'plot-scatter',
+  'plot-simulation-curve',
+  'portfolio-equity-chart',
+  'portfolio-allocation-chart',
+  'overview-stacked-bar-chart',
+  'overview-donut-chart',
+  'chart-proventos-detailed',
+  'chart-patrimonio-detailed',
+];
+
+function resizeAllCharts() {
+  resizeChartResponsive();
+  if (typeof window === 'undefined' || !window.Plotly) return;
+  PLOTLY_CHART_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.data) Plotly.Plots.resize(el);
+  });
+}
+
+if (typeof window !== 'undefined') {
+  let resizeFrame = null;
+  window.addEventListener('resize', () => {
+    if (resizeFrame) cancelAnimationFrame(resizeFrame);
+    resizeFrame = requestAnimationFrame(() => {
+      resizeFrame = null;
+      resizeAllCharts();
+    });
+  });
 }
 
 // Lightweight Charts 60fps TradingView Chart Engine
@@ -2029,18 +2065,6 @@ function initTradingViewChart() {
     borderUpColor: '#00E676',
     wickDownColor: '#FF5252',
     wickUpColor: '#00E676',
-  });
-
-  window.addEventListener('resize', () => {
-    resizeChartResponsive();
-    if (window.Plotly) {
-      const p1 = document.getElementById('plot-ranking');
-      const p2 = document.getElementById('plot-scatter');
-      const p3 = document.getElementById('plot-simulation-curve');
-      if (p1) Plotly.Plots.resize(p1);
-      if (p2) Plotly.Plots.resize(p2);
-      if (p3) Plotly.Plots.resize(p3);
-    }
   });
 
   if (window.ResizeObserver && container) {
