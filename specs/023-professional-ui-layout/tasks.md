@@ -23,7 +23,7 @@
 - [X] T002 [P] Capturar baseline visual das 8 áreas em 375/768/1366/1920px e temas claro/escuro em `/tmp/023-ui-before/`
 - [X] T003 [P] Inventariar IDs, rotas e funções globais estáveis contra `specs/023-professional-ui-layout/contracts/ui-layout-contract.md` e registrar lacunas
 - [X] T004 [P] Verificar/instalar Playwright e Chromium conforme `tests/e2e/conftest.py` e `requirements-dev.txt`
-- [ ] T005 [P] Confirmar que `src/api/` está limpo com `git diff --stat -- src/api` antes do início
+- [X] T005 [P] Confirmar que `src/api/` está limpo com `git diff --stat -- src/api` antes do início
 
 ---
 
