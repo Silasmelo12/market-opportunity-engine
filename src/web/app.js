@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnOverviewRefresh = document.getElementById('btn-overview-refresh');
   if (btnOverviewRefresh) {
     btnOverviewRefresh.addEventListener('click', async () => {
-      showLoading('Atualizando cotaÃ§Ãµes e mÃ©tricas da carteira...');
+      showLoading('Atualizando cotações e métricas da carteira...');
       try {
         state.portfolioState.quotesCache = null; // force fresh quotes
         await renderOverviewDashboard();
@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
           await runPortfolioAdviseAndSimulate();
           await renderOverviewDashboard();
         }
-        showToastNotification('Carteira e cotaÃ§Ãµes atualizadas com sucesso!', false);
+        showToastNotification('Carteira e cotações atualizadas com sucesso!', false);
       } catch (err) {
         console.warn('Erro ao atualizar carteira:', err);
       } finally {
@@ -1214,7 +1214,7 @@ async function fetchPortfolioQuotes(tickers) {
       return data.quotes || {};
     }
   } catch (e) {
-    console.warn('Erro ao buscar cotaÃ§Ãµes periÃ³dicas:', e);
+    console.warn('Erro ao buscar cotações periódicas:', e);
   }
   return {};
 }
@@ -1350,7 +1350,7 @@ async function renderOverviewDashboard() {
   if (bestTickerEl) bestTickerEl.textContent = bestAsset.ticker !== '--' ? bestAsset.ticker : '--';
   if (bestPctEl) {
     if (bestAsset.ticker !== '--') {
-      bestPctEl.textContent = `${bestAsset.pct >= 0 ? '+' : ''}${bestAsset.pct.toFixed(2)}% â†—`;
+      bestPctEl.textContent = `${bestAsset.pct >= 0 ? '+' : ''}${bestAsset.pct.toFixed(2)}% ↗`;
       bestPctEl.className = 'text-[10px] font-bold font-mono text-emerald-400 bg-emerald-500/10 px-1 rounded inline-block mt-0.5';
     } else {
       bestPctEl.textContent = '--';
@@ -1359,7 +1359,7 @@ async function renderOverviewDashboard() {
   if (worstTickerEl) worstTickerEl.textContent = worstAsset.ticker !== '--' ? worstAsset.ticker : '--';
   if (worstPctEl) {
     if (worstAsset.ticker !== '--') {
-      worstPctEl.textContent = `${worstAsset.pct >= 0 ? '+' : ''}${worstAsset.pct.toFixed(2)}% â†˜`;
+      worstPctEl.textContent = `${worstAsset.pct >= 0 ? '+' : ''}${worstAsset.pct.toFixed(2)}% ↘`;
       worstPctEl.className = 'text-[10px] font-bold font-mono text-rose-400 bg-rose-500/10 px-1 rounded inline-block mt-0.5';
     } else {
       worstPctEl.textContent = '--';
@@ -1477,7 +1477,7 @@ async function renderOverviewDashboard() {
   if (ratioBadge) ratioBadge.textContent = `${winRatio.toFixed(0)}%`;
   if (ratioText) ratioText.textContent = `${gainersCount} de ${totalPositions}`;
   if (profitBar) profitBar.style.width = `${winRatio}%`;
-  if (gainersEl) gainersEl.textContent = `${gainersCount} no lucro â–²`;
+  if (gainersEl) gainersEl.textContent = `${gainersCount} no lucro ▲`;
   if (losersEl) losersEl.textContent = `${losersCount} no prejuízo ▼`;
 
   // 5. Populate Card 4: Oportunidades de Compra
@@ -2060,7 +2060,7 @@ async function loadRadarData(forceRefresh = false, category = null) {
   }
 
   const catLabel = cat === 'featured' ? 'Destaques' : (cat === 'all' ? 'Todos os Ativos' : cat);
-  showLoading(`Varrendo ${catLabel} - PÃ¡gina ${page} (${tf.toUpperCase()})...`);
+  showLoading(`Varrendo ${catLabel} - Página ${page} (${tf.toUpperCase()})...`);
   try {
     const url = `/api/radar?interval=${tf}&horizon_x=60&category=${encodeURIComponent(cat)}&refresh=${forceRefresh}&page=${page}&page_size=${pageSize}&direction=${encodeURIComponent(dir)}&strategies=${encodeURIComponent(stratCsv)}`;
     const res = await fetch(url);
@@ -2091,7 +2091,7 @@ function updateRadarPagination(pageData) {
   state.radarTotalPages = pageData.total_pages;
   state.radarTotalAssets = pageData.total_assets;
 
-  pagInfo.textContent = `PÃ¡gina ${pageData.page} de ${pageData.total_pages} (${pageData.total_assets} ativos no universo)`;
+  pagInfo.textContent = `Página ${pageData.page} de ${pageData.total_pages} (${pageData.total_assets} ativos no universo)`;
   btnPrev.disabled = (pageData.page <= 1);
   btnNext.disabled = (pageData.page >= pageData.total_pages);
 
@@ -2132,7 +2132,7 @@ function updateRadarExecutiveDeck(items) {
     const top = sorted[0];
     topAssetEl.textContent = top.ticker;
     topScoreEl.textContent = `${(Number(top.win_rate) || 0).toFixed(1)}% WR`;
-    if (topStratEl) topStratEl.textContent = top.strategy_label || top.strategy_name || 'EstratÃ©gia campeÃ£';
+    if (topStratEl) topStratEl.textContent = top.strategy_label || top.strategy_name || 'Estratégia campeã';
   }
 
   if (regimeEl) {
@@ -2143,7 +2143,7 @@ function updateRadarExecutiveDeck(items) {
       regimeEl.textContent = 'Sobrecomprado (Alerta Topo)';
       regimeEl.className = 'text-base sm:text-lg font-bold text-rose-600 dark:text-rose-400 truncate';
     } else {
-      regimeEl.textContent = 'Equilibrado / RotaÃ§Ã£o';
+      regimeEl.textContent = 'Equilibrado / Rotação';
       regimeEl.className = 'text-base sm:text-lg font-bold text-amber-600 dark:text-amber-400 truncate';
     }
   }
@@ -2413,7 +2413,7 @@ async function loadAnalysisData(forceRefresh = false) {
     applyClientSideFiltering();
 
   } catch (err) {
-    alert(`Erro na anÃ¡lise: ${err.message}`);
+    alert(`Erro na análise: ${err.message}`);
   } finally {
     hideLoading();
   }
@@ -2482,11 +2482,11 @@ function applyClientSideFiltering() {
             }
           }
         } catch (lineErr) {
-          console.warn("Aviso ao renderizar linha de referÃªncia:", lineErr);
+          console.warn("Aviso ao renderizar linha de referência:", lineErr);
         }
       });
     } catch (refErr) {
-      console.error("Erro no processamento de linhas de referÃªncia:", refErr);
+      console.error("Erro no processamento de linhas de referência:", refErr);
     }
   }
 
@@ -2505,7 +2505,7 @@ function applyClientSideFiltering() {
             .replace('Vela: ', '')
             .replace('Vela Topo: ', '')
             .replace('Price Action: ', '')
-            .replace('EstratÃ©gia ', '');
+            .replace('Estratégia ', '');
           if (cleanLabel.length >15) cleanLabel = cleanLabel.slice(0, 15);
           if (isPending) cleanLabel = ` ${cleanLabel}`;
 
@@ -2529,7 +2529,7 @@ function applyClientSideFiltering() {
 
     try {
       state.candleSeries.setMarkers(mappedMarkers);
-      elements.activeMarkerCount.textContent = `Marcadores visÃ­veis: ${mappedMarkers.length}`;
+      elements.activeMarkerCount.textContent = `Marcadores visíveis: ${mappedMarkers.length}`;
     } catch (markerErr) {
       console.error("Erro ao aplicar marcadores no Lightweight Charts:", markerErr);
       elements.activeMarkerCount.textContent = `Marcadores com aviso (${mappedMarkers.length})`;
@@ -2538,7 +2538,7 @@ function applyClientSideFiltering() {
     try {
       state.candleSeries.setMarkers([]);
     } catch (e) {}
-    elements.activeMarkerCount.textContent = `Marcadores visÃ­veis: 0`;
+    elements.activeMarkerCount.textContent = `Marcadores visíveis: 0`;
   }
 
   // 4. Render Plotly Ranking (0ms)
@@ -2710,7 +2710,7 @@ function renderStrategySimulationTable(signals, summaries) {
 
   if (!signals || signals.length === 0) {
     elements.strategySimTableBody.innerHTML = `
-      <tr><td colspan="11" class="text-center py-4 text-gray-500">Nenhuma estratÃ©gia com sinais executados ativa.</td></tr>
+      <tr><td colspan="11" class="text-center py-4 text-gray-500">Nenhuma estratégia com sinais executados ativa.</td></tr>
     `;
     return;
   }
@@ -2818,7 +2818,7 @@ function renderSignalsTable(signals) {
   elements.signalsTableBody.innerHTML = '';
   if (!signals || signals.length === 0) {
     elements.signalsTableBody.innerHTML = `
-      <tr><td colspan="11" class="text-center py-4 text-gray-500">Nenhum sinal executado nas estratÃ©gias ativas.</td></tr>
+      <tr><td colspan="11" class="text-center py-4 text-gray-500">Nenhum sinal executado nas estratégias ativas.</td></tr>
     `;
     return;
   }
@@ -2869,7 +2869,7 @@ function renderSignalsTable(signals) {
       <td class="px-3 py-2 font-mono text-right text-gray-400">${formatPrice(sig.cashRemaining, state.currentTicker)}</td>
       <td class="px-3 py-2 font-mono text-right font-bold ${retClass}">${sig.forward_return_pct !== null && sig.forward_return_pct !== undefined ? (sig.forward_return_pct >= 0 ? '+' : '') + sig.forward_return_pct.toFixed(1) + '%' : (sig.is_open ? 'Pendente' : '-')}</td>
       <td class="px-3 py-2 font-mono text-right text-rose-400">${sig.mae_pct !== null && sig.mae_pct !== undefined ? sig.mae_pct.toFixed(1) + '%' : '-'}</td>
-      <td class="px-3 py-2 font-mono text-center text-[11px]">${sig.is_open ? '<span class="text-amber-400 font-bold">ABERTO / PENDENTE</span>' : '<span class="text-gray-400">CONCLUÃDO</span>'}</td>
+      <td class="px-3 py-2 font-mono text-center text-[11px]">${sig.is_open ? '<span class="text-amber-400 font-bold">ABERTO / PENDENTE</span>' : '<span class="text-gray-400">CONCLUÍDO</span>'}</td>
     `;
     elements.signalsTableBody.appendChild(tr);
   });
@@ -2913,14 +2913,14 @@ function setupSimulationTab() {
         if (lblCap) lblCap.textContent = 'Capital Inicial (R$)';
         if (lblInv) lblInv.textContent = 'Capital Inicial';
         if (lblAux) lblAux.textContent = 'Win Rate / Acertos';
-        if (legendInfo) legendInfo.textContent = 'EvoluÃ§Ã£o de Saldo em Caixa + PosiÃ§Ã£o a Mercado';
+        if (legendInfo) legendInfo.textContent = 'Evolução de Saldo em Caixa + Posição a Mercado';
       } else {
         if (cycleContainer) cycleContainer.classList.add('hidden');
         if (sellStrategyContainer) sellStrategyContainer.classList.add('hidden');
         if (lblCap) lblCap.textContent = 'Aporte por Sinal (R$)';
         if (lblInv) lblInv.textContent = 'Total Aportado';
         if (lblAux) lblAux.textContent = 'Alfa vs. DCA Passivo';
-        if (legendInfo) legendInfo.textContent = 'PatrimÃ´nio em Cotas vs. Capital Desembolsado';
+        if (legendInfo) legendInfo.textContent = 'Patrimônio em Cotas vs. Capital Desembolsado';
       }
     });
   }
@@ -2979,7 +2979,7 @@ function setupSimulationTab() {
 
 async function runSimulation() {
   const mode = (elements.simMode && elements.simMode.value) || 'cycle_trade';
-  showLoading(mode === 'cycle_trade' ? 'Executando backtest de trade (Compra -> Venda)...' : 'Executando simulaÃ§Ã£o de acumulaÃ§Ã£o financeira...');
+  showLoading(mode === 'cycle_trade' ? 'Executando backtest de trade (Compra -> Venda)...' : 'Executando simulação de acumulação financeira...');
   try {
     const tickerInput = resolveTicker((elements.simTicker && elements.simTicker.value.trim().toUpperCase()) || state.currentTicker);
     const capitalVal = parseFloat(document.getElementById('sim-contribution').value) || 1000;
@@ -3030,11 +3030,11 @@ async function runSimulation() {
     const m = data.metrics;
     const isCycle = (mode === 'cycle_trade');
 
-    // 1. Capital Investido & PatrimÃ´nio Final
+    // 1. Capital Investido & Patrimônio Final
     document.getElementById('sim-kpi-invested').textContent = `R$ ${m.total_invested.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
     document.getElementById('sim-kpi-final').textContent = `R$ ${m.final_portfolio_value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
 
-    // 2. Retorno EstratÃ©gia vs Buy & Hold
+    // 2. Retorno Estratégia vs Buy & Hold
     const retEl = document.getElementById('sim-kpi-return');
     if (retEl) {
       retEl.textContent = `${m.total_return_pct >= 0 ? '+' : ''}${m.total_return_pct.toFixed(1)}%`;
@@ -3047,12 +3047,12 @@ async function runSimulation() {
       bnhSub.textContent = `B&H: ${bnh}% (Alpha: ${bnhDiff >= 0 ? '+' : ''}${bnhDiff}%)`;
     }
 
-    // 3. Fator de Lucro & Lucro LÃ­quido
+    // 3. Fator de Lucro & Lucro Líquido
     const pfEl = document.getElementById('sim-kpi-profit-factor');
     if (pfEl) {
-      const pf = m.profit_factor != null ? (m.profit_factor >= 999 ? 'âˆž' : m.profit_factor.toFixed(2)) : '0.00';
+      const pf = m.profit_factor != null ? (m.profit_factor >= 999 ? '∞' : m.profit_factor.toFixed(2)) : '0.00';
       pfEl.textContent = pf;
-      pfEl.className = `text-base sm:text-lg font-bold font-mono ${parseFloat(pf) >= 1.5 || pf === 'âˆž' ? 'text-amber-400' : (parseFloat(pf) >= 1.0 ? 'text-gray-200' : 'text-rose-400')}`;
+      pfEl.className = `text-base sm:text-lg font-bold font-mono ${parseFloat(pf) >= 1.5 || pf === '∞' ? 'text-amber-400' : (parseFloat(pf) >= 1.0 ? 'text-gray-200' : 'text-rose-400')}`;
     }
     const profitSub = document.getElementById('sim-kpi-profit-sub');
     if (profitSub) {
@@ -3077,7 +3077,7 @@ async function runSimulation() {
       }
     }
 
-    // 5. Drawdown MÃ¡ximo & MÃ©dia de Compras
+    // 5. Drawdown Máximo & Média de Compras
     const ddEl = document.getElementById('sim-kpi-drawdown');
     if (ddEl) {
       ddEl.textContent = `${(m.max_drawdown_pct || 0).toFixed(1)}%`;
@@ -3085,9 +3085,9 @@ async function runSimulation() {
     const avgEntriesSub = document.getElementById('sim-kpi-avg-entries-sub');
     if (avgEntriesSub) {
       if (isCycle && m.avg_entries_per_cycle != null) {
-        avgEntriesSub.textContent = `MÃ©dia compras/ciclo: ${m.avg_entries_per_cycle.toFixed(1)}`;
+        avgEntriesSub.textContent = `Média compras/ciclo: ${m.avg_entries_per_cycle.toFixed(1)}`;
       } else {
-        avgEntriesSub.textContent = `DuraÃ§Ã£o mÃ©dia: ${(m.avg_trade_bars || 0).toFixed(0)}b`;
+        avgEntriesSub.textContent = `Duração média: ${(m.avg_trade_bars || 0).toFixed(0)}b`;
       }
     }
 
@@ -3095,7 +3095,7 @@ async function runSimulation() {
     renderSimulationTradesTable(data.trades, mode);
 
   } catch (err) {
-    alert(`Erro na simulaÃ§Ã£o: ${err.message}`);
+    alert(`Erro na simulação: ${err.message}`);
   } finally {
     hideLoading();
   }
@@ -3104,7 +3104,7 @@ async function runSimulation() {
 async function runOptimizer() {
   const currentMode = (elements.simMode && elements.simMode.value) || 'cycle_trade';
   const isDca = (currentMode === 'accumulation');
-  showLoading(isDca ? 'Varrendo estratÃ©gias de compra para encontrar a mais lucrativa em DCA...' : 'Varrendo centenas de combinaÃ§Ãµes para encontrar a mais lucrativa...');
+  showLoading(isDca ? 'Varrendo estratégias de compra para encontrar a mais lucrativa em DCA...' : 'Varrendo centenas de combinações para encontrar a mais lucrativa...');
   try {
     const tickerInput = resolveTicker((elements.simTicker && elements.simTicker.value.trim().toUpperCase()) || state.currentTicker);
     const capitalVal = parseFloat(document.getElementById('sim-contribution').value) || 1000;
@@ -3155,23 +3155,23 @@ async function runOptimizer() {
       const countEl = document.getElementById('opt-champ-tested-count');
       if (countEl) {
         countEl.textContent = isDca
-          ? `${data.total_combinations_tested} estratÃ©gias de compra avaliadas`
-          : `${data.total_combinations_tested} combinaÃ§Ãµes vÃ¡lidas rankeadas`;
+          ? `${data.total_combinations_tested} estratégias de compra avaliadas`
+          : `${data.total_combinations_tested} combinações válidas rankeadas`;
       }
 
       const modeBadge = document.getElementById('opt-champ-mode-badge');
       if (modeBadge) {
         if (isDca) {
-          modeBadge.textContent = 'AcumulaÃ§Ã£o DCA (Fundos)';
+          modeBadge.textContent = 'Acumulação DCA (Fundos)';
         } else {
-          modeBadge.textContent = c.cycle_entry_mode === 'single_buy' ? 'Compra Ãšnica (1x)' : 'Multi-Buy (Nx)';
+          modeBadge.textContent = c.cycle_entry_mode === 'single_buy' ? 'Compra Única (1x)' : 'Multi-Buy (Nx)';
         }
       }
 
       const titleContainer = document.getElementById('opt-champ-title-container') || (document.getElementById('opt-champ-buy-label') && document.getElementById('opt-champ-buy-label').parentElement);
       if (titleContainer) {
         if (isDca) {
-          titleContainer.innerHTML = '<span class="text-emerald-400 font-semibold" id="opt-champ-buy-label">' + c.buy_label + '</span> <span class="text-gray-400 font-normal text-xs">(Aportes PeriÃ³dicos em Fundos)</span>';
+          titleContainer.innerHTML = '<span class="text-emerald-400 font-semibold" id="opt-champ-buy-label">' + c.buy_label + '</span> <span class="text-gray-400 font-normal text-xs">(Aportes Periódicos em Fundos)</span>';
         } else {
           titleContainer.innerHTML = '<span class="text-emerald-400 font-semibold" id="opt-champ-buy-label">' + c.buy_label + '</span> <span class="text-gray-400" id="opt-champ-arrow">-&gt;</span> <span class="text-rose-400 font-semibold" id="opt-champ-sell-label">' + (c.sell_label || '-') + '</span>';
         }
@@ -3185,7 +3185,7 @@ async function runOptimizer() {
         if (isDca) {
           const avgP = c.average_buy_price != null ? `R$ ${c.average_buy_price.toFixed(2)}` : '-';
           winRateEl.textContent = avgP;
-          winRateEl.previousElementSibling.textContent = 'PreÃ§o MÃ©dio de Compra';
+          winRateEl.previousElementSibling.textContent = 'Preço Médio de Compra';
         } else {
           winRateEl.textContent = `${c.win_rate_pct.toFixed(1)}% (${c.winning_trades}/${c.closed_trades})`;
           winRateEl.previousElementSibling.textContent = 'Taxa de Acerto (Win Rate)';
@@ -3223,7 +3223,7 @@ async function runOptimizer() {
     }
 
   } catch (err) {
-    alert(`Erro na otimizaÃ§Ã£o: ${err.message}`);
+    alert(`Erro na otimização: ${err.message}`);
   } finally {
     hideLoading();
   }
@@ -3238,32 +3238,32 @@ function renderTopCombinationsTable(combos, isDca = false) {
     if (isDca) {
       tableHeader.innerHTML = `
         <th class="px-2.5 py-2 text-center">Rank</th>
-        <th class="px-2.5 py-2">EstratÃ©gia de Compra (Fundo)</th>
+        <th class="px-2.5 py-2">Estratégia de Compra (Fundo)</th>
         <th class="px-2.5 py-2 text-center">Aportes</th>
         <th class="px-2.5 py-2 font-mono">Total Aportado</th>
-        <th class="px-2.5 py-2 font-mono">PreÃ§o MÃ©dio</th>
+        <th class="px-2.5 py-2 font-mono">Preço Médio</th>
         <th class="px-2.5 py-2 font-mono">Retorno (%)</th>
-        <th class="px-2.5 py-2 font-mono">PatrimÃ´nio Final</th>
-        <th class="px-2.5 py-2 font-mono">Lucro LÃ­quido</th>
-        <th class="px-2.5 py-2 text-center">AÃ§Ã£o</th>
+        <th class="px-2.5 py-2 font-mono">Patrimônio Final</th>
+        <th class="px-2.5 py-2 font-mono">Lucro Líquido</th>
+        <th class="px-2.5 py-2 text-center">Ação</th>
       `;
     } else {
       tableHeader.innerHTML = `
         <th class="px-2.5 py-2 text-center">Rank</th>
-        <th class="px-2.5 py-2">EstratÃ©gia de Compra (Entrada)</th>
-        <th class="px-2.5 py-2">EstratÃ©gia de Venda (SaÃ­da)</th>
+        <th class="px-2.5 py-2">Estratégia de Compra (Entrada)</th>
+        <th class="px-2.5 py-2">Estratégia de Venda (Saída)</th>
         <th class="px-2.5 py-2 text-center">Trades</th>
         <th class="px-2.5 py-2 text-center font-mono">Win Rate</th>
         <th class="px-2.5 py-2 font-mono">Retorno (%)</th>
-        <th class="px-2.5 py-2 font-mono">Lucro LÃ­quido</th>
+        <th class="px-2.5 py-2 font-mono">Lucro Líquido</th>
         <th class="px-2.5 py-2 font-mono text-center">Max Drawdown</th>
-        <th class="px-2.5 py-2 text-center">AÃ§Ã£o</th>
+        <th class="px-2.5 py-2 text-center">Ação</th>
       `;
     }
   }
 
   if (!combos || combos.length === 0) {
-    elements.simTopCombosTableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-gray-500">${isDca ? 'Nenhuma estratÃ©gia com aportes encontrada no perÃ­odo.' : 'Nenhuma combinaÃ§Ã£o com no mÃ­nimo 2 trades encontrada no perÃ­odo.'}</td></tr>`;
+    elements.simTopCombosTableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-gray-500">${isDca ? 'Nenhuma estratégia com aportes encontrada no período.' : 'Nenhuma combinação com no mínimo 2 trades encontrada no período.'}</td></tr>`;
     return;
   }
 
@@ -3271,7 +3271,7 @@ function renderTopCombinationsTable(combos, isDca = false) {
     const tr = document.createElement('tr');
     tr.className = 'hover:bg-fintech-surface-hover';
 
-    const rankBadge = item.rank === 1 ? ' 1Âº' : (item.rank === 2 ? ' 2Âº' : (item.rank === 3 ? ' 3Âº' : `#${item.rank}`));
+    const rankBadge = item.rank === 1 ? ' 1º' : (item.rank === 2 ? ' 2º' : (item.rank === 3 ? ' 3º' : `#${item.rank}`));
     const retClass = item.total_return_pct >= 0 ? 'text-emerald-400' : 'text-rose-400';
     const pnlClass = item.net_profit >= 0 ? 'text-emerald-400' : 'text-rose-400';
 
@@ -3332,7 +3332,7 @@ function renderSimulationTradesTable(trades, mode) {
   tbody.innerHTML = '';
 
   if (!trades || trades.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="11" class="text-center py-4 text-gray-500">Nenhum trade realizado com as estratÃ©gias selecionadas no perÃ­odo.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="11" class="text-center py-4 text-gray-500">Nenhum trade realizado com as estratégias selecionadas no período.</td></tr>`;
     if (countBadge) countBadge.textContent = '0 trades';
     return;
   }
@@ -3358,7 +3358,7 @@ function renderSimulationTradesTable(trades, mode) {
       } else if (isWin) {
         statusBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">LUCRO</span>';
       } else {
-        statusBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40">PREJUÃZO</span>';
+        statusBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40">PREJUÍZO</span>';
       }
 
       tr.innerHTML = `
@@ -3412,7 +3412,7 @@ function renderSimulationTradesTable(trades, mode) {
       subTr.innerHTML = `
         <td colspan="12" class="px-4 py-1.5 font-mono">
           <div class="flex items-center gap-2 flex-wrap">
-            <span class="text-amber-400 font-semibold font-sans">â†³ Sub-entradas acumuladas:</span>
+            <span class="text-amber-400 font-semibold font-sans">↳ Sub-entradas acumuladas:</span>
             ${entriesDetail}
           </div>
         </td>
@@ -3433,7 +3433,7 @@ function renderSimulationCurve(curve) {
     x: dates,
     y: portfolio,
     mode: 'lines',
-    name: 'Valor Patrimonial (EstratÃ©gia)',
+    name: 'Valor Patrimonial (Estratégia)',
     line: { color: '#00F0FF', width: 2.5 }
   };
 
@@ -3471,8 +3471,8 @@ function setupRadarTableSorting() {
   const iconWin = document.getElementById('sort-icon-winrate');
 
   function updateIcons() {
-    if (iconN) iconN.textContent = state.radarSortField === 'historical_n' ? (state.radarSortOrder === 'asc' ? 'â–²' : 'â–¼') : 'â†•';
-    if (iconWin) iconWin.textContent = state.radarSortField === 'historical_win_rate' ? (state.radarSortOrder === 'asc' ? 'â–²' : 'â–¼') : 'â†•';
+    if (iconN) iconN.textContent = state.radarSortField === 'historical_n' ? (state.radarSortOrder === 'asc' ? '▲' : '▼') : '↕';
+    if (iconWin) iconWin.textContent = state.radarSortField === 'historical_win_rate' ? (state.radarSortOrder === 'asc' ? '▲' : '▼') : '↕';
     if (iconN) iconN.className = state.radarSortField === 'historical_n' ? 'text-[10px] text-cyan-400 font-bold' : 'text-[10px] text-gray-500';
     if (iconWin) iconWin.className = state.radarSortField === 'historical_win_rate' ? 'text-[10px] text-cyan-400 font-bold' : 'text-[10px] text-gray-500';
   }
@@ -3565,7 +3565,7 @@ function renderRadarStratMenu() {
   });
 
   if (strats.length === 0) {
-    container.innerHTML = '<div class="text-gray-500 py-1">Nenhuma estratÃ©gia disponÃ­vel.</div>';
+    container.innerHTML = '<div class="text-gray-500 py-1">Nenhuma estratégia disponível.</div>';
     return;
   }
 
@@ -3731,7 +3731,7 @@ function renderPortfolioHoldingsEditor() {
     tbody.innerHTML = `
       <tr>
         <td colspan="5" class="px-3 py-3 text-center text-gray-500 font-sans text-[11px]">
-          Nenhuma posiÃ§Ã£o cadastrada (100% em Caixa). Adicione ativos acima se jÃ¡ possuir carteira montada.
+          Nenhuma posição cadastrada (100% em Caixa). Adicione ativos acima se já possuir carteira montada.
         </td>
       </tr>
     `;
@@ -3932,7 +3932,7 @@ async function uploadMultipleB3Spreadsheets(files) {
 
     const data = await res.json();
     applyB3ParsedResult(data);
-    showToastNotification(`${count} ${count === 1 ? 'planilha processada' : 'planilhas combinadas'} com sucesso! (${data.holdings.length} ativos em custÃ³dia)`, false);
+    showToastNotification(`${count} ${count === 1 ? 'planilha processada' : 'planilhas combinadas'} com sucesso! (${data.holdings.length} ativos em custódia)`, false);
   } catch (err) {
     console.error('Erro ao enviar planilhas B3:', err);
     alert('Erro ao processar arquivos da B3.');
@@ -4012,7 +4012,7 @@ function importPortfolioHoldingsFromCsv(file) {
       const delimiter = lines[0].includes(';') ? ';' : ',';
       let startIndex = 0;
       const firstLineLower = lines[0].toLowerCase();
-      if (firstLineLower.includes('ticker') || firstLineLower.includes('ativo') || firstLineLower.includes('cÃ³digo') || firstLineLower.includes('codigo') || firstLineLower.includes('papel') || firstLineLower.includes('symbol')) {
+      if (firstLineLower.includes('ticker') || firstLineLower.includes('ativo') || firstLineLower.includes('código') || firstLineLower.includes('codigo') || firstLineLower.includes('papel') || firstLineLower.includes('symbol')) {
         startIndex = 1;
       }
 
@@ -4060,7 +4060,7 @@ function importPortfolioHoldingsFromCsv(file) {
           b3Label.textContent = `${importedHoldings.length} ${importedHoldings.length === 1 ? 'ativo importado' : 'ativos importados'}`;
         }
       } else {
-        alert('Nenhum ativo vÃ¡lido encontrado no CSV. Formato esperado: Ticker, Quantidade, PreÃ§o MÃ©dio (Ex: PETR4.SA, 100, 35.50)');
+        alert('Nenhum ativo válido encontrado no CSV. Formato esperado: Ticker, Quantidade, Preço Médio (Ex: PETR4.SA, 100, 35.50)');
       }
     } catch (err) {
       console.error('Erro ao processar CSV de carteira:', err);
@@ -4072,18 +4072,18 @@ function importPortfolioHoldingsFromCsv(file) {
 
 function getActionBadgeHtml(actionType, actionLabel) {
   if (actionType === 'BUY') {
-    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">ðŸŸ¢ ${actionLabel}</span>`;
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">🟢 ${actionLabel}</span>`;
   }
   if (actionType === 'SELL_FULL') {
-    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/40">ðŸ”´ ${actionLabel}</span>`;
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/40">🔴 ${actionLabel}</span>`;
   }
   if (actionType === 'SELL_PARTIAL_REBALANCE') {
-    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-amber-500/20 text-amber-400 border border-amber-500/40">âš–ï¸ ${actionLabel}</span>`;
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-amber-500/20 text-amber-400 border border-amber-500/40">⚖️ ${actionLabel}</span>`;
   }
   if (actionType === 'ROTATE_OUT' || actionType === 'ROTATE_IN') {
-    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">ðŸ”„ ${actionLabel}</span>`;
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">🔄 ${actionLabel}</span>`;
   }
-  return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-700/50 text-gray-300 border border-gray-600">â¸ï¸ ${actionLabel}</span>`;
+  return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-700/50 text-gray-300 border border-gray-600">⏸️ ${actionLabel}</span>`;
 }
 
 function renderPortfolioAdviseSection(data) {
@@ -4099,7 +4099,7 @@ function renderPortfolioAdviseSection(data) {
   if (cashTransEl) {
     const cBefore = (Number(data.current_cash) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const cAfter = (Number(data.projected_cash_after) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    cashTransEl.textContent = `R$ ${cBefore} â†’ R$ ${cAfter}`;
+    cashTransEl.textContent = `R$ ${cBefore} → R$ ${cAfter}`;
   }
 
   if (!tbody) return;
@@ -4116,7 +4116,7 @@ function renderPortfolioAdviseSection(data) {
     tbody.innerHTML = `
       <tr>
         <td colspan="10" class="px-4 py-6 text-center text-gray-400 font-mono">
-          Nenhuma oportunidade ativa em zona de compra no momento. RecomendaÃ§Ã£o: manter saldo em Caixa aguardando novo fundo estatÃ­stico.
+          Nenhuma oportunidade ativa em zona de compra no momento. Recomendação: manter saldo em Caixa aguardando novo fundo estatístico.
         </td>
       </tr>
     `;
@@ -4164,7 +4164,7 @@ function renderPortfolioAdviseSection(data) {
       </td>
       <td class="px-3 py-2.5 font-mono text-center">
         <span class="text-gray-400">${(Number(r.current_weight_pct) || 0).toFixed(1)}%</span>
-        <span class="text-gray-500 mx-1">â†’</span>
+        <span class="text-gray-500 mx-1">→</span>
         <span class="font-bold text-cyan-300">${(Number(r.target_weight_pct) || 0).toFixed(1)}%</span>
       </td>
       <td class="px-3 py-2.5 text-gray-300 text-[11px] max-w-xs truncate" title="${r.reason_text}">${r.reason_text}</td>
@@ -4193,7 +4193,7 @@ function openPreFlightOrderModal() {
   if (cashEl) {
     const cBefore = (Number(adviseData.current_cash) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const cAfter = (Number(adviseData.projected_cash_after) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    cashEl.textContent = `R$ ${cBefore} â†’ R$ ${cAfter}`;
+    cashEl.textContent = `R$ ${cBefore} → R$ ${cAfter}`;
   }
 
   tbody.innerHTML = '';
@@ -4261,7 +4261,7 @@ function applyRecommendedPortfolioOrders() {
   renderPortfolioHoldingsEditor();
   updateUndoButtonVisibility();
   closePreFlightOrderModal();
-  showToastNotification('Ordens aplicadas com sucesso Ã  sua carteira!', true, undoLastPortfolioApply);
+  showToastNotification('Ordens aplicadas com sucesso à sua carteira!', true, undoLastPortfolioApply);
   runPortfolioAdviseAndSimulate();
 }
 
@@ -4272,7 +4272,7 @@ async function runPortfolioAdviseAndSimulate() {
     .map(s => resolveTicker(s.trim().toUpperCase()))
     .filter(Boolean);
 
-  showLoading('Otimizando estratÃ©gias campeÃ£s por ativo e calculando rebalanceamento da carteira...');
+  showLoading('Otimizando estratégias campeãs por ativo e calculando rebalanceamento da carteira...');
   try {
     const advisePayload = {
       available_cash: state.portfolioState.availableCash,
@@ -4386,9 +4386,9 @@ function renderPortfolioSimulationKPIs(m) {
     elBenchSub.textContent = `B&H Cesta: ${benchRet >= 0 ? '+' : ''}${benchRet.toFixed(1)}% (Alfa: ${alpha >= 0 ? '+' : ''}${alpha.toFixed(1)}%)`;
   }
   if (elWin) elWin.textContent = `${winRate.toFixed(1)}%`;
-  if (elExitsSub) elExitsSub.textContent = `${m.winning_exits_count || 0}W / ${m.losing_exits_count || 0}L (${m.closed_exits_count || 0} saÃ­das)`;
+  if (elExitsSub) elExitsSub.textContent = `${m.winning_exits_count || 0}W / ${m.losing_exits_count || 0}L (${m.closed_exits_count || 0} saídas)`;
   if (elPf) elPf.textContent = pf.toFixed(2);
-  if (elRotSub) elRotSub.textContent = `${m.rebalance_rotations_count || 0} rebalanceamentos/rotaÃ§Ãµes`;
+  if (elRotSub) elRotSub.textContent = `${m.rebalance_rotations_count || 0} rebalanceamentos/rotações`;
   if (elDd) elDd.textContent = `${dd.toFixed(1)}%`;
   if (elEvSub) elEvSub.textContent = `${m.total_events_count || 0} ordens executadas`;
 }
@@ -4405,7 +4405,7 @@ function renderPortfolioLedgerTable(events) {
     tbody.innerHTML = `
       <tr>
         <td colspan="13" class="px-4 py-6 text-center text-gray-500">
-          Nenhuma operaÃ§Ã£o executada no perÃ­odo selecionado.
+          Nenhuma operação executada no período selecionado.
         </td>
       </tr>
     `;
@@ -4440,7 +4440,7 @@ function renderPortfolioLedgerTable(events) {
       <td class="px-2.5 py-2 font-mono text-right font-bold ${deltaColor}">${deltaSign}${delta.toLocaleString('pt-BR')}</td>
       <td class="px-2.5 py-2 font-mono text-right text-white">R$ ${(Number(ev.trade_value) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
       <td class="px-2.5 py-2 font-mono text-right">${pnlHtml}</td>
-      <td class="px-2.5 py-2 font-mono text-center text-gray-300">${(Number(ev.weight_before_pct) || 0).toFixed(1)}% â†’ ${(Number(ev.weight_after_pct) || 0).toFixed(1)}%</td>
+      <td class="px-2.5 py-2 font-mono text-center text-gray-300">${(Number(ev.weight_before_pct) || 0).toFixed(1)}% → ${(Number(ev.weight_after_pct) || 0).toFixed(1)}%</td>
       <td class="px-2.5 py-2 font-mono text-right text-gray-300">R$ ${(Number(ev.cash_after) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
       <td class="px-2.5 py-2 font-mono text-right font-bold text-white">R$ ${(Number(ev.portfolio_equity_after) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
     `;
@@ -4455,7 +4455,7 @@ function renderPortfolioEquityChart(curve) {
 
   if (!curve || curve.length === 0) {
     Plotly.purge(container);
-    container.innerHTML = '<div class="flex items-center justify-center h-full text-xs text-gray-500 font-mono">Execute a anÃ¡lise/simulaÃ§Ã£o para gerar a curva patrimonial.</div>';
+    container.innerHTML = '<div class="flex items-center justify-center h-full text-xs text-gray-500 font-mono">Execute a análise/simulação para gerar a curva patrimonial.</div>';
     return;
   }
   container.innerHTML = '';
@@ -4481,7 +4481,7 @@ function renderPortfolioEquityChart(curve) {
       line: { color: '#00E676', width: 2.5 },
       fill: 'tozeroy',
       fillcolor: 'rgba(0, 230, 118, 0.08)',
-      hovertemplate: '<b>%{x}</b><br>PatrimÃ´nio Carteira: R$ %{y:,.2f}<extra></extra>',
+      hovertemplate: '<b>%{x}</b><br>Patrimônio Carteira: R$ %{y:,.2f}<extra></extra>',
     },
     {
       x: dates,
@@ -4532,7 +4532,7 @@ function renderPortfolioAllocationChart(adviseData) {
 
   if (!adviseData) {
     Plotly.purge(container);
-    container.innerHTML = '<div class="flex items-center justify-center h-full text-xs text-gray-500 font-mono">Execute a anÃ¡lise para visualizar os pesos por ativo.</div>';
+    container.innerHTML = '<div class="flex items-center justify-center h-full text-xs text-gray-500 font-mono">Execute a análise para visualizar os pesos por ativo.</div>';
     return;
   }
   container.innerHTML = '';
@@ -4624,9 +4624,9 @@ function renderPortfolioOpportunityRanking(ranking) {
 
     let sigBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-gray-700/50 text-gray-400">NEUTRO</span>';
     if (p.active_direction === 'BUY') {
-      sigBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">ðŸŸ¢ ZONA DE COMPRA</span>';
+      sigBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">🟢 ZONA DE COMPRA</span>';
     } else if (p.active_direction === 'SELL') {
-      sigBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/40">ðŸ”´ ZONA DE VENDA</span>';
+      sigBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/40">🔴 ZONA DE VENDA</span>';
     }
 
     const retPct = Number(p.historical_return_pct) || 0;
@@ -4746,7 +4746,7 @@ function updateTradingViewAveragePriceLine() {
         title: 'PM B3: R$ ' + found.average_buy_price.toFixed(2),
       });
     } catch (e) {
-      console.warn('Erro ao criar linha de PreÃ§o MÃ©dio no grÃ¡fico:', e);
+      console.warn('Erro ao criar linha de Preço Médio no gráfico:', e);
     }
   }
 }

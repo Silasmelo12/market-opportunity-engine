@@ -226,6 +226,17 @@ def test_index_html_has_no_encoding_artifacts(index_html: str):
     assert '<meta charset="UTF-8">' in index_html
 
 
+def test_javascript_sources_have_no_encoding_artifacts(app_js: str):
+    sources = {"app.js": app_js}
+    for module in sorted((WEB / "modules").glob("*.js")):
+        sources[module.name] = read(module)
+    for name, source in sources.items():
+        artifacts = MOJIBAKE_PATTERN.findall(source)
+        assert artifacts == [], (
+            f"Artefatos de encoding encontrados em {name}: {artifacts[:10]}"
+        )
+
+
 def test_icon_sprite_replaces_functional_emoji(index_html: str):
     sprite_ids = re.findall(r'<g id="(icon-[^"]+)"', index_html)
     assert len(sprite_ids) >= 20, f"Sprite SVG insuficiente: {sprite_ids}"
