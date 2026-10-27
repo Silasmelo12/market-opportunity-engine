@@ -80,6 +80,7 @@ const elements = {
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   setupNavigationTabs();
+  syncHeaderOffset();
   setupDirectionSelector();
   updateSidebarDirectionFilter();
   setupAccordions();
@@ -723,6 +724,19 @@ function setupDirectionSelector() {
 }
 
 // Theme Toggle & Synchronization Helper
+function syncHeaderOffset() {
+  const header = document.querySelector('.app-header');
+  if (!header) return;
+  const height = Math.round(header.getBoundingClientRect().height);
+  if (height > 0) {
+    document.documentElement.style.setProperty('--header-offset', `${height}px`);
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('resize', syncHeaderOffset);
+}
+
 function initTheme() {
   const stored = localStorage.getItem('terminal_theme');
   const savedTheme = (stored === 'light' || stored === 'dark') ? stored : 'light';
@@ -757,6 +771,10 @@ function applyTheme(theme, updateCharts = true) {
   }
   if (text) {
     text.textContent = normalized === 'light' ? 'Claro' : 'Escuro';
+  }
+  const toggleBtn = document.getElementById('btn-theme-toggle');
+  if (toggleBtn) {
+    toggleBtn.setAttribute('aria-pressed', normalized === 'dark' ? 'true' : 'false');
   }
 
   if (updateCharts) {
