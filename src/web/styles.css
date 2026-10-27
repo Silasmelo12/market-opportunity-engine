@@ -2695,3 +2695,62 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
 .border-success { border-color: var(--success); }
 .border-warning { border-color: var(--warning); }
 .border-danger { border-color: var(--danger); }
+
+/* =========================================================================
+   Responsividade e contenção de overflow (T053 / US5)
+   ========================================================================= */
+main,
+.tab-view,
+.quant-area,
+.area-posicoes,
+.area-proventos,
+.area-patrimonio {
+  min-width: 0;
+}
+
+.tab-view .grid > * {
+  min-width: 0;
+}
+
+.table-scroll {
+  scrollbar-gutter: stable;
+}
+
+.table-scroll > table {
+  min-width: 100%;
+}
+
+.touch-target {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+}
+
+.btn-remove-holding {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  min-height: 28px;
+}
+
+.dir-seg-btn {
+  min-height: 28px;
+}
+
+#toast-notification {
+  max-width: calc(100vw - 2rem);
+}
+
+.js-plotly-plot,
+.plot-container,
+.plotly {
+  max-width: 100%;
+}
+
+@media (max-width: 767px) {
+  .btn-remove-holding,
+  .dir-seg-btn {
+    min-height: 32px;
+  }
+}
