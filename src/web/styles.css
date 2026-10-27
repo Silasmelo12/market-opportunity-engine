@@ -261,6 +261,56 @@ code, kbd, pre, .font-mono { font-family: var(--font-mono); }
 .font-mono { font-variant-numeric: tabular-nums; }
 .tabular-nums, td, th { font-variant-numeric: tabular-nums; }
 
+/* =========================================================================
+   Typography scale — hierarchical levels and the absolute 11px floor
+   ========================================================================= */
+body { font-size: var(--font-size-body); line-height: var(--line-height-body); }
+
+.type-display {
+  font-size: var(--font-size-display);
+  font-weight: 800;
+  line-height: var(--line-height-tight);
+  letter-spacing: -0.02em;
+}
+.type-section {
+  font-size: var(--font-size-section);
+  font-weight: 750;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+}
+.type-card {
+  font-size: var(--font-size-card);
+  font-weight: 700;
+  line-height: 1.3;
+}
+.type-body { font-size: var(--font-size-body); }
+.type-label {
+  font-size: var(--font-size-label);
+  font-weight: 600;
+  line-height: 1.35;
+}
+.type-meta {
+  font-size: var(--font-size-meta);
+  line-height: 1.35;
+}
+
+/* Any residual arbitrary size below the floor is clamped to 11px. */
+.text-\[10px\],
+.text-\[9px\],
+.text-\[8px\] {
+  font-size: var(--font-size-floor) !important;
+}
+
+/* Financial values, tickers and quantitative metrics */
+.financial-value,
+[data-financial],
+.kpi-value,
+.metric-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
 ::selection {
   background: var(--primary);
   color: #fff;

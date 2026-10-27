@@ -34,7 +34,7 @@
 **⚠️ CRITICAL**: Nenhuma user story deve começar antes desta fase.
 
 - [X] T006 Consolidar tokens semânticos de superfícies, bordas, texto, estados financeiros, sombras, raios e espaçamento em `src/web/styles.css`
-- [ ] T007 Implementar a escala tipográfica e o piso de 11px, incluindo algarismos tabulares e hierarquia display/seção/card/corpo/label em `src/web/styles.css`
+- [X] T007 Implementar a escala tipográfica e o piso de 11px, incluindo algarismos tabulares e hierarquia display/seção/card/corpo/label em `src/web/styles.css`
 - [ ] T008 Padronizar botões, campos, selects, badges e estados de foco/hover/disabled em `src/web/styles.css`
 - [ ] T009 Padronizar cartões, tabelas, acordeões, divisórias e estados vazio/erro/loading em `src/web/styles.css`
 - [ ] T010 [P] Expandir o sprite SVG de ícones lineares em `src/web/index.html`
