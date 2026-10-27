@@ -205,6 +205,13 @@ def test_navigation_accessibility_markup(index_html: str):
     assert 'aria-label="Ambientes da Plataforma"' in index_html
     assert 'aria-label="Subnavegação Minha Carteira"' in index_html
     assert 'aria-label="Subnavegação Análise Quantitativa"' in index_html
+    assert 'aria-orientation="horizontal"' in index_html
+    assert 'aria-pressed="false"' in index_html
+    nav_tabs = re.findall(r'<div class="nav-tab[^>]*>', index_html)
+    assert len(nav_tabs) == 8, f"Esperadas 8 abas contextuais: {len(nav_tabs)}"
+    assert all('aria-controls="' in tab for tab in nav_tabs)
+    assert index_html.count('tabindex="0"') == 2
+    assert index_html.count('role="tab" tabindex="-1"') == 7
 
 
 def test_reduced_motion_and_focus_contract(styles_css: str):

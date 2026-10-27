@@ -161,10 +161,10 @@
 
       <!-- Seletor dos Dois Ambientes Principais (Fase 2A - Spec 021) -->
       <div class="pillar-nav-group order-3 sm:order-none w-full sm:w-auto flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200" id="global-pillar-selector" role="tablist" aria-label="Ambientes da Plataforma">
-        <button id="pillar-btn-carteira" class="pillar-btn active flex-1 sm:flex-none justify-center flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold text-slate-900 bg-white shadow-sm transition" data-pillar="carteira" role="tab" aria-selected="true" aria-controls="subnav-group-carteira" aria-label="Ambiente Minha Carteira">
+        <button id="pillar-btn-carteira" tabindex="0" class="pillar-btn active flex-1 sm:flex-none justify-center flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold text-slate-900 bg-white shadow-sm transition" data-pillar="carteira" role="tab" aria-selected="true" aria-controls="subnav-group-carteira" aria-label="Ambiente Minha Carteira">
           <svg class="icon" aria-hidden="true"><use href="#icon-wallet"></use></svg> Minha Carteira
         </button>
-        <button id="pillar-btn-quant" class="pillar-btn flex-1 sm:flex-none justify-center flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-900 transition" data-pillar="quant" role="tab" aria-selected="false" aria-controls="subnav-group-quant" aria-label="Ambiente Análise Quantitativa">
+        <button id="pillar-btn-quant" tabindex="-1" class="pillar-btn flex-1 sm:flex-none justify-center flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-900 transition" data-pillar="quant" role="tab" aria-selected="false" aria-controls="subnav-group-quant" aria-label="Ambiente Análise Quantitativa">
           <svg class="icon" aria-hidden="true"><use href="#icon-target"></use></svg> Análise Quantitativa
         </button>
       </div>
@@ -202,29 +202,29 @@
         <div class="nav-tab active flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-slate-900 text-slate-900 whitespace-nowrap transition" data-tab="resumo" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-overview">
           <svg class="icon" aria-hidden="true"><use href="#icon-chart"></use></svg> Resumo
         </div>
-        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="posicoes" role="tab" tabindex="0" aria-selected="false" aria-controls="tab-portfolio">
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="posicoes" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-portfolio">
           <svg class="icon" aria-hidden="true"><use href="#icon-wallet"></use></svg> Posições &amp; Ativos
         </div>
-        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="proventos" role="tab" tabindex="0" aria-selected="false" aria-controls="tab-pane-proventos">
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="proventos" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-pane-proventos">
           <svg class="icon" aria-hidden="true"><use href="#icon-coins"></use></svg> Proventos
         </div>
-        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="patrimonio" role="tab" tabindex="0" aria-selected="false" aria-controls="tab-pane-patrimonio">
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="patrimonio" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-pane-patrimonio">
           <svg class="icon" aria-hidden="true"><use href="#icon-trending-up"></use></svg> Evolução Patrimonial
         </div>
       </div>
 
       <!-- Subnavegação Contextual: Análise Quantitativa -->
       <div id="subnav-group-quant" class="subnav-group hidden flex gap-2 w-full" role="tablist" aria-label="Subnavegação Análise Quantitativa" aria-orientation="horizontal">
-        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="radar" role="tab" tabindex="0" aria-selected="false" aria-controls="tab-pane-radar">
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="radar" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-pane-radar">
           <svg class="icon" aria-hidden="true"><use href="#icon-target"></use></svg> Radar Estatístico (Fundo 2x2)
         </div>
-        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="tradingview" role="tab" tabindex="0" aria-selected="false" aria-controls="tab-terminal">
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="tradingview" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-terminal">
           <svg class="icon" aria-hidden="true"><use href="#icon-candlestick"></use></svg> Gráfico TradingView
         </div>
-        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="simulador" role="tab" tabindex="0" aria-selected="false" aria-controls="tab-simulator">
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="simulador" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-simulator">
           <svg class="icon" aria-hidden="true"><use href="#icon-bolt"></use></svg> Simulador &amp; Backtest
         </div>
-        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="playbook" role="tab" tabindex="0" aria-selected="false" aria-controls="tab-playbook">
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="playbook" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-playbook">
           <svg class="icon" aria-hidden="true"><use href="#icon-book"></use></svg> Playbook de Estratégias
         </div>
       </div>

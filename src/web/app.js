@@ -445,9 +445,11 @@ function navigateToRoute(targetKey, options = {}) {
     if (p === cfg.pillar) {
       btn.classList.add('active');
       btn.setAttribute('aria-selected', 'true');
+      btn.setAttribute('tabindex', '0');
     } else {
       btn.classList.remove('active');
       btn.setAttribute('aria-selected', 'false');
+      btn.setAttribute('tabindex', '-1');
     }
   });
 
@@ -471,10 +473,12 @@ function navigateToRoute(targetKey, options = {}) {
       pill.classList.add('active', 'border-slate-900', 'text-slate-900');
       pill.classList.remove('border-transparent', 'text-slate-500');
       pill.setAttribute('aria-selected', 'true');
+      pill.setAttribute('tabindex', '0');
     } else {
       pill.classList.remove('active', 'border-slate-900', 'text-slate-900');
       pill.classList.add('border-transparent', 'text-slate-500');
       pill.setAttribute('aria-selected', 'false');
+      pill.setAttribute('tabindex', '-1');
     }
   });
 
@@ -869,6 +873,9 @@ function setupNavigationTabs() {
     });
   });
 
+  setupTablistKeyboard('#global-pillar-selector', '.pillar-btn');
+  setupTablistKeyboard('#main-subnav-pills', '.nav-tab');
+
   // 3. Links de contexto internos
   const viewPosBtn = document.getElementById('overview-btn-view-positions');
   if (viewPosBtn) {
@@ -898,6 +905,31 @@ function setupNavigationTabs() {
       }
     });
   }
+}
+
+function setupTablistKeyboard(containerSelector, itemSelector) {
+  const items = Array.from(document.querySelectorAll(`${containerSelector} ${itemSelector}`))
+    .filter(item => item.offsetParent !== null || item.getAttribute('aria-selected') === 'true');
+  if (!items.length) return;
+  items.forEach((item, index) => {
+    item.addEventListener('keydown', (event) => {
+      let nextIndex = null;
+      if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+        nextIndex = (index + 1) % items.length;
+      } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+        nextIndex = (index - 1 + items.length) % items.length;
+      } else if (event.key === 'Home') {
+        nextIndex = 0;
+      } else if (event.key === 'End') {
+        nextIndex = items.length - 1;
+      }
+      if (nextIndex === null) return;
+      event.preventDefault();
+      const target = items[nextIndex];
+      target.focus();
+      target.click();
+    });
+  });
 }
 
 function openChartForHolding(rawTicker, fromRoute = 'carteira/posicoes') {
