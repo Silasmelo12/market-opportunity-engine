@@ -2518,3 +2518,80 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
   .header-actions #btn-refresh-data { padding: 6px 8px; }
   .nav-tab { padding: 11px 10px; font-size: 12px; }
 }
+
+/* =========================================================================
+   US3 — Áreas de carteira com padrão executivo uniforme
+   ========================================================================= */
+.area-posicoes,
+.area-proventos,
+.area-patrimonio {
+  background: var(--bg) !important;
+}
+
+.section-header {
+  border-bottom: 1px solid var(--border);
+}
+
+.section-title {
+  color: var(--text);
+  font-size: 1.05rem;
+  font-weight: 750;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+}
+
+.section-subtitle {
+  color: var(--text-2);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.section-meta {
+  color: var(--text-3);
+  font-size: 11px;
+}
+
+.chart-card {
+  padding: 20px;
+  min-width: 0;
+}
+
+.category-card {
+  padding: 0 !important;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.category-card .category-header {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.category-card .category-title {
+  color: var(--text);
+}
+
+.category-card .category-header:hover {
+  background: var(--surface-2);
+}
+
+.area-posicoes .table-standard,
+.area-posicoes table {
+  color: var(--text-2);
+}
+
+.area-posicoes thead {
+  background: var(--surface-2);
+  color: var(--text-2);
+}
+
+.area-posicoes tbody tr:hover {
+  background: var(--surface-2);
+}
+
+.area-proventos .btn-primary,
+.area-proventos .btn-secondary,
+.area-patrimonio .btn-secondary {
+  font-size: 11px;
+  padding: 6px 12px;
+}
