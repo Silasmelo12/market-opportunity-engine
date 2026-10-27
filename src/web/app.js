@@ -851,15 +851,7 @@ function setupNavigationTabs() {
     });
   });
 
-  // 3. Suporte retrocompatível a cliques em tabs legadas
-  document.querySelectorAll('#main-nav-tabs .nav-tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const targetTabId = btn.getAttribute('data-tab');
-      navigateToRoute(targetTabId);
-    });
-  });
-
-  // 4. Links de contexto internos
+  // 3. Links de contexto internos
   const viewPosBtn = document.getElementById('overview-btn-view-positions');
   if (viewPosBtn) {
     viewPosBtn.addEventListener('click', () => navigateToRoute('carteira/posicoes'));
