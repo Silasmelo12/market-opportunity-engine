@@ -1220,13 +1220,13 @@
     <!-- ========================================== -->
     <!-- TAB 3: SIMULADOR FINANCEIRO & BACKTEST     -->
     <!-- ========================================== -->
-    <section id="tab-simulator" class="tab-view hidden h-full p-4 overflow-y-auto">
+    <section id="tab-simulator" class="tab-view hidden h-full p-4 overflow-y-auto quant-area">
       <div class="max-w-7xl mx-auto space-y-4">
         <div>
-          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <h2 class="section-title flex items-center gap-2">
             <span></span>Simulador Quantitativo: Backtest de Trade (Compra ->Venda) & Acumulação
           </h2>
-          <p class="text-xs text-gray-400">Teste estratégias comprando nos sinais de Fundo e encerrando no próximo Topo (Venda), ou simule aportes contínuos em cotas.</p>
+          <p class="section-subtitle">Teste estratégias comprando nos sinais de Fundo e encerrando no próximo Topo (Venda), ou simule aportes contínuos em cotas.</p>
         </div>
 
         <!-- Simulator Configuration Form -->
@@ -1234,12 +1234,12 @@
           <!-- Row 1: Core Parameters & Timeframe -->
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3">
             <div>
-              <label class="text-gray-400 font-semibold block mb-1">Ativo para Simulação</label>
-              <input id="sim-ticker" list="asset-datalist" type="text" value="PETR4.SA" placeholder="Digite ou selecione..." class="w-full bg-fintech-bg border border-fintech-border rounded px-3 py-1.5 text-white font-mono uppercase focus:border-fintech-cyan focus:outline-none">
+              <label class="field-label">Ativo para Simulação</label>
+              <input id="sim-ticker" list="asset-datalist" type="text" value="PETR4.SA" placeholder="Digite ou selecione..." class="input font-mono uppercase">
             </div>
             <div>
-              <label class="text-gray-400 font-semibold block mb-1">Tempo Gráfico</label>
-              <select id="sim-interval" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-sans focus:border-fintech-cyan focus:outline-none">
+              <label class="field-label">Tempo Gráfico</label>
+              <select id="sim-interval" class="select">
                 <option value="5m">5 Minutos (Intraday)</option>
                 <option value="15m">15 Minutos (Intraday)</option>
                 <option value="60m">60 Minutos (1 Hora)</option>
@@ -1248,44 +1248,44 @@
               </select>
             </div>
             <div>
-              <label class="text-gray-400 font-semibold block mb-1">Modo de Operação</label>
-              <select id="sim-mode" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-sans focus:border-fintech-cyan focus:outline-none">
+              <label class="field-label">Modo de Operação</label>
+              <select id="sim-mode" class="select">
                 <option value="cycle_trade" selected>Trade (Compra -> Venda)</option>
                 <option value="accumulation">Acumulação (DCA Fundos)</option>
               </select>
             </div>
             <div id="sim-cycle-mode-container">
-              <label class="text-gray-400 font-semibold block mb-1">Entradas no Ciclo</label>
-              <select id="sim-cycle-mode" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-sans focus:border-fintech-cyan focus:outline-none">
+              <label class="field-label">Entradas no Ciclo</label>
+              <select id="sim-cycle-mode" class="select">
                 <option value="multi_buy" selected>Acumulação Multi-Buy (Nx)</option>
                 <option value="single_buy">Compra Única (1x)</option>
               </select>
             </div>
             <div>
-              <label class="text-gray-400 font-semibold block mb-1" id="sim-label-capital">Capital Inicial (R$)</label>
-              <input id="sim-contribution" type="number" value="1000" min="100" step="100" class="w-full bg-fintech-bg border border-fintech-border rounded px-3 py-1.5 text-white font-mono">
+              <label class="field-label" id="sim-label-capital">Capital Inicial (R$)</label>
+              <input id="sim-contribution" type="number" value="1000" min="100" step="100" class="input font-mono">
             </div>
             <div>
-              <label class="text-gray-400 font-semibold block mb-1">Data Início (Opcional)</label>
-              <input id="sim-start-date" type="date" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white">
+              <label class="field-label">Data Início (Opcional)</label>
+              <input id="sim-start-date" type="date" class="input">
             </div>
             <div>
-              <label class="text-gray-400 font-semibold block mb-1">Data Fim (Opcional)</label>
-              <input id="sim-end-date" type="date" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white">
+              <label class="field-label">Data Fim (Opcional)</label>
+              <input id="sim-end-date" type="date" class="input">
             </div>
           </div>
 
           <!-- Row 2: Strategy Selectors & Action Buttons -->
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-3 pt-2 border-t border-fintech-border/60">
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-3 pt-2 border-t border-default">
             <!-- Buy Strategy Dropdown with Typeahead Filter -->
             <div class="md:col-span-4">
               <div class="flex items-center justify-between mb-1">
-                <label class="text-emerald-400 font-semibold block flex items-center gap-1">
+                <label class="text-positive font-semibold block flex items-center gap-1">
                   <span>Estratégia de Compra (Entrada)</span>
                 </label>
-                <input id="input-search-sim-buy" type="text" placeholder="Filtrar estratégia..." class="bg-fintech-bg border border-fintech-border rounded px-1.5 py-0.5 text-[11px] text-white font-mono w-24 focus:w-36 transition-all focus:border-emerald-400 focus:outline-none">
+                <input id="input-search-sim-buy" type="text" placeholder="Filtrar estratégia..." class="surface-canvas border border-default rounded px-1.5 py-0.5 text-[11px] text-strong font-mono w-24 focus:w-36 transition-all focus:border-default focus:outline-none">
               </div>
-              <select id="sim-buy-strategy" class="w-full bg-fintech-bg border border-emerald-500/40 rounded px-2.5 py-1.5 text-white font-sans focus:border-emerald-400 focus:outline-none">
+              <select id="sim-buy-strategy" class="w-full surface-canvas border border-default rounded px-2.5 py-1.5 text-strong font-sans focus:border-default focus:outline-none">
                 <option value="ALL" selected>Todas as Compras (Portfólio / Qualquer Sinal)</option>
                 <optgroup label="Proprietárias de Fundo (Reversão Causal)">
                   <option value="t1_open">Negação Barra Anterior (Abertura)</option>
@@ -1338,12 +1338,12 @@
             <!-- Sell Strategy Dropdown with Typeahead Filter -->
             <div class="md:col-span-4" id="sim-sell-strategy-container">
               <div class="flex items-center justify-between mb-1">
-                <label class="text-rose-400 font-semibold block flex items-center gap-1">
+                <label class="text-negative font-semibold block flex items-center gap-1">
                   <span>Estratégia de Venda (Saída / Topo)</span>
                 </label>
-                <input id="input-search-sim-sell" type="text" placeholder="Filtrar estratégia..." class="bg-fintech-bg border border-fintech-border rounded px-1.5 py-0.5 text-[11px] text-white font-mono w-24 focus:w-36 transition-all focus:border-rose-400 focus:outline-none">
+                <input id="input-search-sim-sell" type="text" placeholder="Filtrar estratégia..." class="surface-canvas border border-default rounded px-1.5 py-0.5 text-[11px] text-strong font-mono w-24 focus:w-36 transition-all focus:border-default focus:outline-none">
               </div>
-              <select id="sim-sell-strategy" class="w-full bg-fintech-bg border border-rose-500/40 rounded px-2.5 py-1.5 text-white font-sans focus:border-rose-400 focus:outline-none">
+              <select id="sim-sell-strategy" class="w-full surface-canvas border border-default rounded px-2.5 py-1.5 text-strong font-sans focus:border-default focus:outline-none">
                 <option value="ALL" selected>Todas as Vendas (Portfólio / Qualquer Sinal)</option>
                 <optgroup label="Proprietárias de Topo (Negação Causal)">
                   <option value="sell_t1_open">Negação Máxima Anterior (Abertura)</option>
@@ -1395,14 +1395,14 @@
 
             <!-- Run Button -->
             <div class="md:col-span-2 flex items-end">
-              <button id="btn-run-simulation" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2 rounded transition flex items-center justify-center gap-1.5 shadow">
+              <button id="btn-run-simulation" class="btn-primary w-full">
                 <span></span>Simular
               </button>
             </div>
 
             <!-- Optimize Button -->
             <div class="md:col-span-2 flex items-end">
-              <button id="btn-optimize-combinations" class="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-semibold py-2 rounded transition flex items-center justify-center gap-1.5 shadow">
+              <button id="btn-optimize-combinations" class="btn-contextual w-full">
                 <span></span>Mais Lucrativa
               </button>
             </div>
@@ -1412,52 +1412,52 @@
         <!-- Champion Combination Banner & Top Combinations Ranking Card (Dynamically Populated) -->
         <div id="sim-optimizer-container" class="space-y-3 hidden">
           <!-- Champion Highlight Card -->
-          <div class="bg-gradient-to-r from-amber-950/60 via-fintech-surface to-cyan-950/40 border border-amber-500/50 rounded-lg p-4 shadow-lg">
+          <div class="card-surface border-l-2 border-l-amber-500 p-4">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
               <div class="space-y-1">
                 <div class="flex items-center gap-2">
-                  <span class="px-2 py-0.5 rounded bg-amber-500 text-black font-extrabold text-[11px] tracking-wider uppercase flex items-center gap-1">
+                  <span class="badge badge-warning font-extrabold tracking-wider uppercase">
                     <span></span>Combinação Mais Lucrativa (Campeã)
                   </span>
-                  <span id="opt-champ-mode-badge" class="px-1.5 py-0.5 rounded bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 font-mono text-[11px]"></span>
-                  <span class="text-xs text-gray-400" id="opt-champ-tested-count">Testadas centenas de combinações</span>
+                  <span id="opt-champ-mode-badge" class="badge badge-info font-mono"></span>
+                  <span class="text-xs text-muted" id="opt-champ-tested-count">Testadas centenas de combinações</span>
                 </div>
-                                <div class="text-base font-bold text-white flex flex-wrap items-center gap-2 pt-1" id="opt-champ-title-container">
-                  <span class="text-emerald-400 font-semibold" id="opt-champ-buy-label">Varredura de Liquidez (Wyckoff Spring)</span>
-                  <span class="text-gray-400" id="opt-champ-arrow">-&gt;</span>
-                  <span class="text-rose-400 font-semibold" id="opt-champ-sell-label">Doji Lápide (Gravestone)</span>
+                                <div class="section-title text-base flex flex-wrap items-center gap-2 pt-1" id="opt-champ-title-container">
+                  <span class="text-positive font-semibold" id="opt-champ-buy-label">Varredura de Liquidez (Wyckoff Spring)</span>
+                  <span class="text-muted" id="opt-champ-arrow">-&gt;</span>
+                  <span class="text-negative font-semibold" id="opt-champ-sell-label">Doji Lápide (Gravestone)</span>
                 </div>
               </div>
 
               <!-- Quick Action to Apply Champion -->
               <div class="flex items-center gap-3">
-                <button id="btn-apply-champion" class="bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs px-4 py-2 rounded shadow transition flex items-center gap-1.5">
+                <button id="btn-apply-champion" class="btn-contextual">
                   <span></span>Aplicar e Simular
                 </button>
               </div>
             </div>
 
             <!-- Champion KPIs Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mt-3 pt-3 border-t border-fintech-border/50 text-xs">
-              <div class="bg-fintech-bg/80 p-2 rounded">
-                <span class="text-gray-400 text-[11px] block">Retorno Total Acumulado</span>
-                <span class="text-base font-bold text-emerald-400 font-mono" id="opt-champ-ret">+0.0%</span>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mt-3 pt-3 border-t border-default/50 text-xs">
+              <div class="surface-subtle p-2 rounded">
+                <span class="text-muted text-[11px] block">Retorno Total Acumulado</span>
+                <span class="text-base font-bold text-positive font-mono" id="opt-champ-ret">+0.0%</span>
               </div>
-              <div class="bg-fintech-bg/80 p-2 rounded">
-                <span class="text-gray-400 text-[11px] block">Lucro Líquido (R$)</span>
-                <span class="text-base font-bold text-cyan-300 font-mono" id="opt-champ-pnl">R$ 0,00</span>
+              <div class="surface-subtle p-2 rounded">
+                <span class="text-muted text-[11px] block">Lucro Líquido (R$)</span>
+                <span class="text-base font-bold text-info font-mono" id="opt-champ-pnl">R$ 0,00</span>
               </div>
-              <div class="bg-fintech-bg/80 p-2 rounded">
-                <span class="text-gray-400 text-[11px] block">Taxa de Acerto (Win Rate)</span>
-                <span class="text-base font-bold text-white font-mono" id="opt-champ-winrate">0.0%</span>
+              <div class="surface-subtle p-2 rounded">
+                <span class="text-muted text-[11px] block">Taxa de Acerto (Win Rate)</span>
+                <span class="text-base font-bold text-strong font-mono" id="opt-champ-winrate">0.0%</span>
               </div>
-              <div class="bg-fintech-bg/80 p-2 rounded">
-                <span class="text-gray-400 text-[11px] block">Total de Trades</span>
-                <span class="text-base font-bold text-amber-300 font-mono" id="opt-champ-trades">0 trades</span>
+              <div class="surface-subtle p-2 rounded">
+                <span class="text-muted text-[11px] block">Total de Trades</span>
+                <span class="text-base font-bold text-warning font-mono" id="opt-champ-trades">0 trades</span>
               </div>
-              <div class="bg-fintech-bg/80 p-2 rounded">
-                <span class="text-gray-400 text-[11px] block">Max Drawdown</span>
-                <span class="text-base font-bold text-rose-400 font-mono" id="opt-champ-drawdown">0.0%</span>
+              <div class="surface-subtle p-2 rounded">
+                <span class="text-muted text-[11px] block">Max Drawdown</span>
+                <span class="text-base font-bold text-negative font-mono" id="opt-champ-drawdown">0.0%</span>
               </div>
             </div>
           </div>
@@ -1465,14 +1465,14 @@
           <!-- Top Combinations Ranking Table Card -->
           <div class="card-surface p-4">
             <div class="flex items-center justify-between mb-2">
-              <h3 class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+              <h3 class="section-title text-xs text-warning flex items-center gap-1.5">
                 <span></span>Ranking das Top 15 Combinações Mais Lucrativas
               </h3>
-              <span class="text-[11px] text-gray-400 font-mono">Ordenado por Retorno Total (%)</span>
+              <span class="kpi-sub font-mono">Ordenado por Retorno Total (%)</span>
             </div>
             <div class="overflow-x-auto max-h-72">
-              <table class="w-full text-left text-xs text-gray-300">
-                <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[11px] sticky top-0">
+              <table class="table-standard">
+                <thead class="surface-canvas text-muted font-semibold uppercase text-[11px] sticky top-0">
                   <tr>
                     <th class="px-2.5 py-2 text-center">Rank</th>
                     <th class="px-2.5 py-2">Estratégia de Compra (Entrada)</th>
@@ -1485,7 +1485,7 @@
                     <th class="px-2.5 py-2 text-center">Ação</th>
                   </tr>
                 </thead>
-                <tbody id="sim-top-combos-table-body" class="divide-y divide-fintech-border font-mono text-[11px]">
+                <tbody id="sim-top-combos-table-body" class="divide-y divide-default font-mono text-[11px]">
                   <!-- Dynamically populated -->
                 </tbody>
               </table>
@@ -1495,41 +1495,41 @@
 
         <!-- Institutional KPI Cards -->
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3" id="sim-kpi-container">
-          <div class="card-surface p-2.5 sm:p-3">
-            <div class="text-[11px] sm:text-[11px] text-gray-400 font-semibold" id="sim-kpi-label-invested">Capital Investido</div>
-            <div class="text-base sm:text-lg font-bold text-white font-mono" id="sim-kpi-invested">R$ 0,00</div>
+          <div class="kpi-card p-2.5 sm:p-3">
+            <div class="kpi-label" id="sim-kpi-label-invested">Capital Investido</div>
+            <div class="kpi-value text-base sm:text-lg" id="sim-kpi-invested">R$ 0,00</div>
           </div>
-          <div class="card-surface p-2.5 sm:p-3">
-            <div class="text-[11px] sm:text-[11px] text-gray-400 font-semibold">Patrimônio Final</div>
-            <div class="text-base sm:text-lg font-bold text-fintech-green font-mono" id="sim-kpi-final">R$ 0,00</div>
+          <div class="kpi-card p-2.5 sm:p-3">
+            <div class="kpi-label">Patrimônio Final</div>
+            <div class="kpi-value text-base sm:text-lg text-positive" id="sim-kpi-final">R$ 0,00</div>
           </div>
-          <div class="card-surface p-2.5 sm:p-3">
-            <div class="text-[11px] sm:text-[11px] text-gray-400 font-semibold">Retorno Estratégia</div>
-            <div class="text-base sm:text-lg font-bold text-fintech-cyan font-mono" id="sim-kpi-return">0.0%</div>
-            <div class="text-[11px] text-gray-400 font-mono" id="sim-kpi-bnh-sub">B&H: 0.0%</div>
+          <div class="kpi-card p-2.5 sm:p-3">
+            <div class="kpi-label">Retorno Estratégia</div>
+            <div class="kpi-value text-base sm:text-lg text-info" id="sim-kpi-return">0.0%</div>
+            <div class="kpi-sub font-mono" id="sim-kpi-bnh-sub">B&H: 0.0%</div>
           </div>
-          <div class="card-surface p-2.5 sm:p-3">
-            <div class="text-[11px] sm:text-[11px] text-gray-400 font-semibold">Fator de Lucro</div>
-            <div class="text-base sm:text-lg font-bold text-amber-400 font-mono" id="sim-kpi-profit-factor">0.00</div>
-            <div class="text-[11px] text-gray-400 font-mono" id="sim-kpi-profit-sub">Lucro: R$ 0,00</div>
+          <div class="kpi-card p-2.5 sm:p-3">
+            <div class="kpi-label">Fator de Lucro</div>
+            <div class="kpi-value text-base sm:text-lg text-warning" id="sim-kpi-profit-factor">0.00</div>
+            <div class="kpi-sub font-mono" id="sim-kpi-profit-sub">Lucro: R$ 0,00</div>
           </div>
-          <div class="card-surface p-2.5 sm:p-3">
-            <div class="text-[11px] sm:text-[11px] text-gray-400 font-semibold" id="sim-kpi-label-aux">Taxa de Acerto (Win Rate)</div>
-            <div class="text-base sm:text-lg font-bold text-emerald-400 font-mono" id="sim-kpi-winrate">0.0%</div>
-            <div class="text-[11px] text-gray-400 font-mono" id="sim-kpi-trades-sub">0 trades</div>
+          <div class="kpi-card p-2.5 sm:p-3">
+            <div class="kpi-label" id="sim-kpi-label-aux">Taxa de Acerto (Win Rate)</div>
+            <div class="kpi-value text-base sm:text-lg text-positive" id="sim-kpi-winrate">0.0%</div>
+            <div class="kpi-sub font-mono" id="sim-kpi-trades-sub">0 trades</div>
           </div>
-          <div class="card-surface p-2.5 sm:p-3">
-            <div class="text-[11px] sm:text-[11px] text-gray-400 font-semibold">Drawdown Máximo</div>
-            <div class="text-base sm:text-lg font-bold text-rose-400 font-mono" id="sim-kpi-drawdown">0.0%</div>
-            <div class="text-[11px] text-gray-400 font-mono" id="sim-kpi-avg-entries-sub">Média compras: 1.0</div>
+          <div class="kpi-card p-2.5 sm:p-3">
+            <div class="kpi-label">Drawdown Máximo</div>
+            <div class="kpi-value text-base sm:text-lg text-negative" id="sim-kpi-drawdown">0.0%</div>
+            <div class="kpi-sub font-mono" id="sim-kpi-avg-entries-sub">Média compras: 1.0</div>
           </div>
         </div>
 
         <!-- Simulation Curve Chart -->
-        <div class="card-surface p-3 sm:p-4">
+        <div class="chart-card p-3 sm:p-4">
           <div class="flex items-center justify-between mb-2">
-            <h3 class="text-xs font-bold text-gray-200">Curva de Patrimônio & Evolução</h3>
-            <span class="text-[11px] text-gray-400 font-mono" id="sim-curve-legend-info">Tempo real</span>
+            <h3 class="section-title text-xs">Curva de Patrimônio & Evolução</h3>
+            <span class="kpi-sub font-mono" id="sim-curve-legend-info">Tempo real</span>
           </div>
           <div id="plot-simulation-curve" class="w-full"></div>
         </div>
@@ -1537,15 +1537,15 @@
         <!-- Cycle Trades Detailed Log Table -->
         <div class="card-surface p-3 sm:p-4 overflow-hidden" id="sim-trades-card">
           <div class="flex items-center justify-between mb-2">
-            <h3 class="text-xs font-bold text-gray-200 flex items-center gap-1.5">
+            <h3 class="text-xs font-bold text-strong flex items-center gap-1.5">
               <span></span>Histórico de Trades Executados
             </h3>
-            <span class="text-[11px] text-gray-400 font-mono" id="sim-trades-count-badge">0 trades</span>
+            <span class="kpi-sub font-mono" id="sim-trades-count-badge">0 trades</span>
           </div>
-          <div class="block sm:hidden text-[11px] text-gray-500 text-center py-0.5 font-mono">← Deslize horizontalmente →</div>
-          <div class="overflow-x-auto touch-scroll max-h-80">
-            <table class="w-full text-left text-xs text-gray-300">
-              <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[11px] sticky top-0 whitespace-nowrap">
+          <div class="block sm:hidden text-[11px] text-subtle text-center py-0.5 font-mono">← Deslize horizontalmente →</div>
+          <div class="table-scroll touch-scroll max-h-80">
+            <table class="table-standard">
+              <thead class="surface-canvas text-muted font-semibold uppercase text-[11px] sticky top-0 whitespace-nowrap">
                 <tr>
                   <th class="px-2.5 py-2 text-center">#</th>
                   <th class="px-2.5 py-2">Estratégia Compra</th>
@@ -1561,7 +1561,7 @@
                   <th class="px-2.5 py-2 text-center">Status</th>
                 </tr>
               </thead>
-              <tbody id="sim-trades-table-body" class="divide-y divide-fintech-border font-mono whitespace-nowrap text-[11px]">
+              <tbody id="sim-trades-table-body" class="divide-y divide-default font-mono whitespace-nowrap text-[11px]">
                 <!-- Dynamically populated -->
               </tbody>
             </table>
