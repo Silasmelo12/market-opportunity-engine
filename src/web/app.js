@@ -2760,7 +2760,7 @@ function renderStrategySimulationTable(signals, summaries) {
 
   if (!signals || signals.length === 0) {
     elements.strategySimTableBody.innerHTML = `
-      <tr><td colspan="11" class="text-center py-4 text-gray-500">Nenhuma estratégia com sinais executados ativa.</td></tr>
+      <tr><td colspan="11" class="text-center py-4 text-subtle">Nenhuma estratégia com sinais executados ativa.</td></tr>
     `;
     return;
   }
@@ -2840,24 +2840,24 @@ function renderStrategySimulationTable(signals, summaries) {
 
   simResults.forEach(res => {
     const tr = document.createElement('tr');
-    tr.className = 'hover:bg-fintech-surface-hover';
+    tr.className = 'hover-surface';
 
-    const profitClass = res.netProfit >= 0 ? 'text-emerald-400' : 'text-rose-400';
-    const retClass = res.retPct >= 0 ? 'text-emerald-400' : 'text-rose-400';
+    const profitClass = res.netProfit >= 0 ? 'text-positive' : 'text-negative';
+    const retClass = res.retPct >= 0 ? 'text-positive' : 'text-negative';
     const isBuy = (res.direction === 'BUY');
 
     tr.innerHTML = `
-      <td class="px-3 py-2 ${isBuy ? 'text-cyan-300' : 'text-rose-300'} font-medium font-sans">${res.label}</td>
-      <td class="px-3 py-2"><span class="px-1.5 py-0.5 rounded text-[11px] font-bold ${isBuy ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">${res.direction}</span></td>
-      <td class="px-3 py-2 text-center text-white font-bold">${res.entriesCount}</td>
-      <td class="px-3 py-2 text-right font-mono text-gray-300">R$ ${res.totalAportado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-      <td class="px-3 py-2 text-right font-mono text-amber-300 font-bold">${res.totalShares.toLocaleString('pt-BR')}</td>
-      <td class="px-3 py-2 text-right font-mono text-white">R$ ${res.avgPrice.toFixed(2)}</td>
-      <td class="px-3 py-2 text-right font-mono text-gray-400">R$ ${res.cashBalance.toFixed(2)}</td>
-      <td class="px-3 py-2 text-right font-mono font-bold text-white">R$ ${res.finalEquity.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td class="px-3 py-2 ${isBuy ? 'text-info' : 'text-negative'} font-medium font-sans">${res.label}</td>
+      <td class="px-3 py-2"><span class="px-1.5 py-0.5 rounded text-[11px] font-bold ${isBuy ? 'bg-success-soft text-positive' : 'bg-danger-soft text-negative'}">${res.direction}</span></td>
+      <td class="px-3 py-2 text-center text-strong font-bold">${res.entriesCount}</td>
+      <td class="px-3 py-2 text-right font-mono text-muted">R$ ${res.totalAportado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td class="px-3 py-2 text-right font-mono text-warning font-bold">${res.totalShares.toLocaleString('pt-BR')}</td>
+      <td class="px-3 py-2 text-right font-mono text-strong">R$ ${res.avgPrice.toFixed(2)}</td>
+      <td class="px-3 py-2 text-right font-mono text-muted">R$ ${res.cashBalance.toFixed(2)}</td>
+      <td class="px-3 py-2 text-right font-mono font-bold text-strong">R$ ${res.finalEquity.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
       <td class="px-3 py-2 text-right font-mono font-bold ${profitClass}">${res.netProfit >= 0 ? '+' : ''}R$ ${res.netProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
       <td class="px-3 py-2 text-right font-mono font-bold ${retClass}">${res.retPct >= 0 ? '+' : ''}${res.retPct.toFixed(1)}%</td>
-      <td class="px-3 py-2 text-right font-mono text-rose-400 font-bold">${res.maxDrawdown.toFixed(1)}%</td>
+      <td class="px-3 py-2 text-right font-mono text-negative font-bold">${res.maxDrawdown.toFixed(1)}%</td>
     `;
     elements.strategySimTableBody.appendChild(tr);
   });
@@ -2868,7 +2868,7 @@ function renderSignalsTable(signals) {
   elements.signalsTableBody.innerHTML = '';
   if (!signals || signals.length === 0) {
     elements.signalsTableBody.innerHTML = `
-      <tr><td colspan="11" class="text-center py-4 text-gray-500">Nenhum sinal executado nas estratégias ativas.</td></tr>
+      <tr><td colspan="11" class="text-center py-4 text-subtle">Nenhum sinal executado nas estratégias ativas.</td></tr>
     `;
     return;
   }
@@ -2904,22 +2904,22 @@ function renderSignalsTable(signals) {
   const latest = [...enrichedSignals].reverse();
   latest.forEach(sig => {
     const tr = document.createElement('tr');
-    tr.className = 'hover:bg-fintech-surface-hover';
+    tr.className = 'hover-surface';
 
     const isBuy = (sig.direction === 'BUY');
-    const retClass = (sig.forward_return_pct || 0) >= 0 ? 'text-emerald-400' : 'text-rose-400';
+    const retClass = (sig.forward_return_pct || 0) >= 0 ? 'text-positive' : 'text-negative';
     tr.innerHTML = `
-      <td class="px-3 py-2 ${isBuy ? 'text-cyan-300' : 'text-rose-300'} font-medium font-sans">${sig.strategy_label}</td>
-      <td class="px-3 py-2 text-center"><span class="px-1.5 py-0.5 rounded text-[11px] font-bold ${isBuy ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">${sig.direction}</span></td>
-      <td class="px-3 py-2 font-mono text-gray-400">${sig.signal_date}</td>
-      <td class="px-3 py-2 font-mono text-white">${sig.execution_date}</td>
+      <td class="px-3 py-2 ${isBuy ? 'text-info' : 'text-negative'} font-medium font-sans">${sig.strategy_label}</td>
+      <td class="px-3 py-2 text-center"><span class="px-1.5 py-0.5 rounded text-[11px] font-bold ${isBuy ? 'bg-success-soft text-positive' : 'bg-danger-soft text-negative'}">${sig.direction}</span></td>
+      <td class="px-3 py-2 font-mono text-muted">${sig.signal_date}</td>
+      <td class="px-3 py-2 font-mono text-strong">${sig.execution_date}</td>
       <td class="px-3 py-2 font-mono font-semibold text-right">${formatPrice(sig.execution_price, state.currentTicker)}</td>
-      <td class="px-3 py-2 font-mono text-right font-bold text-amber-300">${sig.sharesBought} cotas</td>
-      <td class="px-3 py-2 font-mono text-right text-white">${formatPrice(sig.boughtVal, state.currentTicker)}</td>
-      <td class="px-3 py-2 font-mono text-right text-gray-400">${formatPrice(sig.cashRemaining, state.currentTicker)}</td>
+      <td class="px-3 py-2 font-mono text-right font-bold text-warning">${sig.sharesBought} cotas</td>
+      <td class="px-3 py-2 font-mono text-right text-strong">${formatPrice(sig.boughtVal, state.currentTicker)}</td>
+      <td class="px-3 py-2 font-mono text-right text-muted">${formatPrice(sig.cashRemaining, state.currentTicker)}</td>
       <td class="px-3 py-2 font-mono text-right font-bold ${retClass}">${sig.forward_return_pct !== null && sig.forward_return_pct !== undefined ? (sig.forward_return_pct >= 0 ? '+' : '') + sig.forward_return_pct.toFixed(1) + '%' : (sig.is_open ? 'Pendente' : '--')}</td>
-      <td class="px-3 py-2 font-mono text-right text-rose-400">${sig.mae_pct !== null && sig.mae_pct !== undefined ? sig.mae_pct.toFixed(1) + '%' : '--'}</td>
-      <td class="px-3 py-2 font-mono text-center text-[11px]">${sig.is_open ? '<span class="text-amber-400 font-bold">ABERTO / PENDENTE</span>' : '<span class="text-gray-400">CONCLUÍDO</span>'}</td>
+      <td class="px-3 py-2 font-mono text-right text-negative">${sig.mae_pct !== null && sig.mae_pct !== undefined ? sig.mae_pct.toFixed(1) + '%' : '--'}</td>
+      <td class="px-3 py-2 font-mono text-center text-[11px]">${sig.is_open ? '<span class="text-warning font-bold">ABERTO / PENDENTE</span>' : '<span class="text-muted">CONCLUÍDO</span>'}</td>
     `;
     elements.signalsTableBody.appendChild(tr);
   });
@@ -3088,7 +3088,7 @@ async function runSimulation() {
     const retEl = document.getElementById('sim-kpi-return');
     if (retEl) {
       retEl.textContent = formatPercent(m.total_return_pct, 1, true);
-      retEl.className = `text-base sm:text-lg font-bold font-mono ${m.total_return_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+      retEl.className = `text-base sm:text-lg font-bold font-mono ${m.total_return_pct >= 0 ? 'text-positive' : 'text-negative'}`;
     }
     const bnhSub = document.getElementById('sim-kpi-bnh-sub');
     if (bnhSub) {
@@ -3103,7 +3103,7 @@ async function runSimulation() {
       const pfValue = m.profit_factor;
       const pf = pfValue != null ? (pfValue >= 999 ? '∞' : formatNumber(pfValue, 2)) : '0,00';
       pfEl.textContent = pf;
-      pfEl.className = `text-base sm:text-lg font-bold font-mono ${pfValue >= 1.5 || pf === '∞' ? 'text-amber-400' : (pfValue >= 1.0 ? 'text-gray-200' : 'text-rose-400')}`;
+      pfEl.className = `text-base sm:text-lg font-bold font-mono ${pfValue >= 1.5 || pf === '∞' ? 'text-warning' : (pfValue >= 1.0 ? 'text-strong' : 'text-negative')}`;
     }
     const profitSub = document.getElementById('sim-kpi-profit-sub');
     if (profitSub) {
@@ -3119,11 +3119,11 @@ async function runSimulation() {
         const wins = m.winning_trades_count || 0;
         const total = (m.winning_trades_count || 0) + (m.losing_trades_count || 0);
         auxEl.textContent = formatPercent(wr, 1);
-        auxEl.className = `text-base sm:text-lg font-bold font-mono ${wr >= 50 ? 'text-emerald-400' : 'text-amber-400'}`;
+        auxEl.className = `text-base sm:text-lg font-bold font-mono ${wr >= 50 ? 'text-positive' : 'text-warning'}`;
         if (tradesSub) tradesSub.textContent = `${wins}W / ${m.losing_trades_count || 0}L (${m.total_trades_count || 0} ciclos)`;
       } else {
         auxEl.textContent = formatPercent(m.alpha_vs_dca_pct, 1, true);
-        auxEl.className = `text-base sm:text-lg font-bold font-mono ${m.alpha_vs_dca_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+        auxEl.className = `text-base sm:text-lg font-bold font-mono ${m.alpha_vs_dca_pct >= 0 ? 'text-positive' : 'text-negative'}`;
         if (tradesSub) tradesSub.textContent = `Aportes: ${m.total_trades_count || 0}`;
       }
     }
@@ -3222,9 +3222,9 @@ async function runOptimizer() {
       const titleContainer = document.getElementById('opt-champ-title-container') || (document.getElementById('opt-champ-buy-label') && document.getElementById('opt-champ-buy-label').parentElement);
       if (titleContainer) {
         if (isDca) {
-          titleContainer.innerHTML = '<span class="text-emerald-400 font-semibold" id="opt-champ-buy-label">' + c.buy_label + '</span> <span class="text-gray-400 font-normal text-xs">(Aportes Periódicos em Fundos)</span>';
+          titleContainer.innerHTML = '<span class="text-positive font-semibold" id="opt-champ-buy-label">' + c.buy_label + '</span> <span class="text-muted font-normal text-xs">(Aportes Periódicos em Fundos)</span>';
         } else {
-          titleContainer.innerHTML = '<span class="text-emerald-400 font-semibold" id="opt-champ-buy-label">' + c.buy_label + '</span> <span class="text-gray-400" id="opt-champ-arrow">-&gt;</span> <span class="text-rose-400 font-semibold" id="opt-champ-sell-label">' + (c.sell_label || '--') + '</span>';
+          titleContainer.innerHTML = '<span class="text-positive font-semibold" id="opt-champ-buy-label">' + c.buy_label + '</span> <span class="text-muted" id="opt-champ-arrow">-&gt;</span> <span class="text-negative font-semibold" id="opt-champ-sell-label">' + (c.sell_label || '--') + '</span>';
         }
       }
 
@@ -3314,30 +3314,30 @@ function renderTopCombinationsTable(combos, isDca = false) {
   }
 
   if (!combos || combos.length === 0) {
-    elements.simTopCombosTableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-gray-500">${isDca ? 'Nenhuma estratégia com aportes encontrada no período.' : 'Nenhuma combinação com no mínimo 2 trades encontrada no período.'}</td></tr>`;
+    elements.simTopCombosTableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-subtle">${isDca ? 'Nenhuma estratégia com aportes encontrada no período.' : 'Nenhuma combinação com no mínimo 2 trades encontrada no período.'}</td></tr>`;
     return;
   }
 
   combos.forEach(item => {
     const tr = document.createElement('tr');
-    tr.className = 'hover:bg-fintech-surface-hover';
+    tr.className = 'hover-surface';
 
     const rankBadge = item.rank === 1 ? ' 1º' : (item.rank === 2 ? ' 2º' : (item.rank === 3 ? ' 3º' : `#${item.rank}`));
-    const retClass = item.total_return_pct >= 0 ? 'text-emerald-400' : 'text-rose-400';
-    const pnlClass = item.net_profit >= 0 ? 'text-emerald-400' : 'text-rose-400';
+    const retClass = item.total_return_pct >= 0 ? 'text-positive' : 'text-negative';
+    const pnlClass = item.net_profit >= 0 ? 'text-positive' : 'text-negative';
 
     if (isDca) {
       tr.innerHTML = `
-        <td class="px-2.5 py-2 text-center font-bold text-amber-400">${rankBadge}</td>
-        <td class="px-2.5 py-2 text-emerald-300 font-medium font-sans">${item.buy_label}</td>
-        <td class="px-2.5 py-2 text-right font-mono text-white font-bold">${item.closed_trades}</td>
-        <td class="px-2.5 py-2 text-right font-mono text-gray-300">R$ ${(item.total_invested || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-        <td class="px-2.5 py-2 text-right font-mono text-amber-300">R$ ${(item.average_buy_price || 0).toFixed(2)}</td>
+        <td class="px-2.5 py-2 text-center font-bold text-warning">${rankBadge}</td>
+        <td class="px-2.5 py-2 text-positive font-medium font-sans">${item.buy_label}</td>
+        <td class="px-2.5 py-2 text-right font-mono text-strong font-bold">${item.closed_trades}</td>
+        <td class="px-2.5 py-2 text-right font-mono text-muted">R$ ${(item.total_invested || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+        <td class="px-2.5 py-2 text-right font-mono text-warning">R$ ${(item.average_buy_price || 0).toFixed(2)}</td>
         <td class="px-2.5 py-2 text-right font-mono font-bold ${retClass}">${item.total_return_pct >= 0 ? '+' : ''}${item.total_return_pct.toFixed(1)}%</td>
-        <td class="px-2.5 py-2 text-right font-mono font-bold text-cyan-300">R$ ${(item.final_equity || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+        <td class="px-2.5 py-2 text-right font-mono font-bold text-info">R$ ${(item.final_equity || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
         <td class="px-2.5 py-2 text-right font-mono font-bold ${pnlClass}">R$ ${item.net_profit.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
         <td class="px-2.5 py-2 text-center">
-          <button class="btn-test-combo bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-[11px] px-2.5 py-1 rounded transition shadow"
+          <button class="btn-test-combo text-[11px]"
             data-buy="${item.buy_sub_id}" data-sell="${item.sell_sub_id || ''}">
              Testar
           </button>
@@ -3345,16 +3345,16 @@ function renderTopCombinationsTable(combos, isDca = false) {
       `;
     } else {
       tr.innerHTML = `
-        <td class="px-2.5 py-2 text-center font-bold text-amber-400">${rankBadge}</td>
-        <td class="px-2.5 py-2 text-emerald-300 font-medium font-sans">${item.buy_label}</td>
-        <td class="px-2.5 py-2 text-rose-300 font-medium font-sans">${item.sell_label}</td>
-        <td class="px-2.5 py-2 text-right font-mono text-white font-bold">${item.closed_trades}</td>
-        <td class="px-2.5 py-2 text-right font-mono text-gray-200">${item.win_rate_pct.toFixed(1)}%</td>
+        <td class="px-2.5 py-2 text-center font-bold text-warning">${rankBadge}</td>
+        <td class="px-2.5 py-2 text-positive font-medium font-sans">${item.buy_label}</td>
+        <td class="px-2.5 py-2 text-negative font-medium font-sans">${item.sell_label}</td>
+        <td class="px-2.5 py-2 text-right font-mono text-strong font-bold">${item.closed_trades}</td>
+        <td class="px-2.5 py-2 text-right font-mono text-strong">${item.win_rate_pct.toFixed(1)}%</td>
         <td class="px-2.5 py-2 text-right font-mono font-bold ${retClass}">${item.total_return_pct >= 0 ? '+' : ''}${item.total_return_pct.toFixed(1)}%</td>
         <td class="px-2.5 py-2 text-right font-mono font-bold ${pnlClass}">R$ ${item.net_profit.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-        <td class="px-2.5 py-2 text-right font-mono text-rose-400">${item.max_drawdown_pct.toFixed(1)}%</td>
+        <td class="px-2.5 py-2 text-right font-mono text-negative">${item.max_drawdown_pct.toFixed(1)}%</td>
         <td class="px-2.5 py-2 text-center">
-          <button class="btn-test-combo bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-[11px] px-2.5 py-1 rounded transition shadow"
+          <button class="btn-test-combo text-[11px]"
             data-buy="${item.buy_sub_id}" data-sell="${item.sell_sub_id}">
              Testar
           </button>
@@ -3383,7 +3383,7 @@ function renderSimulationTradesTable(trades, mode) {
   tbody.innerHTML = '';
 
   if (!trades || trades.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="11" class="text-center py-4 text-gray-500">Nenhum trade realizado com as estratégias selecionadas no período.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="11" class="text-center py-4 text-subtle">Nenhum trade realizado com as estratégias selecionadas no período.</td></tr>`;
     if (countBadge) countBadge.textContent = '0 trades';
     return;
   }
@@ -3392,58 +3392,58 @@ function renderSimulationTradesTable(trades, mode) {
 
   trades.forEach(t => {
     const tr = document.createElement('tr');
-    tr.className = 'hover:bg-fintech-surface-hover';
+    tr.className = 'hover-surface';
 
     if (mode === 'cycle_trade') {
       const isWin = (t.return_pct || 0) > 0;
       const isLoss = (t.return_pct || 0) < 0;
-      const retClass = isWin ? 'text-emerald-400' : (isLoss ? 'text-rose-400' : 'text-gray-300');
-      const pnlClass = (t.profit_loss || 0) >= 0 ? 'text-emerald-400' : 'text-rose-400';
+      const retClass = isWin ? 'text-positive' : (isLoss ? 'text-negative' : 'text-muted');
+      const pnlClass = (t.profit_loss || 0) >= 0 ? 'text-positive' : 'text-negative';
       const isOpen = (t.status === 'ABERTO');
       const numBuys = t.num_entries || (t.buy_entries ? t.buy_entries.length : 1);
       const avgPrice = t.average_buy_price || t.buy_price || 0;
 
       let statusBadge = '';
       if (isOpen) {
-        statusBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40">EM ABERTO</span>';
+        statusBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-warning-soft text-warning border border-default">EM ABERTO</span>';
       } else if (isWin) {
-        statusBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">LUCRO</span>';
+        statusBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-success-soft text-positive border border-default">LUCRO</span>';
       } else {
-        statusBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40">PREJUÍZO</span>';
+        statusBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-danger-soft text-negative border border-default">PREJUÍZO</span>';
       }
 
       tr.innerHTML = `
-        <td class="px-2.5 py-2 text-center text-gray-400 font-bold">${t.trade_id || '--'}</td>
-        <td class="px-2.5 py-2 text-cyan-300 font-medium font-sans">${t.buy_strategy || '--'}</td>
-        <td class="px-2.5 py-2 text-right font-mono font-bold ${numBuys > 1 ? 'text-amber-400' : 'text-gray-300'}">
-          <span class="px-1.5 py-0.5 rounded ${numBuys > 1 ? 'bg-amber-500/20 border border-amber-500/40' : 'bg-gray-800'} text-[11px]">
+        <td class="px-2.5 py-2 text-center text-muted font-bold">${t.trade_id || '--'}</td>
+        <td class="px-2.5 py-2 text-info font-medium font-sans">${t.buy_strategy || '--'}</td>
+        <td class="px-2.5 py-2 text-right font-mono font-bold ${numBuys > 1 ? 'text-warning' : 'text-muted'}">
+          <span class="px-1.5 py-0.5 rounded ${numBuys > 1 ? 'bg-warning-soft border border-default' : 'surface-subtle'} text-[11px]">
             ${numBuys}x
           </span>
         </td>
-        <td class="px-2.5 py-2 text-gray-300">${t.buy_date || '--'}</td>
-        <td class="px-2.5 py-2 text-right font-mono text-white font-semibold">R$ ${avgPrice.toFixed(2)}</td>
-        <td class="px-2.5 py-2 text-rose-300 font-medium font-sans">${t.sell_strategy || '--'}</td>
-        <td class="px-2.5 py-2 text-gray-300">${t.sell_date || '--'}</td>
-        <td class="px-2.5 py-2 text-right font-mono text-white font-semibold">${t.sell_price ? 'R$ ' + t.sell_price.toFixed(2) : '--'}</td>
-        <td class="px-2.5 py-2 text-center text-gray-300">${t.duration_bars != null ? t.duration_bars + 'b' : '--'}</td>
+        <td class="px-2.5 py-2 text-muted">${t.buy_date || '--'}</td>
+        <td class="px-2.5 py-2 text-right font-mono text-strong font-semibold">R$ ${avgPrice.toFixed(2)}</td>
+        <td class="px-2.5 py-2 text-negative font-medium font-sans">${t.sell_strategy || '--'}</td>
+        <td class="px-2.5 py-2 text-muted">${t.sell_date || '--'}</td>
+        <td class="px-2.5 py-2 text-right font-mono text-strong font-semibold">${t.sell_price ? 'R$ ' + t.sell_price.toFixed(2) : '--'}</td>
+        <td class="px-2.5 py-2 text-center text-muted">${t.duration_bars != null ? t.duration_bars + 'b' : '--'}</td>
         <td class="px-2.5 py-2 text-right font-mono font-bold ${retClass}">${(t.return_pct || 0) >= 0 ? '+' : ''}${(t.return_pct || 0).toFixed(1)}%</td>
         <td class="px-2.5 py-2 text-right font-mono font-bold ${pnlClass}">${(t.profit_loss || 0) >= 0 ? '+' : ''}R$ ${(t.profit_loss || 0).toFixed(2)}</td>
         <td class="px-2.5 py-2 text-center">${statusBadge}</td>
       `;
     } else {
       tr.innerHTML = `
-        <td class="px-2.5 py-2 text-center text-gray-400">-</td>
-        <td class="px-2.5 py-2 text-cyan-300 font-medium font-sans">${t.strategy || '--'}</td>
-        <td class="px-2.5 py-2 text-right font-mono text-gray-300 font-bold">1x</td>
-        <td class="px-2.5 py-2 text-gray-300">${t.date || '--'}</td>
-        <td class="px-2.5 py-2 text-right font-mono text-white font-semibold">R$ ${(t.execution_price || 0).toFixed(2)}</td>
-        <td class="px-2.5 py-2 text-gray-500">-</td>
-        <td class="px-2.5 py-2 text-gray-500">-</td>
-        <td class="px-2.5 py-2 text-gray-500">-</td>
-        <td class="px-2.5 py-2 text-center text-gray-400">1b</td>
-        <td class="px-2.5 py-2 text-gray-300">-</td>
-        <td class="px-2.5 py-2 text-right font-mono text-white">R$ ${(t.amount_invested || 0).toFixed(2)}</td>
-        <td class="px-2.5 py-2 text-center"><span class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-400">APORTE</span></td>
+        <td class="px-2.5 py-2 text-center text-muted">-</td>
+        <td class="px-2.5 py-2 text-info font-medium font-sans">${t.strategy || '--'}</td>
+        <td class="px-2.5 py-2 text-right font-mono text-muted font-bold">1x</td>
+        <td class="px-2.5 py-2 text-muted">${t.date || '--'}</td>
+        <td class="px-2.5 py-2 text-right font-mono text-strong font-semibold">R$ ${(t.execution_price || 0).toFixed(2)}</td>
+        <td class="px-2.5 py-2 text-subtle">-</td>
+        <td class="px-2.5 py-2 text-subtle">-</td>
+        <td class="px-2.5 py-2 text-subtle">-</td>
+        <td class="px-2.5 py-2 text-center text-muted">1b</td>
+        <td class="px-2.5 py-2 text-muted">-</td>
+        <td class="px-2.5 py-2 text-right font-mono text-strong">R$ ${(t.amount_invested || 0).toFixed(2)}</td>
+        <td class="px-2.5 py-2 text-center"><span class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-success-soft text-positive">APORTE</span></td>
       `;
     }
 
@@ -3452,10 +3452,10 @@ function renderSimulationTradesTable(trades, mode) {
     // If multi-buy entries exist, append collapsible/informative sub-row
     if (mode === 'cycle_trade' && t.buy_entries && t.buy_entries.length > 1) {
       const subTr = document.createElement('tr');
-      subTr.className = 'bg-fintech-surface/40 text-[11px] text-gray-400';
+      subTr.className = 'surface-subtle text-[11px] text-muted';
       const entriesDetail = t.buy_entries.map(be => `
-        <span class="inline-flex items-center gap-1 bg-fintech-bg px-2 py-0.5 rounded border border-fintech-border/60">
-          <span class="text-cyan-400 font-bold">#${be.entry_id}</span>
+        <span class="inline-flex items-center gap-1 surface-canvas px-2 py-0.5 rounded border border-default">
+          <span class="text-info font-bold">#${be.entry_id}</span>
           <span>${be.date}: R$ ${be.price.toFixed(2)} (${be.shares.toFixed(1)} cotas)</span>
         </span>
       `).join(' ');
@@ -3463,7 +3463,7 @@ function renderSimulationTradesTable(trades, mode) {
       subTr.innerHTML = `
         <td colspan="12" class="px-4 py-1.5 font-mono">
           <div class="flex items-center gap-2 flex-wrap">
-            <span class="text-amber-400 font-semibold font-sans">↳ Sub-entradas acumuladas:</span>
+            <span class="text-warning font-semibold font-sans">↳ Sub-entradas acumuladas:</span>
             ${entriesDetail}
           </div>
         </td>
