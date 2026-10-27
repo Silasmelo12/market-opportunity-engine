@@ -200,3 +200,10 @@ A feature é considerada validada quando:
 - Captura automatizada das 8 áreas × 4 larguras (375/768/1366/1920) × 2 temas = **64 imagens**.
 - Destino: `/tmp/023-ui-before/` (fora do repositório, conforme plano).
 - Carteira sintética (PETR4.SA, TGAR11.SA, caixa e proventos) e respostas de `/api/radar`, `/api/analyze` e `/api/portfolio/quotes` mockadas para determinismo.
+
+### T003 — Inventário de IDs, rotas e funções globais
+
+- IDs do contrato presentes: todos, exceto `#b3-multi-file-input` (referenciado por `onclick` no banner de primeiro uso, porém ausente do DOM). **Lacuna registrada para correção.**
+- Rotas canônicas e legadas: todas mapeadas em `src/web/modules/constants.js` (`CANONICAL_ROUTES` + `ROUTE_ALIASES`).
+- Funções globais: `window.appState` explícito; `window.applyTheme` disponível por declaração de função de topo.
+- IDs duplicados: nenhum (a checagem inicial por `grep 'id="'` gerou falsos positivos em `data-id`; a extração estrita de `id="..."` não encontrou duplicatas).
