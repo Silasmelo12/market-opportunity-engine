@@ -261,3 +261,23 @@ A feature é considerada validada quando:
   - offset sticky da subnavegação igual à altura real do header em 1600px e 768px;
   - seletor de direção visível apenas em Radar/Gráfico.
 - Ajuste de expectativa: percentuais visíveis agora usam vírgula decimal pt-BR (`+6,25%`), coerente com T020.
+
+### T040 — Validação das 4 áreas de carteira (US3)
+
+- Data: 2026-10-27.
+- Matriz recapturada com espera determinística pelo fim do overlay e pela rede: `/tmp/023-ui-us3-validated/` (**64/64 imagens**).
+- Verificações em claro e escuro (1366px e 375px, com conferência em 768/1920px):
+  1. **Resumo/claro** — 4 KPIs, gráficos de evolução/alocação e acordeões de ativos renderizados sem placeholders residuais.
+  2. **Resumo/escuro** — canvas integralmente escuro, títulos com contraste AA e gráficos legíveis.
+  3. **Posições/claro** — cartão de categoria, formulário de rebalanceamento e tabela de posições sobre superfície clara.
+  4. **Posições/escuro** — superfícies, bordas e texto hierarquizados corretamente no tema escuro.
+  5. **Proventos/claro** — canvas claro e cartão do gráfico com controles Mensal/Anual visíveis.
+  6. **Proventos/escuro** — cartão e eixo do gráfico legíveis, sem ilhas claras.
+  7. **Patrimônio/claro** — canvas claro e estado vazio legível.
+  8. **Patrimônio/escuro** — canvas escuro e estado vazio com contraste adequado.
+- Correções aplicadas durante a validação:
+  - `--bg` inexistente trocado por `--canvas` em `.area-posicoes/.area-proventos/.area-patrimonio`, restaurando o fundo claro em Proventos e Patrimônio.
+  - Fundo do `#tab-overview` (que usa `bg-slate-50` no próprio elemento) remapeado para `--canvas` no tema escuro, eliminando a faixa clara e o título invisível.
+  - Contêineres de gráficos do Resumo/Patrimônio limpos antes de `Plotly.newPlot`, removendo os textos "Carregando…" sobre gráficos já renderizados.
+- Ajuste de teste: o E2E de importação agora valida o banner de primeiro uso no estado sem dados, coerente com a exibição condicional da T035.
+- Suítes: `tests/unit/test_layout_contracts.py` + `tests/e2e/test_ui_layout.py` + `tests/e2e/test_dashboard_navigation.py` → **43 passed** (19 unitários + 8 de layout + 16 de navegação).

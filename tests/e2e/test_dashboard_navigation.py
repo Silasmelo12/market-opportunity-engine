@@ -242,10 +242,21 @@ def test_key_text_contrast_in_both_themes(app_page):
 def test_import_controls_open_the_shared_picker_and_csv_imports(app_page, tmp_path):
     page = app_page
 
-    for selector in ("#btn-header-b3-status", "#btn-banner-import-b3"):
-        with page.expect_file_chooser(timeout=3000) as chooser_info:
-            page.click(selector)
-        assert chooser_info.value.element.get_attribute("id") == "portfolio-csv-file-input"
+    with page.expect_file_chooser(timeout=3000) as chooser_info:
+        page.click("#btn-header-b3-status")
+    assert chooser_info.value.element.get_attribute("id") == "portfolio-csv-file-input"
+
+    # O banner de primeiro uso é condicional: só aparece sem dados importados.
+    page.evaluate(
+        """() => localStorage.setItem('market_engine_portfolio_v1', JSON.stringify({
+            holdings: [], availableCash: 0, b3TotalIncome: 0, b3Timeline: [], b3MonthlyIncome: []
+        }))"""
+    )
+    page.reload(wait_until="load")
+    page.wait_for_selector("#investidor10-welcome-banner:not(.hidden)")
+    with page.expect_file_chooser(timeout=3000) as chooser_info:
+        page.click("#btn-banner-import-b3")
+    assert chooser_info.value.element.get_attribute("id") == "portfolio-csv-file-input"
 
     page.click('#pillar-btn-carteira')
     page.click('#subnav-group-carteira [data-tab="posicoes"]')

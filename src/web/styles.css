@@ -1101,6 +1101,7 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
    ========================================================================= */
 [data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio, #tab-portfolio) {
   color: var(--text);
+  background-color: var(--canvas) !important;
 }
 [data-theme="dark"] :is(#tab-overview, #tab-pane-proventos, #tab-pane-patrimonio, #tab-portfolio) :is(.bg-white, .bg-slate-50) {
   background-color: var(--surface) !important;
@@ -2525,7 +2526,7 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
 .area-posicoes,
 .area-proventos,
 .area-patrimonio {
-  background: var(--bg) !important;
+  background: var(--canvas) !important;
 }
 
 .section-header {

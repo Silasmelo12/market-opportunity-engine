@@ -381,6 +381,7 @@ function renderPatrimonioDetailedChart() {
     yaxis: { gridcolor: gridColor, tickprefix: 'R$ ' }
   };
 
+  container.innerHTML = '';
   Plotly.newPlot(container, [trace], layout, { responsive: true, displayModeBar: false });
 }
 
@@ -1621,6 +1622,7 @@ function renderOverviewStackedBarChart(totalInvested, totalProfit) {
     yaxis: { gridcolor: gridColor, tickprefix: 'R$ ', tickfont: { size: 11 } }
   };
 
+  container.innerHTML = '';
   Plotly.newPlot(container, [trace1, trace2], layout, { responsive: true, displayModeBar: false });
   requestAnimationFrame(() => { if (window.Plotly && container.data) Plotly.Plots.resize(container); });
 }
@@ -1705,6 +1707,7 @@ function renderOverviewDonutChart(holdings, cash, totalEquity) {
     showlegend: false,
   };
 
+  container.innerHTML = '';
   Plotly.newPlot(container, [trace], layout, { responsive: true, displayModeBar: false });
 }
 

@@ -53,14 +53,14 @@
 
 **Independent Test**: Percorrer as 8 áreas e verificar zero artefatos de encoding, nenhum texto funcional abaixo de 11px e ícones padronizados.
 
-- [ ] T015 [P] [US1] Corrigir os artefatos de encoding em `src/web/index.html` com reparo controlado `cp1252 → UTF-8`
-- [ ] T016 [P] [US1] Corrigir os artefatos de encoding em `src/web/app.js` e `src/web/modules/*.js`
-- [ ] T017 [US1] Substituir emojis funcionais por referências ao sprite SVG em `src/web/index.html`
-- [ ] T018 [US1] Substituir emojis e strings de ícone em templates dinâmicos de `src/web/app.js` e `src/web/modules/*.js`
-- [ ] T019 [US1] Aplicar o piso tipográfico e algarismos tabulares aos textos visíveis de `src/web/index.html`
-- [ ] T020 [US1] Normalizar rótulos, formatação numérica e strings visíveis em `src/web/app.js` e `src/web/modules/*.js`
-- [ ] T021 [P] [US1] Ativar os contratos de encoding e tipografia em `tests/unit/test_layout_contracts.py`
-- [ ] T022 [US1] Validar as 8 áreas nos dois temas e registrar evidências em `specs/023-professional-ui-layout/quickstart.md`
+- [X] T015 [P] [US1] Corrigir os artefatos de encoding em `src/web/index.html` com reparo controlado `cp1252 → UTF-8`
+- [X] T016 [P] [US1] Corrigir os artefatos de encoding em `src/web/app.js` e `src/web/modules/*.js`
+- [X] T017 [US1] Substituir emojis funcionais por referências ao sprite SVG em `src/web/index.html`
+- [X] T018 [US1] Substituir emojis e strings de ícone em templates dinâmicos de `src/web/app.js` e `src/web/modules/*.js`
+- [X] T019 [US1] Aplicar o piso tipográfico e algarismos tabulares aos textos visíveis de `src/web/index.html`
+- [X] T020 [US1] Normalizar rótulos, formatação numérica e strings visíveis em `src/web/app.js` e `src/web/modules/*.js`
+- [X] T021 [P] [US1] Ativar os contratos de encoding e tipografia em `tests/unit/test_layout_contracts.py`
+- [X] T022 [US1] Validar as 8 áreas nos dois temas e registrar evidências em `specs/023-professional-ui-layout/quickstart.md`
 
 **Checkpoint**: US1 entregue e testável isoladamente (MVP de legibilidade e identidade).
 
@@ -72,14 +72,14 @@
 
 **Independent Test**: Alternar ambientes, percorrer as 8 subáreas, recarregar, usar voltar/avançar e navegar por teclado sem perder sincronia.
 
-- [ ] T023 [US2] Reestruturar o header em `src/web/index.html`, preservando marca, seletor de ambientes, ações e tema
-- [ ] T024 [US2] Reestruturar a subnavegação contextual em `src/web/index.html`, preservando `data-tab` e grupos por ambiente
-- [ ] T025 [US2] Remover o header legado oculto de `src/web/index.html` após validar bindings e IDs
-- [ ] T026 [P] [US2] Atualizar estilos do shell, offsets sticky, estados ativos e comportamento mobile em `src/web/styles.css`
-- [ ] T027 [P] [US2] Ajustar a lógica de navegação e bindings preservados em `src/web/app.js`
-- [ ] T028 [US2] Implementar foco visível, ordem de tabulação e ARIA nos controles de ambiente/subnav em `src/web/index.html` e `src/web/app.js`
-- [ ] T029 [P] [US2] Adicionar/atualizar testes E2E de navegação em `tests/e2e/test_dashboard_navigation.py`
-- [ ] T030 [US2] Validar rotas, precedência URL > storage > padrão, reload, voltar/avançar e painel único; registrar em `specs/023-professional-ui-layout/quickstart.md`
+- [X] T023 [US2] Reestruturar o header em `src/web/index.html`, preservando marca, seletor de ambientes, ações e tema
+- [X] T024 [US2] Reestruturar a subnavegação contextual em `src/web/index.html`, preservando `data-tab` e grupos por ambiente
+- [X] T025 [US2] Remover o header legado oculto de `src/web/index.html` após validar bindings e IDs
+- [X] T026 [P] [US2] Atualizar estilos do shell, offsets sticky, estados ativos e comportamento mobile em `src/web/styles.css`
+- [X] T027 [P] [US2] Ajustar a lógica de navegação e bindings preservados em `src/web/app.js`
+- [X] T028 [US2] Implementar foco visível, ordem de tabulação e ARIA nos controles de ambiente/subnav em `src/web/index.html` e `src/web/app.js`
+- [X] T029 [P] [US2] Adicionar/atualizar testes E2E de navegação em `tests/e2e/test_dashboard_navigation.py`
+- [X] T030 [US2] Validar rotas, precedência URL > storage > padrão, reload, voltar/avançar e painel único; registrar em `specs/023-professional-ui-layout/quickstart.md`
 
 **Checkpoint**: US1 e US2 funcionam independentemente e em conjunto.
 
@@ -91,16 +91,16 @@
 
 **Independent Test**: Navegar pelas 4 áreas de carteira nos dois temas e confirmar consistência de cartões, KPIs, gráficos, tabelas e acordeões.
 
-- [ ] T031 [US3] Refatorar o markup de cabeçalho, KPIs, gráficos e acordeões do Resumo em `src/web/index.html`
-- [ ] T032 [US3] Refatorar o markup de cabeçalho, tabelas e acordeões de Posições em `src/web/index.html`
-- [ ] T033 [US3] Refatorar o markup de Proventos e Evolução Patrimonial em `src/web/index.html`
-- [ ] T034 [P] [US3] Implementar estilos unificados das áreas de carteira em `src/web/styles.css`
-- [ ] T035 [P] [US3] Implementar a exibição condicional do banner de primeiro uso em `src/web/app.js`
-- [ ] T036 [US3] Ajustar renderização, classes e resize/tema dos gráficos do Resumo em `src/web/app.js`
-- [ ] T037 [US3] Ajustar classes de renderização de Posições, Proventos e Patrimônio em `src/web/app.js` e `src/web/modules/proventos.js`
-- [ ] T038 [P] [US3] Estender contratos de UI das áreas de carteira em `tests/unit/test_layout_contracts.py`
-- [ ] T039 [P] [US3] Adicionar testes E2E das áreas de carteira em `tests/e2e/test_ui_layout.py`
-- [ ] T040 [US3] Validar as 4 áreas de carteira nos dois temas e registrar evidências em `specs/023-professional-ui-layout/quickstart.md`
+- [X] T031 [US3] Refatorar o markup de cabeçalho, KPIs, gráficos e acordeões do Resumo em `src/web/index.html`
+- [X] T032 [US3] Refatorar o markup de cabeçalho, tabelas e acordeões de Posições em `src/web/index.html`
+- [X] T033 [US3] Refatorar o markup de Proventos e Evolução Patrimonial em `src/web/index.html`
+- [X] T034 [P] [US3] Implementar estilos unificados das áreas de carteira em `src/web/styles.css`
+- [X] T035 [P] [US3] Implementar a exibição condicional do banner de primeiro uso em `src/web/app.js`
+- [X] T036 [US3] Ajustar renderização, classes e resize/tema dos gráficos do Resumo em `src/web/app.js`
+- [X] T037 [US3] Ajustar classes de renderização de Posições, Proventos e Patrimônio em `src/web/app.js` e `src/web/modules/proventos.js`
+- [X] T038 [P] [US3] Estender contratos de UI das áreas de carteira em `tests/unit/test_layout_contracts.py`
+- [X] T039 [P] [US3] Adicionar testes E2E das áreas de carteira em `tests/e2e/test_ui_layout.py`
+- [X] T040 [US3] Validar as 4 áreas de carteira nos dois temas e registrar evidências em `specs/023-professional-ui-layout/quickstart.md`
 
 **Checkpoint**: As 4 áreas de carteira estão visualmente unificadas e testadas.
 
