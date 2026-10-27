@@ -294,6 +294,91 @@ def test_portfolio_cards_adapt_to_theme_tokens(layout_page):
     assert light["border"] != dark["border"]
 
 
+QUANT_AREAS = {
+    "radar": (
+        "quant/radar",
+        "tab-pane-radar",
+        [".kpi-card", ".segmented", ".filter-chip", ".table-standard", ".btn-primary"],
+    ),
+    "grafico": (
+        "quant/grafico",
+        "tab-terminal",
+        [".chart-sidebar", ".chart-shell", ".strategy-group", ".segmented", ".input"],
+    ),
+    "simulador": (
+        "quant/simulador",
+        "tab-simulator",
+        [".card-surface", ".input", ".btn-primary", ".kpi-card", ".chart-card", ".table-standard"],
+    ),
+    "playbook": (
+        "quant/playbook",
+        "tab-playbook",
+        [".playbook-group-title", ".playbook-block"],
+    ),
+}
+
+
+def test_quant_areas_use_shared_semantic_system(layout_page):
+    page, base = layout_page
+    legacy_pattern = (
+        r"(^|\s)("
+        r"(bg|border|divide)-(fintech|gray)-|"
+        r"text-(fintech|gray|white|cyan|emerald|rose|amber|sky|blue|slate)-|"
+        r"bg-black"
+        r")"
+    )
+    for name, (route, panel, selectors) in QUANT_AREAS.items():
+        page.goto(f"{base}/?e2e=1#{route}", wait_until="load")
+        page.wait_for_selector(f"#{panel}", state="visible", timeout=15000)
+        if name == "radar":
+            page.wait_for_selector("#radar-table-body tr", timeout=15000)
+        page.wait_for_timeout(250)
+
+        assert page.locator(f"#{panel}.quant-area").count() == 1, f"{name}: sem .quant-area"
+        for selector in selectors:
+            assert page.locator(f"#{panel} {selector}").count() >= 1, f"{name}: falta {selector}"
+
+        legacy = page.evaluate(
+            """([id, pattern]) => {
+                const root = document.getElementById(id);
+                const re = new RegExp(pattern);
+                return [...root.querySelectorAll('*')]
+                    .filter(el => re.test(el.className || ''))
+                    .map(el => el.className)
+                    .slice(0, 5);
+            }""",
+            [panel, legacy_pattern],
+        )
+        assert legacy == [], f"{name}: classes legadas remanescentes {legacy}"
+
+
+def test_quant_areas_adapt_to_theme_tokens(layout_page):
+    page, base = layout_page
+    page.goto(f"{base}/?e2e=1#quant/radar", wait_until="load")
+    page.wait_for_selector("#tab-pane-radar", state="visible", timeout=15000)
+    page.wait_for_timeout(250)
+
+    def colors():
+        return page.evaluate(
+            """() => {
+                const root = document.getElementById('tab-pane-radar');
+                const card = root.querySelector('.kpi-card');
+                const cs = getComputedStyle(root);
+                const cc = getComputedStyle(card);
+                return {rootBg: cs.backgroundColor, cardBg: cc.backgroundColor, cardColor: cc.color};
+            }"""
+        )
+
+    light = colors()
+    page.evaluate("() => window.applyTheme('dark', false)")
+    page.wait_for_timeout(200)
+    dark = colors()
+
+    assert light["rootBg"] != dark["rootBg"]
+    assert light["cardBg"] != dark["cardBg"]
+    assert dark["cardColor"] != dark["rootBg"]
+
+
 def test_reduced_motion_suppresses_non_essential_animation(server_url):
     with playwright_sync.sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True)
