@@ -2596,3 +2596,201 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
   font-size: 11px;
   padding: 6px 12px;
 }
+
+/* =========================================================================
+   Unified quantitative areas (US4)
+   Semantic utilities replace the legacy terminal palette so Radar, Chart,
+   Simulator and Playbook share the same tokens as the portfolio areas.
+   ========================================================================= */
+.quant-area { background: var(--canvas); color: var(--text); }
+
+.surface-canvas { background: var(--canvas); }
+.surface { background: var(--surface); }
+.surface-subtle { background: var(--surface-subtle); }
+.surface-hover { background: var(--surface-hover); }
+.primary-soft { background: var(--primary-soft); }
+.border-default { border-color: var(--border); }
+.divide-default > * + * { border-color: var(--border); }
+
+.text-strong { color: var(--text-main); }
+.text-muted { color: var(--text-muted); }
+.text-subtle { color: var(--text-subtle); }
+.text-positive { color: var(--success); }
+.text-negative { color: var(--danger); }
+.text-warning { color: var(--warning); }
+.text-info { color: var(--primary); }
+
+.area-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.area-header-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+.segmented {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.segmented::-webkit-scrollbar { display: none; }
+.segmented-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  padding: 3px 8px;
+  border: 1px solid transparent;
+  border-radius: calc(var(--radius-md) - 2px);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 650;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 140ms ease, background-color 140ms ease, border-color 140ms ease;
+}
+.segmented-btn:hover { color: var(--text-main); background: var(--surface-hover); }
+.segmented-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-text);
+  font-weight: 700;
+}
+.segmented-btn:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 1px; }
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 650;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 140ms ease, background-color 140ms ease, border-color 140ms ease;
+}
+.filter-chip:hover { color: var(--text-main); background: var(--surface-hover); }
+.filter-chip.active {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 700;
+}
+.filter-chip:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 1px; }
+
+.menu-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg, 0 16px 40px rgba(15, 23, 42, 0.18));
+}
+
+.chart-sidebar {
+  background: var(--surface);
+  border-color: var(--border);
+}
+.chart-shell {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+.chart-controls {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.strategy-group {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--surface);
+}
+.strategy-group-header {
+  background: var(--surface-subtle);
+  color: var(--text-main);
+  font-weight: 600;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.strategy-group-body { background: var(--surface); }
+.strategy-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 4px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.strategy-option:hover { color: var(--text-main); background: var(--surface-hover); }
+.strategy-option input { accent-color: var(--primary); }
+
+.playbook-group-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-main);
+  font-size: var(--font-size-card);
+  font-weight: 700;
+}
+.playbook-group-title.is-buy { color: var(--success); }
+.playbook-group-title.is-sell { color: var(--danger); }
+.playbook-group-title.is-accent { color: var(--warning); }
+.playbook-group-title.is-info { color: var(--primary); }
+.playbook-block {
+  background: var(--surface-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+.playbook-block strong, .playbook-block .block-title { color: var(--text-main); }
+
+.quant-empty {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--text-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-meta);
+}
+
+/* Semantic background helpers used by dynamic renderers */
+.bg-primary-strong { background: var(--primary); }
+.bg-success-soft { background: var(--success-soft); }
+.bg-danger-soft { background: var(--danger-soft); }
+.bg-warning-soft { background: var(--warning-soft); }
+.bg-primary-soft { background: var(--primary-soft); }
+.hover-surface { transition: background-color 150ms ease; }
+.hover-surface:hover { background: var(--surface-hover); }
+.hover-text:hover { color: var(--text-main); }
+.hover-danger:hover { color: var(--danger); }
+.hover-primary:hover { color: var(--primary-hover); }
+.group:hover .group-hover-primary { color: var(--primary-hover); }
+
+.border-success { border-color: var(--success); }
+.border-warning { border-color: var(--warning); }
+.border-danger { border-color: var(--danger); }
