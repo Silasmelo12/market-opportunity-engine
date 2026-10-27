@@ -37,7 +37,7 @@
 - [X] T007 Implementar a escala tipográfica e o piso de 11px, incluindo algarismos tabulares e hierarquia display/seção/card/corpo/label em `src/web/styles.css`
 - [X] T008 Padronizar botões, campos, selects, badges e estados de foco/hover/disabled em `src/web/styles.css`
 - [X] T009 Padronizar cartões, tabelas, acordeões, divisórias e estados vazio/erro/loading em `src/web/styles.css`
-- [ ] T010 [P] Expandir o sprite SVG de ícones lineares em `src/web/index.html`
+- [X] T010 [P] Expandir o sprite SVG de ícones lineares em `src/web/index.html`
 - [ ] T011 [P] Alterar o tema padrão para claro e preservar persistência/atualização de gráficos em `src/web/app.js`
 - [ ] T012 [P] Criar contratos de layout (encoding, tipografia, IDs, rotas, temas) em `tests/unit/test_layout_contracts.py`
 - [ ] T013 [P] Criar testes E2E de invariantes (painel único, temas, tabelas roláveis, teclado) em `tests/e2e/test_ui_layout.py`
