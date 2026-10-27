@@ -1,0 +1,245 @@
+# DESIGN.md — Market Opportunity & Bottom Statistical Engine
+*Diretrizes de Design System & Tokens Visuais (Identidade Quant-Executiva Unificada)*
+
+<!-- impeccable:design-schema 1 -->
+
+## 1. Visual World & Direction (Identidade Quant-Executiva)
+
+O **Market Opportunity & Bottom Statistical Engine** combina o melhor de dois mundos:
+1. **A Clareza Executiva do Investidor10:** Resumo patrimonial limpo, cartões respirados, métricas agregadas escaneáveis e foco nas decisões de alocação de capital (*Operate Mode*).
+2. **O Rigor e Densidade do Terminal Quantitativo:** Superfícies profundas navy/grafite, acentos ciano e verde-azulado, tipografia monospaçada de alta legibilidade para séries de preços e indicadores estatísticos (*Bottom Detector 2x2*, *Z-Score*, *Timing*, *Win Rate*).
+
+### Princípios Fundamentais de Design:
+- **Bimodalidade Harmônica com Tokens Únicos:** Ambos os temas (Claro e Escuro) consomem exatamente a mesma nomenclatura semântica de tokens CSS (`--canvas`, `--surface`, `--border`, `--text`, `--primary`, `--success`, etc.). O tema claro oferece uma estética corporativa limpa (Investidor10 clean), enquanto o tema escuro oferece um terminal noturno de alta performance (Navy/Grafite Fintech).
+- **Semântica Financeira Não Dependente Apenas de Cor:** Ganhos/Compras e Perdas/Vendas utilizam sempre reforço textual e ícones de direção (`▲`, `▼`, `↗`, `↘`) em conjunto com as cores de contraste auditadas (WCAG AA > 4.5:1).
+- **Piso Tipográfico Estrito (Mínimo 11px):** Nenhum texto funcional, cabeçalho de tabela, label de formulário ou metadado possui tamanho inferior a 11px (`text-[10px]` banido para elementos legíveis).
+- **Hierarquia Plana e Limpa:** Eliminação de cartões aninhados (*nested cards*) redundantes; agrupamento estruturado por espaçamento rítmico, divisórias sutis e tipografia bem balanceada.
+- **Gráficos Integrados e Transparentes:** Plotly e TradingView utilizam fundos transparentes, herdando as cores de eixos, grid e tipografia diretamente dos tokens de tema ativos.
+
+---
+
+## 2. Design Tokens
+
+### 🎨 Paleta de Cores e Superfícies (Color Tokens)
+
+```css
+/* =========================================================================
+   Tokens Semânticos Universais: Tema Claro (Padrão) vs. Tema Escuro
+   ========================================================================= */
+
+:root {
+  color-scheme: light;
+
+  /* Superfícies & Fundos */
+  --canvas: #f8fafc;                 /* Fundo geral da aplicação (Slate 50) */
+  --surface: #ffffff;                /* Superfície principal de cards e painéis */
+  --surface-subtle: #f1f5f9;         /* Superfície elevada secundária (pílulas, header de tabela) */
+  --surface-hover: #f8fafc;          /* Hover suave sobre linhas e botões secundários */
+  --surface-overlay: rgba(15, 23, 42, 0.6); /* Backdrop para modais e popovers */
+
+  /* Linhas e Bordas */
+  --border: #e2e8f0;                 /* Borda padrão de cards e divisórias (Slate 200) */
+  --border-strong: #cbd5e1;          /* Borda com maior ênfase e inputs (Slate 300) */
+  --border-focus: #0284c7;           /* Borda e anel de foco acessível */
+
+  /* Tipografia & Hierarquia de Contraste */
+  --text-main: #0f172a;              /* Títulos, números grandes e textos de alta ênfase (Slate 900, >13:1) */
+  --text-muted: #475569;             /* Labels, cabeçalhos de coluna e legendas (Slate 600, >6.5:1) */
+  --text-subtle: #64748b;            /* Metadados, notas explicativas e placeholders (Slate 500, >4.5:1) */
+
+  /* Cores Semânticas de Operação & Rentabilidade */
+  --success: #059669;                /* Verde institucional para lucros e sinais de Compra (Fundo) */
+  --success-soft: #ecfdf5;           /* Fundo suave para badges de Compra/Lucro */
+  --success-border: #a7f3d0;         /* Borda de badge de sucesso */
+
+  --danger: #e11d48;                 /* Rose/Vermelho para prejuízos e sinais de Venda (Topo) */
+  --danger-soft: #fff1f2;            /* Fundo suave para badges de Venda/Prejuízo */
+  --danger-border: #fecdd3;          /* Borda de badge de perigo */
+
+  --warning: #d97706;                /* Âmbar institucional para alertas e timing neutro */
+  --warning-soft: #fef3c7;           /* Fundo suave para avisos */
+  --warning-border: #fde68a;         /* Borda de aviso */
+
+  /* Identidade & Acentos Quantitativos */
+  --primary: #0284c7;                /* Azul institucional ciano (B3 / Ação Primária) */
+  --primary-hover: #0369a1;          /* Hover de ação primária */
+  --primary-soft: #e0f2fe;           /* Fundo suave de destaque e seleção de abas */
+  --primary-text: #ffffff;           /* Texto sobre botões primários */
+
+  --accent-teal: #0d9488;            /* Verde-azulado para estratégias quantitativas e timing */
+  --accent-teal-soft: #ccfbf1;
+  --purple: #7c3aed;                 /* Roxo para alocações globais/cripto */
+  --purple-soft: #f3e8ff;
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Superfícies & Fundos Navy/Grafite */
+  --canvas: #0a0e17;                 /* Fundo ultra escuro navy grafite */
+  --surface: #111827;                /* Superfície de cards e painéis (Navy Slate) */
+  --surface-subtle: #162032;         /* Superfície elevada secundária (pílulas, header de tabela) */
+  --surface-hover: #1e293b;          /* Hover sobre linhas e botões */
+  --surface-overlay: rgba(0, 0, 0, 0.75);
+
+  /* Linhas e Bordas */
+  --border: #1e293b;                 /* Borda sutil de painéis (Slate 800) */
+  --border-strong: #334155;          /* Borda com maior ênfase (Slate 700) */
+  --border-focus: #38bdf8;           /* Anel de foco ciano vibrante */
+
+  /* Tipografia & Hierarquia de Contraste */
+  --text-main: #f8fafc;              /* Títulos e valores primários (Slate 50, >14:1) */
+  --text-muted: #94a3b8;             /* Labels e cabeçalhos de coluna (Slate 400, >7:1) */
+  --text-subtle: #64748b;            /* Metadados e legendas (Slate 500, >4.5:1) */
+
+  /* Cores Semânticas de Operação & Rentabilidade */
+  --success: #10b981;                /* Esmeralda vibrante para Compra / Lucro */
+  --success-soft: rgba(16, 185, 129, 0.14);
+  --success-border: rgba(16, 185, 129, 0.35);
+
+  --danger: #f43f5e;                 /* Rose vibrante para Venda / Risco de reversão */
+  --danger-soft: rgba(244, 63, 94, 0.14);
+  --danger-border: rgba(244, 63, 94, 0.35);
+
+  --warning: #f59e0b;                /* Âmbar para alertas e regime neutro */
+  --warning-soft: rgba(245, 158, 11, 0.14);
+  --warning-border: rgba(245, 158, 11, 0.35);
+
+  /* Identidade & Acentos Quantitativos */
+  --primary: #06b6d4;                /* Ciano vibrante para botões e seleção */
+  --primary-hover: #22d3ee;
+  --primary-soft: rgba(6, 182, 212, 0.14);
+  --primary-text: #041019;           /* Texto escuro de alto contraste sobre ciano */
+
+  --accent-teal: #14b8a6;            /* Verde-azulado técnico */
+  --accent-teal-soft: rgba(20, 184, 166, 0.14);
+  --purple: #a78bfa;                 /* Roxo suave para cripto */
+  --purple-soft: rgba(167, 139, 250, 0.14);
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 6px 16px -2px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 14px 28px -4px rgba(0, 0, 0, 0.7);
+}
+```
+
+---
+
+### 🔤 Tipografia & Escala de Tamanhos (Typography Tokens)
+
+- **Família Primária (Interface & Executivo)**: `'Plus Jakarta Sans', system-ui, -apple-system, sans-serif`
+- **Família Monospaçada (Valores, Tickers & Métricas Quant)**: `'JetBrains Mono', Consolas, monospace`
+
+| Nível / Papel | Família | Tamanho (`px` / `rem`) | Peso (`font-weight`) | Line-height | Letter-spacing |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Hero Display / KPI** | `font-sans` | `24px` (`1.5rem`) | 800 (ExtraBold) | 1.15 | `-0.025em` |
+| **Título de Seção (H2)** | `font-sans` | `18px` (`1.125rem`) | 700 (Bold) | 1.25 | `-0.015em` |
+| **Título de Card (H3)** | `font-sans` | `15px` (`0.9375rem`) | 600 (SemiBold) | 1.3 | `-0.01em` |
+| **Corpo / Parágrafo** | `font-sans` | `13px` (`0.8125rem`) | 400 / 500 (Regular/Medium) | 1.5 | `normal` |
+| **Preços & Tickers** | `font-mono` | `12px - 13px` | 600 (SemiBold) | 1.2 | `0.01em` |
+| **Headers de Tabela** | `font-sans` | `11px` (`0.6875rem`) *(Piso mínimo)* | 600 (SemiBold) | 1.2 | `0.04em` (Uppercase) |
+| **Badges & Tags Quant** | `font-mono` | `11px` (`0.6875rem`) *(Piso mínimo)* | 700 (Bold) | 1.2 | `0.02em` |
+
+> [!IMPORTANT]
+> **Piso Mínimo de 11px:** É estritamente proibido o uso de `text-[10px]` para qualquer elemento de texto funcional, cabeçalho de coluna, botão de navegação ou metadado acionável.
+
+---
+
+### 📐 Espaçamento, Bordas e Raio (Spatial Tokens)
+
+```css
+:root {
+  /* Escala Modular de Espaçamento Base 4px */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* Raio de Arredondamento */
+  --radius-xs: 4px;                  /* Pequenos seletores internos */
+  --radius-sm: 6px;                  /* Badges, tags e pílulas */
+  --radius-md: 8px;                  /* Botões, inputs e dropdowns */
+  --radius-lg: 12px;                 /* Cards, painéis e contêineres principais */
+  --radius-xl: 16px;                 /* Diálogos executivos e modais */
+}
+```
+
+---
+
+## 3. Padrões de Componentes Compartilhados (Shared Components)
+
+### 3.1 Cartões Executivos & Painéis (`.card-surface`, `.metric-card`)
+- **Container**: `background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); box-shadow: var(--shadow-sm);`
+- **Hierarquia de Cabeçalho**: Label em `var(--text-muted)` (11px uppercase) seguido por valor em destaque `var(--text-main)` (18px-24px).
+- **Sem Aninhamento de Cartões**: Não aninhar cartões com bordas e sombras dentro de cartões existentes. Usar divisórias horizontais sutis (`border-b: 1px solid var(--border)`) ou fundo elevado `var(--surface-subtle)`.
+
+### 3.2 Tabelas Institucionais (`.table-standard`)
+- **Cabeçalho (`thead`)**:
+  - `background: var(--surface-subtle);`
+  - `color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;`
+  - `padding: 10px 14px; border-bottom: 1px solid var(--border);`
+- **Linhas de Dados (`tbody tr`)**:
+  - `border-bottom: 1px solid var(--border); transition: background 0.15s ease; font-size: 12px;`
+  - `hover: background: var(--surface-hover);`
+  - Padding de célula: `8px 14px;`
+- **Células Numéricas e Financeiras**:
+  - Alinhamento à direita com `font-mono`, tabular numbers e formatação estrita `pt-BR` (ex: `R$ 1.234,56`).
+- **Ações na Linha**:
+  - Botão contextual com área de toque mínima de 28px de altura, rótulo claro e contraste assegurado.
+
+### 3.3 Botões & Controles Interativos (`.btn-primary`, `.btn-secondary`, `.btn-contextual`)
+- **Botão Primário (`.btn-primary`)**:
+  - Fundo: `var(--primary)` com texto `var(--primary-text)`.
+  - Raio: `var(--radius-md)` (8px). Altura: `32px` a `36px`.
+  - Hover: `var(--primary-hover)` com leve transição de escala/brilho.
+- **Botão Secundário / Outline (`.btn-secondary`)**:
+  - Fundo: `var(--surface)`. Borda: `1px solid var(--border)`. Texto: `var(--text-main)`.
+  - Hover: `background: var(--surface-subtle); border-color: var(--border-strong);`
+- **Botão Contextual de Tabela (`.btn-contextual`)**:
+  - Fundo translúcido `var(--primary-soft)`, borda `1px solid var(--primary)`, texto `var(--primary)`.
+  - Hover: elevação de opacidade com preservação rigorosa de legibilidade.
+- **Foco por Teclado (`:focus-visible`)**:
+  - `outline: 2px solid var(--border-focus); outline-offset: 2px;` obrigatório em todos os botões e links.
+
+### 3.4 Badges Quantitativos & Indicadores de Timing (`.badge-pill`)
+- **Estrutura**: Altura `22px`, padding horizontal `8px`, `border-radius: var(--radius-sm)`, tipografia `font-mono` 11px negrito.
+- **Compra / Setup Fundo**: Fundo `var(--success-soft)`, borda `1px solid var(--success-border)`, texto `var(--success)`. Prefixo `▲` ou `●`.
+- **Venda / Topo Alerta**: Fundo `var(--danger-soft)`, borda `1px solid var(--danger-border)`, texto `var(--danger)`. Prefixo `▼` ou `●`.
+- **Neutro / Timing Estendido**: Fundo `var(--warning-soft)`, borda `1px solid var(--warning-border)`, texto `var(--warning)`.
+
+---
+
+## 4. Diretrizes de Acessibilidade & Contraste (a11y)
+
+1. **Relação de Contraste Auditada (WCAG AA):**
+   - Todos os textos primários sobre seus fundos possuem relação > `13:1` (tema claro) e > `14:1` (tema escuro).
+   - Textos secundários (`--text-muted`) possuem relação mínima > `6.5:1` sobre `--surface` e `--canvas`.
+   - Badges e textos coloridos (verde, vermelho, ciano) possuem contraste de texto > `4.5:1` garantido sobre seus respectivos fundos suaves.
+2. **Dupla Codificação Semântica:**
+   - Todo indicador de variação percentual ou direção é acompanhado de texto explícito ou glifo (`▲` / `▼`).
+3. **Navegabilidade por Teclado:**
+   - Navegação completa por tabulação (`Tab` / `Shift+Tab`) com foco visível sem interrupções.
+   - Ativação de abas, acordeões e modais via teclas `Enter` e `Space`.
+
+---
+
+## 5. Diretrizes de Visualização de Gráficos (Plotly & TradingView)
+
+1. **Fundo Transparente:**
+   - Sempre definir `paper_bgcolor: 'rgba(0,0,0,0)'` e `plot_bgcolor: 'rgba(0,0,0,0)'`.
+2. **Cores dos Eixos e Gridlines Dinâmicas:**
+   - Eixos e rótulos consomem cor de texto do tema: `#0F172A` (claro) / `#F8FAFC` (escuro).
+   - Gridlines utilizam cor de borda atenuada: `rgba(203, 213, 225, 0.5)` (claro) / `rgba(51, 65, 85, 0.4)` (escuro).
+3. **Paleta Semântica das Séries:**
+   - Rentabilidade Positiva / Aportes: `var(--success)`.
+   - Venda / Prejuízo / Drawdown: `var(--danger)`.
+   - Patrimônio / Valor de Mercado: `var(--primary)`.
+   - Comparadores / Benchmarks: `var(--accent-teal)` e `var(--purple)`.

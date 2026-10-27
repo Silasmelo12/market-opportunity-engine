@@ -511,44 +511,49 @@ def parse_b3_movimentacao_df(df: pd.DataFrame, filename: str = "movimentacao.xls
     )
 
 
-def parse_b3_file(
+def _empty_result(filename: str) -> B3ParseResult:
+    return B3ParseResult(
+        filename=filename,
+        total_movements=0,
+        holdings=[],
+        total_invested=0.0,
+        total_income=0.0,
+        monthly_income=[],
+        timeline=[],
+    )
+
+
+def _read_b3_dataframe(
     file_source: Union[str, Path, bytes, io.BytesIO],
-    filename: str = "movimentacao.xlsx"
-) -> B3ParseResult:
-    """Parses a single B3 file, automatically detecting sheet type."""
+    filename: str,
+) -> pd.DataFrame:
+    """Reads a B3 spreadsheet/CSV into a DataFrame, handling bytes and paths."""
     if isinstance(file_source, (str, Path)):
         file_path = Path(file_source)
         if not file_path.exists():
             raise FileNotFoundError(f"Arquivo B3 não encontrado: {file_path}")
         is_excel = file_path.suffix.lower() in (".xlsx", ".xls")
         if is_excel:
-            df = pd.read_excel(file_path)
-        else:
-            try:
-                df = pd.read_csv(file_path, sep=";", encoding="utf-8")
-            except Exception:
-                df = pd.read_csv(file_path, sep=",", encoding="latin1")
-    else:
-        stream = file_source if isinstance(file_source, io.BytesIO) else io.BytesIO(file_source)
-        is_excel = filename.lower().endswith((".xlsx", ".xls"))
-        if is_excel:
-            df = pd.read_excel(stream)
-        else:
-            try:
-                df = pd.read_csv(stream, sep=";", encoding="utf-8")
-            except Exception:
-                stream.seek(0)
-                df = pd.read_csv(stream, sep=",", encoding="latin1")
+            return pd.read_excel(file_path)
+        try:
+            return pd.read_csv(file_path, sep=";", encoding="utf-8")
+        except Exception:
+            return pd.read_csv(file_path, sep=",", encoding="latin1")
 
+    stream = file_source if isinstance(file_source, io.BytesIO) else io.BytesIO(file_source)
+    is_excel = filename.lower().endswith((".xlsx", ".xls"))
+    if is_excel:
+        return pd.read_excel(stream)
+    try:
+        return pd.read_csv(stream, sep=";", encoding="utf-8")
+    except Exception:
+        stream.seek(0)
+        return pd.read_csv(stream, sep=",", encoding="latin1")
+
+
+def _parse_dataframe(df: pd.DataFrame, filename: str) -> B3ParseResult:
     if df.empty:
-        return B3ParseResult(
-            filename=filename,
-            total_movements=0,
-            holdings=[],
-            total_invested=0.0,
-            total_income=0.0,
-            monthly_income=[],
-        )
+        return _empty_result(filename)
 
     sheet_type = _detect_b3_sheet_type(df)
     if sheet_type == "negociacao_detalhada":
@@ -558,109 +563,398 @@ def parse_b3_file(
     return parse_b3_movimentacao_df(df, filename=filename)
 
 
-def parse_multiple_b3_files(files_data: List[Tuple[str, bytes]]) -> B3ParseResult:
+def _extract_detalhada_events(df: pd.DataFrame, filename: str) -> List[Dict[str, Any]]:
+    """Extracts explicit Compra/Venda events from a 'Negociação Detalhada' sheet."""
+    col_map: Dict[str, Any] = {}
+    for col in df.columns:
+        norm = _normalize_str(col).lower()
+        if "data" in norm:
+            col_map["data"] = col
+        elif "tipo" in norm or "movimentacao" in norm:
+            col_map["tipo"] = col
+        elif "codigo" in norm or "negociacao" in norm or "ativo" in norm:
+            col_map["codigo"] = col
+        elif "quantidade" in norm or "qtd" in norm:
+            col_map["quantidade"] = col
+        elif "preco" in norm:
+            col_map["preco"] = col
+        elif "valor" in norm:
+            col_map["valor"] = col
+
+    if "codigo" not in col_map or "tipo" not in col_map or "quantidade" not in col_map:
+        return []
+
+    events: List[Dict[str, Any]] = []
+    for order, (_, row) in enumerate(df.iterrows()):
+        raw_code = str(row.get(col_map["codigo"], "") or "").strip().upper()
+        if not raw_code or any(x in raw_code for x in ("WIN", "WDO", "FUTURO", "DI1")):
+            continue
+
+        mov_type = _normalize_str(row.get(col_map["tipo"], "")).lower()
+        if "compra" in mov_type:
+            side = "buy"
+        elif "venda" in mov_type:
+            side = "sell"
+        else:
+            continue
+
+        qty = _parse_numeric(row.get(col_map["quantidade"], 0))
+        if qty <= 0:
+            continue
+        price = _parse_numeric(row.get(col_map.get("preco", 0)))
+        value = _parse_numeric(row.get(col_map.get("valor", 0)))
+        op_value = value if value > 0 else (qty * price)
+        raw_ticker, clean_ticker, sa_ticker = _clean_ticker_from_product(raw_code)
+
+        events.append({
+            "date": _parse_date(row.get(col_map.get("data"))) if "data" in col_map else None,
+            "ticker": sa_ticker,
+            "ticker_clean": clean_ticker,
+            "side": side,
+            "qty": qty,
+            "price": price,
+            "value": op_value,
+            "kind": "trade",
+            "file": filename,
+            "order": order,
+        })
+    return events
+
+
+def _extract_movimentacao_events(df: pd.DataFrame, filename: str) -> List[Dict[str, Any]]:
+    """Extracts custody events from a 'Movimentação' sheet.
+
+    Explicit Compra/Venda rows are trades. 'Transferência - Liquidação' rows are
+    the settlement of a trade and are tagged as transfers so they can be
+    de-duplicated against an explicit trade row for the same operation.
     """
-    Consolidates multiple B3 files (e.g. Negociação Detalhada de vários meses + Movimentação de proventos)
-    into a single unified B3ParseResult.
+    col_map: Dict[str, Any] = {}
+    for col in df.columns:
+        norm = _normalize_str(col).lower()
+        if "entrada/saida" in norm or "entrada" in norm:
+            col_map["entrada_saida"] = col
+        elif "data" in norm:
+            col_map["data"] = col
+        elif "movimentacao" in norm or "tipo" in norm:
+            col_map["movimentacao"] = col
+        elif "produto" in norm or "ativo" in norm or "titulo" in norm:
+            col_map["produto"] = col
+        elif "quantidade" in norm or "qtd" in norm:
+            col_map["quantidade"] = col
+        elif "preco unitario" in norm or "preco" in norm:
+            col_map["preco_unitario"] = col
+        elif "valor da operacao" in norm or "valor" in norm:
+            col_map["valor_operacao"] = col
+
+    if "produto" not in col_map or "movimentacao" not in col_map:
+        return []
+
+    events: List[Dict[str, Any]] = []
+    for order, (_, row) in enumerate(df.iterrows()):
+        prod = row.get(col_map["produto"])
+        raw_ticker, clean_ticker, sa_ticker = _clean_ticker_from_product(prod)
+        if not clean_ticker or "FUTURO" in clean_ticker or "DI1" in clean_ticker:
+            continue
+
+        mov_norm = _normalize_str(row.get(col_map["movimentacao"], "")).lower()
+        es_norm = _normalize_str(row.get(col_map.get("entrada_saida", ""), "")).lower()
+        qty = _parse_numeric(row.get(col_map.get("quantidade", 0)))
+        if qty <= 0:
+            continue
+
+        side = None
+        kind = None
+        if "compra" in mov_norm:
+            side = "buy"
+            kind = "trade"
+        elif "venda" in mov_norm:
+            side = "sell"
+            kind = "trade"
+        elif "transferencia" in mov_norm and "liquidacao" in mov_norm:
+            if es_norm == "credito":
+                side = "buy"
+                kind = "transfer"
+            elif es_norm == "debito":
+                side = "sell"
+                kind = "transfer"
+
+        if side is None:
+            continue
+
+        price = _parse_numeric(row.get(col_map.get("preco_unitario", 0)))
+        value = _parse_numeric(row.get(col_map.get("valor_operacao", 0)))
+        op_value = value if value > 0 else (qty * price)
+
+        events.append({
+            "date": _parse_date(row.get(col_map.get("data"))) if "data" in col_map else None,
+            "ticker": sa_ticker,
+            "ticker_clean": clean_ticker,
+            "side": side,
+            "qty": qty,
+            "price": price,
+            "value": op_value,
+            "kind": kind,
+            "file": filename,
+            "order": order,
+        })
+    return events
+
+
+def _dedupe_custody_events(events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Keeps explicit trades and removes settlement transfers that duplicate them.
+
+    A 'Transferência - Liquidação' is normally the cash/custody settlement of a
+    Compra/Venda already present in a Negociação Detalhada sheet. Without this
+    step the same operation would be counted twice when both files are uploaded.
+    """
+    trades = [e for e in events if e["kind"] == "trade"]
+    transfers = [e for e in events if e["kind"] == "transfer"]
+    kept = list(trades)
+    matched_trades = set()
+
+    for transfer in transfers:
+        match_idx = None
+        for idx, trade in enumerate(trades):
+            if idx in matched_trades:
+                continue
+            if trade["ticker"] != transfer["ticker"] or trade["side"] != transfer["side"]:
+                continue
+            if abs(trade["qty"] - transfer["qty"]) > 1e-6:
+                continue
+            if trade["price"] > 0 and transfer["price"] > 0:
+                tolerance = max(0.05, trade["price"] * 0.02)
+                if abs(trade["price"] - transfer["price"]) > tolerance:
+                    continue
+            if trade["date"] is not None and transfer["date"] is not None:
+                if abs((trade["date"] - transfer["date"]).days) > 7:
+                    continue
+            match_idx = idx
+            break
+
+        if match_idx is None:
+            kept.append(transfer)
+        else:
+            matched_trades.add(match_idx)
+
+    return kept
+
+
+def _build_holdings_from_events(events: List[Dict[str, Any]]) -> List[B3Holding]:
+    """Replays the custody ledger chronologically across every uploaded file."""
+    holdings: Dict[str, Dict[str, Any]] = {}
+
+    for event in events:
+        ticker = event["ticker"]
+        if ticker not in holdings:
+            holdings[ticker] = {
+                "ticker": ticker,
+                "ticker_clean": event["ticker_clean"],
+                "shares": 0.0,
+                "average_buy_price": 0.0,
+                "total_invested": 0.0,
+                "asset_class": _classify_asset(event["ticker_clean"]),
+            }
+
+        current = holdings[ticker]
+        qty = float(event["qty"])
+        value = float(event["value"])
+
+        if event["side"] == "buy":
+            prev_cost = current["shares"] * current["average_buy_price"]
+            new_qty = current["shares"] + qty
+            new_pm = (prev_cost + value) / new_qty if new_qty > 0 else 0.0
+            current["shares"] = new_qty
+            current["average_buy_price"] = new_pm
+            current["total_invested"] = new_qty * new_pm
+        elif event["side"] == "sell":
+            new_qty = max(0.0, current["shares"] - qty)
+            if new_qty <= 1e-6:
+                current["shares"] = 0.0
+                current["average_buy_price"] = 0.0
+                current["total_invested"] = 0.0
+            else:
+                current["shares"] = new_qty
+                current["total_invested"] = new_qty * current["average_buy_price"]
+
+    active: List[B3Holding] = []
+    for data in holdings.values():
+        if data["shares"] <= 1e-4 or data["average_buy_price"] <= 0:
+            continue
+        active.append(
+            B3Holding(
+                ticker=data["ticker"],
+                ticker_clean=data["ticker_clean"],
+                shares=round(data["shares"], 4),
+                average_buy_price=round(data["average_buy_price"], 4),
+                total_invested=round(data["total_invested"], 2),
+                asset_class=data["asset_class"],
+            )
+        )
+
+    active.sort(key=lambda h: h.total_invested, reverse=True)
+    return active
+
+
+def _build_timeline_from_events(events: List[Dict[str, Any]]) -> List[B3TimelinePoint]:
+    monthly: Dict[str, Dict[str, Any]] = {}
+    for event in events:
+        date = event.get("date")
+        if date is None or pd.isna(date):
+            continue
+        key = date.strftime("%Y-%m")
+        if key not in monthly:
+            monthly[key] = {"label": date.strftime("%m/%y"), "cashflow": 0.0}
+        if event["side"] == "buy":
+            monthly[key]["cashflow"] += float(event["value"])
+        else:
+            monthly[key]["cashflow"] -= float(event["value"])
+
+    timeline: List[B3TimelinePoint] = []
+    cumulative = 0.0
+    for key in sorted(monthly.keys()):
+        flow = monthly[key]["cashflow"]
+        cumulative = max(0.0, cumulative + flow)
+        timeline.append(
+            B3TimelinePoint(
+                date=key,
+                label=monthly[key]["label"],
+                invested=round(cumulative, 2),
+                cashflow=round(flow, 2),
+            )
+        )
+    return timeline
+
+
+def _dedupe_exact_events(events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Removes identical custody events repeated across overlapping files."""
+    seen = set()
+    unique: List[Dict[str, Any]] = []
+    for event in events:
+        date_key = event["date"].isoformat() if event["date"] is not None else None
+        key = (
+            event["ticker"],
+            event["side"],
+            event["kind"],
+            date_key,
+            round(float(event["qty"]), 6),
+            round(float(event["price"]), 4),
+            round(float(event["value"]), 2),
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(event)
+    return unique
+
+
+def parse_b3_file(
+    file_source: Union[str, Path, bytes, io.BytesIO],
+    filename: str = "movimentacao.xlsx"
+) -> B3ParseResult:
+    """Parses a single B3 file, automatically detecting sheet type."""
+    df = _read_b3_dataframe(file_source, filename)
+    return _parse_dataframe(df, filename)
+
+
+def parse_multiple_b3_files(files_data: List[Tuple[str, bytes]]) -> B3ParseResult:
+    """Consolidates multiple B3 files into one chronological custody ledger.
+
+    The previous implementation parsed each file independently and summed the
+    resulting holdings. That lost cross-file sells: a share bought in July and
+    sold in August stayed in the portfolio because the August file, parsed
+    alone, had no opening position and clamped the sale to zero. Settlements
+    ('Transferência - Liquidação') could also duplicate explicit trades.
+
+    This implementation extracts every custody event from every file, removes
+    settlement duplicates, sorts by date and replays one single ledger.
     """
     if not files_data:
-        return B3ParseResult(
-            filename="nenhum_arquivo",
-            total_movements=0,
-            holdings=[],
-            total_invested=0.0,
-            total_income=0.0,
-            monthly_income=[],
-        )
+        return _empty_result("nenhum_arquivo")
 
-    parsed_results = []
+    loaded: List[Tuple[str, pd.DataFrame, str, B3ParseResult]] = []
     for fname, content in files_data:
         try:
-            res = parse_b3_file(content, filename=fname)
-            parsed_results.append(res)
-        except Exception as e:
-            pass
+            df = _read_b3_dataframe(content, fname)
+            if df.empty:
+                continue
+            sheet_type = _detect_b3_sheet_type(df)
+            result = _parse_dataframe(df, fname)
+            loaded.append((fname, df, sheet_type, result))
+        except Exception:
+            continue
 
-    if not parsed_results:
+    if not loaded:
         raise ValueError("Nenhum arquivo válido da B3 pôde ser processado.")
 
-    combined_names = ", ".join(r.filename for r in parsed_results)
-    total_movements = sum(r.total_movements for r in parsed_results)
-    total_income = round(sum(r.total_income for r in parsed_results), 2)
+    combined_names = ", ".join(item[0] for item in loaded)
+    total_movements = sum(item[3].total_movements for item in loaded)
+    total_income = round(sum(item[3].total_income for item in loaded), 2)
 
-    # 1. Consolidate monthly income
+    # 1. Income is always additive across files.
     monthly_dict: Dict[str, Dict[str, float]] = {}
-    for r in parsed_results:
-        for m in r.monthly_income:
-            if m.month_year not in monthly_dict:
-                monthly_dict[m.month_year] = {"dividendos": 0.0, "jcp": 0.0, "rendimentos": 0.0}
-            monthly_dict[m.month_year]["dividendos"] += m.dividendos
-            monthly_dict[m.month_year]["jcp"] += m.jcp
-            monthly_dict[m.month_year]["rendimentos"] += m.rendimentos
+    for _, _, _, result in loaded:
+        for month in result.monthly_income:
+            if month.month_year not in monthly_dict:
+                monthly_dict[month.month_year] = {"dividendos": 0.0, "jcp": 0.0, "rendimentos": 0.0}
+            monthly_dict[month.month_year]["dividendos"] += month.dividendos
+            monthly_dict[month.month_year]["jcp"] += month.jcp
+            monthly_dict[month.month_year]["rendimentos"] += month.rendimentos
 
     combined_monthly: List[B3MonthlyIncome] = []
-    for my in sorted(monthly_dict.keys()):
-        d = monthly_dict[my]
-        tot = round(d["dividendos"] + d["jcp"] + d["rendimentos"], 2)
+    for month_year in sorted(monthly_dict.keys()):
+        values = monthly_dict[month_year]
         combined_monthly.append(
             B3MonthlyIncome(
-                month_year=my,
-                dividendos=round(d["dividendos"], 2),
-                jcp=round(d["jcp"], 2),
-                rendimentos=round(d["rendimentos"], 2),
-                total=tot,
+                month_year=month_year,
+                dividendos=round(values["dividendos"], 2),
+                jcp=round(values["jcp"], 2),
+                rendimentos=round(values["rendimentos"], 2),
+                total=round(values["dividendos"] + values["jcp"] + values["rendimentos"], 2),
             )
         )
 
-    # 2. Consolidate holdings across files
-    # We maintain weighted average price for cumulative purchases across separate monthly negotiation sheets
-    holdings_map: Dict[str, B3Holding] = {}
-    for r in parsed_results:
-        for h in r.holdings:
-            if h.shares <= 0 or h.average_buy_price <= 0:
-                continue
-            if h.ticker not in holdings_map:
-                holdings_map[h.ticker] = h
-            else:
-                existing = holdings_map[h.ticker]
-                tot_qty = existing.shares + h.shares
-                if tot_qty > 0:
-                    weighted_cost = (existing.shares * existing.average_buy_price) + (h.shares * h.average_buy_price)
-                    new_pm = round(weighted_cost / tot_qty, 4)
-                    holdings_map[h.ticker] = B3Holding(
-                        ticker=existing.ticker,
-                        ticker_clean=existing.ticker_clean,
-                        shares=round(tot_qty, 4),
-                        average_buy_price=new_pm,
-                        total_invested=round(tot_qty * new_pm, 2),
-                        asset_class=existing.asset_class,
-                    )
+    # 2. Custody source policy:
+    #    - 'Negociação - Resumo' is already a custody snapshot: authoritative.
+    #    - 'Movimentação' is the official custody/cash ledger: authoritative
+    #      over detailed trade confirmations, because it already contains the
+    #      settlement of every trade. Replaying both would double-count.
+    #    - Detailed-only uploads are replayed as one chronological ledger.
+    resumo_results = [item[3] for item in loaded if item[2] == "negociacao_resumo"]
+    movement_sources = [item for item in loaded if item[2] == "movimentacao"]
+    detailed_sources = [item for item in loaded if item[2] == "negociacao_detalhada"]
 
-    final_holdings = list(holdings_map.values())
-    final_holdings.sort(key=lambda x: x.total_invested, reverse=True)
+    if resumo_results:
+        final_holdings = list(resumo_results[-1].holdings)
+        timeline = list(resumo_results[-1].timeline or [])
+    else:
+        movement_events: List[Dict[str, Any]] = []
+        for fname, df, _, _ in movement_sources:
+            movement_events.extend(_extract_movimentacao_events(df, fname))
+        movement_events = _dedupe_exact_events(movement_events)
+        movement_events = _dedupe_custody_events(movement_events)
+
+        if movement_events:
+            events = movement_events
+        else:
+            events = []
+            for fname, df, _, _ in detailed_sources:
+                events.extend(_extract_detalhada_events(df, fname))
+            events = _dedupe_custody_events(events)
+
+        events.sort(key=lambda e: (
+            e["date"] is None,
+            e["date"] if e["date"] is not None else pd.Timestamp("2100-01-01"),
+            0 if e["kind"] == "trade" else 1,
+            0 if e["side"] == "buy" else 1,
+            e["file"],
+            e["order"],
+        ))
+
+        final_holdings = _build_holdings_from_events(events)
+        timeline = _build_timeline_from_events(events)
+
+    final_holdings.sort(key=lambda h: h.total_invested, reverse=True)
     total_invested = round(sum(h.total_invested for h in final_holdings), 2)
-
-    # Consolidate timeline flows
-    flow_combined: Dict[str, Dict[str, Any]] = {}
-    for r in parsed_results:
-        for pt in getattr(r, "timeline", []):
-            if pt.date not in flow_combined:
-                flow_combined[pt.date] = {"label": pt.label, "cashflow": 0.0}
-            flow_combined[pt.date]["cashflow"] += pt.cashflow
-
-    combined_timeline: List[B3TimelinePoint] = []
-    cum_comb = 0.0
-    for m in sorted(flow_combined.keys()):
-        fl = flow_combined[m]["cashflow"]
-        cum_comb = max(0.0, cum_comb + fl)
-        combined_timeline.append(
-            B3TimelinePoint(
-                date=m,
-                label=flow_combined[m]["label"],
-                invested=round(cum_comb, 2),
-                cashflow=round(fl, 2),
-            )
-        )
 
     return B3ParseResult(
         filename=combined_names,
@@ -669,5 +963,5 @@ def parse_multiple_b3_files(files_data: List[Tuple[str, bytes]]) -> B3ParseResul
         total_invested=total_invested,
         total_income=total_income,
         monthly_income=combined_monthly,
-        timeline=combined_timeline,
+        timeline=timeline,
     )

@@ -34,15 +34,104 @@
 </head>
 <body class="bg-fintech-bg text-gray-100 flex flex-col min-h-screen lg:h-screen">
 
+  <!-- SVG Sprite Definitions for Theme Toggle and Common Icons -->
+  <svg xmlns="http://www.w3.org/2000/svg" class="hidden" style="display: none;">
+    <defs>
+      <g id="icon-sun">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+      </g>
+      <g id="icon-moon">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+      </g>
+    </defs>
+  </svg>
+
   <!-- Top Institutional Header (Responsive Mobile & Desktop) -->
-  <header class="bg-fintech-surface border-b border-fintech-border px-3 py-2 lg:px-4 shrink-0 space-y-2 lg:space-y-0">
+  <!-- Top Global Header (Investidor10 Style) -->
+  <header class="app-header bg-white border-b border-slate-200 px-4 py-3 shrink-0 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="brand-group flex items-center gap-3">
+        <div class="brand-icon w-9 h-9 bg-gradient-to-tr from-sky-600 to-blue-700 rounded-lg flex items-center justify-center text-white font-extrabold shadow-sm">📈</div>
+        <div>
+          <div class="brand-title font-extrabold text-slate-900 tracking-tight text-base sm:text-lg flex items-center gap-2">
+            Market Opportunity Engine
+            <span class="brand-tag text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full border border-slate-200">Quantitative Pro</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seletor dos Dois Ambientes Principais (Fase 2A - Spec 021) -->
+      <div class="pillar-nav-group flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200" id="global-pillar-selector" role="tablist" aria-label="Ambientes da Plataforma">
+        <button id="pillar-btn-carteira" class="pillar-btn active flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold text-slate-900 bg-white shadow-sm transition" data-pillar="carteira" role="tab" aria-selected="true" aria-controls="subnav-group-carteira">
+          <span>💼</span> Minha Carteira
+        </button>
+        <button id="pillar-btn-quant" class="pillar-btn flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-900 transition" data-pillar="quant" role="tab" aria-selected="false" aria-controls="subnav-group-quant">
+          <span>🎯</span> Análise Quantitativa
+        </button>
+      </div>
+
+      <div class="header-actions flex items-center gap-2.5">
+        <button id="btn-header-b3-status" class="btn-b3 bg-white text-slate-800 border border-slate-300 hover:bg-slate-50 text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition">
+          <span class="text-sky-600 font-extrabold">[B]³</span> <span id="b3-import-label">Planilhas Importadas</span>
+        </button>
+        <button id="btn-header-add-trade" class="btn-primary bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition">
+          + Lançamento
+        </button>
+        <button id="btn-theme-toggle" title="Alternar Tema Claro / Escuro" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs px-2.5 py-1.5 rounded-lg transition flex items-center gap-1">
+          <span id="theme-toggle-icon" class="inline-flex items-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="#icon-moon"></use></svg>
+          </span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Horizontal Subnav Pills Contextuais (Investidor10 Style - Spec 021) -->
+  <nav class="subnav-bar bg-white border-b border-slate-200 sticky top-[61px] z-40">
+    <div class="subnav-container max-w-7xl mx-auto px-4 flex gap-2 overflow-x-auto" id="main-subnav-pills">
+      <!-- Subnavegação Contextual: Minha Carteira -->
+      <div id="subnav-group-carteira" class="subnav-group flex gap-2 w-full" role="tablist" aria-label="Subnavegação Minha Carteira">
+        <div class="nav-tab active flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-slate-900 text-slate-900 whitespace-nowrap transition" data-tab="resumo" role="tab" tabindex="0" aria-selected="true">
+          <span>📊</span> Resumo
+        </div>
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="posicoes" role="tab" tabindex="0" aria-selected="false">
+          <span>💼</span> Posições & Ativos
+        </div>
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="proventos" role="tab" tabindex="0" aria-selected="false">
+          <span>💰</span> Proventos
+        </div>
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="patrimonio" role="tab" tabindex="0" aria-selected="false">
+          <span>📈</span> Evolução Patrimonial
+        </div>
+      </div>
+
+      <!-- Subnavegação Contextual: Análise Quantitativa -->
+      <div id="subnav-group-quant" class="subnav-group hidden flex gap-2 w-full" role="tablist" aria-label="Subnavegação Análise Quantitativa">
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="radar" role="tab" tabindex="0" aria-selected="false">
+          <span>🎯</span> Radar Estatístico (Fundo 2x2)
+        </div>
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="tradingview" role="tab" tabindex="0" aria-selected="false">
+          <span>🕯️</span> Gráfico TradingView
+        </div>
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="simulador" role="tab" tabindex="0" aria-selected="false">
+          <span>⚡</span> Simulador & Backtest
+        </div>
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="playbook" role="tab" tabindex="0" aria-selected="false">
+          <span>📖</span> Playbook de Estratégias
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Legacy Header Kept Hidden for full retro-compatibility with old bindings -->
+  <header style="display:none;" class="bg-fintech-surface border-b border-fintech-border px-3 py-2 lg:px-4 shrink-0 space-y-2 lg:space-y-0">
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 lg:gap-4">
       
       <!-- Top Row Mobile: Brand & Refresh Action -->
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-2.5">
           <div class="w-7 h-7 sm:w-8 sm:h-8 rounded bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-bold text-white shadow-lg text-sm shrink-0">
-            
+            📈
           </div>
           <div>
             <h1 class="text-base sm:text-xl font-extrabold tracking-wider text-white uppercase flex items-center gap-1.5 sm:gap-2">
@@ -56,9 +145,9 @@
           <div id="header-status-badge" class="hidden items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold font-mono">
             <!-- Rendered dynamically -->
           </div>
-          <button id="btn-theme-toggle" title="Alternar Tema Claro / Escuro" class="bg-fintech-border hover:bg-gray-700 text-xs text-gray-200 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded transition flex items-center gap-1.5 shrink-0 cursor-pointer">
-            <span id="theme-toggle-icon">🌙</span>
-            <span id="theme-toggle-text" class="hidden sm:inline">Escuro</span>
+          <button id="btn-theme-toggle-legacy" title="Alternar Tema Claro / Escuro" class="bg-fintech-border hover:bg-gray-700 text-xs text-gray-200 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded transition flex items-center gap-1.5 shrink-0 cursor-pointer">
+            <span id="theme-toggle-icon-legacy">🌙</span>
+            <span id="theme-toggle-text-legacy" class="hidden sm:inline">Escuro</span>
           </button>
           <button id="btn-refresh-data" class="bg-fintech-border hover:bg-gray-700 text-xs text-gray-200 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded transition flex items-center gap-1 shrink-0">
             <span>🔄</span> <span class="hidden sm:inline">Atualizar</span>
@@ -116,342 +205,159 @@
     <!-- ========================================== -->
     <!-- TAB 0: VISÃO GERAL / EXECUTIVO (INVESTIDOR10 STYLE) -->
     <!-- ========================================== -->
-    <section id="tab-overview" class="tab-view h-full p-2.5 sm:p-5 overflow-y-auto">
-      <div class="max-w-7xl mx-auto space-y-4 sm:space-y-5">
-        
-        <!-- Sub-Header com Abas de Navegação Estilo Investidor10 -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-fintech-border/80 pb-2">
-          <h2 class="text-lg font-bold text-white sr-only">Visao Geral e Alocacao da Carteira</h2>
-          <div class="flex items-center space-x-1 sm:space-x-2 overflow-x-auto no-scrollbar touch-scroll" id="overview-sub-nav">
-            <button class="overview-sub-btn active px-3 py-1.5 rounded-md text-xs font-bold text-white bg-fintech-surface border border-fintech-border shadow-sm" data-sub="resumo">
-              <span>Resumo</span>
-            </button>
-            <button class="overview-sub-btn px-3 py-1.5 rounded-md text-xs font-semibold text-gray-400 hover:text-white hover:bg-fintech-surface/60 transition" data-sub="posicoes">
-              <span>Posições</span>
-            </button>
-            <button class="overview-sub-btn px-3 py-1.5 rounded-md text-xs font-semibold text-gray-400 hover:text-white hover:bg-fintech-surface/60 transition" data-sub="patrimonio">
-              <span>Patrimônio</span>
-            </button>
-            <button class="overview-sub-btn px-3 py-1.5 rounded-md text-xs font-semibold text-gray-400 hover:text-white hover:bg-fintech-surface/60 transition" data-sub="metas">
-              <span>Metas</span>
-            </button>
+        <section id="tab-overview" data-legacy-id="tab-pane-resumo" data-tab-pane="resumo" class="tab-pane tab-view h-full p-4 sm:p-6 overflow-y-auto bg-slate-50">
+      <div class="max-w-7xl mx-auto space-y-6">
+
+        <!-- 4 Hero KPI Cards (Investidor10 Style) -->
+                <!-- Onboarding Hero Banner (Investidor10 Style) -->
+        <div id="investidor10-welcome-banner" class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-6 text-white shadow-md flex flex-col md:flex-row items-center justify-between gap-6 border border-slate-700">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center text-3xl shrink-0 shadow-inner">
+              📊
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-white tracking-tight">Traga seus investimentos e extratos da B3</h2>
+              <p class="text-xs text-slate-300 mt-1 max-w-xl">
+                Importe suas planilhas oficiais de negociação e movimentação da B3 para calcular preço médio, rentabilidade real, proventos automáticos e sinais estatísticos de Fundo 2x2.
+              </p>
+            </div>
           </div>
-
-          <div class="flex items-center gap-2">
-            <button id="btn-overview-open-metas" class="bg-fintech-surface hover:bg-fintech-surface-hover text-xs font-semibold text-cyan-300 hover:text-white px-3 py-1.5 rounded border border-fintech-border transition flex items-center gap-1.5 cursor-pointer" title="Definir Metas e Objetivos Financeiros de Longo Prazo">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-              <span>Definir Metas</span>
-            </button>
-            <button id="btn-overview-config-ideal" class="bg-fintech-surface hover:bg-fintech-surface-hover text-xs font-semibold text-gray-200 px-3 py-1.5 rounded border border-fintech-border transition flex items-center gap-1.5">
-              <span class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Configurar % Ideal</span>
-            </button>
-
-            <button id="btn-overview-import-csv" class="bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white px-3 py-1.5 rounded shadow transition flex items-center gap-1.5" title="Importar planilha B3 (.xlsx) ou arquivo .csv">
-              <span>+ Importar B3 / CSV</span>
+          <div class="flex items-center gap-3 shrink-0">
+            <button id="btn-banner-import-b3" onclick="document.getElementById('b3-multi-file-input') ? document.getElementById('b3-multi-file-input').click() : null" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-lg transition flex items-center gap-2 cursor-pointer">
+              <span>+ Importar Extratos B3</span>
             </button>
           </div>
         </div>
 
-        <!-- 1. Hero KPI Cards (Layout Investidor10 5 Colunas com Proventos da B3) -->
-        <div id="overview-section-kpis" class="overview-panel">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-          
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="investidor10-hero-kpis">
           <!-- Card 1: Patrimônio Total -->
-          <div class="card-surface p-4 flex flex-col justify-between">
-            <div class="flex items-center justify-between text-gray-400 text-xs">
-              <span class="flex items-center gap-1.5 font-medium">
-                <span class="text-base">💼</span> Patrimônio total
-              </span>
-              <span id="overview-card1-var" class="text-emerald-400 font-bold font-mono text-[11px] bg-emerald-500/10 px-1.5 py-0.5 rounded">+0.0% ▲</span>
+          <div id="kpi-patrimonio-total" class="kpi-card bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+            <div class="flex justify-between items-center text-slate-500 text-xs font-semibold">
+              <span class="kpi-label flex items-center gap-1.5">💼 Patrimônio total</span>
+              <span id="overview-card1-var" class="badge-gain">0,00% ▲</span>
             </div>
             <div class="mt-2">
-              <span id="overview-total-equity" class="text-2xl sm:text-3xl font-extrabold font-mono text-white tracking-tight">R$ 0,00</span>
+              <span id="overview-total-equity" class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">R$ 0,00</span>
             </div>
-            <div class="mt-2 text-xs text-gray-400 border-t border-fintech-border/40 pt-1.5 flex justify-between">
+            <div class="kpi-sub mt-2 text-xs text-slate-500 flex justify-between border-t border-slate-100 pt-2">
               <span>Valor investido:</span>
-              <span id="overview-invested-val" class="font-bold font-mono text-gray-300">R$ 0,00</span>
+              <span id="overview-invested-val" class="font-bold text-slate-700">R$ 0,00</span>
             </div>
           </div>
 
-          <!-- Card 2: Lucro Total & Destaques -->
-          <div class="card-surface p-4 flex flex-col justify-between">
-            <div class="flex items-center justify-between text-gray-400 text-xs">
-              <span class="flex items-center gap-1.5 font-medium">
-                <span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span> Destaques da Carteira
-              </span>
-              <span class="text-[10px] text-gray-500 font-mono">Performance</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 mt-2">
-              <div>
-                <span class="text-[10px] text-gray-400 block">Melhor ativo</span>
-                <span id="overview-best-asset" class="font-bold font-mono text-white text-sm block">--</span>
-                <span id="overview-best-pct" class="text-[10px] font-bold font-mono text-emerald-400 bg-emerald-500/10 px-1 rounded inline-block mt-0.5">-- ↗</span>
-              </div>
-              <div>
-                <span class="text-[10px] text-gray-400 block">Pior ativo</span>
-                <span id="overview-worst-asset" class="font-bold font-mono text-white text-sm block">--</span>
-                <span id="overview-worst-pct" class="text-[10px] font-bold font-mono text-rose-400 bg-rose-500/10 px-1 rounded inline-block mt-0.5">-- ↘</span>
-              </div>
-            </div>
-            <div class="mt-2 text-xs text-gray-400 border-t border-fintech-border/40 pt-1.5 flex justify-between">
-              <span>Lucro estimado:</span>
-              <span id="overview-total-profit" class="font-bold font-mono text-emerald-400">R$ 0,00</span>
-            </div>
-          </div>
-
-          <!-- Card 3: Proventos Recebidos (B3) -->
-          <div class="card-surface p-4 flex flex-col justify-between">
-            <div class="flex items-center justify-between text-gray-400 text-xs">
-              <span class="flex items-center gap-1.5 font-medium">
-                <span class="text-base">💰</span> Proventos Recebidos
-              </span>
-              <span class="text-[10px] text-amber-400 font-mono bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/30">B3 Oficial</span>
+          <!-- Card 2: Lucro Total -->
+          <div id="kpi-lucro-total" class="kpi-card bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+            <div class="flex justify-between items-center text-slate-500 text-xs font-semibold">
+              <span class="kpi-label flex items-center gap-1.5">📈 Lucro Líquido Total</span>
+              <span id="kpi-lucro-badge" class="badge-gain">0,00%</span>
             </div>
             <div class="mt-2">
-              <span id="overview-total-income" class="text-2xl sm:text-3xl font-extrabold font-mono text-amber-300 tracking-tight">R$ 0,00</span>
+              <span id="kpi-lucro-val" class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">R$ 0,00</span>
             </div>
-            <div class="mt-2 text-xs text-gray-400 border-t border-fintech-border/40 pt-1.5 flex justify-between">
-              <span>Último mês:</span>
-              <span id="overview-latest-income-val" class="font-bold font-mono text-gray-300">R$ 0,00</span>
+            <div class="kpi-sub mt-2 text-xs text-slate-500 flex justify-between border-t border-slate-100 pt-2">
+              <span>Ganho Capital + Proventos</span>
+              <span id="kpi-lucro-sub" class="font-semibold text-slate-600">Consolidado</span>
             </div>
           </div>
 
-          <!-- Card 4: Posições no Lucro (Barra Verde/Rosa) -->
-          <div class="card-surface p-4 flex flex-col justify-between">
-            <div class="flex items-center justify-between text-gray-400 text-xs">
-              <span class="flex items-center gap-1.5 font-medium">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span> Posições no Lucro
-              </span>
-              <span id="overview-profit-ratio-badge" class="bg-cyan-500/20 text-cyan-300 text-[10px] px-1.5 py-0.5 rounded font-bold font-mono">0%</span>
+          <!-- Card 3: Proventos 12M -->
+          <div id="kpi-proventos-12m" class="kpi-card bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+            <div class="flex justify-between items-center text-slate-500 text-xs font-semibold">
+              <span class="kpi-label flex items-center gap-1.5"><span id="overview-dividends-title">Proventos registrados no histórico importado</span></span>
+              <span id="overview-card5-yield" class="badge-gain"><span id="overview-dividends-period-label">Histórico total</span></span>
             </div>
             <div class="mt-2">
-              <div class="flex items-baseline gap-1.5">
-                <span id="overview-profit-ratio-text" class="text-xl sm:text-2xl font-bold font-mono text-white">0 de 0</span>
-                <span class="text-xs text-gray-400">ativos</span>
-              </div>
-              <!-- Barra Bi-Color de Posições -->
-              <div class="w-full h-2.5 bg-rose-500/40 rounded-full overflow-hidden mt-1.5 flex">
-                <div id="overview-profit-bar" class="h-full bg-emerald-400 transition-all duration-500" style="width: 0%"></div>
-              </div>
+              <span id="overview-dividends-total" class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">R$ 0,00</span>
             </div>
-            <div class="mt-2 text-[11px] text-gray-400 border-t border-fintech-border/40 pt-1.5 flex justify-between">
-              <span class="text-emerald-400 font-bold" id="overview-gainers-count">0 no lucro ▲</span>
-              <span class="text-rose-400 font-bold" id="overview-losers-count">0 no prejuízo ▼</span>
+            <div class="kpi-sub mt-2 text-xs text-slate-500 flex justify-between border-t border-slate-100 pt-2">
+              <span>Média mensal:</span>
+              <span id="overview-dividends-monthly" class="font-bold text-slate-700">R$ 0,00/m</span>
             </div>
           </div>
 
-          <!-- Card 5: Oportunidades de Compra Hoje -->
-          <div class="card-surface p-4 flex flex-col justify-between">
-            <div class="flex items-center justify-between text-gray-400 text-xs">
-              <span class="flex items-center gap-1.5 font-medium">
-                <span class="w-2 h-2 rounded-full bg-purple-400 inline-block"></span> Oportunidades de Compra
-              </span>
-              <span class="text-[10px] text-gray-500 font-mono">Radar Quant</span>
+          <!-- Card 4: Posições no Lucro -->
+          <div id="kpi-posicoes-lucro" class="kpi-card bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+            <div class="flex justify-between items-center text-slate-500 text-xs font-semibold">
+              <span class="kpi-label flex items-center gap-1.5">🎯 Posições no Lucro</span>
+              <span id="kpi-posicoes-percent" class="badge-gain">0%</span>
             </div>
-            <div class="mt-2 flex items-baseline justify-between">
-              <span id="overview-buy-ops-count" class="text-2xl sm:text-3xl font-extrabold font-mono text-emerald-400">0 ativos</span>
+            <div class="mt-2">
+              <span id="kpi-posicoes-count" class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">0 de 0</span>
             </div>
-            <div class="mt-2 pt-1.5 border-t border-fintech-border/40">
-              <button id="btn-overview-goto-radar" class="w-full py-1 text-xs font-bold text-center text-cyan-300 hover:text-white bg-fintech-bg hover:bg-fintech-surface-hover border border-fintech-border rounded transition flex items-center justify-center gap-1">
-                Ver oportunidades no Radar →
-              </button>
+            <div class="kpi-sub progress-bar-container mt-3">
+              <div id="kpi-progress-green" class="progress-fill-green" style="width: 0%;"></div>
+              <div id="kpi-progress-red" class="progress-fill-red" style="width: 0%;"></div>
+            </div>
+            <div class="mt-1 text-[11px] text-slate-400">
+              <span id="kpi-posicoes-sub"></span>
             </div>
           </div>
-
         </div>
 
-        </div>
-
-
-        <!-- 2. Gráficos Centrais (Evolução do Patrimônio + Ativos na Carteira) -->
-        <div id="overview-section-charts" class="overview-panel">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-          
-          <!-- Lado Esquerdo: Evolução do Patrimônio (Barras Empilhadas) -->
-          <div class="lg:col-span-7 card-surface p-4 flex flex-col justify-between">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-fintech-border pb-3 mb-2">
+        <!-- 2 Column Charts Grid: Evolução do Patrimônio & Alocação por Classe -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Coluna Esquerda (2 cols): Evolução do Patrimônio -->
+          <div class="lg:col-span-2 bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
               <div>
-                <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
-                  Evolução do Patrimônio
-                  <span class="text-[10px] font-mono font-normal text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/30" title="A projeção histórica utiliza a rentabilidade dos ativos para estimar a trajetória temporal recente.">Estimado</span>
-                </h3>
-                <div class="flex items-center gap-3 text-[11px] text-gray-400 mt-1">
-                  <span class="flex items-center gap-1">
-                    <span class="w-2.5 h-2.5 rounded-sm bg-emerald-600 inline-block"></span> Valor aplicado
-                  </span>
-                  <span class="flex items-center gap-1">
-                    <span class="w-2.5 h-2.5 rounded-sm bg-emerald-400 inline-block"></span> Ganho de capital
-                  </span>
-                </div>
+                <h3 class="text-base font-bold text-slate-900">Evolução do Patrimônio</h3>
+                <p class="text-xs text-slate-500">Valor aplicado acumulado versus ganho de capital</p>
               </div>
-              <div class="flex items-center gap-1.5">
-                <select id="overview-period-select" class="bg-fintech-bg border border-fintech-border rounded px-2 py-1 text-xs text-white font-sans focus:outline-none focus:border-cyan-400">
-                  <option value="12m" selected>Últimos 12 Meses</option>
-                  <option value="all">Desde o Início</option>
-                </select>
-              </div>
-            </div>
-
-            <div id="overview-stacked-bar-chart" class="w-full h-64 min-h-[260px]"></div>
-          </div>
-
-          <!-- Lado Direito: Ativos na Carteira (Donut + Legenda Limpa) -->
-          <div class="lg:col-span-5 card-surface p-4 flex flex-col justify-between">
-            <div class="flex items-center justify-between border-b border-fintech-border pb-3 mb-2">
-              <h3 class="text-sm font-bold text-white">Ativos na Carteira (Alocação)</h3>
-              <span class="text-xs text-gray-400 font-mono" id="overview-class-count-badge">4 Classes</span>
-            </div>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
-              <div class="sm:col-span-7">
-                <div id="overview-donut-chart" class="w-full h-56 min-h-[220px]"></div>
-              </div>
-              <div class="sm:col-span-5 space-y-1.5 text-xs font-mono" id="overview-donut-legend">
-                <!-- Legenda gerada dinamicamente com percentuais -->
-                <div class="flex items-center justify-between text-gray-300">
-                  <span class="flex items-center gap-1 text-[11px] font-sans"><span class="w-2 h-2 rounded-full bg-cyan-400"></span> Ações</span>
-                  <span class="font-bold" id="leg-pct-acoes">0%</span>
-                </div>
-                <div class="flex items-center justify-between text-gray-300">
-                  <span class="flex items-center gap-1 text-[11px] font-sans"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> BDRs</span>
-                  <span class="font-bold" id="leg-pct-bdrs">0%</span>
-                </div>
-                <div class="flex items-center justify-between text-gray-300">
-                  <span class="flex items-center gap-1 text-[11px] font-sans"><span class="w-2 h-2 rounded-full bg-amber-400"></span> FIIs</span>
-                  <span class="font-bold" id="leg-pct-fiis">0%</span>
-                </div>
-                <div class="flex items-center justify-between text-gray-300">
-                  <span class="flex items-center gap-1 text-[11px] font-sans"><span class="w-2 h-2 rounded-full bg-purple-400"></span> Macro/Ouro</span>
-                  <span class="font-bold" id="leg-pct-macro">0%</span>
-                </div>
-                <div class="flex items-center justify-between text-gray-400 border-t border-fintech-border/40 pt-1">
-                  <span class="flex items-center gap-1 text-[11px] font-sans"><span class="w-2 h-2 rounded-full bg-gray-500"></span> Caixa Livre</span>
-                  <span class="font-bold" id="leg-pct-cash">0%</span>
+              <div class="flex items-center gap-2">
+                <a id="link-overview-ver-patrimonio" href="#carteira/patrimonio" class="text-xs text-sky-600 font-semibold hover:underline mr-1">Ver série completa →</a>
+                <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg">
+                  <button class="px-2.5 py-1 text-xs font-semibold rounded bg-white text-slate-900 shadow-sm">12M</button>
+                  <button class="px-2.5 py-1 text-xs font-semibold rounded text-slate-600 hover:text-slate-900">Tudo</button>
                 </div>
               </div>
             </div>
-
-            <div class="mt-2 pt-2 border-t border-fintech-border/40 text-[11px] text-gray-400 flex justify-between">
-              <span>Maior concentração:</span>
-              <span id="overview-top-asset-label" class="font-bold font-mono text-white">--</span>
+            <div id="overview-stacked-bar-chart" class="w-full h-64 mt-2 relative overflow-hidden block">
+              Carregando gráfico de evolução...
             </div>
           </div>
 
+          <!-- Coluna Direita (1 col): Alocação por Classe (Donut) -->
+          <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col justify-between">
+            <div class="pb-3 border-b border-slate-100 flex items-center justify-between">
+              <h3 class="text-base font-bold text-slate-900">Alocação por Classe</h3>
+              <button id="btn-overview-config-ideal" class="text-xs text-sky-600 font-semibold hover:underline">Configurar %</button>
+            </div>
+            <div id="overview-donut-chart" class="w-full h-56 my-auto relative overflow-hidden block">
+              Carregando alocação...
+            </div>
+            <div id="overview-donut-legend" class="mt-3 pt-3 border-t border-slate-100 space-y-2 text-xs">
+              <!-- Legenda dinâmica injetada pelo app.js -->
+            </div>
+          </div>
         </div>
 
-        </div>
-
-        <!-- 3. Seção "Meus Ativos" Agrupada por Categoria com Accordions (Investidor10 Style) -->
-        <div id="overview-section-posicoes" class="overview-panel">
-        <div class="space-y-3">
-          <div class="flex items-center justify-between">
-            <h3 class="text-base font-bold text-white flex items-center gap-2">
-              <span>Meus Ativos na Carteira</span>
-              <span id="overview-total-assets-badge" class="text-xs bg-fintech-surface px-2 py-0.5 rounded text-gray-400 font-mono">0 ativos</span>
-            </h3>
-            <div class="text-xs text-gray-400 font-mono">
+        <!-- Seção Meus Ativos na Carteira (Acordeões por Categoria) -->
+        <div id="overview-section-posicoes" class="space-y-4 pt-2">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+            <div>
+              <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                <span>Meus Ativos na Carteira</span>
+                <span id="overview-total-assets-badge" class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full font-bold">0 ativos</span>
+              </h3>
+              <p class="text-xs text-slate-500 mt-0.5">Diagnóstico consolidado da custódia por classe de ativo</p>
+            </div>
+            <div class="text-xs text-slate-400 font-mono">
               Status de Rebalanceamento & Aporte
             </div>
           </div>
 
-          <!-- Container de Categorias Expansíveis (Ações, BDRs, FIIs, Ouro) -->
           <div id="overview-categories-accordions" class="space-y-3">
             <!-- Gerado via JavaScript agrupando a carteira -->
           </div>
         </div>
 
-        </div>
-
-        <!-- 4. Metas da Carteira em Andamento (Investidor10 Style) -->
-        <div id="overview-section-metas" class="overview-panel">
-          <div class="card-surface p-4 space-y-4">
-        <div class="card-surface p-4 space-y-4">
-          <div class="flex items-center justify-between border-b border-fintech-border pb-2">
-            <div>
-              <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                <span>Metas Financeiras em Andamento</span>
-              </h3>
-              <span class="text-[10px] text-gray-400 font-mono">Plano de Longo Prazo</span>
-            </div>
-            <button id="btn-edit-metas" class="bg-fintech-surface hover:bg-fintech-surface-hover text-xs text-cyan-300 hover:text-white px-2.5 py-1 rounded border border-fintech-border transition flex items-center gap-1.5 cursor-pointer">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-              <span>Ajustar Metas</span>
-            </button>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Meta 1: Patrimônio Total -->
-            <div class="bg-fintech-bg p-3.5 rounded border border-fintech-border space-y-2">
-              <div class="flex justify-between items-center text-xs">
-                <span class="font-semibold text-gray-200">Total de Patrimônio</span>
-                <span class="font-mono text-cyan-400 font-bold" id="meta-patrimonio-pct">0.0%</span>
-              </div>
-              <div class="w-full h-2.5 bg-fintech-surface rounded-full overflow-hidden">
-                <div id="meta-patrimonio-bar" class="h-full bg-cyan-400 transition-all duration-500" style="width: 0%"></div>
-              </div>
-              <div class="grid grid-cols-4 gap-1 text-[10px] text-gray-400 pt-1 font-mono">
-                <div>
-                  <span class="block text-gray-500">Atual:</span>
-                  <span id="meta-patrimonio-atual" class="font-bold text-white">R$ 0</span>
-                </div>
-                <div>
-                  <span class="block text-gray-500">Faltam:</span>
-                  <span id="meta-patrimonio-faltam" class="font-bold text-amber-300">R$ 0</span>
-                </div>
-                <div>
-                  <span class="block text-gray-500">Objetivo:</span>
-                  <span class="font-bold text-white">R$ 100K</span>
-                </div>
-                <div class="text-right">
-                  <span class="block text-gray-500">Previsão:</span>
-                  <span class="font-bold text-emerald-400">2027</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Meta 2: Proventos Mensais ou Reserva -->
-            <div class="bg-fintech-bg p-3.5 rounded border border-fintech-border space-y-2">
-              <div class="flex justify-between items-center text-xs">
-                <span class="font-semibold text-gray-200">Meta de Alocação em Renda Passiva (FIIs + Dividendos)</span>
-                <span class="font-mono text-emerald-400 font-bold" id="meta-renda-pct">0.0%</span>
-              </div>
-              <div class="w-full h-2.5 bg-fintech-surface rounded-full overflow-hidden">
-                <div id="meta-renda-bar" class="h-full bg-emerald-400 transition-all duration-500" style="width: 0%"></div>
-              </div>
-              <div class="grid grid-cols-4 gap-1 text-[10px] text-gray-400 pt-1 font-mono">
-                <div>
-                  <span class="block text-gray-500">Atual:</span>
-                  <span id="meta-renda-atual" class="font-bold text-white">R$ 0</span>
-                </div>
-                <div>
-                  <span class="block text-gray-500">Faltam:</span>
-                  <span id="meta-renda-faltam" class="font-bold text-amber-300">R$ 0</span>
-                </div>
-                <div>
-                  <span class="block text-gray-500">Objetivo:</span>
-                  <span class="font-bold text-white">R$ 30K</span>
-                </div>
-                <div class="text-right">
-                  <span class="block text-gray-500">Alocação:</span>
-                  <span class="font-bold text-cyan-300">30%</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        </div>
-
+      <div class="max-w-7xl mx-auto space-y-4 sm:space-y-5">
+        
       </div>
     </section>
 
     <!-- ========================================== -->
-    <!-- TAB 1: RADAR DE MERCADO                   -->
-    <!-- ========================================== -->
-
-    <!-- ========================================== -->
-    <!-- TAB 1: RADAR DE MERCADO                   -->
-    <!-- ========================================== -->
-    <section id="tab-radar" class="tab-view h-full p-2.5 sm:p-4 overflow-y-auto">
+    <section id="tab-pane-radar" data-tab-pane="radar" class="tab-pane tab-view hidden h-full p-2.5 sm:p-4 overflow-y-auto">
       <div class="max-w-7xl mx-auto space-y-3 sm:space-y-4">
 
         <!-- Executive Command Deck / Macro KPI Summary -->
@@ -469,9 +375,9 @@
             <span class="text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider">Topos em Alerta (Venda)</span>
             <div class="flex items-baseline justify-between mt-1">
               <span id="exec-kpi-sells" class="text-lg sm:text-2xl font-bold font-mono text-rose-400">--</span>
-              <span class="text-[10px] text-gray-500 font-mono">Exaustão</span>
+              <span class="text-[10px] text-gray-500 font-mono">ExaustÃ£o</span>
             </div>
-            <div class="text-[10px] text-gray-400 mt-0.5 truncate" id="exec-kpi-sells-sub">Risco de reversão</div>
+            <div class="text-[10px] text-gray-400 mt-0.5 truncate" id="exec-kpi-sells-sub">Risco de reversÃ£o</div>
           </div>
 
           <div class="card-surface p-3 sm:p-3.5 flex flex-col justify-between border-l-2 border-l-cyan-500">
@@ -480,7 +386,7 @@
               <span id="exec-kpi-top-asset" class="text-base sm:text-xl font-bold font-mono text-cyan-300 truncate">--</span>
               <span id="exec-kpi-top-score" class="text-[10px] font-mono font-bold text-emerald-400">--</span>
             </div>
-            <div class="text-[10px] text-gray-400 mt-0.5 truncate" id="exec-kpi-top-strat">Estratégia campeã</div>
+            <div class="text-[10px] text-gray-400 mt-0.5 truncate" id="exec-kpi-top-strat">EstratÃ©gia campeÃ£</div>
           </div>
 
           <div class="card-surface p-3 sm:p-3.5 flex flex-col justify-between border-l-2 border-l-amber-500">
@@ -498,7 +404,7 @@
             <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
               <span></span>Radar de Oportunidades & Timing
             </h2>
-            <p class="text-[11px] sm:text-xs text-gray-400">Varredura multiativos identificando fundos estatísticos (Compra) e topos (Venda).</p>
+            <p class="text-[11px] sm:text-xs text-gray-400">Varredura multiativos identificando fundos estatÃ­sticos (Compra) e topos (Venda).</p>
           </div>
           <div class="flex flex-wrap items-center gap-2">
             <!-- Timeframe selector for Radar -->
@@ -513,9 +419,9 @@
             <!-- Radar Strategy Multi-Select Dropdown (Starts all unchecked) -->
             <div class="relative" id="radar-strategy-dropdown-wrapper">
               <button id="btn-radar-strat-toggle" class="bg-fintech-surface hover:bg-fintech-surface-hover text-gray-300 hover:text-white text-xs px-2.5 py-1.5 sm:py-2 rounded border border-fintech-border flex items-center gap-1.5 shrink-0">
-                <span>Filtro de Estratégias</span>
+                <span>Filtro de EstratÃ©gias</span>
                 <span id="radar-strat-badge" class="bg-fintech-cyan/20 text-fintech-cyan text-[10px] px-1 rounded font-mono hidden">0</span>
-                <span class="text-xs text-gray-400">▼</span>
+                <span class="text-xs text-gray-400">â–¼</span>
               </button>
               <div id="radar-strat-menu" class="absolute left-0 mt-1 w-64 bg-fintech-surface border border-fintech-border rounded shadow-xl z-50 p-2 hidden max-h-60 overflow-y-auto text-xs space-y-1">
                 <div class="text-[10px] text-gray-400 border-b border-fintech-border pb-1 mb-1 flex justify-between items-center">
@@ -550,7 +456,7 @@
         <!-- Radar Opportunities Table -->
         <div class="card-surface overflow-hidden">
           <div class="block sm:hidden text-[10px] text-gray-400 bg-fintech-bg/60 px-3 py-1 border-b border-fintech-border text-center font-mono">
-            ← Deslize para os lados para ver detalhes →
+            â† Deslize para os lados para ver detalhes â†’
           </div>
           <div class="overflow-x-auto touch-scroll">
             <table class="w-full text-left text-xs text-gray-300">
@@ -558,20 +464,20 @@
                 <tr>
                   <th class="px-3 sm:px-4 py-2.5 sm:py-3">Ativo</th>
                   <th class="px-2 sm:px-3 py-2.5 sm:py-3 text-center">Dir</th>
-                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Estratégia Confirmada</th>
+                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">EstratÃ©gia Confirmada</th>
                   <th class="px-3 sm:px-4 py-2.5 sm:py-3">Status do Setup</th>
                   <th class="px-2 sm:px-3 py-2.5 sm:py-3 text-center">Timing</th>
-                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">Distância (%)</th>
+                  <th class="px-3 sm:px-4 py-2.5 sm:py-3">DistÃ¢ncia (%)</th>
                   <th class="px-3 sm:px-4 py-2.5 sm:py-3 cursor-pointer hover:text-cyan-400 select-none text-right" id="th-sort-n" title="Clique para ordenar por Quantidade de Sinais">
                     <div class="inline-flex items-center gap-1 justify-end">
                       <span>Qtd Sinais</span>
-                      <span id="sort-icon-n" class="text-[10px] text-gray-500">↕</span>
+                      <span id="sort-icon-n" class="text-[10px] text-gray-500">â†•</span>
                     </div>
                   </th>
                   <th class="px-3 sm:px-4 py-2.5 sm:py-3 cursor-pointer hover:text-cyan-400 select-none text-right" id="th-sort-winrate" title="Clique para ordenar por Taxa de Acerto (Win Rate)">
                     <div class="inline-flex items-center gap-1 justify-end">
                       <span>Win Rate (%)</span>
-                      <span id="sort-icon-winrate" class="text-[10px] text-gray-500">↕</span>
+                      <span id="sort-icon-winrate" class="text-[10px] text-gray-500">â†•</span>
                     </div>
                   </th>
                 </tr>
@@ -584,14 +490,14 @@
           <!-- Radar Pagination Controls -->
           <div id="radar-pagination-container" class="flex items-center justify-between px-3 py-2.5 bg-fintech-bg/80 border-t border-fintech-border text-xs">
             <div class="text-gray-400 font-mono text-[11px]" id="radar-pagination-info">
-              Página 1 de 1 (0 ativos)
+              PÃ¡gina 1 de 1 (0 ativos)
             </div>
             <div class="flex items-center gap-2">
               <button id="btn-radar-prev" class="px-2.5 py-1 rounded bg-fintech-surface hover:bg-fintech-cyan/20 text-gray-300 hover:text-fintech-cyan border border-fintech-border transition disabled:opacity-30 disabled:cursor-not-allowed">
-                ← Anterior
+                â† Anterior
               </button>
               <button id="btn-radar-next" class="px-2.5 py-1 rounded bg-fintech-surface hover:bg-fintech-cyan/20 text-gray-300 hover:text-fintech-cyan border border-fintech-border transition disabled:opacity-30 disabled:cursor-not-allowed">
-                Próxima →
+                PrÃ³xima â†’
               </button>
             </div>
           </div>
@@ -600,11 +506,19 @@
     </section>
 
     <!-- ========================================== -->
-    <!-- TAB 2: TERMINAL DE ANÁLISE (TRADINGVIEW)   -->
+    <!-- TAB 2: TERMINAL DE ANÃLISE (TRADINGVIEW)   -->
     <!-- ========================================== -->
-    <section id="tab-terminal" class="tab-view hidden h-full flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">
+    <section id="tab-terminal" data-tab-pane="tradingview" class="tab-pane tab-view hidden h-full flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">
       <!-- Left Sidebar: Asset Controls & 48 Granular Strategy Toggles -->
       <aside class="w-full lg:w-80 bg-fintech-surface border-b lg:border-b-0 lg:border-r border-fintech-border flex flex-col shrink-0 lg:h-full lg:min-h-0">
+        <!-- Banner de Retorno Contextual (Fase 2B) -->
+        <div id="chart-contextual-return-bar" class="hidden bg-slate-800 border-b border-slate-700 px-3 py-2 flex items-center justify-between text-xs shrink-0">
+          <button id="btn-chart-return-to-source" type="button" class="flex items-center gap-1 font-semibold text-sky-400 hover:text-sky-300 transition cursor-pointer">
+            <span id="chart-return-label">← Voltar</span>
+          </button>
+          <span id="chart-contextual-ticker-badge" class="font-mono font-bold bg-slate-900 text-amber-400 px-1.5 py-0.5 rounded border border-slate-700 text-[11px]"></span>
+        </div>
+
         <!-- Asset Parameters -->
         <div class="p-3 border-b border-fintech-border space-y-2.5">
           <div>
@@ -740,34 +654,34 @@
                 <option value="WPC">WPC (Ações EUA)</option>
                 <option value="GLPI">GLPI (Ações EUA)</option>
                 <!-- Futuros & Mini Contratos B3 -->
-                <option value="^BVSP">Mini Índice / Ibovespa (WIN / ^BVSP)</option>
-                <option value="WIN">Mini Índice (WIN)</option>
-                <option value="USDBRL=X">Mini Dólar (WDO / USDBRL)</option>
-                <option value="WDO">Mini Dólar (WDO)</option>
+                <option value="^BVSP">Mini Ãndice / Ibovespa (WIN / ^BVSP)</option>
+                <option value="WIN">Mini Ãndice (WIN)</option>
+                <option value="USDBRL=X">Mini DÃ³lar (WDO / USDBRL)</option>
+                <option value="WDO">Mini DÃ³lar (WDO)</option>
                 <option value="GC=F">Gold / Ouro (XAUUSD / GC=F)</option>
                 <option value="XAUUSD">Gold / Ouro (XAUUSD)</option>
                 <!-- Commodities Globais -->
                 <option value="SI=F">Silver / Prata (SI=F)</option>
-                <option value="CL=F">Crude Oil WTI / Petróleo (CL=F)</option>
-                <option value="BZ=F">Brent Oil / Petróleo Brent (BZ=F)</option>
+                <option value="CL=F">Crude Oil WTI / PetrÃ³leo (CL=F)</option>
+                <option value="BZ=F">Brent Oil / PetrÃ³leo Brent (BZ=F)</option>
                 <option value="HG=F">Copper / Cobre (HG=F)</option>
-                <option value="NG=F">Natural Gas / Gás Natural (NG=F)</option>
+                <option value="NG=F">Natural Gas / GÃ¡s Natural (NG=F)</option>
                 <option value="ZC=F">Corn / Milho (ZC=F)</option>
                 <option value="ZS=F">Soybeans / Soja (ZS=F)</option>
                 <option value="ZW=F">Wheat / Trigo (ZW=F)</option>
-                <option value="KC=F">Coffee / Café (KC=F)</option>
-                <option value="CT=F">Cotton / Algodão (CT=F)</option>
-                <option value="SB=F">Sugar / Açúcar (SB=F)</option>
+                <option value="KC=F">Coffee / CafÃ© (KC=F)</option>
+                <option value="CT=F">Cotton / AlgodÃ£o (CT=F)</option>
+                <option value="SB=F">Sugar / AÃ§Ãºcar (SB=F)</option>
                 <option value="LE=F">Live Cattle / Boi Gordo (LE=F)</option>
-                <option value="HE=F">Lean Hogs / Suínos (HE=F)</option>
+                <option value="HE=F">Lean Hogs / SuÃ­nos (HE=F)</option>
                 <!-- Forex (10) -->
-                <option value="EURUSD=X">EUR/USD - Euro / Dólar (EURUSD=X)</option>
-                <option value="GBPUSD=X">GBP/USD - Libra / Dólar (GBPUSD=X)</option>
-                <option value="USDJPY=X">USD/JPY - Dólar / Iene (USDJPY=X)</option>
-                <option value="USDCHF=X">USD/CHF - Dólar / Franco (USDCHF=X)</option>
-                <option value="AUDUSD=X">AUD/USD - Dólar Australiano (AUDUSD=X)</option>
-                <option value="USDCAD=X">USD/CAD - Dólar / Dólar Can. (USDCAD=X)</option>
-                <option value="NZDUSD=X">NZD/USD - Dólar Neozelandês (NZDUSD=X)</option>
+                <option value="EURUSD=X">EUR/USD - Euro / DÃ³lar (EURUSD=X)</option>
+                <option value="GBPUSD=X">GBP/USD - Libra / DÃ³lar (GBPUSD=X)</option>
+                <option value="USDJPY=X">USD/JPY - DÃ³lar / Iene (USDJPY=X)</option>
+                <option value="USDCHF=X">USD/CHF - DÃ³lar / Franco (USDCHF=X)</option>
+                <option value="AUDUSD=X">AUD/USD - DÃ³lar Australiano (AUDUSD=X)</option>
+                <option value="USDCAD=X">USD/CAD - DÃ³lar / DÃ³lar Can. (USDCAD=X)</option>
+                <option value="NZDUSD=X">NZD/USD - DÃ³lar NeozelandÃªs (NZDUSD=X)</option>
                 <option value="EURJPY=X">EUR/JPY - Euro / Iene (EURJPY=X)</option>
                 <option value="GBPJPY=X">GBP/JPY - Libra / Iene (GBPJPY=X)</option>
                 <option value="EURCHF=X">EUR/CHF - Euro / Franco (EURCHF=X)</option>
@@ -825,13 +739,13 @@
 
           <div class="flex items-center gap-2">
             <div class="flex-1">
-              <label class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block">Período</label>
+              <label class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block">PerÃ­odo</label>
               <select id="select-period" class="w-full bg-fintech-bg border border-fintech-border rounded px-2 py-1 text-xs text-white focus:border-fintech-cyan focus:outline-none">
                 <option value="60d">60 Dias</option>
                 <option value="1y">1 Ano</option>
                 <option value="2y" selected>2 Anos</option>
                 <option value="5y">5 Anos</option>
-                <option value="max">Máximo</option>
+                <option value="max">MÃ¡ximo</option>
               </select>
             </div>
           </div>
@@ -860,7 +774,7 @@
         <!-- Mobile Toggle Button for Strategy Selector -->
         <div class="lg:hidden p-2 border-b border-fintech-border bg-fintech-bg/60">
           <button id="btn-toggle-strategies-mobile" type="button" class="w-full flex items-center justify-between px-3 py-2 bg-fintech-surface hover:bg-fintech-surface/80 border border-fintech-border rounded text-xs font-semibold text-cyan-300">
-            <span class="flex items-center gap-1.5"><span></span>Filtro das 48 Estratégias</span>
+            <span class="flex items-center gap-1.5"><span></span>Filtro das 48 EstratÃ©gias</span>
             <span id="strategies-mobile-chevron" class="text-gray-400 text-xs">Toque para abrir</span>
           </button>
         </div>
@@ -870,7 +784,7 @@
           <!-- Strategy Granular Selector with Presets & 0ms Reactivity -->
           <div class="p-2 border-b border-fintech-border bg-fintech-bg/40 shrink-0 space-y-1.5">
             <div class="flex items-center justify-between">
-              <span class="text-[11px] font-bold text-gray-300 uppercase tracking-wider">Estratégias (48)</span>
+              <span class="text-[11px] font-bold text-gray-300 uppercase tracking-wider">EstratÃ©gias (48)</span>
               <div class="flex items-center space-x-1.5 text-[10px]">
                 <button id="btn-toggle-all-accordions" type="button" class="text-gray-400 hover:text-white hover:underline">Recolher</button>
                 <span class="text-gray-600">|</span>
@@ -882,14 +796,14 @@
 
             <!-- Cognitive Triage Presets -->
             <div class="grid grid-cols-3 gap-1 pt-1 border-t border-fintech-border/40">
-              <button id="btn-preset-institutional" type="button" class="px-1.5 py-1 text-[10px] font-bold rounded bg-cyan-950/40 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-900/60 transition truncate" title="Top Sharpe & Price Action Institucional (Wyckoff, BOS, Negação Causal)">
+              <button id="btn-preset-institutional" type="button" class="px-1.5 py-1 text-[10px] font-bold rounded bg-cyan-950/40 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-900/60 transition truncate" title="Top Sharpe & Price Action Institucional (Wyckoff, BOS, NegaÃ§Ã£o Causal)">
                 Top Institucional
               </button>
-              <button id="btn-preset-reversal" type="button" class="px-1.5 py-1 text-[10px] font-bold rounded bg-emerald-950/40 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-900/60 transition truncate" title="Sobrevenda Estatística Extrema (RSI, Z-Score, Bandas)">
-                Reversão Extrema
+              <button id="btn-preset-reversal" type="button" class="px-1.5 py-1 text-[10px] font-bold rounded bg-emerald-950/40 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-900/60 transition truncate" title="Sobrevenda EstatÃ­stica Extrema (RSI, Z-Score, Bandas)">
+                ReversÃ£o Extrema
               </button>
-              <button id="btn-preset-trend" type="button" class="px-1.5 py-1 text-[10px] font-bold rounded bg-amber-950/40 text-amber-300 border border-amber-500/30 hover:bg-amber-900/60 transition truncate" title="Seguidores de Tendência & Momentum (Supertrend, VWAP, MACD)">
-                Tendência/Fluxo
+              <button id="btn-preset-trend" type="button" class="px-1.5 py-1 text-[10px] font-bold rounded bg-amber-950/40 text-amber-300 border border-amber-500/30 hover:bg-amber-900/60 transition truncate" title="Seguidores de TendÃªncia & Momentum (Supertrend, VWAP, MACD)">
+                TendÃªncia/Fluxo
               </button>
             </div>
           </div>
@@ -899,25 +813,25 @@
           <!-- Accordion 1: Proprietary Reversal BUY (4) -->
           <div class="border border-fintech-border rounded overflow-hidden strategy-group-wrapper" data-direction="BUY">
             <div class="accordion-header bg-fintech-bg px-2.5 py-1.5 flex items-center justify-between text-gray-200 font-semibold" data-accordion="acc-prop-buy">
-              <span class="flex items-center gap-1">Proprietária Compra (4)</span>
+              <span class="flex items-center gap-1">ProprietÃ¡ria Compra (4)</span>
               <span class="text-gray-400 text-xs"></span>
             </div>
             <div id="acc-prop-buy" class="p-2 space-y-1 bg-fintech-surface">
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
                 <input type="checkbox" class="strategy-cb" data-id="t1_open" data-dir="BUY">
-                <span>Negação Anterior (Abertura)</span>
+                <span>NegaÃ§Ã£o Anterior (Abertura)</span>
               </label>
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
                 <input type="checkbox" class="strategy-cb" data-id="t1_retest" data-dir="BUY">
-                <span>Negação Anterior (Reteste)</span>
+                <span>NegaÃ§Ã£o Anterior (Reteste)</span>
               </label>
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
                 <input type="checkbox" class="strategy-cb" data-id="t2_open" data-dir="BUY">
-                <span>Negação N Barras (Abertura)</span>
+                <span>NegaÃ§Ã£o N Barras (Abertura)</span>
               </label>
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
                 <input type="checkbox" class="strategy-cb" data-id="t2_retest" data-dir="BUY">
-                <span>Negação N Barras (Reteste)</span>
+                <span>NegaÃ§Ã£o N Barras (Reteste)</span>
               </label>
             </div>
           </div>
@@ -925,25 +839,25 @@
           <!-- Accordion 2: Proprietary Reversal SELL (4) -->
           <div class="border border-fintech-border rounded overflow-hidden strategy-group-wrapper" data-direction="SELL">
             <div class="accordion-header bg-fintech-bg px-2.5 py-1.5 flex items-center justify-between text-gray-200 font-semibold" data-accordion="acc-prop-sell">
-              <span class="flex items-center gap-1">Proprietária Venda/Topo (4)</span>
+              <span class="flex items-center gap-1">ProprietÃ¡ria Venda/Topo (4)</span>
               <span class="text-gray-400 text-xs"></span>
             </div>
             <div id="acc-prop-sell" class="p-2 space-y-1 bg-fintech-surface">
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
                 <input type="checkbox" class="strategy-cb" data-id="sell_t1_open" data-dir="SELL">
-                <span>Negação Máxima Anterior (Abertura)</span>
+                <span>NegaÃ§Ã£o MÃ¡xima Anterior (Abertura)</span>
               </label>
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
                 <input type="checkbox" class="strategy-cb" data-id="sell_t1_retest" data-dir="SELL">
-                <span>Negação Máxima Anterior (Reteste)</span>
+                <span>NegaÃ§Ã£o MÃ¡xima Anterior (Reteste)</span>
               </label>
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
                 <input type="checkbox" class="strategy-cb" data-id="sell_t2_open" data-dir="SELL">
-                <span>Negação Topo N Barras (Abertura)</span>
+                <span>NegaÃ§Ã£o Topo N Barras (Abertura)</span>
               </label>
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white">
                 <input type="checkbox" class="strategy-cb" data-id="sell_t2_retest" data-dir="SELL">
-                <span>Negação Topo N Barras (Reteste)</span>
+                <span>NegaÃ§Ã£o Topo N Barras (Reteste)</span>
               </label>
             </div>
           </div>
@@ -999,24 +913,24 @@
               <span class="text-gray-400 text-xs"></span>
             </div>
             <div id="acc-alloc-buy" class="p-2 space-y-1 bg-fintech-surface">
-              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="dca_dynamic" data-dir="BUY"><span>DCA Dinâmico</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="dca_dynamic" data-dir="BUY"><span>DCA DinÃ¢mico</span></label>
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="value_proxy" data-dir="BUY"><span>Value Proxy</span></label>
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="rebal_rf_rv" data-dir="BUY"><span>Rebal. RF x RV</span></label>
-              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="rebal_relative_strength" data-dir="BUY"><span>Força Relativa Z</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="rebal_relative_strength" data-dir="BUY"><span>ForÃ§a Relativa Z</span></label>
             </div>
           </div>
 
-          <!-- Accordion 6: Alocação & Realização SELL (4) -->
+          <!-- Accordion 6: Alocação & RealizaÃ§Ã£o SELL (4) -->
           <div class="border border-fintech-border rounded overflow-hidden strategy-group-wrapper" data-direction="SELL">
             <div class="accordion-header bg-fintech-bg px-2.5 py-1.5 flex items-center justify-between text-gray-200 font-semibold" data-accordion="acc-alloc-sell">
               <span class="flex items-center gap-1">Alocação Topo (4)</span>
               <span class="text-gray-400 text-xs"></span>
             </div>
             <div id="acc-alloc-sell" class="p-2 space-y-1 bg-fintech-surface">
-              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="sell_overbought_stat" data-dir="SELL"><span>Excesso Estatístico</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="sell_overbought_stat" data-dir="SELL"><span>Excesso EstatÃ­stico</span></label>
               <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="sell_rebal_rv_rf" data-dir="SELL"><span>Rebal. RV ->RF</span></label>
-              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="sell_rebal_relative_strength" data-dir="SELL"><span>Exaustão Força Rel.</span></label>
-              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="sell_value_proxy" data-dir="SELL"><span>Prêmio Valuation</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="sell_rebal_relative_strength" data-dir="SELL"><span>ExaustÃ£o ForÃ§a Rel.</span></label>
+              <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="sell_value_proxy" data-dir="SELL"><span>PrÃªmio Valuation</span></label>
             </div>
           </div>
 
@@ -1032,16 +946,16 @@
                 <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="inverted_hammer" data-dir="BUY"><span>Martelo Invertido</span></label>
                 <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bullish_engulfing" data-dir="BUY"><span>Engolfo de Alta</span></label>
                 <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="piercing_line" data-dir="BUY"><span>Piercing Line</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="morning_star" data-dir="BUY"><span>Estrela da Manhã</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="morning_star" data-dir="BUY"><span>Estrela da ManhÃ£</span></label>
                 <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bullish_harami" data-dir="BUY"><span>Harami de Alta</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_inside_up" data-dir="BUY"><span>Três Por Dentro</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_outside_up" data-dir="BUY"><span>Três Por Fora</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_white_soldiers" data-dir="BUY"><span>Três Soldados Brancos</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="tweezer_bottom" data-dir="BUY"><span>Pinça de Fundo</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="dragonfly_doji" data-dir="BUY"><span>Doji Libélula</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="abandoned_baby_bullish" data-dir="BUY"><span>Bebê Abandonado</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_inside_up" data-dir="BUY"><span>TrÃªs Por Dentro</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_outside_up" data-dir="BUY"><span>TrÃªs Por Fora</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_white_soldiers" data-dir="BUY"><span>TrÃªs Soldados Brancos</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="tweezer_bottom" data-dir="BUY"><span>PinÃ§a de Fundo</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="dragonfly_doji" data-dir="BUY"><span>Doji LibÃ©lula</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="abandoned_baby_bullish" data-dir="BUY"><span>BebÃª Abandonado</span></label>
                 <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bullish_kicker" data-dir="BUY"><span>Chute de Alta</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="climactic_pinbar" data-dir="BUY"><span>Pinbar Clímax Volume</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="climactic_pinbar" data-dir="BUY"><span>Pinbar ClÃ­max Volume</span></label>
               </div>
             </div>
           </div>
@@ -1060,14 +974,14 @@
                 <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="dark_cloud_cover" data-dir="SELL"><span>Nuvem Negra</span></label>
                 <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="evening_star" data-dir="SELL"><span>Estrela da Tarde</span></label>
                 <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bearish_harami" data-dir="SELL"><span>Harami de Baixa</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_inside_down" data-dir="SELL"><span>Três Por Dentro Baixa</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_outside_down" data-dir="SELL"><span>Três Por Fora Baixa</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_black_crows" data-dir="SELL"><span>Três Corvos Negros</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="tweezer_top" data-dir="SELL"><span>Pinça de Topo</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="gravestone_doji" data-dir="SELL"><span>Doji Lápide</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="abandoned_baby_bearish" data-dir="SELL"><span>Bebê Abandonado Baixa</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_inside_down" data-dir="SELL"><span>TrÃªs Por Dentro Baixa</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_outside_down" data-dir="SELL"><span>TrÃªs Por Fora Baixa</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="three_black_crows" data-dir="SELL"><span>TrÃªs Corvos Negros</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="tweezer_top" data-dir="SELL"><span>PinÃ§a de Topo</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="gravestone_doji" data-dir="SELL"><span>Doji LÃ¡pide</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="abandoned_baby_bearish" data-dir="SELL"><span>BebÃª Abandonado Baixa</span></label>
                 <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bearish_kicker" data-dir="SELL"><span>Chute de Baixa</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="climactic_bearish_pinbar" data-dir="SELL"><span>Pinbar Clímax Topo</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="climactic_bearish_pinbar" data-dir="SELL"><span>Pinbar ClÃ­max Topo</span></label>
               </div>
             </div>
           </div>
@@ -1085,14 +999,14 @@
             <div id="acc-quant-buy" class="accordion-content p-2 bg-fintech-surface space-y-1.5 border-t border-fintech-border hidden">
               <div class="grid grid-cols-1 gap-1 text-[11px] text-gray-300">
                 <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bollinger_close_in" data-dir="BUY"><span>Bollinger Fechou Fora/Dentro</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="keltner_squeeze" data-dir="BUY"><span>Keltner Squeeze (Compressão/Alta)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="keltner_squeeze" data-dir="BUY"><span>Keltner Squeeze (CompressÃ£o/Alta)</span></label>
                 <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="zscore_extreme" data-dir="BUY"><span>Z-Score Fundo Extremo (&lt;-2.0)</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="rsi_divergence" data-dir="BUY"><span>Divergência Regular IFR/RSI</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="stochastic_extreme" data-dir="BUY"><span>Estocástico Lento em Sobrevenda (&lt;25)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="rsi_divergence" data-dir="BUY"><span>DivergÃªncia Regular IFR/RSI</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="stochastic_extreme" data-dir="BUY"><span>EstocÃ¡stico Lento em Sobrevenda (&lt;25)</span></label>
                 <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="macd_momentum" data-dir="BUY"><span>MACD Histogram Momentum (Alta)</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="vwap_bands" data-dir="BUY"><span>Bandas de VWAP (Retorno à Média)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="vwap_bands" data-dir="BUY"><span>Bandas de VWAP (Retorno Ã  MÃ©dia)</span></label>
                 <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="mfi_extreme" data-dir="BUY"><span>Money Flow Index (MFI) Sobrevenda (&lt;20)</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="volume_climax_vsa" data-dir="BUY"><span>Volume Clímax / VSA Absorção</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="volume_climax_vsa" data-dir="BUY"><span>Volume ClÃ­max / VSA AbsorÃ§Ã£o</span></label>
                 <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="supertrend_trailing" data-dir="BUY"><span>SuperTrend Virada Compradora</span></label>
               </div>
             </div>
@@ -1110,14 +1024,14 @@
             <div id="acc-quant-sell" class="accordion-content p-2 bg-fintech-surface space-y-1.5 border-t border-fintech-border hidden">
               <div class="grid grid-cols-1 gap-1 text-[11px] text-gray-300">
                 <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="bollinger_close_in" data-dir="SELL"><span>Bollinger Fechou Fora/Dentro</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="keltner_squeeze" data-dir="SELL"><span>Keltner Squeeze (Compressão/Baixa)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="keltner_squeeze" data-dir="SELL"><span>Keltner Squeeze (CompressÃ£o/Baixa)</span></label>
                 <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="zscore_extreme" data-dir="SELL"><span>Z-Score Topo Extremo (&gt;+2.0)</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="rsi_divergence" data-dir="SELL"><span>Divergência Regular IFR/RSI</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="stochastic_extreme" data-dir="SELL"><span>Estocástico Lento em Sobrecompra (&gt;75)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="rsi_divergence" data-dir="SELL"><span>DivergÃªncia Regular IFR/RSI</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="stochastic_extreme" data-dir="SELL"><span>EstocÃ¡stico Lento em Sobrecompra (&gt;75)</span></label>
                 <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="macd_momentum" data-dir="SELL"><span>MACD Histogram Momentum (Baixa)</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="vwap_bands" data-dir="SELL"><span>Bandas de VWAP (Retorno à Média)</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="vwap_bands" data-dir="SELL"><span>Bandas de VWAP (Retorno Ã  MÃ©dia)</span></label>
                 <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="mfi_extreme" data-dir="SELL"><span>Money Flow Index (MFI) Sobrecompra (&gt;80)</span></label>
-                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="volume_climax_vsa" data-dir="SELL"><span>Volume Clímax / VSA Distribuição</span></label>
+                <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="volume_climax_vsa" data-dir="SELL"><span>Volume ClÃ­max / VSA DistribuiÃ§Ã£o</span></label>
                 <label class="flex items-center space-x-2 cursor-pointer hover:text-white"><input type="checkbox" class="strategy-cb" data-id="supertrend_trailing" data-dir="SELL"><span>SuperTrend Virada Vendedora</span></label>
               </div>
             </div>
@@ -1157,7 +1071,7 @@
                 +
               </button>
               <button id="btn-chart-zoom-out" title="Zoom Out (-)" class="w-6 h-6 flex items-center justify-center text-xs font-bold text-gray-300 hover:text-white hover:bg-fintech-cyan/20 rounded transition">
-                −
+                âˆ’
               </button>
               <button id="btn-chart-zoom-reset" title="Reset Zoom" class="px-1.5 h-6 flex items-center justify-center text-[10px] font-semibold text-gray-300 hover:text-white hover:bg-fintech-cyan/20 rounded transition border-l border-fintech-border/60">
                 Reset
@@ -1171,7 +1085,7 @@
         <div class="p-2 sm:p-3 grid grid-cols-1 lg:grid-cols-2 gap-3">
           <div class="card-surface p-3">
             <h3 class="text-xs font-bold text-gray-200 mb-2 flex items-center justify-between">
-              <span>Ranking de Eficiência</span>
+              <span>Ranking de EficiÃªncia</span>
               <span class="text-[10px] text-gray-400 font-mono">Win Rate</span>
             </h3>
             <div id="plot-ranking" class="w-full"></div>
@@ -1193,7 +1107,7 @@
             <div class="flex items-center justify-between mb-2">
               <div>
                 <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
-                  <span></span>Simulação Comparativa por Estratégia
+                  <span></span>SimulaÃ§Ã£o Comparativa por EstratÃ©gia
                 </h3>
                 <p class="text-[10px] sm:text-[11px] text-gray-400">
                   Aporte R$ 1.000/sinal com reinvestimento de sobras.
@@ -1201,20 +1115,20 @@
               </div>
               <div class="text-[10px] text-gray-400 font-mono">Base: R$ 1.000</div>
             </div>
-            <div class="block sm:hidden text-[10px] text-gray-500 text-center py-0.5 font-mono">← Deslize horizontalmente →</div>
+            <div class="block sm:hidden text-[10px] text-gray-500 text-center py-0.5 font-mono">â† Deslize horizontalmente â†’</div>
             <div class="overflow-x-auto touch-scroll max-h-64">
               <table class="w-full text-left text-xs text-gray-300">
                 <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[10px] sticky top-0 whitespace-nowrap">
                   <tr>
-                    <th class="px-3 py-2">Estratégia</th>
-                    <th class="px-3 py-2">Direção</th>
+                    <th class="px-3 py-2">EstratÃ©gia</th>
+                    <th class="px-3 py-2">DireÃ§Ã£o</th>
                     <th class="px-3 py-2 text-center">Entradas</th>
                     <th class="px-3 py-2">Total Operado</th>
                     <th class="px-3 py-2 text-center">Ações / Cotas</th>
                     <th class="px-3 py-2">Preço Médio</th>
                     <th class="px-3 py-2">Caixa Sobra</th>
                     <th class="px-3 py-2">Valor Atual</th>
-                    <th class="px-3 py-2">Lucro / Prejuízo</th>
+                    <th class="px-3 py-2">Lucro / PrejuÃ­zo</th>
                     <th class="px-3 py-2">Retorno (%)</th>
                     <th class="px-3 py-2">Max Drawdown</th>
                   </tr>
@@ -1230,20 +1144,20 @@
           <div class="card-surface p-3 overflow-hidden">
             <div class="flex items-center justify-between mb-2">
               <h3 class="text-xs font-bold text-gray-200 flex items-center gap-1.5">
-                <span></span>Histórico de Sinais & Execuções
+                <span></span>HistÃ³rico de Sinais & ExecuÃ§Ãµes
               </h3>
               <span class="text-[10px] text-gray-400 font-mono">Mais recentes</span>
             </div>
-            <div class="block sm:hidden text-[10px] text-gray-500 text-center py-0.5 font-mono">← Deslize horizontalmente →</div>
+            <div class="block sm:hidden text-[10px] text-gray-500 text-center py-0.5 font-mono">â† Deslize horizontalmente â†’</div>
             <div class="overflow-x-auto touch-scroll max-h-72">
               <table class="w-full text-left text-xs text-gray-300">
                 <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[10px] sticky top-0 whitespace-nowrap">
                   <tr>
-                    <th class="px-3 py-2">Estratégia</th>
-                    <th class="px-3 py-2">Direção</th>
+                    <th class="px-3 py-2">EstratÃ©gia</th>
+                    <th class="px-3 py-2">DireÃ§Ã£o</th>
                     <th class="px-3 py-2">Data Sinal</th>
-                    <th class="px-3 py-2">Data Execução</th>
-                    <th class="px-3 py-2">Preço Execução</th>
+                    <th class="px-3 py-2">Data ExecuÃ§Ã£o</th>
+                    <th class="px-3 py-2">Preço ExecuÃ§Ã£o</th>
                     <th class="px-3 py-2 text-center">Qtd Cotas</th>
                     <th class="px-3 py-2">Valor Operado</th>
                     <th class="px-3 py-2">Sobra Caixa</th>
@@ -1273,9 +1187,9 @@
       <div class="max-w-7xl mx-auto space-y-4">
         <div>
           <h2 class="text-lg font-bold text-white flex items-center gap-2">
-            <span></span>Simulador Quantitativo: Backtest de Trade (Compra ->Venda) & Acumulação
+            <span></span>Simulador Quantitativo: Backtest de Trade (Compra ->Venda) & AcumulaÃ§Ã£o
           </h2>
-          <p class="text-xs text-gray-400">Teste estratégias comprando nos sinais de Fundo e encerrando no próximo Topo (Venda), ou simule aportes contínuos em cotas.</p>
+          <p class="text-xs text-gray-400">Teste estratégias comprando nos sinais de Fundo e encerrando no prÃ³ximo Topo (Venda), ou simule aportes contÃ­nuos em cotas.</p>
         </div>
 
         <!-- Simulator Configuration Form -->
@@ -1283,31 +1197,31 @@
           <!-- Row 1: Core Parameters & Timeframe -->
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3">
             <div>
-              <label class="text-gray-400 font-semibold block mb-1">Ativo para Simulação</label>
+              <label class="text-gray-400 font-semibold block mb-1">Ativo para SimulaÃ§Ã£o</label>
               <input id="sim-ticker" list="asset-datalist" type="text" value="PETR4.SA" placeholder="Digite ou selecione..." class="w-full bg-fintech-bg border border-fintech-border rounded px-3 py-1.5 text-white font-mono uppercase focus:border-fintech-cyan focus:outline-none">
             </div>
             <div>
-              <label class="text-gray-400 font-semibold block mb-1">Tempo Gráfico</label>
+              <label class="text-gray-400 font-semibold block mb-1">Tempo GrÃ¡fico</label>
               <select id="sim-interval" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-sans focus:border-fintech-cyan focus:outline-none">
                 <option value="5m">5 Minutos (Intraday)</option>
                 <option value="15m">15 Minutos (Intraday)</option>
                 <option value="60m">60 Minutos (1 Hora)</option>
-                <option value="1d" selected>Diário (1D)</option>
+                <option value="1d" selected>DiÃ¡rio (1D)</option>
                 <option value="1wk">Semanal (1W)</option>
               </select>
             </div>
             <div>
-              <label class="text-gray-400 font-semibold block mb-1">Modo de Operação</label>
+              <label class="text-gray-400 font-semibold block mb-1">Modo de OperaÃ§Ã£o</label>
               <select id="sim-mode" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-sans focus:border-fintech-cyan focus:outline-none">
                 <option value="cycle_trade" selected>Trade (Compra -> Venda)</option>
-                <option value="accumulation">Acumulação (DCA Fundos)</option>
+                <option value="accumulation">AcumulaÃ§Ã£o (DCA Fundos)</option>
               </select>
             </div>
             <div id="sim-cycle-mode-container">
               <label class="text-gray-400 font-semibold block mb-1">Entradas no Ciclo</label>
               <select id="sim-cycle-mode" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-sans focus:border-fintech-cyan focus:outline-none">
-                <option value="multi_buy" selected>Acumulação Multi-Buy (Nx)</option>
-                <option value="single_buy">Compra Única (1x)</option>
+                <option value="multi_buy" selected>AcumulaÃ§Ã£o Multi-Buy (Nx)</option>
+                <option value="single_buy">Compra Ãšnica (1x)</option>
               </select>
             </div>
             <div>
@@ -1315,7 +1229,7 @@
               <input id="sim-contribution" type="number" value="1000" min="100" step="100" class="w-full bg-fintech-bg border border-fintech-border rounded px-3 py-1.5 text-white font-mono">
             </div>
             <div>
-              <label class="text-gray-400 font-semibold block mb-1">Data Início (Opcional)</label>
+              <label class="text-gray-400 font-semibold block mb-1">Data InÃ­cio (Opcional)</label>
               <input id="sim-start-date" type="date" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white">
             </div>
             <div>
@@ -1330,17 +1244,17 @@
             <div class="md:col-span-4">
               <div class="flex items-center justify-between mb-1">
                 <label class="text-emerald-400 font-semibold block flex items-center gap-1">
-                  <span>Estratégia de Compra (Entrada)</span>
+                  <span>EstratÃ©gia de Compra (Entrada)</span>
                 </label>
-                <input id="input-search-sim-buy" type="text" placeholder="Filtrar estratégia..." class="bg-fintech-bg border border-fintech-border rounded px-1.5 py-0.5 text-[10px] text-white font-mono w-24 focus:w-36 transition-all focus:border-emerald-400 focus:outline-none">
+                <input id="input-search-sim-buy" type="text" placeholder="Filtrar estratÃ©gia..." class="bg-fintech-bg border border-fintech-border rounded px-1.5 py-0.5 text-[10px] text-white font-mono w-24 focus:w-36 transition-all focus:border-emerald-400 focus:outline-none">
               </div>
               <select id="sim-buy-strategy" class="w-full bg-fintech-bg border border-emerald-500/40 rounded px-2.5 py-1.5 text-white font-sans focus:border-emerald-400 focus:outline-none">
-                <option value="ALL" selected>Todas as Compras (Portfólio / Qualquer Sinal)</option>
-                <optgroup label="Proprietárias de Fundo (Reversão Causal)">
-                  <option value="t1_open">Negação Barra Anterior (Abertura)</option>
-                  <option value="t1_retest">Negação Barra Anterior (Reteste)</option>
-                  <option value="t2_open">Negação Fundo N Barras (Abertura)</option>
-                  <option value="t2_retest">Negação Fundo N Barras (Reteste)</option>
+                <option value="ALL" selected>Todas as Compras (PortfÃ³lio / Qualquer Sinal)</option>
+                <optgroup label="ProprietÃ¡rias de Fundo (ReversÃ£o Causal)">
+                  <option value="t1_open">NegaÃ§Ã£o Barra Anterior (Abertura)</option>
+                  <option value="t1_retest">NegaÃ§Ã£o Barra Anterior (Reteste)</option>
+                  <option value="t2_open">NegaÃ§Ã£o Fundo N Barras (Abertura)</option>
+                  <option value="t2_retest">NegaÃ§Ã£o Fundo N Barras (Reteste)</option>
                 </optgroup>
                 <optgroup label="Price Action Institucional">
                   <option value="double_bottom_bos">Fundo Duplo + BOS (Refinado)</option>
@@ -1348,37 +1262,37 @@
                   <option value="wyckoff_spring">Varredura de Liquidez (Wyckoff Spring)</option>
                 </optgroup>
                 <optgroup label="Alocação & Rebalanceamento">
-                  <option value="dca_dynamic">DCA Dinâmico (Sobrevendido RSI < 30)</option>
+                  <option value="dca_dynamic">DCA DinÃ¢mico (Sobrevendido RSI < 30)</option>
                   <option value="value_proxy">Estiramento de Valuation (Mayer Multiple)</option>
                   <option value="rebal_rf_rv">Rebalanceamento RF ->RV</option>
-                  <option value="rebal_relative_strength">Força Relativa vs. Benchmark</option>
+                  <option value="rebal_relative_strength">ForÃ§a Relativa vs. Benchmark</option>
                 </optgroup>
-                <optgroup label="Padrões de Velas (MQL5)">
+                <optgroup label="PadrÃµes de Velas (MQL5)">
                   <option value="hammer">Martelo (Hammer)</option>
                   <option value="inverted_hammer">Martelo Invertido</option>
                   <option value="bullish_engulfing">Engolfo de Alta</option>
-                  <option value="piercing_line">Linha de Perfuração</option>
-                  <option value="morning_star">Estrela da Manhã</option>
+                  <option value="piercing_line">Linha de PerfuraÃ§Ã£o</option>
+                  <option value="morning_star">Estrela da ManhÃ£</option>
                   <option value="bullish_harami">Harami de Alta</option>
-                  <option value="three_inside_up">Três Por Dentro de Alta</option>
-                  <option value="three_outside_up">Três Por Fora de Alta</option>
-                  <option value="three_white_soldiers">Três Soldados Brancos</option>
-                  <option value="tweezer_bottom">Pinça de Fundo (Tweezer Bottom)</option>
-                  <option value="dragonfly_doji">Doji Libélula (Dragonfly)</option>
-                  <option value="abandoned_baby_bullish">Bebê Abandonado de Alta</option>
+                  <option value="three_inside_up">TrÃªs Por Dentro de Alta</option>
+                  <option value="three_outside_up">TrÃªs Por Fora de Alta</option>
+                  <option value="three_white_soldiers">TrÃªs Soldados Brancos</option>
+                  <option value="tweezer_bottom">PinÃ§a de Fundo (Tweezer Bottom)</option>
+                  <option value="dragonfly_doji">Doji LibÃ©lula (Dragonfly)</option>
+                  <option value="abandoned_baby_bullish">BebÃª Abandonado de Alta</option>
                   <option value="bullish_kicker">Kicker de Alta</option>
-                  <option value="climactic_pinbar">Pinbar Climático de Exaustão</option>
+                  <option value="climactic_pinbar">Pinbar ClimÃ¡tico de ExaustÃ£o</option>
                 </optgroup>
                               <optgroup label="Indicadores Quantitativos - Fundos">
                   <option value="bollinger_close_in">Bandas de Bollinger (Fechou Fora/Dentro)</option>
-                  <option value="keltner_squeeze">Keltner Squeeze (Compressão/Expansão)</option>
+                  <option value="keltner_squeeze">Keltner Squeeze (CompressÃ£o/ExpansÃ£o)</option>
                   <option value="zscore_extreme">Z-Score de Preço em Extremos (<-2.0)</option>
-                  <option value="rsi_divergence">Divergência Regular de IFR/RSI</option>
-                  <option value="stochastic_extreme">Estocástico Lento em Extremos (<25)</option>
-                  <option value="macd_momentum">MACD Histogram Momentum (Inflexão)</option>
-                  <option value="vwap_bands">Bandas de VWAP (Retorno à Média)</option>
+                  <option value="rsi_divergence">DivergÃªncia Regular de IFR/RSI</option>
+                  <option value="stochastic_extreme">EstocÃ¡stico Lento em Extremos (<25)</option>
+                  <option value="macd_momentum">MACD Histogram Momentum (InflexÃ£o)</option>
+                  <option value="vwap_bands">Bandas de VWAP (Retorno Ã  MÃ©dia)</option>
                   <option value="mfi_extreme">Money Flow Index (MFI) Extremo (<20)</option>
-                  <option value="volume_climax_vsa">Volume Clímax / VSA Absorção</option>
+                  <option value="volume_climax_vsa">Volume ClÃ­max / VSA AbsorÃ§Ã£o</option>
                   <option value="supertrend_trailing">SuperTrend / ATR Trailing</option>
                 </optgroup>
 </select>
@@ -1388,55 +1302,55 @@
             <div class="md:col-span-4" id="sim-sell-strategy-container">
               <div class="flex items-center justify-between mb-1">
                 <label class="text-rose-400 font-semibold block flex items-center gap-1">
-                  <span>Estratégia de Venda (Saída / Topo)</span>
+                  <span>EstratÃ©gia de Venda (SaÃ­da / Topo)</span>
                 </label>
-                <input id="input-search-sim-sell" type="text" placeholder="Filtrar estratégia..." class="bg-fintech-bg border border-fintech-border rounded px-1.5 py-0.5 text-[10px] text-white font-mono w-24 focus:w-36 transition-all focus:border-rose-400 focus:outline-none">
+                <input id="input-search-sim-sell" type="text" placeholder="Filtrar estratÃ©gia..." class="bg-fintech-bg border border-fintech-border rounded px-1.5 py-0.5 text-[10px] text-white font-mono w-24 focus:w-36 transition-all focus:border-rose-400 focus:outline-none">
               </div>
               <select id="sim-sell-strategy" class="w-full bg-fintech-bg border border-rose-500/40 rounded px-2.5 py-1.5 text-white font-sans focus:border-rose-400 focus:outline-none">
-                <option value="ALL" selected>Todas as Vendas (Portfólio / Qualquer Sinal)</option>
-                <optgroup label="Proprietárias de Topo (Negação Causal)">
-                  <option value="sell_t1_open">Negação Máxima Anterior (Abertura)</option>
-                  <option value="sell_t1_retest">Negação Máxima Anterior (Reteste)</option>
-                  <option value="sell_t2_open">Negação Topo N Barras (Abertura)</option>
-                  <option value="sell_t2_retest">Negação Topo N Barras (Reteste)</option>
+                <option value="ALL" selected>Todas as Vendas (PortfÃ³lio / Qualquer Sinal)</option>
+                <optgroup label="ProprietÃ¡rias de Topo (NegaÃ§Ã£o Causal)">
+                  <option value="sell_t1_open">NegaÃ§Ã£o MÃ¡xima Anterior (Abertura)</option>
+                  <option value="sell_t1_retest">NegaÃ§Ã£o MÃ¡xima Anterior (Reteste)</option>
+                  <option value="sell_t2_open">NegaÃ§Ã£o Topo N Barras (Abertura)</option>
+                  <option value="sell_t2_retest">NegaÃ§Ã£o Topo N Barras (Reteste)</option>
                 </optgroup>
                 <optgroup label="Price Action Institucional">
                   <option value="sell_double_top_bos">Topo Duplo + BOS (Refinado)</option>
                   <option value="sell_double_bottom_inverted">Fundo Duplo Invertido (Venda)</option>
                   <option value="sell_wyckoff_upthrust">Varredura de Topo (Wyckoff Upthrust)</option>
                 </optgroup>
-                <optgroup label="Alocação & Realização">
-                  <option value="sell_overbought_stat">Excesso Estatístico (Sobrecomprado RSI >70)</option>
+                <optgroup label="Alocação & RealizaÃ§Ã£o">
+                  <option value="sell_overbought_stat">Excesso EstatÃ­stico (Sobrecomprado RSI >70)</option>
                   <option value="sell_rebal_rv_rf">Rebalanceamento RV ->Renda Fixa</option>
-                  <option value="sell_rebal_relative_strength">Exaustão de Força Relativa</option>
-                  <option value="sell_value_proxy">Prêmio Excessivo / Estiramento Valuation</option>
+                  <option value="sell_rebal_relative_strength">ExaustÃ£o de ForÃ§a Relativa</option>
+                  <option value="sell_value_proxy">PrÃªmio Excessivo / Estiramento Valuation</option>
                 </optgroup>
-                <optgroup label="Padrões de Velas (MQL5)">
+                <optgroup label="PadrÃµes de Velas (MQL5)">
                   <option value="shooting_star">Estrela Cadente (Shooting Star)</option>
                   <option value="hanging_man">Enforcado (Hanging Man)</option>
                   <option value="bearish_engulfing">Engolfo de Baixa</option>
                   <option value="dark_cloud_cover">Nuvem Negra (Dark Cloud Cover)</option>
                   <option value="evening_star">Estrela da Tarde (Evening Star)</option>
                   <option value="bearish_harami">Harami de Baixa</option>
-                  <option value="three_inside_down">Três Por Dentro de Baixa</option>
-                  <option value="three_outside_down">Três Por Fora de Baixa</option>
-                  <option value="three_black_crows">Três Corvos Negros</option>
-                  <option value="tweezer_top">Pinça de Topo (Tweezer Top)</option>
-                  <option value="gravestone_doji">Doji Lápide (Gravestone)</option>
-                  <option value="abandoned_baby_bearish">Bebê Abandonado de Baixa</option>
+                  <option value="three_inside_down">TrÃªs Por Dentro de Baixa</option>
+                  <option value="three_outside_down">TrÃªs Por Fora de Baixa</option>
+                  <option value="three_black_crows">TrÃªs Corvos Negros</option>
+                  <option value="tweezer_top">PinÃ§a de Topo (Tweezer Top)</option>
+                  <option value="gravestone_doji">Doji LÃ¡pide (Gravestone)</option>
+                  <option value="abandoned_baby_bearish">BebÃª Abandonado de Baixa</option>
                   <option value="bearish_kicker">Kicker de Baixa</option>
-                  <option value="climactic_bearish_pinbar">Pinbar Climático de Topo</option>
+                  <option value="climactic_bearish_pinbar">Pinbar ClimÃ¡tico de Topo</option>
                 </optgroup>
                               <optgroup label="Indicadores Quantitativos - Topos">
                   <option value="bollinger_close_in">Bandas de Bollinger (Fechou Fora/Dentro)</option>
-                  <option value="keltner_squeeze">Keltner Squeeze (Compressão/Expansão)</option>
+                  <option value="keltner_squeeze">Keltner Squeeze (CompressÃ£o/ExpansÃ£o)</option>
                   <option value="zscore_extreme">Z-Score de Preço em Extremos (>+2.0)</option>
-                  <option value="rsi_divergence">Divergência Regular de IFR/RSI</option>
-                  <option value="stochastic_extreme">Estocástico Lento em Extremos (>75)</option>
-                  <option value="macd_momentum">MACD Histogram Momentum (Inflexão)</option>
-                  <option value="vwap_bands">Bandas de VWAP (Retorno à Média)</option>
+                  <option value="rsi_divergence">DivergÃªncia Regular de IFR/RSI</option>
+                  <option value="stochastic_extreme">EstocÃ¡stico Lento em Extremos (>75)</option>
+                  <option value="macd_momentum">MACD Histogram Momentum (InflexÃ£o)</option>
+                  <option value="vwap_bands">Bandas de VWAP (Retorno Ã  MÃ©dia)</option>
                   <option value="mfi_extreme">Money Flow Index (MFI) Extremo (>80)</option>
-                  <option value="volume_climax_vsa">Volume Clímax / VSA Distribuição</option>
+                  <option value="volume_climax_vsa">Volume ClÃ­max / VSA DistribuiÃ§Ã£o</option>
                   <option value="supertrend_trailing">SuperTrend / ATR Trailing</option>
                 </optgroup>
 </select>
@@ -1466,15 +1380,15 @@
               <div class="space-y-1">
                 <div class="flex items-center gap-2">
                   <span class="px-2 py-0.5 rounded bg-amber-500 text-black font-extrabold text-[10px] tracking-wider uppercase flex items-center gap-1">
-                    <span></span>Combinação Mais Lucrativa (Campeã)
+                    <span></span>CombinaÃ§Ã£o Mais Lucrativa (CampeÃ£)
                   </span>
                   <span id="opt-champ-mode-badge" class="px-1.5 py-0.5 rounded bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 font-mono text-[10px]"></span>
-                  <span class="text-xs text-gray-400" id="opt-champ-tested-count">Testadas centenas de combinações</span>
+                  <span class="text-xs text-gray-400" id="opt-champ-tested-count">Testadas centenas de combinaÃ§Ãµes</span>
                 </div>
                                 <div class="text-base font-bold text-white flex flex-wrap items-center gap-2 pt-1" id="opt-champ-title-container">
                   <span class="text-emerald-400 font-semibold" id="opt-champ-buy-label">Varredura de Liquidez (Wyckoff Spring)</span>
                   <span class="text-gray-400" id="opt-champ-arrow">-&gt;</span>
-                  <span class="text-rose-400 font-semibold" id="opt-champ-sell-label">Doji Lápide (Gravestone)</span>
+                  <span class="text-rose-400 font-semibold" id="opt-champ-sell-label">Doji LÃ¡pide (Gravestone)</span>
                 </div>
               </div>
 
@@ -1493,7 +1407,7 @@
                 <span class="text-base font-bold text-emerald-400 font-mono" id="opt-champ-ret">+0.0%</span>
               </div>
               <div class="bg-fintech-bg/80 p-2 rounded">
-                <span class="text-gray-400 text-[10px] block">Lucro Líquido (R$)</span>
+                <span class="text-gray-400 text-[10px] block">Lucro LÃ­quido (R$)</span>
                 <span class="text-base font-bold text-cyan-300 font-mono" id="opt-champ-pnl">R$ 0,00</span>
               </div>
               <div class="bg-fintech-bg/80 p-2 rounded">
@@ -1515,7 +1429,7 @@
           <div class="card-surface p-4">
             <div class="flex items-center justify-between mb-2">
               <h3 class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
-                <span></span>Ranking das Top 15 Combinações Mais Lucrativas
+                <span></span>Ranking das Top 15 CombinaÃ§Ãµes Mais Lucrativas
               </h3>
               <span class="text-[10px] text-gray-400 font-mono">Ordenado por Retorno Total (%)</span>
             </div>
@@ -1524,14 +1438,14 @@
                 <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[10px] sticky top-0">
                   <tr>
                     <th class="px-2.5 py-2 text-center">Rank</th>
-                    <th class="px-2.5 py-2">Estratégia de Compra (Entrada)</th>
-                    <th class="px-2.5 py-2">Estratégia de Venda (Saída)</th>
+                    <th class="px-2.5 py-2">EstratÃ©gia de Compra (Entrada)</th>
+                    <th class="px-2.5 py-2">EstratÃ©gia de Venda (SaÃ­da)</th>
                     <th class="px-2.5 py-2 text-center">Trades</th>
                     <th class="px-2.5 py-2 text-center font-mono">Win Rate</th>
                     <th class="px-2.5 py-2 font-mono">Retorno (%)</th>
-                    <th class="px-2.5 py-2 font-mono">Lucro Líquido</th>
+                    <th class="px-2.5 py-2 font-mono">Lucro LÃ­quido</th>
                     <th class="px-2.5 py-2 font-mono text-center">Max Drawdown</th>
-                    <th class="px-2.5 py-2 text-center">Ação</th>
+                    <th class="px-2.5 py-2 text-center">AÃ§Ã£o</th>
                   </tr>
                 </thead>
                 <tbody id="sim-top-combos-table-body" class="divide-y divide-fintech-border font-mono text-[11px]">
@@ -1553,7 +1467,7 @@
             <div class="text-base sm:text-lg font-bold text-fintech-green font-mono" id="sim-kpi-final">R$ 0,00</div>
           </div>
           <div class="card-surface p-2.5 sm:p-3">
-            <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Retorno Estratégia</div>
+            <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Retorno EstratÃ©gia</div>
             <div class="text-base sm:text-lg font-bold text-fintech-cyan font-mono" id="sim-kpi-return">0.0%</div>
             <div class="text-[10px] text-gray-400 font-mono" id="sim-kpi-bnh-sub">B&H: 0.0%</div>
           </div>
@@ -1568,16 +1482,16 @@
             <div class="text-[10px] text-gray-400 font-mono" id="sim-kpi-trades-sub">0 trades</div>
           </div>
           <div class="card-surface p-2.5 sm:p-3">
-            <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Drawdown Máximo</div>
+            <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Drawdown MÃ¡ximo</div>
             <div class="text-base sm:text-lg font-bold text-rose-400 font-mono" id="sim-kpi-drawdown">0.0%</div>
-            <div class="text-[10px] text-gray-400 font-mono" id="sim-kpi-avg-entries-sub">Média compras: 1.0</div>
+            <div class="text-[10px] text-gray-400 font-mono" id="sim-kpi-avg-entries-sub">MÃ©dia compras: 1.0</div>
           </div>
         </div>
 
         <!-- Simulation Curve Chart -->
         <div class="card-surface p-3 sm:p-4">
           <div class="flex items-center justify-between mb-2">
-            <h3 class="text-xs font-bold text-gray-200">Curva de Patrimônio & Evolução</h3>
+            <h3 class="text-xs font-bold text-gray-200">Curva de Patrimônio & EvoluÃ§Ã£o</h3>
             <span class="text-[10px] text-gray-400 font-mono" id="sim-curve-legend-info">Tempo real</span>
           </div>
           <div id="plot-simulation-curve" class="w-full"></div>
@@ -1587,24 +1501,24 @@
         <div class="card-surface p-3 sm:p-4 overflow-hidden" id="sim-trades-card">
           <div class="flex items-center justify-between mb-2">
             <h3 class="text-xs font-bold text-gray-200 flex items-center gap-1.5">
-              <span></span>Histórico de Trades Executados
+              <span></span>HistÃ³rico de Trades Executados
             </h3>
             <span class="text-[10px] text-gray-400 font-mono" id="sim-trades-count-badge">0 trades</span>
           </div>
-          <div class="block sm:hidden text-[10px] text-gray-500 text-center py-0.5 font-mono">← Deslize horizontalmente →</div>
+          <div class="block sm:hidden text-[10px] text-gray-500 text-center py-0.5 font-mono">â† Deslize horizontalmente â†’</div>
           <div class="overflow-x-auto touch-scroll max-h-80">
             <table class="w-full text-left text-xs text-gray-300">
               <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[10px] sticky top-0 whitespace-nowrap">
                 <tr>
                   <th class="px-2.5 py-2 text-center">#</th>
-                  <th class="px-2.5 py-2">Estratégia Compra</th>
+                  <th class="px-2.5 py-2">EstratÃ©gia Compra</th>
                   <th class="px-2.5 py-2 text-center font-mono">Compras</th>
-                  <th class="px-2.5 py-2 font-mono">Data 1ª Compra</th>
+                  <th class="px-2.5 py-2 font-mono">Data 1Âª Compra</th>
                   <th class="px-2.5 py-2 font-mono">Preço Médio</th>
-                  <th class="px-2.5 py-2">Estratégia Venda</th>
+                  <th class="px-2.5 py-2">EstratÃ©gia Venda</th>
                   <th class="px-2.5 py-2 font-mono">Data Venda</th>
                   <th class="px-2.5 py-2 font-mono">Preço Venda</th>
-                  <th class="px-2.5 py-2 text-center font-mono">Duração</th>
+                  <th class="px-2.5 py-2 text-center font-mono">DuraÃ§Ã£o</th>
                   <th class="px-2.5 py-2 font-mono">Retorno (%)</th>
                   <th class="px-2.5 py-2 font-mono">Resultado (R$)</th>
                   <th class="px-2.5 py-2 text-center">Status</th>
@@ -1626,26 +1540,26 @@
       <div class="max-w-5xl mx-auto space-y-4 sm:space-y-6">
         <div>
           <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
-            <span></span>Playbook: Catálogo das 48 Estratégias
+            <span></span>Playbook: CatÃ¡logo das 48 EstratÃ©gias
           </h2>
-          <p class="text-xs text-gray-400">Diretrizes quantitativas, lógica matemática de entrada e gestão de risco para compras e vendas.</p>
+          <p class="text-xs text-gray-400">Diretrizes quantitativas, lÃ³gica matemÃ¡tica de entrada e gestÃ£o de risco para compras e vendas.</p>
         </div>
 
         <div class="card-surface p-4 space-y-4">
           <h3 class="text-sm font-bold text-fintech-cyan flex items-center gap-2 border-b border-fintech-border pb-2">
-            <span></span>Grupo 1: Estratégias Proprietárias de Rompimento e Negação (2x2 Compra & Venda)
+            <span></span>Grupo 1: EstratÃ©gias ProprietÃ¡rias de Rompimento e NegaÃ§Ã£o (2x2 Compra & Venda)
           </h3>
           <p class="text-xs text-gray-300 leading-relaxed">
-            Monitora rompimentos de suporte ou resistência e executa na reversão com confirmação de fechamento (Zero Look-Ahead Bias).
+            Monitora rompimentos de suporte ou resistÃªncia e executa na reversÃ£o com confirmaÃ§Ã£o de fechamento (Zero Look-Ahead Bias).
           </p>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
             <div class="bg-fintech-bg/60 p-3 rounded">
-              <span class="font-bold text-fintech-green block mb-1">Compra (Negação de Fundo):</span>
-              Violação da mínima de T-1 ou mínima de N barras, fechando de volta acima. Execução na Abertura de T+1 ou no reteste.
+              <span class="font-bold text-fintech-green block mb-1">Compra (NegaÃ§Ã£o de Fundo):</span>
+              ViolaÃ§Ã£o da mÃ­nima de T-1 ou mÃ­nima de N barras, fechando de volta acima. ExecuÃ§Ã£o na Abertura de T+1 ou no reteste.
             </div>
             <div class="bg-fintech-bg/60 p-3 rounded">
-              <span class="font-bold text-fintech-red block mb-1">Venda (Negação de Topo):</span>
-              Violação da máxima de T-1 ou máxima de N barras, fechando de volta abaixo. Execução na Abertura de T+1 ou no reteste.
+              <span class="font-bold text-fintech-red block mb-1">Venda (NegaÃ§Ã£o de Topo):</span>
+              ViolaÃ§Ã£o da mÃ¡xima de T-1 ou mÃ¡xima de N barras, fechando de volta abaixo. ExecuÃ§Ã£o na Abertura de T+1 ou no reteste.
             </div>
           </div>
         </div>
@@ -1658,13 +1572,13 @@
             <div class="bg-fintech-bg/60 p-3 rounded space-y-1.5">
               <span class="font-bold text-white block">Fundo Duplo / Topo Duplo + BOS (Refinados):</span>
               <p class="text-gray-300">
-                Padrões de reversão estrutural com confirmação de rompimento do neckline (BOS). O Fundo Duplo exige tendência prévia de baixa (abaixo da SMA50 ou queda ≥ 6%), filtro anti-máxima de 60 barras, e IFR/RSI não exausto (< 45 nos fundos e ≤ 60 no rompimento).
+                PadrÃµes de reversÃ£o estrutural com confirmaÃ§Ã£o de rompimento do neckline (BOS). O Fundo Duplo exige tendÃªncia prÃ©via de baixa (abaixo da SMA50 ou queda â‰¥ 6%), filtro anti-mÃ¡xima de 60 barras, e IFR/RSI nÃ£o exausto (< 45 nos fundos e â‰¤ 60 no rompimento).
               </p>
             </div>
             <div class="bg-fintech-bg/60 p-3 rounded space-y-1.5">
               <span class="font-bold text-white block">Wyckoff Spring & Upthrust (UTAD):</span>
               <p class="text-gray-300">
-                Varredura de liquidez com rompimento falso de suporte (Spring) ou de resistência (Upthrust) com volume acima da média.
+                Varredura de liquidez com rompimento falso de suporte (Spring) ou de resistÃªncia (Upthrust) com volume acima da mÃ©dia.
               </p>
             </div>
           </div>
@@ -1676,22 +1590,22 @@
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
             <div class="bg-fintech-bg/60 p-3 rounded space-y-1">
-              <span class="font-bold text-white block">DCA Dinâmico / Excesso Estatístico:</span>
-              <p class="text-gray-300">Aumenta compras quando o preço cai além de 2 desvios padrão da SMA(200) ou RSI < 30. Sinaliza venda/realização parcial quando sobe além de 2 desvios padrão ou RSI >70.</p>
+              <span class="font-bold text-white block">DCA DinÃ¢mico / Excesso EstatÃ­stico:</span>
+              <p class="text-gray-300">Aumenta compras quando o preÃ§o cai alÃ©m de 2 desvios padrÃ£o da SMA(200) ou RSI < 30. Sinaliza venda/realizaÃ§Ã£o parcial quando sobe alÃ©m de 2 desvios padrÃ£o ou RSI >70.</p>
             </div>
             <div class="bg-fintech-bg/60 p-3 rounded space-y-1">
               <span class="font-bold text-white block">Rebalanceamento de Carteira:</span>
-              <p class="text-gray-300">Rebalanceia peso da carteira entre Renda Fixa e Renda Variável ao exceder a tolerância (+/- 5%), comprando na baixa e realizando no topo.</p>
+              <p class="text-gray-300">Rebalanceia peso da carteira entre Renda Fixa e Renda VariÃ¡vel ao exceder a tolerÃ¢ncia (+/- 5%), comprando na baixa e realizando no topo.</p>
             </div>
           </div>
         </div>
 
         <div class="card-surface p-4 space-y-4">
           <h3 class="text-sm font-bold text-fintech-green flex items-center gap-2 border-b border-fintech-border pb-2">
-            <span></span>Grupo 4: 28 Padrões Clássicos de Velas (MQL5 Vectorized)
+            <span></span>Grupo 4: 28 PadrÃµes ClÃ¡ssicos de Velas (MQL5 Vectorized)
           </h3>
           <p class="text-xs text-gray-300 leading-relaxed">
-            14 padrões de velas de fundo filtrados por tendência de baixa prévia (<code class="text-cyan-400">Close < SMA(20)</code>) e 14 padrões de velas de topo filtrados por tendência de alta prévia (<code class="text-cyan-400">Close >SMA(20)</code>), com execução estrita em Open[t+1].
+            14 padrÃµes de velas de fundo filtrados por tendÃªncia de baixa prÃ©via (<code class="text-cyan-400">Close < SMA(20)</code>) e 14 padrÃµes de velas de topo filtrados por tendÃªncia de alta prÃ©via (<code class="text-cyan-400">Close >SMA(20)</code>), com execuÃ§Ã£o estrita em Open[t+1].
           </p>
         </div>
       </div>
@@ -1700,7 +1614,92 @@
     <!-- ========================================== -->
     <!-- TAB 5: GESTOR E SIMULADOR DE CARTEIRA      -->
     <!-- ========================================== -->
-    <section id="tab-portfolio" class="tab-view hidden h-full p-2.5 sm:p-4 overflow-y-auto">
+        <!-- TAB: PROVENTOS (INVESTIDOR10 STYLE) -->
+    <section id="tab-pane-proventos" data-tab-pane="proventos" class="tab-pane tab-view hidden h-full p-2.5 sm:p-5 overflow-y-auto">
+      <div class="max-w-7xl mx-auto space-y-4 sm:space-y-5">
+        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+            <div>
+              <h2 class="text-lg font-bold text-slate-900">Evolução de Proventos</h2>
+              <p class="text-xs text-slate-500">Histórico de dividendos e JCP recebidos da custódia B3</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="btn-proventos-view-mensal" class="px-3 py-1 text-xs font-semibold rounded-lg bg-slate-900 text-white shadow-sm">Mensal</button>
+              <button id="btn-proventos-view-anual" class="px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200">Anual</button>
+            </div>
+          </div>
+          <div id="chart-proventos-detailed" class="w-full h-72 mt-4 relative overflow-hidden block">
+            Carregando proventos...
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB: PATRIMÔNIO (INVESTIDOR10 STYLE) -->
+    <section id="tab-pane-patrimonio" data-tab-pane="patrimonio" class="tab-pane tab-view hidden h-full p-2.5 sm:p-5 overflow-y-auto">
+      <div class="max-w-7xl mx-auto space-y-4 sm:space-y-5">
+        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+          <h2 class="text-lg font-bold text-slate-900 mb-2">Evolução do Patrimônio Consolidado</h2>
+          <p class="text-xs text-slate-500 mb-4">Aportes acumulados versus ganho de capital em séries temporais</p>
+          <div id="chart-patrimonio-detailed" class="h-80 w-full flex items-center justify-center text-slate-400 text-sm">
+            Carregando evolução patrimonial...
+          </div>
+        </div>
+      </div>
+    </section>
+
+        <section id="tab-portfolio" data-legacy-id="tab-pane-posicoes" data-tab-pane="posicoes" class="tab-pane tab-view hidden h-full p-4 sm:p-6 overflow-y-auto bg-slate-50">
+      <div class="max-w-7xl mx-auto space-y-6">
+
+        <!-- Header da Seção de Posições (Investidor10 Style) -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+          <div>
+            <h2 class="text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+              Meus Ativos & Diagnóstico Estatístico
+              <span id="pos-total-count-badge" class="text-xs bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded-full">0</span>
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Custódia categorizada por classe com sinais em tempo real de Fundo 2x2 e nota estatística</p>
+          </div>
+          <div class="flex items-center gap-2.5">
+            <button id="btn-pos-expand-all" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 shadow-sm transition">
+              Expandir Todos
+            </button>
+            <button id="btn-pos-collapse-all" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 shadow-sm transition">
+              Recolher Todos
+            </button>
+          </div>
+        </div>
+
+        <!-- Container Dinâmico dos Acordeões por Categoria (Investidor10 Style) -->
+                <div id="investidor10-positions-categories" class="space-y-4">
+          <!-- Modelo/Template de Category Card (Investidor10 Style) -->
+          <div class="category-card bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+            <div class="category-header p-4 bg-white flex items-center justify-between border-b border-slate-200 cursor-pointer">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center font-bold text-slate-700 text-xs">S</div>
+                <div>
+                  <h3 class="font-bold text-slate-900 text-sm">Ações Brasileiras</h3>
+                  <span class="text-xs text-slate-500">Custódia B3</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-6 text-xs">
+                <div class="text-right">
+                  <span class="text-[10px] text-slate-400 font-semibold block uppercase">Valor Total</span>
+                  <span class="font-bold text-slate-900 text-xs">R$ 0,00</span>
+                </div>
+                <div class="text-right">
+                  <span class="text-[10px] text-slate-400 font-semibold block uppercase">Variação</span>
+                  <span class="font-bold text-emerald-600 text-xs">0,00% ▲</span>
+                </div>
+                <span class="text-slate-400">▲</span>
+              </div>
+            </div>
+          </div>
+          <!-- Categorias (Ações, FIIs, BDRs, etc.) injetadas dinamicamente via app.js -->
+        </div>
+
+        <!-- Seção de Simulador e Rebalanceamento Quantitativo Preservada -->
+        <div class="mt-8 pt-6 border-t border-slate-200">
       <div class="max-w-7xl mx-auto space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
@@ -1713,7 +1712,7 @@
           </div>
           <div class="flex items-center gap-2">
             <button id="btn-run-portfolio" class="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold px-4 py-2 rounded shadow-lg transition flex items-center gap-1.5 cursor-pointer">
-              <span class="text-black font-extrabold">▶</span> Gerar Plano de Hoje & Simular Carteira
+              <span class="text-black font-extrabold">â–¶</span> Gerar Plano de Hoje & Simular Carteira
             </button>
           </div>
         </div>
@@ -1753,15 +1752,15 @@
                 <div>
                   <label class="text-gray-400 font-semibold block mb-1">Tempo</label>
                   <select id="portfolio-interval-select" class="w-full bg-fintech-bg border border-fintech-border rounded px-2 py-1.5 text-white font-sans focus:border-fintech-cyan focus:outline-none">
-                    <option value="1d" selected>1D (Diário)</option>
+                    <option value="1d" selected>1D (DiÃ¡rio)</option>
                     <option value="1wk">1S (Semanal)</option>
-                    <option value="1h">1h (Horário)</option>
+                    <option value="1h">1h (HorÃ¡rio)</option>
                     <option value="15m">15m</option>
                     <option value="5m">5m</option>
                   </select>
                 </div>
                 <div>
-                  <label class="text-gray-400 font-semibold block mb-1">Período</label>
+                  <label class="text-gray-400 font-semibold block mb-1">PerÃ­odo</label>
                   <select id="portfolio-period-select" class="w-full bg-fintech-bg border border-fintech-border rounded px-2 py-1.5 text-white font-sans focus:border-fintech-cyan focus:outline-none">
                     <option value="1y">1 Ano</option>
                     <option value="2y" selected>2 Anos</option>
@@ -1772,7 +1771,7 @@
             </div>
 
             <div id="portfolio-custom-tickers-wrapper" class="hidden">
-              <label class="text-gray-400 font-semibold block mb-1">Tickers Personalizados (separados por vírgula)</label>
+              <label class="text-gray-400 font-semibold block mb-1">Tickers Personalizados (separados por vÃ­rgula)</label>
               <input id="portfolio-custom-tickers-input" type="text" placeholder="Ex: PETR4.SA, VALE3.SA, ITUB4.SA, WEGE3.SA, BTC-USD" class="w-full bg-fintech-bg border border-fintech-border rounded px-2.5 py-1.5 text-white font-mono uppercase focus:border-fintech-cyan focus:outline-none">
             </div>
           </div>
@@ -1786,11 +1785,11 @@
               </div>
               <div class="flex items-center gap-1.5">
                 <input type="file" id="portfolio-csv-file-input" accept=".xlsx,.xls,.csv,.txt" multiple class="hidden">
-                <button id="btn-portfolio-import-csv" type="button" class="text-[11px] px-2.5 py-1 rounded bg-cyan-950/50 hover:bg-cyan-900/60 text-cyan-300 hover:text-cyan-200 border border-cyan-800/60 transition cursor-pointer flex items-center gap-1 font-semibold" title="Importar uma ou múltiplas planilhas oficiais B3 (.xlsx) ou arquivo CSV">
-                  <span>📁</span>Importar B3 / CSV
+                <button id="btn-portfolio-import-csv" type="button" class="text-[11px] px-2.5 py-1 rounded bg-cyan-950/50 hover:bg-cyan-900/60 text-cyan-300 hover:text-cyan-200 border border-cyan-800/60 transition cursor-pointer flex items-center gap-1 font-semibold" title="Importar uma ou mÃºltiplas planilhas oficiais B3 (.xlsx) ou arquivo CSV">
+                  <span>ðŸ“</span>Importar B3 / CSV
                 </button>
-                <button id="btn-portfolio-undo-apply" type="button" class="hidden text-[11px] px-2.5 py-1 rounded bg-amber-950/50 hover:bg-amber-900/60 text-amber-300 hover:text-amber-200 border border-amber-800/60 transition cursor-pointer flex items-center gap-1" title="Desfazer aplicação de ordens e restaurar carteira anterior">
-                  <span>↩️</span>Desfazer Aplicação
+                <button id="btn-portfolio-undo-apply" type="button" class="hidden text-[11px] px-2.5 py-1 rounded bg-amber-950/50 hover:bg-amber-900/60 text-amber-300 hover:text-amber-200 border border-amber-800/60 transition cursor-pointer flex items-center gap-1" title="Desfazer aplicaÃ§Ã£o de ordens e restaurar carteira anterior">
+                  <span>â†©ï¸</span>Desfazer AplicaÃ§Ã£o
                 </button>
                 <button id="btn-portfolio-clear-holdings" class="text-[11px] px-2.5 py-1 rounded bg-fintech-bg hover:bg-rose-950/60 text-gray-300 hover:text-rose-300 border border-fintech-border transition cursor-pointer">
                   Limpar (100% Caixa)
@@ -1846,10 +1845,10 @@
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div>
               <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                <span></span>Plano de Ação & Rebalanceamento Hoje (Boleta de Recomendações)
+                <span></span>Plano de AÃ§Ã£o & Rebalanceamento Hoje (Boleta de RecomendaÃ§Ãµes)
               </h3>
               <p class="text-[11px] text-gray-400">
-                O que comprar, quanto comprar, o que vender, quanto vender e como rebalancear sua carteira agora segundo a estratégia campeã de cada ativo.
+                O que comprar, quanto comprar, o que vender, quanto vender e como rebalancear sua carteira agora segundo a estratÃ©gia campeÃ£ de cada ativo.
               </p>
             </div>
             <div class="flex flex-wrap items-center gap-3 text-xs">
@@ -1858,8 +1857,8 @@
                 <span id="advise-total-equity" class="font-bold text-white font-mono">R$ 10.000,00</span>
               </div>
               <div class="bg-fintech-bg px-3 py-1.5 rounded border border-fintech-border">
-                <span class="text-gray-400 text-[10px] block">Caixa Atual → Pós-Ordens</span>
-                <span id="advise-cash-transition" class="font-bold text-fintech-cyan font-mono">R$ 10.000,00 → R$ 0,00</span>
+                <span class="text-gray-400 text-[10px] block">Caixa Atual â†’ PÃ³s-Ordens</span>
+                <span id="advise-cash-transition" class="font-bold text-fintech-cyan font-mono">R$ 10.000,00 â†’ R$ 0,00</span>
               </div>
               <button id="btn-apply-portfolio-orders" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-2 rounded shadow transition cursor-pointer hidden">
                 Aplicar Ordens na Minha Carteira
@@ -1871,15 +1870,15 @@
             <table class="w-full text-left text-xs text-gray-300">
               <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[10px] border-b border-fintech-border whitespace-nowrap">
                 <tr>
-                  <th class="px-3 py-2.5">Ação Recomendada</th>
+                  <th class="px-3 py-2.5">AÃ§Ã£o Recomendada</th>
                   <th class="px-3 py-2.5">Ativo</th>
-                  <th class="px-3 py-2.5">Estratégia Campeã Acionada</th>
+                  <th class="px-3 py-2.5">EstratÃ©gia CampeÃ£ Acionada</th>
                   <th class="px-3 py-2.5 text-center">Score Potencial</th>
                   <th class="px-3 py-2.5 text-center">Timing</th>
                   <th class="px-3 py-2.5 font-mono">Preço Ref.</th>
                   <th class="px-3 py-2.5 font-mono">Qtd (Comprar/Vender)</th>
                   <th class="px-3 py-2.5 font-mono">Valor da Ordem (R$)</th>
-                  <th class="px-3 py-2.5 font-mono text-center">Peso (Atual → Alvo)</th>
+                  <th class="px-3 py-2.5 font-mono text-center">Peso (Atual â†’ Alvo)</th>
                   <th class="px-3 py-2.5">Justificativa Quantitativa</th>
                 </tr>
               </thead>
@@ -1895,16 +1894,16 @@
         </div>
 
         <!-- ======================================================= -->
-        <!-- SECTION B: SIMULADOR HISTÓRICO MULTIATIVOS (BACKTEST)   -->
+        <!-- SECTION B: SIMULADOR HISTÃ“RICO MULTIATIVOS (BACKTEST)   -->
         <!-- ======================================================= -->
         <div class="space-y-4">
           <div class="flex items-center justify-between">
             <div>
               <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                <span></span>Simulador Histórico da Carteira (Backtest Multiativos Zero Look-Ahead)
+                <span></span>Simulador HistÃ³rico da Carteira (Backtest Multiativos Zero Look-Ahead)
               </h3>
               <p class="text-[11px] text-gray-400">
-                Simula como o motor teria gerenciado e rebalanceado o capital ao longo do período, comparando contra o Buy & Hold em pesos iguais da cesta.
+                Simula como o motor teria gerenciado e rebalanceado o capital ao longo do perÃ­odo, comparando contra o Buy & Hold em pesos iguais da cesta.
               </p>
             </div>
           </div>
@@ -1927,14 +1926,14 @@
               <div class="text-[10px] text-gray-400 font-mono" id="port-kpi-bench-sub">B&H Cesta: 0.0% (Alfa: 0.0%)</div>
             </div>
             <div class="card-surface p-2.5 sm:p-3">
-              <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Taxa de Acerto (Saídas)</div>
+              <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Taxa de Acerto (SaÃ­das)</div>
               <div class="text-base sm:text-lg font-bold text-emerald-400 font-mono" id="port-kpi-winrate">0.0%</div>
-              <div class="text-[10px] text-gray-400 font-mono" id="port-kpi-exits-sub">0 saídas fechadas</div>
+              <div class="text-[10px] text-gray-400 font-mono" id="port-kpi-exits-sub">0 saÃ­das fechadas</div>
             </div>
             <div class="card-surface p-2.5 sm:p-3">
               <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Fator de Lucro</div>
               <div class="text-base sm:text-lg font-bold text-amber-400 font-mono" id="port-kpi-pf">0.00</div>
-              <div class="text-[10px] text-gray-400 font-mono" id="port-kpi-rotations-sub">0 rebalanceamentos/rotações</div>
+              <div class="text-[10px] text-gray-400 font-mono" id="port-kpi-rotations-sub">0 rebalanceamentos/rotaÃ§Ãµes</div>
             </div>
             <div class="card-surface p-2.5 sm:p-3">
               <div class="text-[10px] sm:text-[11px] text-gray-400 font-semibold">Max Drawdown Carteira</div>
@@ -1947,14 +1946,14 @@
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
             <div class="lg:col-span-8 card-surface p-3.5 sm:p-4">
               <div class="flex items-center justify-between mb-2">
-                <h3 class="text-xs font-bold text-gray-200">Evolução Patrimonial: Carteira Gerenciada vs. Buy & Hold Cesta vs. Caixa</h3>
+                <h3 class="text-xs font-bold text-gray-200">EvoluÃ§Ã£o Patrimonial: Carteira Gerenciada vs. Buy & Hold Cesta vs. Caixa</h3>
                 <span class="text-[10px] text-gray-400 font-mono">Zero Look-Ahead Bias</span>
               </div>
               <div id="portfolio-equity-chart" class="w-full h-72"></div>
             </div>
             <div class="lg:col-span-4 card-surface p-3.5 sm:p-4">
               <div class="flex items-center justify-between mb-2">
-                <h3 class="text-xs font-bold text-gray-200">Distribuição Alvo da Carteira (%)</h3>
+                <h3 class="text-xs font-bold text-gray-200">DistribuiÃ§Ã£o Alvo da Carteira (%)</h3>
                 <span class="text-[10px] text-gray-400 font-mono">Ativos + Caixa</span>
               </div>
               <div id="portfolio-allocation-chart" class="w-full h-72"></div>
@@ -1965,9 +1964,9 @@
           <div class="card-surface p-3.5 sm:p-4 overflow-hidden">
             <div class="flex items-center justify-between mb-2">
               <h3 class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
-                <span></span>Ranking de Potencial do Universo & Par de Estratégias Campeão por Ativo
+                <span></span>Ranking de Potencial do Universo & Par de EstratÃ©gias CampeÃ£o por Ativo
               </h3>
-              <span class="text-[10px] text-gray-400 font-mono">Ordenado por Score de Potencial (0–100)</span>
+              <span class="text-[10px] text-gray-400 font-mono">Ordenado por Score de Potencial (0â€“100)</span>
             </div>
             <div class="overflow-x-auto touch-scroll max-h-64">
               <table class="w-full text-left text-xs text-gray-300">
@@ -1975,9 +1974,9 @@
                   <tr>
                     <th class="px-2.5 py-2 text-center">Rank</th>
                     <th class="px-2.5 py-2">Ativo</th>
-                    <th class="px-2.5 py-2 text-center font-mono">Score (0–100)</th>
-                    <th class="px-2.5 py-2">Estratégia Compra Campeã</th>
-                    <th class="px-2.5 py-2">Estratégia Venda Campeã</th>
+                    <th class="px-2.5 py-2 text-center font-mono">Score (0â€“100)</th>
+                    <th class="px-2.5 py-2">EstratÃ©gia Compra CampeÃ£</th>
+                    <th class="px-2.5 py-2">EstratÃ©gia Venda CampeÃ£</th>
                     <th class="px-2.5 py-2 text-center font-mono">Win Rate</th>
                     <th class="px-2.5 py-2 font-mono">Retorno Hist.</th>
                     <th class="px-2.5 py-2 font-mono text-center">Max DD</th>
@@ -1999,7 +1998,7 @@
           <div class="card-surface p-3.5 sm:p-4 overflow-hidden">
             <div class="flex items-center justify-between mb-2">
               <h3 class="text-xs font-bold text-gray-200 flex items-center gap-1.5">
-                <span></span>Histórico Cronológico de Compras, Vendas e Rebalanceamentos da Carteira
+                <span></span>HistÃ³rico CronolÃ³gico de Compras, Vendas e Rebalanceamentos da Carteira
               </h3>
               <span class="text-[10px] text-gray-400 font-mono" id="portfolio-ledger-count-badge">0 eventos</span>
             </div>
@@ -2009,15 +2008,15 @@
                   <tr>
                     <th class="px-2.5 py-2 text-center">#</th>
                     <th class="px-2.5 py-2 font-mono">Data</th>
-                    <th class="px-2.5 py-2">Operação</th>
+                    <th class="px-2.5 py-2">OperaÃ§Ã£o</th>
                     <th class="px-2.5 py-2">Ativo</th>
-                    <th class="px-2.5 py-2">Estratégia Acionada</th>
+                    <th class="px-2.5 py-2">EstratÃ©gia Acionada</th>
                     <th class="px-2.5 py-2 text-center font-mono">Score</th>
                     <th class="px-2.5 py-2 font-mono">Preço Exec.</th>
                     <th class="px-2.5 py-2 font-mono">Cotas</th>
                     <th class="px-2.5 py-2 font-mono">Valor Ordem</th>
                     <th class="px-2.5 py-2 font-mono">Lucro/Prej. Realizado</th>
-                    <th class="px-2.5 py-2 font-mono text-center">Peso (Antes → Depois)</th>
+                    <th class="px-2.5 py-2 font-mono text-center">Peso (Antes â†’ Depois)</th>
                     <th class="px-2.5 py-2 font-mono">Caixa Restante</th>
                     <th class="px-2.5 py-2 font-mono">Patrimônio Total</th>
                   </tr>
@@ -2025,7 +2024,7 @@
                 <tbody id="portfolio-ledger-tbody" class="divide-y divide-fintech-border font-mono whitespace-nowrap text-[11px]">
                   <tr>
                     <td colspan="13" class="px-4 py-6 text-center text-gray-500">
-                      Execute a simulação da carteira para visualizar o histórico barra a barra de alocações e rotações.
+                      Execute a simulaÃ§Ã£o da carteira para visualizar o histórico barra a barra de alocaÃ§Ãµes e rotaÃ§Ãµes.
                     </td>
                   </tr>
                 </tbody>
@@ -2043,13 +2042,13 @@
     <div class="bg-fintech-surface max-w-lg w-full p-4 sm:p-6 space-y-4 border border-fintech-border shadow-2xl rounded-lg">
       <div class="flex items-center justify-between border-b border-fintech-border pb-3">
         <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">✓</div>
+          <div class="w-8 h-8 rounded bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">âœ“</div>
           <div>
-            <h3 class="text-sm sm:text-base font-bold text-white">Revisão Prévia de Execução de Ordens</h3>
-            <p class="text-[11px] text-gray-400">Confirme a aplicação das ordens recomendadas na sua carteira.</p>
+            <h3 class="text-sm sm:text-base font-bold text-white">RevisÃ£o PrÃ©via de ExecuÃ§Ã£o de Ordens</h3>
+            <p class="text-[11px] text-gray-400">Confirme a aplicaÃ§Ã£o das ordens recomendadas na sua carteira.</p>
           </div>
         </div>
-        <button id="btn-modal-close" class="text-gray-400 hover:text-white text-lg font-bold p-1">✕</button>
+        <button id="btn-modal-close" class="text-gray-400 hover:text-white text-lg font-bold p-1">âœ•</button>
       </div>
 
       <div class="space-y-2">
@@ -2058,8 +2057,8 @@
           <span id="modal-orders-count" class="font-bold font-mono text-white">0</span>
         </div>
         <div class="flex justify-between items-center text-xs bg-fintech-bg/60 p-2.5 rounded">
-          <span class="text-gray-400">Transição de Caixa:</span>
-          <span id="modal-cash-transition" class="font-bold font-mono text-fintech-cyan">R$ 0,00 → R$ 0,00</span>
+          <span class="text-gray-400">TransiÃ§Ã£o de Caixa:</span>
+          <span id="modal-cash-transition" class="font-bold font-mono text-fintech-cyan">R$ 0,00 â†’ R$ 0,00</span>
         </div>
       </div>
 
@@ -2069,7 +2068,7 @@
           <thead class="bg-fintech-bg text-gray-400 uppercase text-[10px] sticky top-0 font-mono">
             <tr>
               <th class="px-2.5 py-1.5">Ativo</th>
-              <th class="px-2.5 py-1.5">Ação</th>
+              <th class="px-2.5 py-1.5">AÃ§Ã£o</th>
               <th class="px-2.5 py-1.5 font-mono text-right">Qtd</th>
               <th class="px-2.5 py-1.5 font-mono text-right">Valor Estimado</th>
             </tr>
@@ -2082,7 +2081,7 @@
 
       <div class="bg-amber-500/10 rounded p-2.5 text-[11px] text-amber-300 flex items-start gap-2">
         <span class="text-base leading-none">Aviso:</span>
-        <span>As alterações atualizarão a sua custódia e recalcularão os pesos ideais. Você poderá desfazer a qualquer momento pelo botão <strong>Desfazer Aplicação</strong>.</span>
+        <span>As alteraÃ§Ãµes atualizarÃ£o a sua custÃ³dia e recalcularÃ£o os pesos ideais. VocÃª poderÃ¡ desfazer a qualquer momento pelo botÃ£o <strong>Desfazer AplicaÃ§Ã£o</strong>.</span>
       </div>
 
       <div class="flex items-center justify-end gap-2.5 pt-2">
@@ -2090,7 +2089,7 @@
           Cancelar
         </button>
         <button id="btn-modal-confirm" class="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded shadow-lg transition">
-          Confirmar Execução
+          Confirmar ExecuÃ§Ã£o
         </button>
       </div>
     </div>
@@ -2104,6 +2103,10 @@
   </div>
 
   <!-- Application Logic -->
+  <script src="modules/constants.js"></script>
+  <script src="modules/formatters.js"></script>
+  <script src="modules/toast.js"></script>
+  <script src="modules/proventos.js"></script>
   <script src="app.js"></script>
 
   <!-- Modal de Configuração de Metas -->
@@ -2114,7 +2117,7 @@
           <h3 class="text-sm sm:text-base font-bold text-white">Configurar Metas de Longo Prazo</h3>
           <p class="text-[11px] text-gray-400">Defina seus objetivos financeiros patrimoniais e de proventos.</p>
         </div>
-        <button id="btn-modal-metas-close" class="text-gray-400 hover:text-white text-lg font-bold p-1">✕</button>
+        <button id="btn-modal-metas-close" class="text-gray-400 hover:text-white text-lg font-bold p-1">âœ•</button>
       </div>
 
       <div class="space-y-3">
@@ -2141,3 +2144,5 @@
 
 </body>
 </html>
+
+

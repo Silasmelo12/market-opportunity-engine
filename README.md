@@ -210,13 +210,22 @@ Documentação interativa Swagger disponível em: **`http://localhost:8000/docs`
 O projeto conta com rigorosa cobertura de testes unitários e de integração, incluindo validações formais contra viés de antecipação temporal (*anti-look-ahead*):
 
 ```bash
-# Executar suíte completa de testes
-pytest -v
+# Suíte rápida (contratos de API, engine, B3 e guardrails estáticos de UI)
+pytest tests/unit -q
+
+# Regressão visual real da UI (requer Chromium do Playwright)
+pip install -r requirements-dev.txt
+python -m playwright install chromium
+pytest tests/e2e -v
 ```
 
-```text
-======================= 51 passed in 4.79s =======================
-```
+**Guardrails de UI (não remover):**
+
+- Hosts de gráfico (`id` contendo `chart`/`plot`) devem ser `block`/`relative`; nunca `flex items-center justify-center`. O CSS ainda força `.js-plotly-plot { display: block !important; }` como segunda barreira.
+- Plotly: primeiro paint com `newPlot` (limpando o placeholder), atualizações com `react`; nunca `innerHTML = ''` num gráfico já montado.
+- Rótulos mensais passam por `parseProventoPeriod()` (aceita `YYYY-MM`, `YYYY-MM-DD` e `MM/YYYY`) e são ordenados cronologicamente.
+- Fontes web são UTF-8 (ver `.editorconfig`). O teste `test_frontend_text_has_no_mojibake` varre `src/web/*` e falha em sequências como `NegaÃ§Ã£o`.
+- O teste E2E mede o retângulo real do gráfico e falha se ele sair do card, se o toggle Mensal/Anual quebrar ou se houver overflow horizontal.
 
 ---
 

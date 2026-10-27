@@ -1,5 +1,6 @@
 import pytest
 from pathlib import Path
+import pandas as pd
 from src.data_loader.b3_parser import (
     parse_b3_file,
     parse_multiple_b3_files,
@@ -7,6 +8,24 @@ from src.data_loader.b3_parser import (
     _clean_ticker_from_product,
     _classify_asset,
 )
+
+
+def _csv_bytes(df: pd.DataFrame) -> bytes:
+    return df.to_csv(index=False, sep=";").encode("utf-8")
+
+
+def _detalhada(rows):
+    return pd.DataFrame(rows, columns=[
+        "Data do Negócio", "Tipo de Movimentação", "Mercado", "Prazo/Vencimento",
+        "Instituição", "Código de Negociação", "Quantidade", "Preço", "Valor",
+    ])
+
+
+def _movimentacao(rows):
+    return pd.DataFrame(rows, columns=[
+        "Entrada/Saída", "Data", "Movimentação", "Produto", "Instituição",
+        "Quantidade", "Preço unitário", "Valor da Operação",
+    ])
 
 
 def test_numeric_parsing():
@@ -115,3 +134,78 @@ def test_b3_api_multi_upload():
         data = res.json()
         assert len(data["holdings"]) > 0
         assert data["total_income"] >= 26.0
+
+
+def test_multi_file_ledger_nets_cross_file_sales():
+    """A compra em julho e a venda em agosto devem resultar em saldo zero.
+
+    Regressão do AMZO34/MSFT34/SSFO34/S2NA34: o parser antigo somava as
+    holdings de cada arquivo e a venda do mês seguinte era descartada por não
+    haver posição inicial dentro daquele arquivo.
+    """
+    julho = _detalhada([
+        ["06/07/2026", "Compra", "Mercado à Vista", "-", "XP", "AMZO34", 1, 63.0, 63.0],
+        ["06/07/2026", "Compra", "Mercado Fracionário", "-", "XP", "PETR4F", 5, 38.66, 193.30],
+    ])
+    agosto = _detalhada([
+        ["05/08/2026", "Venda", "Mercado à Vista", "-", "XP", "AMZO34", 1, 69.76, 69.76],
+    ])
+    movimento = _movimentacao([
+        ["Credito", "08/07/2026", "Transferência - Liquidação", "AMZO34 - AMAZON.COM, INC", "XP", 1, 63.0, 63.0],
+        ["Debito", "07/08/2026", "Transferência - Liquidação", "AMZO34 - AMAZON.COM, INC", "XP", 1, 69.76, 69.76],
+        ["Credito", "08/07/2026", "Transferência - Liquidação", "PETR4 - PETROLEO BRASILEIRO", "XP", 5, 38.66, 193.30],
+        ["Credito", "15/09/2026", "Rendimento", "MXRF11 - MAXI RENDA FII", "XP", 1, 0.10, 0.10],
+    ])
+
+    files = [
+        ("julho.csv", _csv_bytes(julho)),
+        ("agosto.csv", _csv_bytes(agosto)),
+        ("movimentacao.csv", _csv_bytes(movimento)),
+    ]
+    result = parse_multiple_b3_files(files)
+
+    tickers = {h.ticker: h for h in result.holdings}
+    assert "AMZO34.SA" not in tickers
+    assert tickers["PETR4.SA"].shares == 5.0
+    assert tickers["PETR4.SA"].average_buy_price == pytest.approx(38.66, abs=1e-4)
+    assert result.total_income == pytest.approx(0.10, abs=1e-6)
+    assert [(m.month_year, m.total) for m in result.monthly_income] == [("2026-09", 0.10)]
+
+
+def test_detailed_only_multi_file_ledger_nets_cross_file_sales():
+    """Mesmo sem o arquivo de movimentação, julho + agosto não podem deixar saldo."""
+    julho = _detalhada([
+        ["06/07/2026", "Compra", "Mercado à Vista", "-", "XP", "AMZO34", 1, 63.0, 63.0],
+        ["06/07/2026", "Compra", "Mercado Fracionário", "-", "XP", "PETR4F", 5, 38.66, 193.30],
+    ])
+    agosto = _detalhada([
+        ["05/08/2026", "Venda", "Mercado à Vista", "-", "XP", "AMZO34", 1, 69.76, 69.76],
+    ])
+
+    result = parse_multiple_b3_files([
+        ("julho.csv", _csv_bytes(julho)),
+        ("agosto.csv", _csv_bytes(agosto)),
+    ])
+
+    tickers = {h.ticker: h for h in result.holdings}
+    assert "AMZO34.SA" not in tickers
+    assert tickers["PETR4.SA"].shares == 5.0
+
+
+def test_movement_file_takes_precedence_over_detailed_trades():
+    """Movimentação já contém a liquidação; não pode duplicar a Compra detalhada."""
+    julho = _detalhada([
+        ["06/07/2026", "Compra", "Mercado à Vista", "-", "XP", "PETR4", 5, 38.66, 193.30],
+    ])
+    movimento = _movimentacao([
+        ["Credito", "08/07/2026", "Transferência - Liquidação", "PETR4 - PETROLEO BRASILEIRO", "XP", 5, 38.66, 193.30],
+    ])
+
+    result = parse_multiple_b3_files([
+        ("julho.csv", _csv_bytes(julho)),
+        ("movimentacao.csv", _csv_bytes(movimento)),
+    ])
+
+    tickers = {h.ticker: h for h in result.holdings}
+    assert tickers["PETR4.SA"].shares == 5.0
+    assert tickers["PETR4.SA"].total_invested == pytest.approx(193.30, abs=1e-2)

@@ -1,13 +1,6 @@
+// Proventos extraído para modules/proventos.js (Etapa 4 - Spec 022)
 
-function stripCorporateSuffix(name) {
-  if (!name) return '';
-  const parts = String(name).split(/\s+/);
-  const clean = parts.filter(p => {
-    const up = p.toUpperCase().replace(/[.,-]+$/, '');
-    return up !== 'S.A' && up !== 'S/A' && up !== 'SA';
-  });
-  return clean.join(' ').replace(/^[ ,-]+|[ ,-]+$/, '');
-}
+// stripCorporateSuffix extraído para modules/formatters.js
 /**
  * Market Opportunity & Top/Bottom Statistical Engine
  * 60fps TradingView Lightweight Charts & Zero-Latency Client-Side Bidirectional Filtering.
@@ -43,18 +36,9 @@ window.appState = {
 const state = window.appState;
 
 // Ticker Aliases for Brazilian Mini Futures & Commodities
-const TICKER_ALIASES = {
-  'WIN': '^BVSP',
-  'WDO': 'USDBRL=X',
-  'XAUUSD': 'GC=F',
-  'GOLD': 'GC=F',
-};
+// TICKER_ALIASES extraído para modules/constants.js
 
-function resolveTicker(input) {
-  if (!input) return input;
-  const clean = String(input).trim().toUpperCase();
-  return TICKER_ALIASES[clean] || clean;
-}
+// resolveTicker extraído para modules/formatters.js
 
 // DOM Elements
 const elements = {
@@ -86,238 +70,11 @@ const elements = {
 };
 
 // Institutional Portuguese Asset Names Mapping
-const ASSET_NAMES = {
-  // Futuros B3 & Commodities Globais
-  '^BVSP': 'Mini Índice / Ibovespa (WIN)',
-  'WIN': 'Mini Índice / Ibovespa (WIN)',
-  'USDBRL=X': 'Mini Dólar (WDO / USDBRL)',
-  'WDO': 'Mini Dólar (WDO / USDBRL)',
-  'GC=F': 'Gold (Ouro / XAUUSD)',
-  'XAUUSD': 'Gold (Ouro / XAUUSD)',
-  'GOLD': 'Gold (Ouro / XAUUSD)',
-  'SI=F': 'Silver (Prata)',
-  'CL=F': 'Crude Oil WTI (Petróleo)',
-  'BZ=F': 'Brent Oil (Petróleo Brent)',
-  'HG=F': 'Copper (Cobre)',
-  'NG=F': 'Natural Gas (Gás Natural)',
-  'ZC=F': 'Corn (Milho)',
-  'ZS=F': 'Soybeans (Soja)',
-  'ZW=F': 'Wheat (Trigo)',
-  'KC=F': 'Coffee (Café Arábica)',
-  'CT=F': 'Cotton (Algodão)',
-  'SB=F': 'Sugar (Açúcar)',
-  'LE=F': 'Live Cattle (Boi Gordo)',
-  'HE=F': 'Lean Hogs (Suínos)',
-  // Forex
-  'EURUSD=X': 'EUR/USD',
-  'GBPUSD=X': 'GBP/USD',
-  'USDJPY=X': 'USD/JPY',
-  'USDCHF=X': 'USD/CHF',
-  'AUDUSD=X': 'AUD/USD',
-  'USDCAD=X': 'USD/CAD',
-  'NZDUSD=X': 'NZD/USD',
-  'EURJPY=X': 'EUR/JPY',
-  'GBPJPY=X': 'GBP/JPY',
-  'EURCHF=X': 'EUR/CHF',
-  // Criptomoedas
-  'BTC-USD': 'Bitcoin',
-  'ETH-USD': 'Ethereum',
-  'SOL-USD': 'Solana',
-  // Ações Brasil
-  'PETR4.SA': 'Petrobras PN',
-  'VALE3.SA': 'Vale ON',
-  'ITUB4.SA': 'Itaú Unibanco PN',
-  'BBDC4.SA': 'Bradesco PN',
-  'BBAS3.SA': 'Banco do Brasil ON',
-  'ABEV3.SA': 'Ambev ON',
-  'WEGE3.SA': 'WEG ON',
-  'RENT3.SA': 'Localiza ON',
-  'EGIE3.SA': 'Engie Brasil ON',
-  'PRIO3.SA': 'PRIO ON',
-  'BRSR6.SA': 'Banrisul PNB',
-  'KLBN4.SA': 'Klabin PN',
-  'CXSE3.SA': 'Caixa Seguridade ON',
-  'BMGB4.SA': 'Banco BMG PN',
-  'BRKM5.SA': 'Braskem PNA',
-  'TASA4.SA': 'Taurus Armas PN',
-  'PMAM3.SA': 'Paranapanema ON',
-  'CMIG4.SA': 'Cemig PN',
-  'CPFE3.SA': 'CPFL Energia ON',
-  'POMO4.SA': 'Marcopolo PN',
-  'TAEE11.SA': 'Taesa Unit',
-  'BBSE3.SA': 'BB Seguridade ON',
-  'SUZB3.SA': 'Suzano ON',
-  'GGBR4.SA': 'Gerdau PN',
-  'CSNA3.SA': 'Siderúrgica Nacional ON',
-  // FIIs Brasil
-  'HGLG11.SA': 'CSHG Logística',
-  'KNRI11.SA': 'Kinea Renda Imob.',
-  'MXRF11.SA': 'Maxi Renda',
-  'VISC11.SA': 'Vinci Shopping',
-  'BTLG11.SA': 'BTG Logística',
-  'HGRE11.SA': 'CSHG Real Estate',
-  'KNIP11.SA': 'Kinea Índices',
-  'HSML11.SA': 'HSI Malls',
-  'GGRC11.SA': 'GGR Covepi',
-  'RBRR11.SA': 'RBR Rendimento',
-  'RBVA11.SA': 'Rio Bravo Renda',
-  'SNCI11.SA': 'Suno Recebíveis',
-  'TRXF11.SA': 'TRX Real Estate',
-  'XPLG11.SA': 'XP Log',
-  'CPTS11.SA': 'Capitânia Securities',
-  'VGIR11.SA': 'Valora RE',
-  'VRTA11.SA': 'Fator Verita',
-  'VINO11.SA': 'Vinci Offices',
-  'RECR11.SA': 'REC Renda Imob.',
-  'HFOF11.SA': 'Hedge FOF',
-  'BTAL11.SA': 'BTG Agro Logística',
-  // BDRs Brasil
-  'NVDC34.SA': 'Nvidia BDR',
-  'AAPL34.SA': 'Apple BDR',
-  'MSFT34.SA': 'Microsoft BDR',
-  'GOGL34.SA': 'Alphabet (Google) BDR',
-  'AMZO34.SA': 'Amazon BDR',
-  'M1TA34.SA': 'Meta Platforms BDR',
-  'TSLA34.SA': 'Tesla BDR',
-  'AVGO34.SA': 'Broadcom BDR',
-  'TSMC34.SA': 'TSMC BDR',
-  'A1MD34.SA': 'AMD BDR',
-  'TMCO34.SA': 'Toyota BDR',
-  'BERK34.SA': 'Berkshire Hathaway BDR',
-  'JPMC34.SA': 'JPMorgan Chase BDR',
-  'VISA34.SA': 'Visa BDR',
-  'MSCD34.SA': 'Mastercard BDR',
-  'BOAC34.SA': 'Bank of America BDR',
-  'GSGI34.SA': 'Goldman Sachs BDR',
-  'WALM34.SA': 'Walmart BDR',
-  'COCA34.SA': 'Coca-Cola BDR',
-  'PEPB34.SA': 'PepsiCo BDR',
-  'MCDC34.SA': 'McDonald\'s BDR',
-  'DISB34.SA': 'Disney BDR',
-  'NFLX34.SA': 'Netflix BDR',
-  'NIKE34.SA': 'Nike BDR',
-  'COWC34.SA': 'Costco BDR',
-  'LILY34.SA': 'Eli Lilly BDR',
-  'N1VO34.SA': 'Novo Nordisk BDR',
-  'JNJB34.SA': 'Johnson & Johnson BDR',
-  'UNHH34.SA': 'UnitedHealth BDR',
-  'PFIZ34.SA': 'Pfizer BDR',
-  'EXXO34.SA': 'Exxon Mobil BDR',
-  'CHVX34.SA': 'Chevron BDR',
-  'CATP34.SA': 'Caterpillar BDR',
-  'BOEI34.SA': 'Boeing BDR',
-  'IVVB11.SA': 'iShares S&P 500 Fundo de Índice',
-  'BIVB39.SA': 'iShares Core S&P 500 BDR',
-  'NASD11.SA': 'Trend ETF Nasdaq 100',
-  'BNDA39.SA': 'Invesco QQQ Trust BDR',
-  'ACWI11.SA': 'Trend ETF MSCI ACWI',
-  'BACW39.SA': 'iShares MSCI ACWI BDR',
-  'SPCX34.SA': 'SpaceX BDR (Space Exploration)',
-  // Ações EUA
-  'AAPL': 'Apple',
-  'MSFT': 'Microsoft',
-  'GOOGL': 'Google (Alphabet)',
-  'AMZN': 'Amazon',
-  'NVDA': 'Nvidia',
-  'META': 'Meta Platforms',
-  'TSLA': 'Tesla',
-  'BRK-B': 'Berkshire Hathaway',
-  'JPM': 'JPMorgan Chase',
-  'V': 'Visa',
-  'JNJ': 'Johnson & Johnson',
-  'WMT': 'Walmart',
-  'PG': 'Procter & Gamble',
-  'MA': 'Mastercard',
-  'UNH': 'UnitedHealth',
-  'HD': 'Home Depot',
-  'DIS': 'Disney',
-  'ADBE': 'Adobe',
-  'NFLX': 'Netflix',
-  'CRM': 'Salesforce',
-  'KO': 'Coca-Cola',
-  'AMD': 'AMD',
-  'INTC': 'Intel',
-  'CSCO': 'Cisco',
-  'ABBV': 'AbbVie',
-  'CVX': 'Chevron',
-  'XOM': 'Exxon Mobil',
-  'PFE': 'Pfizer',
-  'IBM': 'IBM',
-  'MMM': '3M',
-  'VZ': 'Verizon',
-  'T': 'AT&T',
-  'BA': 'Boeing',
-  'CAT': 'Caterpillar',
-  'GE': 'General Electric',
-  'GM': 'General Motors',
-  'F': 'Ford',
-  'UBER': 'Uber',
-  'LYFT': 'Lyft',
-  'TM': 'Toyota',
-  'SNAP': 'Snap',
-  'PINS': 'Pinterest',
-  'PYPL': 'PayPal',
-  'SHOP': 'Shopify',
-  'ZM': 'Zoom',
-  'DOCU': 'DocuSign',
-  'CRWD': 'CrowdStrike',
-  'NET': 'Cloudflare',
-  'O': 'Realty Income',
-  'SPG': 'Simon Property',
-  'PLD': 'Prologis',
-  'AMT': 'American Tower',
-  'CCI': 'Crown Castle',
-  'EQIX': 'Equinix',
-  'PSA': 'Public Storage',
-  'DLR': 'Digital Realty',
-  'WELL': 'Welltower',
-  'AVB': 'AvalonBay',
-  'EQR': 'Equity Residential',
-  'BXP': 'Boston Properties',
-  'VTR': 'Ventas',
-  'ARE': 'Alexandria RE',
-  'MAA': 'Mid-America Apt.',
-  'UDR': 'UDR Inc.',
-  'KIM': 'Kimco Realty',
-  'REG': 'Regency Centers',
-  'HST': 'Host Hotels',
-  'FRT': 'Federal Realty',
-  'NNN': 'NNN REIT',
-  'WPC': 'W. P. Carey',
-  'GLPI': 'Gaming and Leisure',
-};
+// ASSET_NAMES extraído para modules/constants.js
 
-function getAssetName(ticker) {
-  if (!ticker) return '';
-  return ASSET_NAMES[ticker.toUpperCase()] || ticker;
-}
+// getAssetName extraído para modules/formatters.js
 
-function formatPrice(price, ticker = null, category = null) {
-  if (price === null || price === undefined || isNaN(price)) return '-';
-  const num = Number(price);
-  const t = (ticker || state.currentTicker || '').toUpperCase();
-  const c = (category || '').toLowerCase();
-
-  if (t === '^BVSP' || t === 'WIN') {
-    return `${Math.round(num).toLocaleString('pt-BR')} pts`;
-  }
-  if (t === 'USDBRL=X' || t === 'WDO') {
-    return `R$ ${num.toFixed(4)}`;
-  }
-
-  const isForex = t.endsWith('=X') || c.includes('forex') || c.includes('fx');
-  const isUS = (!t.endsWith('.SA') && !t.endsWith('=F') && !isForex && !c.includes('brasil') && !c.includes('fii'));
-  const isCommodity = t.endsWith('=F') || c.includes('commodit');
-  const isCrypto = t.includes('BTC') || t.includes('ETH') || t.includes('SOL') || c.includes('cripto') || c.includes('crypto');
-
-  if (isForex) {
-    return num.toFixed(4);
-  } else if (isUS || isCommodity || isCrypto) {
-    return `$ ${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  } else {
-    return `R$ ${num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  }
-}
+// formatPrice extraído para modules/formatters.js
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
@@ -338,23 +95,29 @@ document.addEventListener('DOMContentLoaded', () => {
   setupPortfolioTab();
   setupOverviewSubNav();
   setupOverviewMetasModal();
+  setupProventosControls();
 
   // Holdings are loaded purely from storage or user uploads
 
 
+  // Listeners para sincronia de rotas e historico (Voltar / Avancar)
   window.addEventListener('hashchange', () => {
-    const targetTab = getTabFromHash();
-    if (targetTab && targetTab !== state.activeTab) {
-      switchTab(targetTab, false);
-    }
+    if (_isNavigating) return;
+    const res = determineActiveRoute();
+    navigateToRoute(res.route, { params: res.params, updateUrl: true, replaceHistory: true });
   });
 
-  // Initial tab restoration from URL hash or localStorage
-  const initialTab = getTabFromHash();
-  switchTab(initialTab, true);
+  window.addEventListener('popstate', () => {
+    if (_isNavigating) return;
+    const res = determineActiveRoute();
+    navigateToRoute(res.route, { params: res.params, updateUrl: false });
+  });
 
-  if (initialTab !== 'tab-radar') {
-    // Also preload radar in background for 0ms tab switches
+  // Initial navigation
+  const initialRes = determineActiveRoute();
+  navigateToRoute(initialRes.route, { params: initialRes.params, updateUrl: true, replaceHistory: true });
+
+  if (initialRes.route !== 'quant/radar') {
     loadRadarData();
   }
 
@@ -399,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnOverviewRefresh = document.getElementById('btn-overview-refresh');
   if (btnOverviewRefresh) {
     btnOverviewRefresh.addEventListener('click', async () => {
-      showLoading('Atualizando cotações e métricas da carteira...');
+      showLoading('Atualizando cotaÃ§Ãµes e mÃ©tricas da carteira...');
       try {
         state.portfolioState.quotesCache = null; // force fresh quotes
         await renderOverviewDashboard();
@@ -407,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
           await runPortfolioAdviseAndSimulate();
           await renderOverviewDashboard();
         }
-        showToastNotification('Carteira e cotações atualizadas com sucesso!', false);
+        showToastNotification('Carteira e cotaÃ§Ãµes atualizadas com sucesso!', false);
       } catch (err) {
         console.warn('Erro ao atualizar carteira:', err);
       } finally {
@@ -460,6 +223,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  const btnBannerImportB3 = document.getElementById('btn-banner-import-b3');
+  if (btnBannerImportB3) {
+    btnBannerImportB3.addEventListener('click', () => {
+      const fileInput = document.getElementById('portfolio-csv-file-input');
+      if (fileInput) fileInput.click();
+    });
+  }
+
+  const btnHeaderB3Status = document.getElementById('btn-header-b3-status');
+  if (btnHeaderB3Status) {
+    btnHeaderB3Status.addEventListener('click', () => {
+      const fileInput = document.getElementById('portfolio-csv-file-input');
+      if (fileInput) fileInput.click();
+    });
+  }
+
   const btnOverviewGotoRadar = document.getElementById('btn-overview-goto-radar');
   if (btnOverviewGotoRadar) {
     btnOverviewGotoRadar.addEventListener('click', () => {
@@ -494,39 +273,369 @@ document.addEventListener('DOMContentLoaded', () => {
 // UI: Direction Selector (Compra, Venda, Ambos)
 
 
-const TAB_HASH_MAP = {
-  '#overview': 'tab-overview',
-  '#dashboard': 'tab-overview',
-  '#/': 'tab-overview',
-  '#radar': 'tab-radar',
-  '#terminal': 'tab-terminal',
-  '#grafico': 'tab-terminal',
-  '#simulator': 'tab-simulator',
-  '#simulador': 'tab-simulator',
-  '#playbook': 'tab-playbook',
-  '#portfolio': 'tab-portfolio',
-  '#carteira': 'tab-portfolio',
-};
+// =========================================================
+// Fase 2A: Roteamento Canônico e Navegação em 2 Ambientes
+// =========================================================
+// CANONICAL_ROUTES extraído para modules/constants.js
 
-const TAB_TO_HASH_MAP = {
-  'tab-overview': '#overview',
-  'tab-radar': '#radar',
-  'tab-terminal': '#terminal',
-  'tab-simulator': '#simulator',
-  'tab-playbook': '#playbook',
-  'tab-portfolio': '#portfolio',
-};
+// ROUTE_ALIASES extraído para modules/constants.js
 
-function getTabFromHash() {
-  const hash = (window.location.hash || '').toLowerCase();
-  if (TAB_HASH_MAP[hash]) return TAB_HASH_MAP[hash];
-  const saved = localStorage.getItem('market_engine_active_tab');
-  if (saved && TAB_TO_HASH_MAP[saved]) return saved;
-  return 'tab-overview';
+// ALLOWED_RETURN_ROUTES extraído para modules/constants.js
+
+// sanitizeTickerParam extraído para modules/formatters.js
+
+function parseHashRoute(hashRaw) {
+  if (!hashRaw || typeof hashRaw !== 'string') {
+    return { path: '', params: new URLSearchParams() };
+  }
+  const clean = String(hashRaw).replace(/^[#/]+/, '').trim();
+  const qIndex = clean.indexOf('?');
+  if (qIndex === -1) {
+    return { path: clean, params: new URLSearchParams() };
+  }
+  const path = clean.slice(0, qIndex);
+  const queryStr = clean.slice(qIndex + 1);
+  return { path, params: new URLSearchParams(queryStr) };
+}
+
+function resolveRouteString(str) {
+  if (!str) return null;
+  const raw = String(str);
+  const qIdx = raw.indexOf('?');
+  const pathOnly = (qIdx !== -1 ? raw.slice(0, qIdx) : raw);
+  const clean = pathOnly.replace(/^[#/]+/, '').trim().toLowerCase();
+  if (!clean) return null;
+  if (CANONICAL_ROUTES[clean]) return clean;
+  if (ROUTE_ALIASES[clean]) return ROUTE_ALIASES[clean];
+  return null;
+}
+
+function determineActiveRoute() {
+  const hashRaw = window.location.hash;
+  if (hashRaw && hashRaw.length > 1) {
+    const { path, params } = parseHashRoute(hashRaw);
+    const fromHash = resolveRouteString(path);
+    if (fromHash) return { route: fromHash, source: 'hash', params, rawHash: hashRaw };
+    return { route: 'carteira/visao-geral', source: 'unknown-hash', params: new URLSearchParams(), rawHash: hashRaw };
+  }
+
+  try {
+    const savedCanonical = localStorage.getItem('mo_active_route');
+    const fromCanonical = resolveRouteString(savedCanonical);
+    if (fromCanonical) return { route: fromCanonical, source: 'storage-canonical', params: new URLSearchParams() };
+
+    const savedLegacy1 = localStorage.getItem('mo_active_tab');
+    const fromLegacy1 = resolveRouteString(savedLegacy1);
+    if (fromLegacy1) return { route: fromLegacy1, source: 'storage-legacy', params: new URLSearchParams() };
+
+    const savedLegacy2 = localStorage.getItem('market_engine_active_tab');
+    const fromLegacy2 = resolveRouteString(savedLegacy2);
+    if (fromLegacy2) return { route: fromLegacy2, source: 'storage-legacy', params: new URLSearchParams() };
+  } catch (e) {}
+
+  return { route: 'carteira/visao-geral', source: 'default', params: new URLSearchParams() };
+}
+
+let _isNavigating = false;
+
+function renderPatrimonioDetailedChart() {
+  const container = document.getElementById('chart-patrimonio-detailed');
+  if (!container || !window.Plotly) return;
+
+  const timeline = state.portfolioState.b3Timeline || [];
+  if (!Array.isArray(timeline) || timeline.length === 0) {
+    container.innerHTML = `
+      <div class="p-8 text-center text-slate-400 font-mono text-xs">
+        Nenhum dado de evolução patrimonial importado. Importe seus extratos da B3 para visualizar a série temporal.
+      </div>
+    `;
+    return;
+  }
+
+  const isDark = (document.documentElement.getAttribute('data-theme') || 'dark') === 'dark';
+  const bgColor = isDark ? '#151924' : '#FFFFFF';
+  const textColor = isDark ? '#8B98A5' : '#0F172A';
+  const gridColor = isDark ? 'rgba(38, 43, 56, 0.5)' : '#F1F5F9';
+
+  const xDates = timeline.map(pt => pt.label || pt.date);
+  const yInvested = timeline.map(pt => Number(pt.invested) || 0);
+
+  const trace = {
+    x: xDates,
+    y: yInvested,
+    name: 'Total Aplicado',
+    type: 'bar',
+    marker: { color: '#059669' },
+    hovertemplate: '<b>%{x}</b><br>Aplicado: R$ %{y:,.2f}<extra></extra>'
+  };
+
+  const layout = {
+    autosize: true,
+    height: 320,
+    paper_bgcolor: bgColor,
+    plot_bgcolor: bgColor,
+    font: { family: 'Plus Jakarta Sans, sans-serif', size: 11, color: textColor },
+    margin: { t: 20, r: 20, b: 40, l: 65 },
+    xaxis: { gridcolor: gridColor },
+    yaxis: { gridcolor: gridColor, tickprefix: 'R$ ' }
+  };
+
+  Plotly.newPlot(container, [trace], layout, { responsive: true, displayModeBar: false });
+}
+
+function navigateToRoute(targetKey, options = {}) {
+  const { updateUrl = true, replaceHistory = false, params: explicitParams = null, historyState = null } = options;
+
+  let canonical = null;
+  let queryParams = explicitParams;
+
+  if (typeof targetKey === 'string' && targetKey.includes('?')) {
+    const parsed = parseHashRoute(targetKey);
+    canonical = resolveRouteString(parsed.path) || 'carteira/visao-geral';
+    if (!queryParams) queryParams = parsed.params;
+  } else {
+    canonical = resolveRouteString(targetKey) || 'carteira/visao-geral';
+  }
+
+  const cfg = CANONICAL_ROUTES[canonical];
+  if (!cfg) return;
+
+  _isNavigating = true;
+
+  state.activeRoute = canonical;
+  state.activePillar = cfg.pillar;
+  state.activeTab = cfg.paneId;
+
+  try {
+    localStorage.setItem('mo_active_route', canonical);
+    // Retrocompatibilidade obrigatria para testes existentes (test_proventos_layout.py:78)
+    localStorage.setItem('mo_active_tab', cfg.tab);
+  } catch (e) {}
+
+  // Construcao do targetHash com suporte a query parameters seguros
+  let targetHash = '#' + canonical;
+  if (queryParams) {
+    const qs = queryParams.toString();
+    if (qs) {
+      const readableQs = qs.replace(/from=carteira%2F/g, 'from=carteira/').replace(/from=quant%2F/g, 'from=quant/');
+      targetHash += '?' + readableQs;
+    }
+  }
+
+  if (updateUrl && window.location.hash !== targetHash) {
+    try {
+      if (replaceHistory) {
+        history.replaceState(null, '', targetHash);
+      } else {
+        history.pushState(historyState, '', targetHash);
+      }
+    } catch (e) {
+      window.location.hash = targetHash;
+    }
+  }
+
+  if (cfg.title) {
+    document.title = cfg.title;
+  }
+
+  // Seletor de Pilares (Ambientes)
+  document.querySelectorAll('#global-pillar-selector .pillar-btn').forEach(btn => {
+    const p = btn.getAttribute('data-pillar');
+    if (p === cfg.pillar) {
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+    } else {
+      btn.classList.remove('active');
+      btn.setAttribute('aria-selected', 'false');
+    }
+  });
+
+  // Alternar Subnavegações Contextuais
+  const carteiraSubnav = document.getElementById('subnav-group-carteira');
+  const quantSubnav = document.getElementById('subnav-group-quant');
+  if (carteiraSubnav && quantSubnav) {
+    if (cfg.pillar === 'carteira') {
+      carteiraSubnav.classList.remove('hidden');
+      quantSubnav.classList.add('hidden');
+    } else {
+      carteiraSubnav.classList.add('hidden');
+      quantSubnav.classList.remove('hidden');
+    }
+  }
+
+  // Pílulas da Subnavegação ativa
+  document.querySelectorAll('#main-subnav-pills .nav-tab').forEach(pill => {
+    const tabKey = pill.getAttribute('data-tab');
+    if (tabKey === cfg.tab) {
+      pill.classList.add('active', 'border-slate-900', 'text-slate-900');
+      pill.classList.remove('border-transparent', 'text-slate-500');
+      pill.setAttribute('aria-selected', 'true');
+    } else {
+      pill.classList.remove('active', 'border-slate-900', 'text-slate-900');
+      pill.classList.add('border-transparent', 'text-slate-500');
+      pill.setAttribute('aria-selected', 'false');
+    }
+  });
+
+  // Visibilidade dos painéis: apenas cfg.paneId visível
+  document.querySelectorAll('.tab-view, .tab-pane').forEach(view => {
+    if (view.id === cfg.paneId) {
+      view.classList.remove('hidden');
+    } else {
+      view.classList.add('hidden');
+    }
+  });
+
+  // Seletor de Direção Global (visível apenas em Radar e Gráfico)
+  const dirSelector = document.getElementById('global-direction-selector');
+  if (dirSelector) {
+    const tabId = cfg.paneId;
+    if (tabId === 'tab-simulator' || tabId === 'tab-playbook' || tabId === 'tab-portfolio') {
+      dirSelector.classList.add('hidden');
+    } else if (tabId === 'tab-pane-radar' || tabId === 'tab-terminal' || tabId === 'tab-radar') {
+      dirSelector.classList.remove('hidden');
+    } else {
+      dirSelector.classList.add('hidden');
+    }
+  }
+
+  // Ciclo de Vida e Redimensionamento
+  if (canonical === 'carteira/visao-geral') {
+    if (typeof renderOverviewDashboard === 'function') {
+      renderOverviewDashboard();
+    }
+    setTimeout(() => {
+      ['overview-stacked-bar-chart', 'overview-donut-chart'].forEach(cid => {
+        const cEl = document.getElementById(cid);
+        if (cEl && cEl.data && window.Plotly) Plotly.Plots.resize(cEl);
+      });
+    }, 60);
+  } else if (canonical === 'carteira/proventos') {
+    if (typeof renderProventosTabChart === 'function') {
+      renderProventosTabChart();
+    }
+    setTimeout(() => {
+      const pChart = document.getElementById('chart-proventos-detailed');
+      if (pChart && pChart.data && window.Plotly) Plotly.Plots.resize(pChart);
+    }, 60);
+  } else if (canonical === 'carteira/patrimonio') {
+    if (typeof renderPatrimonioDetailedChart === 'function') {
+      renderPatrimonioDetailedChart();
+    }
+    setTimeout(() => {
+      const patChart = document.getElementById('chart-patrimonio-detailed');
+      if (patChart && patChart.data && window.Plotly) Plotly.Plots.resize(patChart);
+    }, 60);
+  } else if (canonical === 'quant/grafico') {
+    updateSidebarDirectionFilter();
+
+    let requestedTicker = null;
+    let requestedFrom = null;
+
+    if (queryParams) {
+      const rawTicker = queryParams.get('ticker');
+      requestedTicker = sanitizeTickerParam(rawTicker);
+
+      const rawFrom = queryParams.get('from');
+      const resolvedFrom = resolveRouteString(rawFrom);
+      if (resolvedFrom && ALLOWED_RETURN_ROUTES.has(resolvedFrom)) {
+        requestedFrom = resolvedFrom;
+      }
+    }
+
+    // Configuracao do Banner de Retorno Contextual (Fase 2B)
+    const returnBar = document.getElementById('chart-contextual-return-bar');
+    const returnLabel = document.getElementById('chart-return-label');
+    const tickerBadge = document.getElementById('chart-contextual-ticker-badge');
+
+    if (requestedFrom) {
+      state.chartContextualReturnRoute = requestedFrom;
+      if (returnBar) returnBar.classList.remove('hidden');
+      if (returnLabel) {
+        if (requestedFrom === 'carteira/posicoes') {
+          returnLabel.textContent = '← Voltar para Posições';
+        } else if (requestedFrom === 'carteira/visao-geral') {
+          returnLabel.textContent = '← Voltar para Visão Geral';
+        } else if (requestedFrom === 'quant/radar') {
+          returnLabel.textContent = '← Voltar para Radar';
+        } else {
+          returnLabel.textContent = '← Voltar para Carteira';
+        }
+      }
+    } else {
+      state.chartContextualReturnRoute = null;
+      if (returnBar) returnBar.classList.add('hidden');
+    }
+
+    if (requestedTicker) {
+      state.currentTicker = requestedTicker;
+      if (elements.inputTicker) elements.inputTicker.value = requestedTicker;
+      if (tickerBadge) tickerBadge.textContent = requestedTicker;
+    }
+
+    const isNewTicker = requestedTicker && (!state.analysisData || state.analysisData.ticker !== requestedTicker);
+    if (!state.analysisData || isNewTicker) {
+      loadAnalysisData(false);
+    } else {
+      setTimeout(() => {
+        resizeChartResponsive();
+        if (state.chart) {
+          state.chart.timeScale().fitContent();
+        }
+        renderPlotlyRanking();
+        renderPlotlyScatter();
+      }, 60);
+    }
+  } else if (canonical === 'quant/radar') {
+    if (state.radarScrollTop != null) {
+      setTimeout(() => {
+        const radarPane = document.getElementById('tab-pane-radar');
+        if (radarPane) radarPane.scrollTop = state.radarScrollTop;
+      }, 50);
+    }
+    if (!state.lastRadarPage || (state.lastRadarPage.direction && state.lastRadarPage.direction !== state.activeDirection)) {
+      loadRadarData(false);
+    }
+  } else if (canonical === 'quant/simulador') {
+    setTimeout(() => {
+      const p3 = document.getElementById('plot-simulation-curve');
+      if (p3 && window.Plotly && p3.data) Plotly.Plots.resize(p3);
+    }, 60);
+  } else if (canonical === 'carteira/posicoes') {
+    if (state.portfolioScrollTop != null) {
+      setTimeout(() => {
+        const portEl = document.getElementById('tab-portfolio');
+        if (portEl) portEl.scrollTop = state.portfolioScrollTop;
+      }, 50);
+    }
+    setTimeout(() => {
+      ['portfolio-equity-chart', 'portfolio-allocation-chart'].forEach(cid => {
+        const cEl = document.getElementById(cid);
+        if (cEl && cEl.data && window.Plotly) Plotly.Plots.resize(cEl);
+      });
+    }, 60);
+  }
+
+  _isNavigating = false;
+}
+
+function switchTab(tabId, updateHash = true) {
+  navigateToRoute(tabId, { updateUrl: updateHash });
+}
+
+function activateInvestidor10Tab(tabKey) {
+  navigateToRoute(tabKey, { updateUrl: true });
 }
 
 function getHashFromTab(tabId) {
-  return TAB_TO_HASH_MAP[tabId] || '#overview';
+  const c = resolveRouteString(tabId);
+  return c ? '#' + c : '#carteira/visao-geral';
+}
+
+function getTabFromHash() {
+  const res = determineActiveRoute();
+  const cfg = CANONICAL_ROUTES[res.route];
+  return cfg ? cfg.paneId : 'tab-overview';
 }
 
 
@@ -634,14 +743,16 @@ function applyTheme(theme, updateCharts = true) {
 
   const icon = document.getElementById('theme-toggle-icon');
   const text = document.getElementById('theme-toggle-text');
-  if (icon && text) {
-    if (theme === 'light') {
-      icon.textContent = '☀️';
-      text.textContent = 'Claro';
+  if (icon) {
+    const useEl = icon.querySelector('use');
+    if (useEl) {
+      useEl.setAttribute('href', theme === 'light' ? '#icon-sun' : '#icon-moon');
     } else {
-      icon.textContent = '🌙';
-      text.textContent = 'Escuro';
+      icon.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="${theme === 'light' ? '#icon-sun' : '#icon-moon'}"></use></svg>`;
     }
+  }
+  if (text) {
+    text.textContent = theme === 'light' ? 'Claro' : 'Escuro';
   }
 
   if (updateCharts) {
@@ -651,7 +762,7 @@ function applyTheme(theme, updateCharts = true) {
 
 function updateChartsTheme(theme) {
   const isLight = theme === 'light';
-  const bgColor = isLight ? '#FFFFFF' : '#0B0E14';
+  const bgColor = isLight ? '#FFFFFF' : '#111827';
   const textColor = isLight ? '#334155' : '#8B98A5';
   const gridColor = isLight ? 'rgba(226, 232, 240, 0.8)' : 'rgba(38, 43, 56, 0.5)';
   const borderColor = isLight ? '#E2E8F0' : '#262B38';
@@ -678,8 +789,8 @@ function updateChartsTheme(theme) {
   // Update Plotly charts if present with light/dark synchronization
   if (window.Plotly) {
     const plotlyLayoutUpdate = {
-      paper_bgcolor: bgColor,
-      plot_bgcolor: bgColor,
+      paper_bgcolor: 'rgba(0,0,0,0)',
+      plot_bgcolor: 'rgba(0,0,0,0)',
       'font.color': textColor,
       'xaxis.gridcolor': gridColor,
       'yaxis.gridcolor': gridColor,
@@ -700,98 +811,111 @@ function updateChartsTheme(theme) {
       renderPortfolioSimulationCurve(state.portfolioState.lastSimulateResponse.curve);
     } else if (state.activeTab === 'tab-simulator' && state.lastSimulationResult) {
       renderSimulationCurve(state.lastSimulationResult.curve);
+    } else if (state.activeTab === 'tab-terminal' || state.activeTab === 'tab-pane-tradingview') {
+      renderPlotlyRanking();
+      renderPlotlyScatter();
     }
   }
 }
 
 // UI: Navigation Tabs
+// Investidor10 Subnav Pills Support
 function setupNavigationTabs() {
-  const tabs = document.querySelectorAll('#main-nav-tabs .nav-tab-btn');
-  tabs.forEach(btn => {
+  // 1. Alternador dos 2 Ambientes (Pilares)
+  document.querySelectorAll('#global-pillar-selector .pillar-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const targetTabId = btn.getAttribute('data-tab');
-      switchTab(targetTabId);
+      const targetPillar = btn.getAttribute('data-pillar');
+      if (targetPillar === 'carteira') {
+        navigateToRoute('carteira/visao-geral');
+      } else if (targetPillar === 'quant') {
+        navigateToRoute('quant/radar');
+      }
     });
   });
+
+  // 2. Abas das Subnavegações Contextuais
+  document.querySelectorAll('#main-subnav-pills .nav-tab').forEach(pill => {
+    pill.addEventListener('click', () => {
+      const tabKey = pill.getAttribute('data-tab');
+      navigateToRoute(tabKey);
+    });
+    pill.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        pill.click();
+      }
+    });
+  });
+
+  // 3. Suporte retrocompatível a cliques em tabs legadas
+  document.querySelectorAll('#main-nav-tabs .nav-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetTabId = btn.getAttribute('data-tab');
+      navigateToRoute(targetTabId);
+    });
+  });
+
+  // 4. Links de contexto internos
+  const viewPosBtn = document.getElementById('overview-btn-view-positions');
+  if (viewPosBtn) {
+    viewPosBtn.addEventListener('click', () => navigateToRoute('carteira/posicoes'));
+  }
+  const verPatLink = document.getElementById('link-overview-ver-patrimonio');
+  if (verPatLink) {
+    verPatLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      navigateToRoute('carteira/patrimonio');
+    });
+  }
+
+  // 5. Botao de Retorno Contextual do Grafico (Fase 2B)
+  const btnReturn = document.getElementById('btn-chart-return-to-source');
+  if (btnReturn) {
+    btnReturn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const returnRoute = state.chartContextualReturnRoute || 'carteira/posicoes';
+      const st = history.state;
+      if (st && st.moChartOpener === returnRoute) {
+        // Fluxo interno: a entrada anterior do historico e a tela de origem; popstate sincroniza a UI.
+        history.back();
+      } else {
+        // Deep-link direto: sem entrada anterior confiavel; substitui a entrada atual (sem criar nova).
+        navigateToRoute(returnRoute, { updateUrl: true, replaceHistory: true });
+      }
+    });
+  }
 }
 
-function switchTab(tabId, updateHash = true) {
-  state.activeTab = tabId;
-  try {
-    localStorage.setItem('market_engine_active_tab', tabId);
-  } catch (e) {}
-  if (updateHash && window.location.hash !== getHashFromTab(tabId)) {
-    try {
-      history.replaceState(null, '', getHashFromTab(tabId));
-    } catch (e) {
-      window.location.hash = getHashFromTab(tabId);
-    }
+function openChartForHolding(rawTicker, fromRoute = 'carteira/posicoes') {
+  const ticker = sanitizeTickerParam(rawTicker);
+  if (!ticker) {
+    console.warn('Ticker invalido para navegacao ao grafico:', rawTicker);
+    return;
   }
-  document.querySelectorAll('#main-nav-tabs .nav-tab-btn').forEach(b => {
-    if (b.getAttribute('data-tab') === tabId) {
-      b.classList.add('active');
-    } else {
-      b.classList.remove('active');
-    }
-  });
+  const portEl = document.getElementById('tab-portfolio');
+  if (portEl) state.portfolioScrollTop = portEl.scrollTop;
 
-  document.querySelectorAll('.tab-view').forEach(view => {
-    if (view.id === tabId) {
-      view.classList.remove('hidden');
-    } else {
-      view.classList.add('hidden');
-    }
-  });
-
-  // Toggle Global Direction Selector visibility: only displayed in Radar and Gráfico (Terminal)
-  const dirSelector = document.getElementById('global-direction-selector');
-  if (dirSelector) {
-    if (tabId === 'tab-overview' || tabId === 'tab-simulator' || tabId === 'tab-playbook' || tabId === 'tab-portfolio') {
-      dirSelector.classList.add('hidden');
-    } else {
-      dirSelector.classList.remove('hidden');
-    }
+  const params = new URLSearchParams();
+  params.set('ticker', ticker);
+  if (fromRoute && ALLOWED_RETURN_ROUTES.has(fromRoute)) {
+    params.set('from', fromRoute);
   }
+  navigateToRoute('quant/grafico', { params, updateUrl: true, replaceHistory: false, historyState: { moChartOpener: params.get('from') || null } });
+}
 
-  if (tabId === 'tab-overview') {
-    renderOverviewDashboard();
-    setTimeout(() => {
-      ['overview-stacked-bar-chart', 'overview-donut-chart'].forEach(cid => {
-        const cEl = document.getElementById(cid);
-        if (cEl && cEl.data && window.Plotly) Plotly.Plots.resize(cEl);
-      });
-    }, 60);
-  } else if (tabId === 'tab-terminal') {
-    updateSidebarDirectionFilter();
-    if (!state.analysisData) {
-      loadAnalysisData();
-    } else {
-      setTimeout(() => {
-        resizeChartResponsive();
-        if (state.chart) {
-          state.chart.timeScale().fitContent();
-        }
-        renderPlotlyRanking();
-        renderPlotlyScatter();
-      }, 60);
-    }
-  } else if (tabId === 'tab-radar') {
-    if (!state.lastRadarPage || (state.lastRadarPage.direction && state.lastRadarPage.direction !== state.activeDirection)) {
-      loadRadarData(false);
-    }
-  } else if (tabId === 'tab-simulator') {
-    setTimeout(() => {
-      const p3 = document.getElementById('plot-simulation-curve');
-      if (p3 && window.Plotly) Plotly.Plots.resize(p3);
-    }, 60);
-  } else if (tabId === 'tab-portfolio') {
-    setTimeout(() => {
-      ['portfolio-equity-chart', 'portfolio-allocation-chart'].forEach(cid => {
-        const cEl = document.getElementById(cid);
-        if (cEl && cEl.data && window.Plotly) Plotly.Plots.resize(cEl);
-      });
-    }, 60);
+function openChartFromRadar(rawTicker) {
+  const ticker = sanitizeTickerParam(rawTicker);
+  if (!ticker) {
+    console.warn('Ticker invalido no radar para navegacao ao grafico:', rawTicker);
+    return;
   }
+  const radarPane = document.getElementById('tab-pane-radar');
+  if (radarPane) state.radarScrollTop = radarPane.scrollTop;
+
+  const params = new URLSearchParams();
+  params.set('ticker', ticker);
+  params.set('from', 'quant/radar');
+  navigateToRoute('quant/grafico', { params, updateUrl: true, replaceHistory: false, historyState: { moChartOpener: 'quant/radar' } });
 }
 
 // UI: Mobile Strategies Toggle
@@ -907,6 +1031,7 @@ function setupRadarCategoryPills() {
 
       const selectedCat = pill.getAttribute('data-cat') || 'featured';
       state.radarActiveCategory = selectedCat;
+      state.radarPage = 1;
       loadRadarData(false, selectedCat);
     });
   });
@@ -1085,7 +1210,7 @@ async function fetchPortfolioQuotes(tickers) {
       return data.quotes || {};
     }
   } catch (e) {
-    console.warn('Erro ao buscar cotações periódicas:', e);
+    console.warn('Erro ao buscar cotaÃ§Ãµes periÃ³dicas:', e);
   }
   return {};
 }
@@ -1122,6 +1247,8 @@ async function renderOverviewDashboard() {
   let totalCurrentValue = 0;
   let gainersCount = 0;
   let losersCount = 0;
+  let eligiblePositionsCount = 0;
+  let missingQuotesCount = 0;
   let assetPerformances = [];
 
   // Fetch latest quotes from periodic cache if not cached
@@ -1140,25 +1267,36 @@ async function renderOverviewDashboard() {
     totalInvested += cost;
 
     // 1. Check live quotes cache, 2. check advise recommendation, 3. fallback to average_buy_price
-    let currentP = Number(h.average_buy_price) || 0;
+    const avgP = Number(h.average_buy_price) || 0;
+    let currentP = avgP;
+    let hasValidMarketQuote = false;
     const q = quotesMap[h.ticker.toUpperCase()] || quotesMap[`${h.ticker.toUpperCase()}.SA`];
     if (q && Number(q.price) > 0) {
       currentP = Number(q.price);
+      hasValidMarketQuote = true;
     } else if (adviseData && Array.isArray(adviseData.recommendations)) {
       const match = adviseData.recommendations.find(r => r.ticker.toUpperCase() === h.ticker.toUpperCase());
       if (match && Number(match.current_price) > 0) {
         currentP = Number(match.current_price);
+        hasValidMarketQuote = true;
       }
+    }
+
+    if (!hasValidMarketQuote) {
+      missingQuotesCount++;
     }
 
     const curVal = (Number(h.shares) || 0) * currentP;
     totalCurrentValue += curVal;
 
     const diffPct = cost > 0 ? ((curVal - cost) / cost) * 100 : 0;
-    if (diffPct > 0.001) {
-      gainersCount++;
-    } else if (diffPct < -0.001) {
-      losersCount++;
+    if (hasValidMarketQuote && avgP > 0) {
+      eligiblePositionsCount++;
+      if (currentP > avgP + 0.0001) {
+        gainersCount++;
+      } else if (currentP < avgP - 0.0001) {
+        losersCount++;
+      }
     }
 
     assetPerformances.push({ ticker: h.ticker, pct: diffPct, cost: cost, curVal: curVal });
@@ -1167,12 +1305,12 @@ async function renderOverviewDashboard() {
   // Sort performances descending to pick distinct best and worst assets
   assetPerformances.sort((a, b) => b.pct - a.pct);
   let bestAsset = assetPerformances.length > 0 ? assetPerformances[0] : { ticker: '--', pct: 0 };
-  let worstAsset = assetPerformances.length > 1 
-    ? assetPerformances[assetPerformances.length - 1] 
+  let worstAsset = assetPerformances.length > 1
+    ? assetPerformances[assetPerformances.length - 1]
     : (assetPerformances.length === 1 && assetPerformances[0].pct < 0 ? assetPerformances[0] : { ticker: '--', pct: 0 });
 
-  const cash = adviseData && adviseData.current_cash !== undefined 
-    ? Number(adviseData.current_cash) 
+  const cash = adviseData && adviseData.current_cash !== undefined
+    ? Number(adviseData.current_cash)
     : (Number(state.portfolioState.availableCash) || 0);
 
   const totalEquity = cash + totalCurrentValue;
@@ -1187,9 +1325,9 @@ async function renderOverviewDashboard() {
   if (invEl) invEl.textContent = `R$ ${totalInvested.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   if (varEl) {
     const sign = totalProfitPct >= 0 ? '+' : '';
-    varEl.textContent = `${sign}${totalProfitPct.toFixed(2)}% ${totalProfitPct >= 0 ? '▲' : '▼'}`;
-    varEl.className = totalProfitPct >= 0 
-      ? 'text-emerald-400 font-bold font-mono text-[11px] bg-emerald-500/10 px-1.5 py-0.5 rounded' 
+    varEl.textContent = `${sign}${totalProfitPct.toFixed(2)}%`;
+    varEl.className = totalProfitPct >= 0
+      ? 'text-emerald-400 font-bold font-mono text-[11px] bg-emerald-500/10 px-1.5 py-0.5 rounded'
       : 'text-rose-400 font-bold font-mono text-[11px] bg-rose-500/10 px-1.5 py-0.5 rounded';
   }
 
@@ -1208,7 +1346,7 @@ async function renderOverviewDashboard() {
   if (bestTickerEl) bestTickerEl.textContent = bestAsset.ticker !== '--' ? bestAsset.ticker : '--';
   if (bestPctEl) {
     if (bestAsset.ticker !== '--') {
-      bestPctEl.textContent = `${bestAsset.pct >= 0 ? '+' : ''}${bestAsset.pct.toFixed(2)}% ↗`;
+      bestPctEl.textContent = `${bestAsset.pct >= 0 ? '+' : ''}${bestAsset.pct.toFixed(2)}% â†—`;
       bestPctEl.className = 'text-[10px] font-bold font-mono text-emerald-400 bg-emerald-500/10 px-1 rounded inline-block mt-0.5';
     } else {
       bestPctEl.textContent = '--';
@@ -1217,7 +1355,7 @@ async function renderOverviewDashboard() {
   if (worstTickerEl) worstTickerEl.textContent = worstAsset.ticker !== '--' ? worstAsset.ticker : '--';
   if (worstPctEl) {
     if (worstAsset.ticker !== '--') {
-      worstPctEl.textContent = `${worstAsset.pct >= 0 ? '+' : ''}${worstAsset.pct.toFixed(2)}% ↘`;
+      worstPctEl.textContent = `${worstAsset.pct >= 0 ? '+' : ''}${worstAsset.pct.toFixed(2)}% â†˜`;
       worstPctEl.className = 'text-[10px] font-bold font-mono text-rose-400 bg-rose-500/10 px-1 rounded inline-block mt-0.5';
     } else {
       worstPctEl.textContent = '--';
@@ -1231,17 +1369,42 @@ async function renderOverviewDashboard() {
   const b3Monthly = state.portfolioState.b3MonthlyIncome || [];
 
   if (incomeEl) {
-    incomeEl.textContent = `R$ ${b3TotalInc.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    incomeEl.textContent = 'R$ ' + b3TotalInc.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
   if (latestIncomeEl) {
     if (b3Monthly.length > 0) {
       const lastM = b3Monthly[b3Monthly.length - 1];
       const mVal = Number(lastM.total || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      latestIncomeEl.textContent = `R$ ${mVal} (${lastM.month_year})`;
+      latestIncomeEl.textContent = 'R$ ' + mVal + ' (' + lastM.month_year + ')';
     } else {
-      latestIncomeEl.textContent = `R$ 0,00`;
+      latestIncomeEl.textContent = 'R$ 0,00';
     }
   }
+
+  // Investidor10 Card 3 Elements
+  const divTotalEl = document.getElementById('overview-dividends-total');
+  const divMonthlyEl = document.getElementById('overview-dividends-monthly');
+  const divTitleEl = document.getElementById('overview-dividends-title');
+  const divPeriodLabelEl = document.getElementById('overview-dividends-period-label');
+
+  if (divTotalEl) {
+    divTotalEl.textContent = 'R$ ' + b3TotalInc.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  // Proventos: sem metadados estritos de cobertura dos extratos, exibir histórico importado
+  if (divTitleEl) {
+    divTitleEl.textContent = 'Proventos registrados no hist\u00f3rico importado';
+  }
+
+  if (divPeriodLabelEl) {
+    divPeriodLabelEl.textContent = 'Hist\u00f3rico total';
+  }
+
+  if (divMonthlyEl) {
+    const entriesCount = Array.isArray(b3Monthly) ? b3Monthly.length : 0;
+    divMonthlyEl.textContent = entriesCount > 0 ? (entriesCount + ' ' + (entriesCount === 1 ? 'm\u00eas com registro' : 'meses com registros')) : 'Sem registros';
+  }
+
 
   // 4. Populate Card 4: Posições no Lucro (Barra Verde/Rosa)
   const ratioBadge = document.getElementById('overview-profit-ratio-badge');
@@ -1250,12 +1413,67 @@ async function renderOverviewDashboard() {
   const gainersEl = document.getElementById('overview-gainers-count');
   const losersEl = document.getElementById('overview-losers-count');
 
+  // Atualiza elementos do Investidor10 Card 2 e 4
+  const kpiLucroVal = document.getElementById('kpi-lucro-val');
+  const kpiLucroBadge = document.getElementById('kpi-lucro-badge');
+  const kpiLucroSub = document.getElementById('kpi-lucro-sub');
+  if (kpiLucroVal) {
+    const sign = totalProfit >= 0 ? '+' : '';
+    kpiLucroVal.textContent = sign + 'R$ ' + totalProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  if (kpiLucroBadge) {
+    if (totalInvested > 0) {
+      const sign = totalProfitPct >= 0 ? '+' : '';
+      kpiLucroBadge.textContent = sign + totalProfitPct.toFixed(2) + '%';
+      kpiLucroBadge.className = totalProfitPct >= 0 ? 'badge-gain' : 'badge-loss';
+    } else {
+      kpiLucroBadge.textContent = 'N/A';
+      kpiLucroBadge.className = 'badge-neutral';
+    }
+  }
+  if (kpiLucroSub) {
+    kpiLucroSub.textContent = totalInvested > 0 ? ('Sobre custo: R$ ' + totalInvested.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) : 'Sem custo em cust\u00f3dia';
+  }
+
+  const kpiPosCount = document.getElementById('kpi-posicoes-count');
+  const kpiPosPct = document.getElementById('kpi-posicoes-percent');
+  const kpiPosSub = document.getElementById('kpi-posicoes-sub');
+  const kpiProgGreen = document.getElementById('kpi-progress-green');
+  const kpiProgRed = document.getElementById('kpi-progress-red');
   const totalPositions = holdings.length;
+  if (eligiblePositionsCount > 0) {
+    const pctGain = (gainersCount / eligiblePositionsCount) * 100;
+    if (kpiPosCount) kpiPosCount.textContent = gainersCount + ' de ' + eligiblePositionsCount;
+    if (kpiPosPct) {
+      kpiPosPct.textContent = pctGain.toFixed(0) + '%';
+      kpiPosPct.className = 'badge-gain';
+    }
+    if (kpiProgGreen) kpiProgGreen.style.width = pctGain + '%';
+    if (kpiProgRed) kpiProgRed.style.width = (100 - pctGain) + '%';
+    if (kpiPosSub) {
+      kpiPosSub.textContent = missingQuotesCount > 0
+        ? (missingQuotesCount + ' ' + (missingQuotesCount === 1 ? 'sem cota\u00e7\u00e3o v\u00e1lida' : 'sem cota\u00e7\u00e3o v\u00e1lida'))
+        : (eligiblePositionsCount + ' ' + (eligiblePositionsCount === 1 ? 'eleg\u00edvel' : 'eleg\u00edveis'));
+    }
+  } else {
+    if (kpiPosCount) kpiPosCount.textContent = totalPositions === 0 ? 'Sem ativos' : 'Sem cota\u00e7\u00f5es v\u00e1lidas';
+    if (kpiPosPct) {
+      kpiPosPct.textContent = 'N/A';
+      kpiPosPct.className = 'badge-neutral';
+    }
+    if (kpiProgGreen) kpiProgGreen.style.width = '0%';
+    if (kpiProgRed) kpiProgRed.style.width = '0%';
+    if (kpiPosSub) {
+      kpiPosSub.textContent = missingQuotesCount > 0
+        ? (missingQuotesCount + ' sem cota\u00e7\u00e3o v\u00e1lida')
+        : 'Nenhuma posi\u00e7\u00e3o eleg\u00edvel';
+    }
+  }
   const winRatio = totalPositions > 0 ? (gainersCount / totalPositions) * 100 : 0;
   if (ratioBadge) ratioBadge.textContent = `${winRatio.toFixed(0)}%`;
   if (ratioText) ratioText.textContent = `${gainersCount} de ${totalPositions}`;
   if (profitBar) profitBar.style.width = `${winRatio}%`;
-  if (gainersEl) gainersEl.textContent = `${gainersCount} no lucro ▲`;
+  if (gainersEl) gainersEl.textContent = `${gainersCount} no lucro â–²`;
   if (losersEl) losersEl.textContent = `${losersCount} no prejuízo ▼`;
 
   // 5. Populate Card 4: Oportunidades de Compra
@@ -1280,10 +1498,10 @@ function renderOverviewStackedBarChart(totalInvested, totalProfit) {
   const container = document.getElementById('overview-stacked-bar-chart');
   if (!container || !window.Plotly) return;
 
-  const isLight = (document.documentElement.getAttribute('data-theme') || 'dark') === 'light';
-  const bgColor = isLight ? '#FFFFFF' : '#151924';
-  const textColor = isLight ? '#334155' : '#8B98A5';
-  const gridColor = isLight ? 'rgba(226, 232, 240, 0.8)' : 'rgba(38, 43, 56, 0.5)';
+  const isDark = (document.documentElement.getAttribute('data-theme') === 'dark');
+  const bgColor = isDark ? '#151924' : '#FFFFFF';
+  const textColor = isDark ? '#8B98A5' : '#0F172A';
+  const gridColor = isDark ? 'rgba(38, 43, 56, 0.5)' : '#F1F5F9';
 
   const timeline = state.portfolioState.b3Timeline || [];
   let months = [];
@@ -1330,10 +1548,12 @@ function renderOverviewStackedBarChart(totalInvested, totalProfit) {
 
   const layout = {
     barmode: 'stack',
+    autosize: true,
+    height: 250,
     paper_bgcolor: bgColor,
     plot_bgcolor: bgColor,
-    font: { family: 'JetBrains Mono, monospace', size: 10, color: textColor },
-    margin: { t: 20, r: 15, b: 35, l: 60 },
+    font: { family: 'Plus Jakarta Sans, sans-serif', size: 10, color: textColor },
+    margin: { t: 15, r: 15, b: 30, l: 55 },
     showlegend: false,
     xaxis: { gridcolor: gridColor, tickfont: { size: 9 } },
     yaxis: { gridcolor: gridColor, tickprefix: 'R$ ', tickfont: { size: 9 } }
@@ -1483,7 +1703,7 @@ function renderOverviewGroupedHoldings(holdings, adviseData, totalEquity) {
     const accordionId = `overview-acc-group-${groupIdx}`;
 
     const accDiv = document.createElement('div');
-    accDiv.className = 'card-surface overflow-hidden border border-fintech-border';
+    accDiv.className = 'category-card bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm mb-4';
 
     accDiv.innerHTML = `
       <div class="accordion-header bg-fintech-surface hover:bg-fintech-surface-hover p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 cursor-pointer transition border-b border-fintech-border/40" data-accordion="${accordionId}">
@@ -1494,11 +1714,11 @@ function renderOverviewGroupedHoldings(holdings, adviseData, totalEquity) {
         </div>
         <div class="flex items-center gap-4 text-xs font-mono">
           <div>
-            <span class="text-gray-400 text-[10px] block font-sans">Valor total</span>
+            <span class="text-gray-400 text-[11px] block font-sans">Valor total</span>
             <span class="font-bold text-white">R$ ${groupTotalVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
           </div>
           <div>
-            <span class="text-gray-400 text-[10px] block font-sans">% na carteira / % Ideal</span>
+            <span class="text-gray-400 text-[11px] block font-sans">% na carteira / % Ideal</span>
             <span class="font-bold text-cyan-300">${currentWeightPct.toFixed(1)}% <span class="text-gray-500 font-normal">/ ${group.idealPct}%</span></span>
           </div>
           <span class="text-gray-400 text-xs">▶</span>
@@ -1506,8 +1726,8 @@ function renderOverviewGroupedHoldings(holdings, adviseData, totalEquity) {
       </div>
 
       <div id="${accordionId}" class="overflow-x-auto touch-scroll hidden">
-        <table class="w-full text-left text-xs text-gray-300">
-          <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[10px] border-b border-fintech-border whitespace-nowrap font-mono">
+        <table class="table-standard w-full text-left text-xs text-gray-300">
+          <thead class="bg-fintech-bg text-gray-400 font-semibold uppercase text-[11px] border-b border-fintech-border whitespace-nowrap font-mono">
             <tr>
               <th class="px-3 py-2">Ativo</th>
               <th class="px-3 py-2 text-right">Quant.</th>
@@ -1515,9 +1735,9 @@ function renderOverviewGroupedHoldings(holdings, adviseData, totalEquity) {
               <th class="px-3 py-2 text-right">Preço Atual</th>
               <th class="px-3 py-2 text-right">Saldo (R$)</th>
               <th class="px-3 py-2 text-right">Lucro/Prej. (R$)</th>
-              <th class="px-3 py-2 text-center">Rentab. (%)</th>
-              <th class="px-3 py-2 text-center">% Carteira</th>
-              <th class="px-3 py-2 text-center">% Ideal</th>
+              <th class="px-3 py-2 text-right">Rentab. (%)</th>
+              <th class="px-3 py-2 text-right">% Carteira</th>
+              <th class="px-3 py-2 text-right">% Ideal</th>
               <th class="px-3 py-2 text-center">Comprar Hoje?</th>
             </tr>
           </thead>
@@ -1529,10 +1749,10 @@ function renderOverviewGroupedHoldings(holdings, adviseData, totalEquity) {
                 const rec = recs.find(r => r.ticker.toUpperCase() === h.ticker.toUpperCase());
                 const quotesMap = state.portfolioState.quotesCache || {};
                 const q = quotesMap[h.ticker.toUpperCase()] || quotesMap[`${h.ticker.toUpperCase()}.SA`];
-                const currentP = (q && Number(q.price) > 0) 
-                  ? Number(q.price) 
+                const currentP = (q && Number(q.price) > 0)
+                  ? Number(q.price)
                   : (rec && Number(rec.current_price) > 0 ? Number(rec.current_price) : Number(h.average_buy_price));
-                
+
                 const cost = (Number(h.shares) || 0) * (Number(h.average_buy_price) || 0);
                 const saldo = (Number(h.shares) || 0) * currentP;
                 grpCost += cost;
@@ -1548,14 +1768,14 @@ function renderOverviewGroupedHoldings(holdings, adviseData, totalEquity) {
                 const isBuy = delta > 0;
 
                 const buyBadge = isBuy
-                  ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">✓ Sim (+${delta})</span>`
-                  : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-700/40 text-gray-400">✕ Não</span>`;
+                  ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">✓ Sim (+${delta})</span>`
+                  : `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-gray-700/40 text-gray-400">✕ Não</span>`;
 
                 return `
                   <tr class="hover:bg-fintech-surface-hover">
                     <td class="px-3 py-2.5">
                       <span class="font-bold text-white">${h.ticker}</span>
-                      <span class="text-[10px] text-gray-400 block">${stripCorporateSuffix(h.ticker)}</span>
+                      <span class="text-[11px] text-gray-400 block">${stripCorporateSuffix(h.ticker)}</span>
                     </td>
                     <td class="px-3 py-2.5 text-right font-bold text-gray-200">${Number(h.shares).toLocaleString('pt-BR')}</td>
                     <td class="px-3 py-2.5 text-right text-gray-400">R$ ${Number(h.average_buy_price).toFixed(2)}</td>
@@ -1564,11 +1784,11 @@ function renderOverviewGroupedHoldings(holdings, adviseData, totalEquity) {
                     <td class="px-3 py-2.5 text-right font-bold ${retColor}">
                       ${profit >= 0 ? '+' : ''}R$ ${profit.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </td>
-                    <td class="px-3 py-2.5 text-center font-bold ${retColor}">
+                    <td class="px-3 py-2.5 text-right font-bold ${retColor}">
                       ${retPct >= 0 ? '+' : ''}${retPct.toFixed(2)}%
                     </td>
-                    <td class="px-3 py-2.5 text-center text-cyan-300 font-bold">${w.toFixed(1)}%</td>
-                    <td class="px-3 py-2.5 text-center text-gray-400" title="Calculado com base no Score de Oportunidade e peso teto de alocação">${idealW.toFixed(1)}%</td>
+                    <td class="px-3 py-2.5 text-right text-cyan-300 font-bold">${w.toFixed(1)}%</td>
+                    <td class="px-3 py-2.5 text-right text-gray-400" title="Calculado com base no Score de Oportunidade e peso teto de alocação">${idealW.toFixed(1)}%</td>
                     <td class="px-3 py-2.5 text-center">${buyBadge}</td>
                   </tr>
                 `;
@@ -1587,9 +1807,9 @@ function renderOverviewGroupedHoldings(holdings, adviseData, totalEquity) {
                   <td class="px-3 py-2 text-right text-gray-400">--</td>
                   <td class="px-3 py-2 text-right text-white">R$ ${grpSaldo.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   <td class="px-3 py-2 text-right ${grpRetColor}">${grpProfit >= 0 ? '+' : ''}R$ ${grpProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                  <td class="px-3 py-2 text-center ${grpRetColor}">${grpRetPct >= 0 ? '+' : ''}${grpRetPct.toFixed(2)}%</td>
-                  <td class="px-3 py-2 text-center text-cyan-300">${grpWeight.toFixed(1)}%</td>
-                  <td class="px-3 py-2 text-center text-gray-400">${group.idealPct}%</td>
+                  <td class="px-3 py-2 text-right ${grpRetColor}">${grpRetPct >= 0 ? '+' : ''}${grpRetPct.toFixed(2)}%</td>
+                  <td class="px-3 py-2 text-right text-cyan-300">${grpWeight.toFixed(1)}%</td>
+                  <td class="px-3 py-2 text-right text-gray-400">${group.idealPct}%</td>
                   <td class="px-3 py-2 text-center text-gray-500">--</td>
                 </tr>
               `;
@@ -1606,7 +1826,7 @@ function renderOverviewGroupedHoldings(holdings, adviseData, totalEquity) {
     if (head && content) {
       head.addEventListener('click', () => {
         content.classList.toggle('hidden');
-        if (arrow) arrow.textContent = content.classList.contains('hidden') ? '►' : '▼';
+        if (arrow) arrow.textContent = content.classList.contains('hidden') ? '▶' : '▼';
       });
     }
 
@@ -1707,7 +1927,7 @@ function initTradingViewChart() {
 
   const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
   const isLight = currentTheme === 'light';
-  const bgColor = isLight ? '#FFFFFF' : '#0B0E14';
+  const bgColor = isLight ? '#FFFFFF' : '#111827';
   const textColor = isLight ? '#334155' : '#8B98A5';
   const gridColor = isLight ? 'rgba(226, 232, 240, 0.8)' : 'rgba(38, 43, 56, 0.5)';
   const borderColor = isLight ? '#E2E8F0' : '#262B38';
@@ -1836,7 +2056,7 @@ async function loadRadarData(forceRefresh = false, category = null) {
   }
 
   const catLabel = cat === 'featured' ? 'Destaques' : (cat === 'all' ? 'Todos os Ativos' : cat);
-  showLoading(`Varrendo ${catLabel} - Página ${page} (${tf.toUpperCase()})...`);
+  showLoading(`Varrendo ${catLabel} - PÃ¡gina ${page} (${tf.toUpperCase()})...`);
   try {
     const url = `/api/radar?interval=${tf}&horizon_x=60&category=${encodeURIComponent(cat)}&refresh=${forceRefresh}&page=${page}&page_size=${pageSize}&direction=${encodeURIComponent(dir)}&strategies=${encodeURIComponent(stratCsv)}`;
     const res = await fetch(url);
@@ -1867,7 +2087,7 @@ function updateRadarPagination(pageData) {
   state.radarTotalPages = pageData.total_pages;
   state.radarTotalAssets = pageData.total_assets;
 
-  pagInfo.textContent = `Página ${pageData.page} de ${pageData.total_pages} (${pageData.total_assets} ativos no universo)`;
+  pagInfo.textContent = `PÃ¡gina ${pageData.page} de ${pageData.total_pages} (${pageData.total_assets} ativos no universo)`;
   btnPrev.disabled = (pageData.page <= 1);
   btnNext.disabled = (pageData.page >= pageData.total_pages);
 
@@ -1908,19 +2128,19 @@ function updateRadarExecutiveDeck(items) {
     const top = sorted[0];
     topAssetEl.textContent = top.ticker;
     topScoreEl.textContent = `${(Number(top.win_rate) || 0).toFixed(1)}% WR`;
-    if (topStratEl) topStratEl.textContent = top.strategy_label || top.strategy_name || 'Estratégia campeã';
+    if (topStratEl) topStratEl.textContent = top.strategy_label || top.strategy_name || 'EstratÃ©gia campeÃ£';
   }
 
   if (regimeEl) {
     if (buys.length > sells.length * 1.5) {
       regimeEl.textContent = 'Sobrevendido (Alta Assimetria)';
-      regimeEl.className = 'text-base sm:text-xl font-bold text-emerald-400 truncate';
+      regimeEl.className = 'text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 truncate';
     } else if (sells.length > buys.length * 1.5) {
       regimeEl.textContent = 'Sobrecomprado (Alerta Topo)';
-      regimeEl.className = 'text-base sm:text-xl font-bold text-rose-400 truncate';
+      regimeEl.className = 'text-base sm:text-lg font-bold text-rose-600 dark:text-rose-400 truncate';
     } else {
-      regimeEl.textContent = 'Equilibrado / Rotação';
-      regimeEl.className = 'text-base sm:text-xl font-bold text-amber-300 truncate';
+      regimeEl.textContent = 'Equilibrado / RotaÃ§Ã£o';
+      regimeEl.className = 'text-base sm:text-lg font-bold text-amber-600 dark:text-amber-400 truncate';
     }
   }
 
@@ -1930,46 +2150,7 @@ function updateRadarExecutiveDeck(items) {
   }
 }
 
-function showToastNotification(message, isSuccess = true, onUndo = null) {
-  const toast = document.getElementById('toast-notification');
-  const msgEl = document.getElementById('toast-message');
-  const iconEl = document.getElementById('toast-icon');
-  const undoBtn = document.getElementById('toast-action-btn');
-  if (!toast || !msgEl) return;
-
-  msgEl.textContent = message;
-  if (iconEl) iconEl.textContent = isSuccess ? '✓' : '⚠️';
-
-  toast.className = `fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-2xl border text-xs font-medium transition-all duration-300 transform translate-y-0 opacity-100 pointer-events-auto ${
-    isSuccess
-      ? 'bg-fintech-surface border-emerald-500/50 text-white'
-      : 'bg-fintech-surface border-amber-500/50 text-white'
-  }`;
-
-  if (undoBtn) {
-    if (typeof onUndo === 'function') {
-      undoBtn.classList.remove('hidden');
-      undoBtn.onclick = () => {
-        onUndo();
-        hideToastNotification();
-      };
-    } else {
-      undoBtn.classList.add('hidden');
-    }
-  }
-
-  if (window._toastTimeout) clearTimeout(window._toastTimeout);
-  window._toastTimeout = setTimeout(() => {
-    hideToastNotification();
-  }, 6000);
-}
-
-function hideToastNotification() {
-  const toast = document.getElementById('toast-notification');
-  if (toast) {
-    toast.className = 'fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-2xl border text-xs font-medium transition-all duration-300 transform translate-y-16 opacity-0 pointer-events-none';
-  }
-}
+// showToastNotification e hideToastNotification extraidos para modules/toast.js
 
 function renderRadarTable(pageOrItems) {
   const items = Array.isArray(pageOrItems) ? pageOrItems : (pageOrItems ? pageOrItems.items : []);
@@ -1980,7 +2161,7 @@ function renderRadarTable(pageOrItems) {
   if (!items || items.length === 0) {
     elements.radarTableBody.innerHTML = `
       <tr>
-        <td colspan="8" class="text-center py-8 text-gray-500">
+        <td colspan="9" class="text-center py-8 text-gray-500">
           Nenhuma oportunidade com sinal ativo ou reteste pendente no momento.
         </td>
       </tr>
@@ -2006,7 +2187,7 @@ function renderRadarTable(pageOrItems) {
   if (filtered.length === 0) {
     elements.radarTableBody.innerHTML = `
       <tr>
-        <td colspan="8" class="text-center py-8 text-gray-500">
+        <td colspan="9" class="text-center py-8 text-gray-500">
           Nenhuma oportunidade encontrada para a direção selecionada (${state.activeDirection || 'BUY'}).
         </td>
       </tr>
@@ -2032,8 +2213,8 @@ function renderRadarTable(pageOrItems) {
     const isBuy = (item.direction === 'BUY');
     // Compact Direction Badge: C (Compra) or V (Venda)
     const dirBadge = isBuy
-      ? '<span class="inline-flex items-center justify-center w-6 h-6 rounded-full font-bold text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 select-none" title="Compra (Fundo)">C</span>'
-      : '<span class="inline-flex items-center justify-center w-6 h-6 rounded-full font-bold text-xs bg-rose-500/20 text-rose-400 border border-rose-500/40 select-none" title="Venda (Topo)">V</span>';
+      ? '<span class="badge-pill badge-buy select-none" title="Compra (Fundo)">▲ C</span>'
+      : '<span class="badge-pill badge-sell select-none" title="Venda (Topo)">▼ V</span>';
 
     const friendlyName = stripCorporateSuffix(item.asset_name || getAssetName(item.ticker));
 
@@ -2053,7 +2234,7 @@ function renderRadarTable(pageOrItems) {
       <td class="px-2 sm:px-3 py-2.5 sm:py-3 text-center">
         <span class="inline-block w-3 h-3 rounded-full cursor-help ${dotClass}" title="${item.timing_label}"></span>
       </td>
-      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono font-bold ${item.distance_pct >= 0 ? 'text-amber-400' : 'text-cyan-400'}">
+      <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono font-bold text-right ${item.distance_pct >= 0 ? 'text-amber-400' : 'text-cyan-400'}">
         ${item.distance_pct >= 0 ? '+' : ''}${item.distance_pct.toFixed(1)}%
       </td>
       <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono text-right text-gray-200 font-semibold">
@@ -2062,63 +2243,79 @@ function renderRadarTable(pageOrItems) {
       <td class="px-3 sm:px-4 py-2.5 sm:py-3 font-mono text-right font-semibold ${item.historical_win_rate >= 60 ? 'text-emerald-400' : 'text-gray-300'}">
         ${item.historical_win_rate !== undefined && item.historical_win_rate !== null ? item.historical_win_rate.toFixed(1) + '%' : '-'}
       </td>
+      <td class="px-3 sm:px-4 py-2.5 sm:py-3 text-right whitespace-nowrap">
+        <button class="btn-radar-open-chart btn-contextual text-cyan-400 hover:text-cyan-300 text-xs font-semibold px-2 py-0.5 rounded bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-800/50 transition cursor-pointer" data-ticker="${item.ticker}" data-strategy="${item.strategy_sub_id || ''}" data-direction="${item.direction || 'BUY'}" title="Abrir ativo no Gráfico Interativo">
+          Abrir gráfico
+        </button>
+      </td>
     `;
     elements.radarTableBody.appendChild(tr);
   });
 
-  // Re-attach click events to all ticker links
+  // Re-attach click events to all ticker links and discrete action buttons
+  const handleRadarAssetSelect = (ticker, strat, dir) => {
+    state.currentTicker = ticker;
+    elements.inputTicker.value = ticker;
+
+    // Synchronize direction if not BOTH
+    if (state.activeDirection !== 'BOTH' && state.activeDirection !== dir) {
+      state.activeDirection = dir;
+      const dirButtons = document.querySelectorAll('#global-direction-selector .dir-seg-btn');
+      dirButtons.forEach(b => {
+        b.classList.remove('active-buy', 'active-sell', 'active-both');
+        b.classList.add('text-gray-400');
+      });
+      const activeBtn = document.querySelector(`#global-direction-selector .dir-seg-btn[data-dir="${dir}"]`);
+      if (activeBtn) {
+        if (dir === 'BUY') activeBtn.classList.add('active-buy');
+        else if (dir === 'SELL') activeBtn.classList.add('active-sell');
+        else activeBtn.classList.add('active-both');
+        activeBtn.classList.remove('text-gray-400');
+      }
+      updateSidebarDirectionFilter();
+    }
+
+    if (state.radarTimeframe && state.radarTimeframe !== state.currentTimeframe) {
+      state.currentTimeframe = state.radarTimeframe;
+      document.querySelectorAll('#timeframe-buttons .tf-btn').forEach(b => {
+        if (b.getAttribute('data-tf') === state.currentTimeframe) {
+          b.classList.add('active', 'bg-fintech-cyan/20', 'text-fintech-cyan', 'border', 'border-fintech-cyan/40', 'font-bold');
+          b.classList.remove('bg-fintech-bg', 'text-gray-300');
+        } else {
+          b.classList.remove('active', 'bg-fintech-cyan/20', 'text-fintech-cyan', 'border', 'border-fintech-cyan/40', 'font-bold');
+          b.classList.add('bg-fintech-bg', 'text-gray-300');
+        }
+      });
+    }
+
+    // If user opened a specific strategy from radar, ensure it's selected and active
+    if (strat) {
+      state.activeStrategies.add(strat);
+      const aliases = STRATEGY_ALIASES[strat] || [];
+      aliases.forEach(a => state.activeStrategies.add(a));
+      const cb = document.querySelector(`.strategy-cb[data-id="${strat}"]`);
+      if (cb) cb.checked = true;
+    }
+
+    openChartFromRadar(ticker);
+  };
+
   document.querySelectorAll('.btn-open-ticker').forEach(btn => {
     btn.addEventListener('click', () => {
       const ticker = btn.getAttribute('data-ticker');
       const strat = btn.getAttribute('data-strategy');
       const dir = btn.getAttribute('data-direction') || 'BUY';
+      handleRadarAssetSelect(ticker, strat, dir);
+    });
+  });
 
-      state.currentTicker = ticker;
-      elements.inputTicker.value = ticker;
-      if (elements.simTicker) elements.simTicker.value = ticker;
-
-      // Synchronize direction if not BOTH
-      if (state.activeDirection !== 'BOTH' && state.activeDirection !== dir) {
-        state.activeDirection = dir;
-        const dirButtons = document.querySelectorAll('#global-direction-selector .dir-seg-btn');
-        dirButtons.forEach(b => {
-          b.classList.remove('active-buy', 'active-sell', 'active-both');
-          b.classList.add('text-gray-400');
-        });
-        const activeBtn = document.querySelector(`#global-direction-selector .dir-seg-btn[data-dir="${dir}"]`);
-        if (activeBtn) {
-          if (dir === 'BUY') activeBtn.classList.add('active-buy');
-          else if (dir === 'SELL') activeBtn.classList.add('active-sell');
-          else activeBtn.classList.add('active-both');
-          activeBtn.classList.remove('text-gray-400');
-        }
-        updateSidebarDirectionFilter();
-      }
-
-      if (state.radarTimeframe && state.radarTimeframe !== state.currentTimeframe) {
-        state.currentTimeframe = state.radarTimeframe;
-        document.querySelectorAll('#timeframe-buttons .tf-btn').forEach(b => {
-          if (b.getAttribute('data-tf') === state.currentTimeframe) {
-            b.classList.add('active', 'bg-fintech-cyan/20', 'text-fintech-cyan', 'border', 'border-fintech-cyan/40', 'font-bold');
-            b.classList.remove('bg-fintech-bg', 'text-gray-300');
-          } else {
-            b.classList.remove('active', 'bg-fintech-cyan/20', 'text-fintech-cyan', 'border', 'border-fintech-cyan/40', 'font-bold');
-            b.classList.add('bg-fintech-bg', 'text-gray-300');
-          }
-        });
-      }
-
-      // If user opened a specific strategy from radar, ensure it's selected and active
-      if (strat) {
-        state.activeStrategies.add(strat);
-        const aliases = STRATEGY_ALIASES[strat] || [];
-        aliases.forEach(a => state.activeStrategies.add(a));
-        const cb = document.querySelector(`.strategy-cb[data-id="${strat}"]`);
-        if (cb) cb.checked = true;
-      }
-
-      switchTab('tab-terminal');
-      loadAnalysisData(false);
+  document.querySelectorAll('.btn-radar-open-chart').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const ticker = btn.getAttribute('data-ticker');
+      const strat = btn.getAttribute('data-strategy');
+      const dir = btn.getAttribute('data-direction') || 'BUY';
+      handleRadarAssetSelect(ticker, strat, dir);
     });
   });
 }
@@ -2212,7 +2409,7 @@ async function loadAnalysisData(forceRefresh = false) {
     applyClientSideFiltering();
 
   } catch (err) {
-    alert(`Erro na análise: ${err.message}`);
+    alert(`Erro na anÃ¡lise: ${err.message}`);
   } finally {
     hideLoading();
   }
@@ -2281,11 +2478,11 @@ function applyClientSideFiltering() {
             }
           }
         } catch (lineErr) {
-          console.warn("Aviso ao renderizar linha de referência:", lineErr);
+          console.warn("Aviso ao renderizar linha de referÃªncia:", lineErr);
         }
       });
     } catch (refErr) {
-      console.error("Erro no processamento de linhas de referência:", refErr);
+      console.error("Erro no processamento de linhas de referÃªncia:", refErr);
     }
   }
 
@@ -2304,7 +2501,7 @@ function applyClientSideFiltering() {
             .replace('Vela: ', '')
             .replace('Vela Topo: ', '')
             .replace('Price Action: ', '')
-            .replace('Estratégia ', '');
+            .replace('EstratÃ©gia ', '');
           if (cleanLabel.length >15) cleanLabel = cleanLabel.slice(0, 15);
           if (isPending) cleanLabel = ` ${cleanLabel}`;
 
@@ -2328,7 +2525,7 @@ function applyClientSideFiltering() {
 
     try {
       state.candleSeries.setMarkers(mappedMarkers);
-      elements.activeMarkerCount.textContent = `Marcadores visíveis: ${mappedMarkers.length}`;
+      elements.activeMarkerCount.textContent = `Marcadores visÃ­veis: ${mappedMarkers.length}`;
     } catch (markerErr) {
       console.error("Erro ao aplicar marcadores no Lightweight Charts:", markerErr);
       elements.activeMarkerCount.textContent = `Marcadores com aviso (${mappedMarkers.length})`;
@@ -2337,7 +2534,7 @@ function applyClientSideFiltering() {
     try {
       state.candleSeries.setMarkers([]);
     } catch (e) {}
-    elements.activeMarkerCount.textContent = `Marcadores visíveis: 0`;
+    elements.activeMarkerCount.textContent = `Marcadores visÃ­veis: 0`;
   }
 
   // 4. Render Plotly Ranking (0ms)
@@ -2367,34 +2564,24 @@ function renderPlotlyRanking(summaries = null) {
     const labels = sorted.map(s =>s.strategy_label || s.strategy_sub_id);
     const winRates = sorted.map(s =>Number(s.win_rate) || 0);
     const texts = sorted.map(s => `${(Number(s.win_rate) || 0).toFixed(1)}% (${s.executed_buys || s.total_signals || 0} operadas)`);
-    const colors = sorted.map(s => (s.direction === 'SELL' ? '#FF5252' : '#00E676'));
-
-    const trace = {
-      type: 'bar',
-      orientation: 'h',
-      x: winRates,
-      y: labels,
-      text: texts,
-      textposition: 'outside',
-      cliponaxis: false,
-      marker: {
-        color: colors
-      }
-    };
+    const isMobile = window.innerWidth < 768;
+    const leftMargin = isMobile ? 140 : 220;
 
     const layout = {
-      margin: { l: 220, r: 60, t: 20, b: 40 },
+      margin: { l: leftMargin, r: 60, t: 20, b: 40 },
       paper_bgcolor: 'rgba(0,0,0,0)',
       plot_bgcolor: 'rgba(0,0,0,0)',
-      font: { color: '#F0F4F8', size: 11 },
+      font: { color: chartFontColor, size: 11, family: 'Plus Jakarta Sans, system-ui, sans-serif' },
       xaxis: {
         range: [0, 118],
-        gridcolor: '#262B38',
-        title: 'Taxa de Acerto (%)'
+        gridcolor: chartGridColor,
+        tickfont: { color: chartFontColor, size: 11, family: 'JetBrains Mono, monospace' },
+        title: { text: 'Taxa de Acerto (%)', font: { color: chartFontColor, size: 11, family: 'Plus Jakarta Sans, sans-serif' } }
       },
       yaxis: {
         autorange: 'reversed',
-        gridcolor: '#262B38'
+        gridcolor: chartGridColor,
+        tickfont: { color: chartFontColor, size: 11, family: 'Plus Jakarta Sans, sans-serif' }
       }
     };
 
@@ -2419,7 +2606,13 @@ function renderPlotlyScatter(summaries = null) {
     const returns = dataList.map(s =>Number(s.mean_forward_return) || 0);
     const maes = dataList.map(s =>Number(s.mean_mae) || 0);
     const labels = dataList.map(s =>s.strategy_label || s.strategy_sub_id);
-    const colors = dataList.map(s => (s.direction === 'SELL' ? '#FF5252' : '#00E676'));
+    const isLight = (document.documentElement.getAttribute('data-theme') || 'dark') === 'light';
+    const chartFontColor = isLight ? '#0F172A' : '#F8FAFC';
+    const chartGridColor = isLight ? 'rgba(203, 213, 225, 0.5)' : 'rgba(51, 65, 85, 0.4)';
+    const buyColor = isLight ? '#059669' : '#10B981';
+    const sellColor = isLight ? '#E11D48' : '#F43F5E';
+
+    const colors = dataList.map(s => (s.direction === 'SELL' ? sellColor : buyColor));
     const sizes = dataList.map(s =>Math.min(28, Math.max(10, (s.executed_buys || s.total_signals || 1) * 2)));
 
     const meanRet = returns.length >0 ? (returns.reduce((a, b) =>a + b, 0) / returns.length) : 0;
@@ -2446,39 +2639,45 @@ function renderPlotlyScatter(summaries = null) {
         size: sizes,
         color: colors,
         opacity: 0.9,
-        line: { color: '#ffffff', width: 1 }
+        line: { color: isLight ? '#ffffff' : '#111827', width: 1.5 }
       },
       hoverinfo: 'text',
       hovertext: dataList.map(s => `<b>${s.strategy_label || s.strategy_sub_id}</b> [${s.direction}]<br>Taxa de Acerto: <b>${(Number(s.win_rate) || 0).toFixed(1)}%</b><br>Operações: <b>${s.executed_buys || s.total_signals || 0}</b><br>Retorno Médio: <b>+${(Number(s.mean_forward_return) || 0).toFixed(1)}%</b><br>Calor Médio (MAE): <b>${(Number(s.mean_mae) || 0).toFixed(1)}%</b>`)
     };
 
+    const isMobile = window.innerWidth < 768;
+    const leftMargin = isMobile ? 40 : 55;
+    const rightMargin = isMobile ? 20 : 35;
+
     const layout = {
-      margin: { l: 55, r: 35, t: 25, b: 45 },
+      margin: { l: leftMargin, r: rightMargin, t: 25, b: 45 },
       paper_bgcolor: 'rgba(0,0,0,0)',
       plot_bgcolor: 'rgba(0,0,0,0)',
-      font: { color: '#F0F4F8', size: 10 },
+      font: { color: chartFontColor, size: 11, family: 'Plus Jakarta Sans, system-ui, sans-serif' },
       xaxis: {
         range: xRange,
-        gridcolor: '#262B38',
-        title: 'Calor Médio / MAE Máximo Adverso (%)'
+        gridcolor: chartGridColor,
+        tickfont: { color: chartFontColor, size: 11, family: 'JetBrains Mono, monospace' },
+        title: { text: 'Calor Médio / MAE Máximo Adverso (%)', font: { color: chartFontColor, size: 11, family: 'Plus Jakarta Sans, sans-serif' } }
       },
       yaxis: {
         range: yRange,
-        gridcolor: '#262B38',
-        title: 'Retorno Médio Forward (%)'
+        gridcolor: chartGridColor,
+        tickfont: { color: chartFontColor, size: 11, family: 'JetBrains Mono, monospace' },
+        title: { text: 'Retorno Médio Forward (%)', font: { color: chartFontColor, size: 11, family: 'Plus Jakarta Sans, sans-serif' } }
       },
       shapes: [
         {
           type: 'line',
           x0: meanMae, x1: meanMae,
           y0: yRange[0], y1: yRange[1],
-          line: { color: 'rgba(255, 214, 0, 0.4)', dash: 'dash', width: 1.5 }
+          line: { color: isLight ? 'rgba(217, 119, 6, 0.6)' : 'rgba(245, 158, 11, 0.6)', dash: 'dash', width: 1.5 }
         },
         {
           type: 'line',
           y0: meanRet, y1: meanRet,
           x0: xRange[0], x1: xRange[1],
-          line: { color: 'rgba(0, 230, 118, 0.4)', dash: 'dash', width: 1.5 }
+          line: { color: isLight ? 'rgba(5, 150, 105, 0.6)' : 'rgba(16, 185, 129, 0.6)', dash: 'dash', width: 1.5 }
         }
       ],
       annotations: [
@@ -2487,9 +2686,9 @@ function renderPlotlyScatter(summaries = null) {
           y: yRange[1] * 0.9,
           xref: 'x',
           yref: 'y',
-          text: ' Alta Assimetria',
+          text: '▲ Alta Assimetria',
           showarrow: false,
-          font: { color: 'rgba(0, 230, 118, 0.7)', size: 10 }
+          font: { color: isLight ? '#059669' : '#10B981', size: 11, family: 'Plus Jakarta Sans, sans-serif', weight: 600 }
         }
       ]
     };
@@ -2507,7 +2706,7 @@ function renderStrategySimulationTable(signals, summaries) {
 
   if (!signals || signals.length === 0) {
     elements.strategySimTableBody.innerHTML = `
-      <tr><td colspan="11" class="text-center py-4 text-gray-500">Nenhuma estratégia com sinais executados ativa.</td></tr>
+      <tr><td colspan="11" class="text-center py-4 text-gray-500">Nenhuma estratÃ©gia com sinais executados ativa.</td></tr>
     `;
     return;
   }
@@ -2595,16 +2794,16 @@ function renderStrategySimulationTable(signals, summaries) {
 
     tr.innerHTML = `
       <td class="px-3 py-2 ${isBuy ? 'text-cyan-300' : 'text-rose-300'} font-medium font-sans">${res.label}</td>
-      <td class="px-3 py-2"><span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${isBuy ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">${res.direction}</span></td>
+      <td class="px-3 py-2"><span class="px-1.5 py-0.5 rounded text-[11px] font-bold ${isBuy ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">${res.direction}</span></td>
       <td class="px-3 py-2 text-center text-white font-bold">${res.entriesCount}</td>
-      <td class="px-3 py-2 text-gray-300">R$ ${res.totalAportado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-      <td class="px-3 py-2 text-center text-amber-300 font-bold">${res.totalShares.toLocaleString('pt-BR')}</td>
-      <td class="px-3 py-2 text-white">R$ ${res.avgPrice.toFixed(2)}</td>
-      <td class="px-3 py-2 text-gray-400">R$ ${res.cashBalance.toFixed(2)}</td>
-      <td class="px-3 py-2 font-bold text-white">R$ ${res.finalEquity.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-      <td class="px-3 py-2 font-bold ${profitClass}">${res.netProfit >= 0 ? '+' : ''}R$ ${res.netProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-      <td class="px-3 py-2 font-bold ${retClass}">${res.retPct >= 0 ? '+' : ''}${res.retPct.toFixed(1)}%</td>
-      <td class="px-3 py-2 text-rose-400 font-bold">${res.maxDrawdown.toFixed(1)}%</td>
+      <td class="px-3 py-2 text-right font-mono text-gray-300">R$ ${res.totalAportado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td class="px-3 py-2 text-right font-mono text-amber-300 font-bold">${res.totalShares.toLocaleString('pt-BR')}</td>
+      <td class="px-3 py-2 text-right font-mono text-white">R$ ${res.avgPrice.toFixed(2)}</td>
+      <td class="px-3 py-2 text-right font-mono text-gray-400">R$ ${res.cashBalance.toFixed(2)}</td>
+      <td class="px-3 py-2 text-right font-mono font-bold text-white">R$ ${res.finalEquity.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td class="px-3 py-2 text-right font-mono font-bold ${profitClass}">${res.netProfit >= 0 ? '+' : ''}R$ ${res.netProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td class="px-3 py-2 text-right font-mono font-bold ${retClass}">${res.retPct >= 0 ? '+' : ''}${res.retPct.toFixed(1)}%</td>
+      <td class="px-3 py-2 text-right font-mono text-rose-400 font-bold">${res.maxDrawdown.toFixed(1)}%</td>
     `;
     elements.strategySimTableBody.appendChild(tr);
   });
@@ -2615,7 +2814,7 @@ function renderSignalsTable(signals) {
   elements.signalsTableBody.innerHTML = '';
   if (!signals || signals.length === 0) {
     elements.signalsTableBody.innerHTML = `
-      <tr><td colspan="11" class="text-center py-4 text-gray-500">Nenhum sinal executado nas estratégias ativas.</td></tr>
+      <tr><td colspan="11" class="text-center py-4 text-gray-500">Nenhum sinal executado nas estratÃ©gias ativas.</td></tr>
     `;
     return;
   }
@@ -2656,17 +2855,17 @@ function renderSignalsTable(signals) {
     const isBuy = (sig.direction === 'BUY');
     const retClass = (sig.forward_return_pct || 0) >= 0 ? 'text-emerald-400' : 'text-rose-400';
     tr.innerHTML = `
-      <td class="px-3 py-2 ${isBuy ? 'text-cyan-300' : 'text-rose-300'} font-medium">${sig.strategy_label}</td>
-      <td class="px-3 py-2"><span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${isBuy ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">${sig.direction}</span></td>
+      <td class="px-3 py-2 ${isBuy ? 'text-cyan-300' : 'text-rose-300'} font-medium font-sans">${sig.strategy_label}</td>
+      <td class="px-3 py-2 text-center"><span class="px-1.5 py-0.5 rounded text-[11px] font-bold ${isBuy ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">${sig.direction}</span></td>
       <td class="px-3 py-2 font-mono text-gray-400">${sig.signal_date}</td>
       <td class="px-3 py-2 font-mono text-white">${sig.execution_date}</td>
-      <td class="px-3 py-2 font-mono font-semibold">${formatPrice(sig.execution_price, state.currentTicker)}</td>
-      <td class="px-3 py-2 font-mono text-center font-bold text-amber-300">${sig.sharesBought} cotas</td>
-      <td class="px-3 py-2 font-mono text-white">${formatPrice(sig.boughtVal, state.currentTicker)}</td>
-      <td class="px-3 py-2 font-mono text-gray-400">${formatPrice(sig.cashRemaining, state.currentTicker)}</td>
-      <td class="px-3 py-2 font-mono font-bold ${retClass}">${sig.forward_return_pct !== null && sig.forward_return_pct !== undefined ? (sig.forward_return_pct >= 0 ? '+' : '') + sig.forward_return_pct.toFixed(1) + '%' : (sig.is_open ? 'Pendente' : '-')}</td>
-      <td class="px-3 py-2 font-mono text-rose-400">${sig.mae_pct !== null && sig.mae_pct !== undefined ? sig.mae_pct.toFixed(1) + '%' : '-'}</td>
-      <td class="px-3 py-2 font-mono text-[10px]">${sig.is_open ? '<span class="text-amber-400 font-bold">ABERTO / PENDENTE</span>' : '<span class="text-gray-400">CONCLUÍDO</span>'}</td>
+      <td class="px-3 py-2 font-mono font-semibold text-right">${formatPrice(sig.execution_price, state.currentTicker)}</td>
+      <td class="px-3 py-2 font-mono text-right font-bold text-amber-300">${sig.sharesBought} cotas</td>
+      <td class="px-3 py-2 font-mono text-right text-white">${formatPrice(sig.boughtVal, state.currentTicker)}</td>
+      <td class="px-3 py-2 font-mono text-right text-gray-400">${formatPrice(sig.cashRemaining, state.currentTicker)}</td>
+      <td class="px-3 py-2 font-mono text-right font-bold ${retClass}">${sig.forward_return_pct !== null && sig.forward_return_pct !== undefined ? (sig.forward_return_pct >= 0 ? '+' : '') + sig.forward_return_pct.toFixed(1) + '%' : (sig.is_open ? 'Pendente' : '-')}</td>
+      <td class="px-3 py-2 font-mono text-right text-rose-400">${sig.mae_pct !== null && sig.mae_pct !== undefined ? sig.mae_pct.toFixed(1) + '%' : '-'}</td>
+      <td class="px-3 py-2 font-mono text-center text-[11px]">${sig.is_open ? '<span class="text-amber-400 font-bold">ABERTO / PENDENTE</span>' : '<span class="text-gray-400">CONCLUÃDO</span>'}</td>
     `;
     elements.signalsTableBody.appendChild(tr);
   });
@@ -2710,14 +2909,14 @@ function setupSimulationTab() {
         if (lblCap) lblCap.textContent = 'Capital Inicial (R$)';
         if (lblInv) lblInv.textContent = 'Capital Inicial';
         if (lblAux) lblAux.textContent = 'Win Rate / Acertos';
-        if (legendInfo) legendInfo.textContent = 'Evolução de Saldo em Caixa + Posição a Mercado';
+        if (legendInfo) legendInfo.textContent = 'EvoluÃ§Ã£o de Saldo em Caixa + PosiÃ§Ã£o a Mercado';
       } else {
         if (cycleContainer) cycleContainer.classList.add('hidden');
         if (sellStrategyContainer) sellStrategyContainer.classList.add('hidden');
         if (lblCap) lblCap.textContent = 'Aporte por Sinal (R$)';
         if (lblInv) lblInv.textContent = 'Total Aportado';
         if (lblAux) lblAux.textContent = 'Alfa vs. DCA Passivo';
-        if (legendInfo) legendInfo.textContent = 'Patrimônio em Cotas vs. Capital Desembolsado';
+        if (legendInfo) legendInfo.textContent = 'PatrimÃ´nio em Cotas vs. Capital Desembolsado';
       }
     });
   }
@@ -2776,7 +2975,7 @@ function setupSimulationTab() {
 
 async function runSimulation() {
   const mode = (elements.simMode && elements.simMode.value) || 'cycle_trade';
-  showLoading(mode === 'cycle_trade' ? 'Executando backtest de trade (Compra -> Venda)...' : 'Executando simulação de acumulação financeira...');
+  showLoading(mode === 'cycle_trade' ? 'Executando backtest de trade (Compra -> Venda)...' : 'Executando simulaÃ§Ã£o de acumulaÃ§Ã£o financeira...');
   try {
     const tickerInput = resolveTicker((elements.simTicker && elements.simTicker.value.trim().toUpperCase()) || state.currentTicker);
     const capitalVal = parseFloat(document.getElementById('sim-contribution').value) || 1000;
@@ -2827,11 +3026,11 @@ async function runSimulation() {
     const m = data.metrics;
     const isCycle = (mode === 'cycle_trade');
 
-    // 1. Capital Investido & Patrimônio Final
+    // 1. Capital Investido & PatrimÃ´nio Final
     document.getElementById('sim-kpi-invested').textContent = `R$ ${m.total_invested.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
     document.getElementById('sim-kpi-final').textContent = `R$ ${m.final_portfolio_value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
 
-    // 2. Retorno Estratégia vs Buy & Hold
+    // 2. Retorno EstratÃ©gia vs Buy & Hold
     const retEl = document.getElementById('sim-kpi-return');
     if (retEl) {
       retEl.textContent = `${m.total_return_pct >= 0 ? '+' : ''}${m.total_return_pct.toFixed(1)}%`;
@@ -2844,12 +3043,12 @@ async function runSimulation() {
       bnhSub.textContent = `B&H: ${bnh}% (Alpha: ${bnhDiff >= 0 ? '+' : ''}${bnhDiff}%)`;
     }
 
-    // 3. Fator de Lucro & Lucro Líquido
+    // 3. Fator de Lucro & Lucro LÃ­quido
     const pfEl = document.getElementById('sim-kpi-profit-factor');
     if (pfEl) {
-      const pf = m.profit_factor != null ? (m.profit_factor >= 999 ? '∞' : m.profit_factor.toFixed(2)) : '0.00';
+      const pf = m.profit_factor != null ? (m.profit_factor >= 999 ? 'âˆž' : m.profit_factor.toFixed(2)) : '0.00';
       pfEl.textContent = pf;
-      pfEl.className = `text-base sm:text-lg font-bold font-mono ${parseFloat(pf) >= 1.5 || pf === '∞' ? 'text-amber-400' : (parseFloat(pf) >= 1.0 ? 'text-gray-200' : 'text-rose-400')}`;
+      pfEl.className = `text-base sm:text-lg font-bold font-mono ${parseFloat(pf) >= 1.5 || pf === 'âˆž' ? 'text-amber-400' : (parseFloat(pf) >= 1.0 ? 'text-gray-200' : 'text-rose-400')}`;
     }
     const profitSub = document.getElementById('sim-kpi-profit-sub');
     if (profitSub) {
@@ -2874,7 +3073,7 @@ async function runSimulation() {
       }
     }
 
-    // 5. Drawdown Máximo & Média de Compras
+    // 5. Drawdown MÃ¡ximo & MÃ©dia de Compras
     const ddEl = document.getElementById('sim-kpi-drawdown');
     if (ddEl) {
       ddEl.textContent = `${(m.max_drawdown_pct || 0).toFixed(1)}%`;
@@ -2882,9 +3081,9 @@ async function runSimulation() {
     const avgEntriesSub = document.getElementById('sim-kpi-avg-entries-sub');
     if (avgEntriesSub) {
       if (isCycle && m.avg_entries_per_cycle != null) {
-        avgEntriesSub.textContent = `Média compras/ciclo: ${m.avg_entries_per_cycle.toFixed(1)}`;
+        avgEntriesSub.textContent = `MÃ©dia compras/ciclo: ${m.avg_entries_per_cycle.toFixed(1)}`;
       } else {
-        avgEntriesSub.textContent = `Duração média: ${(m.avg_trade_bars || 0).toFixed(0)}b`;
+        avgEntriesSub.textContent = `DuraÃ§Ã£o mÃ©dia: ${(m.avg_trade_bars || 0).toFixed(0)}b`;
       }
     }
 
@@ -2892,7 +3091,7 @@ async function runSimulation() {
     renderSimulationTradesTable(data.trades, mode);
 
   } catch (err) {
-    alert(`Erro na simulação: ${err.message}`);
+    alert(`Erro na simulaÃ§Ã£o: ${err.message}`);
   } finally {
     hideLoading();
   }
@@ -2901,7 +3100,7 @@ async function runSimulation() {
 async function runOptimizer() {
   const currentMode = (elements.simMode && elements.simMode.value) || 'cycle_trade';
   const isDca = (currentMode === 'accumulation');
-  showLoading(isDca ? 'Varrendo estratégias de compra para encontrar a mais lucrativa em DCA...' : 'Varrendo centenas de combinações para encontrar a mais lucrativa...');
+  showLoading(isDca ? 'Varrendo estratÃ©gias de compra para encontrar a mais lucrativa em DCA...' : 'Varrendo centenas de combinaÃ§Ãµes para encontrar a mais lucrativa...');
   try {
     const tickerInput = resolveTicker((elements.simTicker && elements.simTicker.value.trim().toUpperCase()) || state.currentTicker);
     const capitalVal = parseFloat(document.getElementById('sim-contribution').value) || 1000;
@@ -2952,23 +3151,23 @@ async function runOptimizer() {
       const countEl = document.getElementById('opt-champ-tested-count');
       if (countEl) {
         countEl.textContent = isDca
-          ? `${data.total_combinations_tested} estratégias de compra avaliadas`
-          : `${data.total_combinations_tested} combinações válidas rankeadas`;
+          ? `${data.total_combinations_tested} estratÃ©gias de compra avaliadas`
+          : `${data.total_combinations_tested} combinaÃ§Ãµes vÃ¡lidas rankeadas`;
       }
 
       const modeBadge = document.getElementById('opt-champ-mode-badge');
       if (modeBadge) {
         if (isDca) {
-          modeBadge.textContent = 'Acumulação DCA (Fundos)';
+          modeBadge.textContent = 'AcumulaÃ§Ã£o DCA (Fundos)';
         } else {
-          modeBadge.textContent = c.cycle_entry_mode === 'single_buy' ? 'Compra Única (1x)' : 'Multi-Buy (Nx)';
+          modeBadge.textContent = c.cycle_entry_mode === 'single_buy' ? 'Compra Ãšnica (1x)' : 'Multi-Buy (Nx)';
         }
       }
 
       const titleContainer = document.getElementById('opt-champ-title-container') || (document.getElementById('opt-champ-buy-label') && document.getElementById('opt-champ-buy-label').parentElement);
       if (titleContainer) {
         if (isDca) {
-          titleContainer.innerHTML = '<span class="text-emerald-400 font-semibold" id="opt-champ-buy-label">' + c.buy_label + '</span> <span class="text-gray-400 font-normal text-xs">(Aportes Periódicos em Fundos)</span>';
+          titleContainer.innerHTML = '<span class="text-emerald-400 font-semibold" id="opt-champ-buy-label">' + c.buy_label + '</span> <span class="text-gray-400 font-normal text-xs">(Aportes PeriÃ³dicos em Fundos)</span>';
         } else {
           titleContainer.innerHTML = '<span class="text-emerald-400 font-semibold" id="opt-champ-buy-label">' + c.buy_label + '</span> <span class="text-gray-400" id="opt-champ-arrow">-&gt;</span> <span class="text-rose-400 font-semibold" id="opt-champ-sell-label">' + (c.sell_label || '-') + '</span>';
         }
@@ -2982,7 +3181,7 @@ async function runOptimizer() {
         if (isDca) {
           const avgP = c.average_buy_price != null ? `R$ ${c.average_buy_price.toFixed(2)}` : '-';
           winRateEl.textContent = avgP;
-          winRateEl.previousElementSibling.textContent = 'Preço Médio de Compra';
+          winRateEl.previousElementSibling.textContent = 'PreÃ§o MÃ©dio de Compra';
         } else {
           winRateEl.textContent = `${c.win_rate_pct.toFixed(1)}% (${c.winning_trades}/${c.closed_trades})`;
           winRateEl.previousElementSibling.textContent = 'Taxa de Acerto (Win Rate)';
@@ -3020,7 +3219,7 @@ async function runOptimizer() {
     }
 
   } catch (err) {
-    alert(`Erro na otimização: ${err.message}`);
+    alert(`Erro na otimizaÃ§Ã£o: ${err.message}`);
   } finally {
     hideLoading();
   }
@@ -3035,32 +3234,32 @@ function renderTopCombinationsTable(combos, isDca = false) {
     if (isDca) {
       tableHeader.innerHTML = `
         <th class="px-2.5 py-2 text-center">Rank</th>
-        <th class="px-2.5 py-2">Estratégia de Compra (Fundo)</th>
+        <th class="px-2.5 py-2">EstratÃ©gia de Compra (Fundo)</th>
         <th class="px-2.5 py-2 text-center">Aportes</th>
         <th class="px-2.5 py-2 font-mono">Total Aportado</th>
-        <th class="px-2.5 py-2 font-mono">Preço Médio</th>
+        <th class="px-2.5 py-2 font-mono">PreÃ§o MÃ©dio</th>
         <th class="px-2.5 py-2 font-mono">Retorno (%)</th>
-        <th class="px-2.5 py-2 font-mono">Patrimônio Final</th>
-        <th class="px-2.5 py-2 font-mono">Lucro Líquido</th>
-        <th class="px-2.5 py-2 text-center">Ação</th>
+        <th class="px-2.5 py-2 font-mono">PatrimÃ´nio Final</th>
+        <th class="px-2.5 py-2 font-mono">Lucro LÃ­quido</th>
+        <th class="px-2.5 py-2 text-center">AÃ§Ã£o</th>
       `;
     } else {
       tableHeader.innerHTML = `
         <th class="px-2.5 py-2 text-center">Rank</th>
-        <th class="px-2.5 py-2">Estratégia de Compra (Entrada)</th>
-        <th class="px-2.5 py-2">Estratégia de Venda (Saída)</th>
+        <th class="px-2.5 py-2">EstratÃ©gia de Compra (Entrada)</th>
+        <th class="px-2.5 py-2">EstratÃ©gia de Venda (SaÃ­da)</th>
         <th class="px-2.5 py-2 text-center">Trades</th>
         <th class="px-2.5 py-2 text-center font-mono">Win Rate</th>
         <th class="px-2.5 py-2 font-mono">Retorno (%)</th>
-        <th class="px-2.5 py-2 font-mono">Lucro Líquido</th>
+        <th class="px-2.5 py-2 font-mono">Lucro LÃ­quido</th>
         <th class="px-2.5 py-2 font-mono text-center">Max Drawdown</th>
-        <th class="px-2.5 py-2 text-center">Ação</th>
+        <th class="px-2.5 py-2 text-center">AÃ§Ã£o</th>
       `;
     }
   }
 
   if (!combos || combos.length === 0) {
-    elements.simTopCombosTableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-gray-500">${isDca ? 'Nenhuma estratégia com aportes encontrada no período.' : 'Nenhuma combinação com no mínimo 2 trades encontrada no período.'}</td></tr>`;
+    elements.simTopCombosTableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-gray-500">${isDca ? 'Nenhuma estratÃ©gia com aportes encontrada no perÃ­odo.' : 'Nenhuma combinaÃ§Ã£o com no mÃ­nimo 2 trades encontrada no perÃ­odo.'}</td></tr>`;
     return;
   }
 
@@ -3068,7 +3267,7 @@ function renderTopCombinationsTable(combos, isDca = false) {
     const tr = document.createElement('tr');
     tr.className = 'hover:bg-fintech-surface-hover';
 
-    const rankBadge = item.rank === 1 ? ' 1º' : (item.rank === 2 ? ' 2º' : (item.rank === 3 ? ' 3º' : `#${item.rank}`));
+    const rankBadge = item.rank === 1 ? ' 1Âº' : (item.rank === 2 ? ' 2Âº' : (item.rank === 3 ? ' 3Âº' : `#${item.rank}`));
     const retClass = item.total_return_pct >= 0 ? 'text-emerald-400' : 'text-rose-400';
     const pnlClass = item.net_profit >= 0 ? 'text-emerald-400' : 'text-rose-400';
 
@@ -3076,14 +3275,14 @@ function renderTopCombinationsTable(combos, isDca = false) {
       tr.innerHTML = `
         <td class="px-2.5 py-2 text-center font-bold text-amber-400">${rankBadge}</td>
         <td class="px-2.5 py-2 text-emerald-300 font-medium font-sans">${item.buy_label}</td>
-        <td class="px-2.5 py-2 text-center text-white font-bold">${item.closed_trades}</td>
-        <td class="px-2.5 py-2 font-mono text-gray-300">R$ ${(item.total_invested || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-        <td class="px-2.5 py-2 font-mono text-amber-300">R$ ${(item.average_buy_price || 0).toFixed(2)}</td>
-        <td class="px-2.5 py-2 font-bold ${retClass}">${item.total_return_pct >= 0 ? '+' : ''}${item.total_return_pct.toFixed(1)}%</td>
-        <td class="px-2.5 py-2 font-bold text-cyan-300 font-mono">R$ ${(item.final_equity || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-        <td class="px-2.5 py-2 font-bold ${pnlClass}">R$ ${item.net_profit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+        <td class="px-2.5 py-2 text-right font-mono text-white font-bold">${item.closed_trades}</td>
+        <td class="px-2.5 py-2 text-right font-mono text-gray-300">R$ ${(item.total_invested || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+        <td class="px-2.5 py-2 text-right font-mono text-amber-300">R$ ${(item.average_buy_price || 0).toFixed(2)}</td>
+        <td class="px-2.5 py-2 text-right font-mono font-bold ${retClass}">${item.total_return_pct >= 0 ? '+' : ''}${item.total_return_pct.toFixed(1)}%</td>
+        <td class="px-2.5 py-2 text-right font-mono font-bold text-cyan-300">R$ ${(item.final_equity || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+        <td class="px-2.5 py-2 text-right font-mono font-bold ${pnlClass}">R$ ${item.net_profit.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
         <td class="px-2.5 py-2 text-center">
-          <button class="btn-test-combo bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-[10px] px-2.5 py-1 rounded transition shadow"
+          <button class="btn-test-combo bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-[11px] px-2.5 py-1 rounded transition shadow"
             data-buy="${item.buy_sub_id}" data-sell="${item.sell_sub_id || ''}">
              Testar
           </button>
@@ -3094,13 +3293,13 @@ function renderTopCombinationsTable(combos, isDca = false) {
         <td class="px-2.5 py-2 text-center font-bold text-amber-400">${rankBadge}</td>
         <td class="px-2.5 py-2 text-emerald-300 font-medium font-sans">${item.buy_label}</td>
         <td class="px-2.5 py-2 text-rose-300 font-medium font-sans">${item.sell_label}</td>
-        <td class="px-2.5 py-2 text-center text-white font-bold">${item.closed_trades}</td>
-        <td class="px-2.5 py-2 text-center text-gray-200">${item.win_rate_pct.toFixed(1)}%</td>
-        <td class="px-2.5 py-2 font-bold ${retClass}">${item.total_return_pct >= 0 ? '+' : ''}${item.total_return_pct.toFixed(1)}%</td>
-        <td class="px-2.5 py-2 font-bold ${pnlClass}">R$ ${item.net_profit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-        <td class="px-2.5 py-2 text-center text-rose-400">${item.max_drawdown_pct.toFixed(1)}%</td>
+        <td class="px-2.5 py-2 text-right font-mono text-white font-bold">${item.closed_trades}</td>
+        <td class="px-2.5 py-2 text-right font-mono text-gray-200">${item.win_rate_pct.toFixed(1)}%</td>
+        <td class="px-2.5 py-2 text-right font-mono font-bold ${retClass}">${item.total_return_pct >= 0 ? '+' : ''}${item.total_return_pct.toFixed(1)}%</td>
+        <td class="px-2.5 py-2 text-right font-mono font-bold ${pnlClass}">R$ ${item.net_profit.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+        <td class="px-2.5 py-2 text-right font-mono text-rose-400">${item.max_drawdown_pct.toFixed(1)}%</td>
         <td class="px-2.5 py-2 text-center">
-          <button class="btn-test-combo bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-[10px] px-2.5 py-1 rounded transition shadow"
+          <button class="btn-test-combo bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-[11px] px-2.5 py-1 rounded transition shadow"
             data-buy="${item.buy_sub_id}" data-sell="${item.sell_sub_id}">
              Testar
           </button>
@@ -3129,7 +3328,7 @@ function renderSimulationTradesTable(trades, mode) {
   tbody.innerHTML = '';
 
   if (!trades || trades.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="11" class="text-center py-4 text-gray-500">Nenhum trade realizado com as estratégias selecionadas no período.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="11" class="text-center py-4 text-gray-500">Nenhum trade realizado com as estratÃ©gias selecionadas no perÃ­odo.</td></tr>`;
     if (countBadge) countBadge.textContent = '0 trades';
     return;
   }
@@ -3151,45 +3350,45 @@ function renderSimulationTradesTable(trades, mode) {
 
       let statusBadge = '';
       if (isOpen) {
-        statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40">EM ABERTO</span>';
+        statusBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40">EM ABERTO</span>';
       } else if (isWin) {
-        statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">LUCRO</span>';
+        statusBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">LUCRO</span>';
       } else {
-        statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40">PREJUÍZO</span>';
+        statusBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40">PREJUÃZO</span>';
       }
 
       tr.innerHTML = `
         <td class="px-2.5 py-2 text-center text-gray-400 font-bold">${t.trade_id || '-'}</td>
         <td class="px-2.5 py-2 text-cyan-300 font-medium font-sans">${t.buy_strategy || '-'}</td>
-        <td class="px-2.5 py-2 text-center font-bold ${numBuys > 1 ? 'text-amber-400' : 'text-gray-300'}">
-          <span class="px-1.5 py-0.5 rounded ${numBuys > 1 ? 'bg-amber-500/20 border border-amber-500/40' : 'bg-gray-800'} text-[10px]">
+        <td class="px-2.5 py-2 text-right font-mono font-bold ${numBuys > 1 ? 'text-amber-400' : 'text-gray-300'}">
+          <span class="px-1.5 py-0.5 rounded ${numBuys > 1 ? 'bg-amber-500/20 border border-amber-500/40' : 'bg-gray-800'} text-[11px]">
             ${numBuys}x
           </span>
         </td>
         <td class="px-2.5 py-2 text-gray-300">${t.buy_date || '-'}</td>
-        <td class="px-2.5 py-2 text-white font-semibold">R$ ${avgPrice.toFixed(2)}</td>
+        <td class="px-2.5 py-2 text-right font-mono text-white font-semibold">R$ ${avgPrice.toFixed(2)}</td>
         <td class="px-2.5 py-2 text-rose-300 font-medium font-sans">${t.sell_strategy || '-'}</td>
         <td class="px-2.5 py-2 text-gray-300">${t.sell_date || '-'}</td>
-        <td class="px-2.5 py-2 text-white font-semibold">${t.sell_price ? 'R$ ' + t.sell_price.toFixed(2) : '-'}</td>
+        <td class="px-2.5 py-2 text-right font-mono text-white font-semibold">${t.sell_price ? 'R$ ' + t.sell_price.toFixed(2) : '-'}</td>
         <td class="px-2.5 py-2 text-center text-gray-300">${t.duration_bars != null ? t.duration_bars + 'b' : '-'}</td>
-        <td class="px-2.5 py-2 font-bold ${retClass}">${(t.return_pct || 0) >= 0 ? '+' : ''}${(t.return_pct || 0).toFixed(1)}%</td>
-        <td class="px-2.5 py-2 font-bold ${pnlClass}">${(t.profit_loss || 0) >= 0 ? '+' : ''}R$ ${(t.profit_loss || 0).toFixed(2)}</td>
+        <td class="px-2.5 py-2 text-right font-mono font-bold ${retClass}">${(t.return_pct || 0) >= 0 ? '+' : ''}${(t.return_pct || 0).toFixed(1)}%</td>
+        <td class="px-2.5 py-2 text-right font-mono font-bold ${pnlClass}">${(t.profit_loss || 0) >= 0 ? '+' : ''}R$ ${(t.profit_loss || 0).toFixed(2)}</td>
         <td class="px-2.5 py-2 text-center">${statusBadge}</td>
       `;
     } else {
       tr.innerHTML = `
         <td class="px-2.5 py-2 text-center text-gray-400">-</td>
         <td class="px-2.5 py-2 text-cyan-300 font-medium font-sans">${t.strategy || '-'}</td>
-        <td class="px-2.5 py-2 text-center text-gray-300 font-bold">1x</td>
+        <td class="px-2.5 py-2 text-right font-mono text-gray-300 font-bold">1x</td>
         <td class="px-2.5 py-2 text-gray-300">${t.date || '-'}</td>
-        <td class="px-2.5 py-2 text-white font-semibold">R$ ${(t.execution_price || 0).toFixed(2)}</td>
+        <td class="px-2.5 py-2 text-right font-mono text-white font-semibold">R$ ${(t.execution_price || 0).toFixed(2)}</td>
         <td class="px-2.5 py-2 text-gray-500">-</td>
         <td class="px-2.5 py-2 text-gray-500">-</td>
         <td class="px-2.5 py-2 text-gray-500">-</td>
         <td class="px-2.5 py-2 text-center text-gray-400">1b</td>
         <td class="px-2.5 py-2 text-gray-300">-</td>
-        <td class="px-2.5 py-2 text-white">R$ ${(t.amount_invested || 0).toFixed(2)}</td>
-        <td class="px-2.5 py-2 text-center"><span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400">APORTE</span></td>
+        <td class="px-2.5 py-2 text-right font-mono text-white">R$ ${(t.amount_invested || 0).toFixed(2)}</td>
+        <td class="px-2.5 py-2 text-center"><span class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-400">APORTE</span></td>
       `;
     }
 
@@ -3198,7 +3397,7 @@ function renderSimulationTradesTable(trades, mode) {
     // If multi-buy entries exist, append collapsible/informative sub-row
     if (mode === 'cycle_trade' && t.buy_entries && t.buy_entries.length > 1) {
       const subTr = document.createElement('tr');
-      subTr.className = 'bg-fintech-surface/40 text-[10px] text-gray-400';
+      subTr.className = 'bg-fintech-surface/40 text-[11px] text-gray-400';
       const entriesDetail = t.buy_entries.map(be => `
         <span class="inline-flex items-center gap-1 bg-fintech-bg px-2 py-0.5 rounded border border-fintech-border/60">
           <span class="text-cyan-400 font-bold">#${be.entry_id}</span>
@@ -3209,7 +3408,7 @@ function renderSimulationTradesTable(trades, mode) {
       subTr.innerHTML = `
         <td colspan="12" class="px-4 py-1.5 font-mono">
           <div class="flex items-center gap-2 flex-wrap">
-            <span class="text-amber-400 font-semibold font-sans">↳ Sub-entradas acumuladas:</span>
+            <span class="text-amber-400 font-semibold font-sans">â†³ Sub-entradas acumuladas:</span>
             ${entriesDetail}
           </div>
         </td>
@@ -3230,7 +3429,7 @@ function renderSimulationCurve(curve) {
     x: dates,
     y: portfolio,
     mode: 'lines',
-    name: 'Valor Patrimonial (Estratégia)',
+    name: 'Valor Patrimonial (EstratÃ©gia)',
     line: { color: '#00F0FF', width: 2.5 }
   };
 
@@ -3256,14 +3455,7 @@ function renderSimulationCurve(curve) {
 }
 
 // Helpers
-function showLoading(msg = 'Carregando...') {
-  elements.loadingText.textContent = msg;
-  elements.loadingOverlay.classList.remove('hidden');
-}
-
-function hideLoading() {
-  elements.loadingOverlay.classList.add('hidden');
-}
+// showLoading e hideLoading extraidos para modules/toast.js
 
 // UI: Radar Strategy Multi-Select Dropdown Filter
 
@@ -3275,8 +3467,8 @@ function setupRadarTableSorting() {
   const iconWin = document.getElementById('sort-icon-winrate');
 
   function updateIcons() {
-    if (iconN) iconN.textContent = state.radarSortField === 'historical_n' ? (state.radarSortOrder === 'asc' ? '▲' : '▼') : '↕';
-    if (iconWin) iconWin.textContent = state.radarSortField === 'historical_win_rate' ? (state.radarSortOrder === 'asc' ? '▲' : '▼') : '↕';
+    if (iconN) iconN.textContent = state.radarSortField === 'historical_n' ? (state.radarSortOrder === 'asc' ? 'â–²' : 'â–¼') : 'â†•';
+    if (iconWin) iconWin.textContent = state.radarSortField === 'historical_win_rate' ? (state.radarSortOrder === 'asc' ? 'â–²' : 'â–¼') : 'â†•';
     if (iconN) iconN.className = state.radarSortField === 'historical_n' ? 'text-[10px] text-cyan-400 font-bold' : 'text-[10px] text-gray-500';
     if (iconWin) iconWin.className = state.radarSortField === 'historical_win_rate' ? 'text-[10px] text-cyan-400 font-bold' : 'text-[10px] text-gray-500';
   }
@@ -3369,7 +3561,7 @@ function renderRadarStratMenu() {
   });
 
   if (strats.length === 0) {
-    container.innerHTML = '<div class="text-gray-500 py-1">Nenhuma estratégia disponível.</div>';
+    container.innerHTML = '<div class="text-gray-500 py-1">Nenhuma estratÃ©gia disponÃ­vel.</div>';
     return;
   }
 
@@ -3535,7 +3727,7 @@ function renderPortfolioHoldingsEditor() {
     tbody.innerHTML = `
       <tr>
         <td colspan="5" class="px-3 py-3 text-center text-gray-500 font-sans text-[11px]">
-          Nenhuma posição cadastrada (100% em Caixa). Adicione ativos acima se já possuir carteira montada.
+          Nenhuma posiÃ§Ã£o cadastrada (100% em Caixa). Adicione ativos acima se jÃ¡ possuir carteira montada.
         </td>
       </tr>
     `;
@@ -3549,16 +3741,27 @@ function renderPortfolioHoldingsEditor() {
     const name = stripCorporateSuffix(getAssetName(h.ticker));
     tr.innerHTML = `
       <td class="px-2.5 py-1.5 font-bold text-white">
-        ${name} <span class="text-[10px] text-gray-400">(${h.ticker})</span>
+        ${name} <span class="text-[11px] text-gray-400">(${h.ticker})</span>
       </td>
-      <td class="px-2.5 py-1.5 text-amber-300 font-bold">${Number(h.shares).toLocaleString('pt-BR')}</td>
-      <td class="px-2.5 py-1.5 text-gray-200">R$ ${Number(h.average_buy_price).toFixed(2)}</td>
-      <td class="px-2.5 py-1.5 text-cyan-300">R$ ${cost.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-      <td class="px-2.5 py-1.5 text-right">
+      <td class="px-2.5 py-1.5 text-right font-mono text-amber-300 font-bold">${Number(h.shares).toLocaleString('pt-BR')}</td>
+      <td class="px-2.5 py-1.5 text-right font-mono text-gray-200">R$ ${Number(h.average_buy_price).toFixed(2)}</td>
+      <td class="px-2.5 py-1.5 text-right font-mono text-cyan-300">R$ ${cost.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td class="px-2.5 py-1.5 text-right whitespace-nowrap">
+        <button class="btn-holding-open-chart btn-contextual text-cyan-400 hover:text-cyan-300 text-xs font-semibold px-2 py-0.5 mr-2 rounded bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-800/50 transition cursor-pointer" data-ticker="${h.ticker}" title="Abrir ativo no Gráfico Interativo">
+          Abrir gráfico
+        </button>
         <button class="btn-remove-holding text-rose-400 hover:text-rose-300 text-xs font-bold px-1.5 cursor-pointer" data-idx="${idx}" title="Remover ativo">✕</button>
       </td>
     `;
     tbody.appendChild(tr);
+  });
+
+  tbody.querySelectorAll('.btn-holding-open-chart').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const rawTicker = btn.getAttribute('data-ticker');
+      openChartForHolding(rawTicker, 'carteira/posicoes');
+    });
   });
 
   tbody.querySelectorAll('.btn-remove-holding').forEach(btn => {
@@ -3725,7 +3928,7 @@ async function uploadMultipleB3Spreadsheets(files) {
 
     const data = await res.json();
     applyB3ParsedResult(data);
-    showToastNotification(`${count} ${count === 1 ? 'planilha processada' : 'planilhas combinadas'} com sucesso! (${data.holdings.length} ativos em custódia)`, false);
+    showToastNotification(`${count} ${count === 1 ? 'planilha processada' : 'planilhas combinadas'} com sucesso! (${data.holdings.length} ativos em custÃ³dia)`, false);
   } catch (err) {
     console.error('Erro ao enviar planilhas B3:', err);
     alert('Erro ao processar arquivos da B3.');
@@ -3805,7 +4008,7 @@ function importPortfolioHoldingsFromCsv(file) {
       const delimiter = lines[0].includes(';') ? ';' : ',';
       let startIndex = 0;
       const firstLineLower = lines[0].toLowerCase();
-      if (firstLineLower.includes('ticker') || firstLineLower.includes('ativo') || firstLineLower.includes('código') || firstLineLower.includes('codigo') || firstLineLower.includes('papel') || firstLineLower.includes('symbol')) {
+      if (firstLineLower.includes('ticker') || firstLineLower.includes('ativo') || firstLineLower.includes('cÃ³digo') || firstLineLower.includes('codigo') || firstLineLower.includes('papel') || firstLineLower.includes('symbol')) {
         startIndex = 1;
       }
 
@@ -3847,8 +4050,13 @@ function importPortfolioHoldingsFromCsv(file) {
         renderPortfolioHoldingsEditor();
         updateUndoButtonVisibility();
         runPortfolioAdviseAndSimulate();
+
+        const b3Label = document.getElementById('b3-import-label');
+        if (b3Label) {
+          b3Label.textContent = `${importedHoldings.length} ${importedHoldings.length === 1 ? 'ativo importado' : 'ativos importados'}`;
+        }
       } else {
-        alert('Nenhum ativo válido encontrado no CSV. Formato esperado: Ticker, Quantidade, Preço Médio (Ex: PETR4.SA, 100, 35.50)');
+        alert('Nenhum ativo vÃ¡lido encontrado no CSV. Formato esperado: Ticker, Quantidade, PreÃ§o MÃ©dio (Ex: PETR4.SA, 100, 35.50)');
       }
     } catch (err) {
       console.error('Erro ao processar CSV de carteira:', err);
@@ -3860,18 +4068,18 @@ function importPortfolioHoldingsFromCsv(file) {
 
 function getActionBadgeHtml(actionType, actionLabel) {
   if (actionType === 'BUY') {
-    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">🟢 ${actionLabel}</span>`;
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">ðŸŸ¢ ${actionLabel}</span>`;
   }
   if (actionType === 'SELL_FULL') {
-    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/40">🔴 ${actionLabel}</span>`;
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/40">ðŸ”´ ${actionLabel}</span>`;
   }
   if (actionType === 'SELL_PARTIAL_REBALANCE') {
-    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-amber-500/20 text-amber-400 border border-amber-500/40">⚖️ ${actionLabel}</span>`;
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-amber-500/20 text-amber-400 border border-amber-500/40">âš–ï¸ ${actionLabel}</span>`;
   }
   if (actionType === 'ROTATE_OUT' || actionType === 'ROTATE_IN') {
-    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">🔄 ${actionLabel}</span>`;
+    return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">ðŸ”„ ${actionLabel}</span>`;
   }
-  return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-700/50 text-gray-300 border border-gray-600">⏸️ ${actionLabel}</span>`;
+  return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-700/50 text-gray-300 border border-gray-600">â¸ï¸ ${actionLabel}</span>`;
 }
 
 function renderPortfolioAdviseSection(data) {
@@ -3887,7 +4095,7 @@ function renderPortfolioAdviseSection(data) {
   if (cashTransEl) {
     const cBefore = (Number(data.current_cash) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const cAfter = (Number(data.projected_cash_after) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    cashTransEl.textContent = `R$ ${cBefore} → R$ ${cAfter}`;
+    cashTransEl.textContent = `R$ ${cBefore} â†’ R$ ${cAfter}`;
   }
 
   if (!tbody) return;
@@ -3904,7 +4112,7 @@ function renderPortfolioAdviseSection(data) {
     tbody.innerHTML = `
       <tr>
         <td colspan="10" class="px-4 py-6 text-center text-gray-400 font-mono">
-          Nenhuma oportunidade ativa em zona de compra no momento. Recomendação: manter saldo em Caixa aguardando novo fundo estatístico.
+          Nenhuma oportunidade ativa em zona de compra no momento. RecomendaÃ§Ã£o: manter saldo em Caixa aguardando novo fundo estatÃ­stico.
         </td>
       </tr>
     `;
@@ -3932,7 +4140,7 @@ function renderPortfolioAdviseSection(data) {
       <td class="px-3 py-2.5">${getActionBadgeHtml(r.action_type, r.action_label)}</td>
       <td class="px-3 py-2.5">
         <div class="font-bold text-white">${stripCorporateSuffix(r.asset_name || r.ticker)}</div>
-        <div class="text-[10px] text-gray-400 font-mono">${r.ticker}</div>
+        <div class="text-[11px] text-gray-400 font-mono">${r.ticker}</div>
       </td>
       <td class="px-3 py-2.5 text-cyan-300 font-medium">${r.strategy_label}</td>
       <td class="px-3 py-2.5 text-center font-mono">
@@ -3941,18 +4149,18 @@ function renderPortfolioAdviseSection(data) {
           <div class="h-full ${scoreBarColor}" style="width: ${Math.min(100, Math.max(0, score))}%"></div>
         </div>
       </td>
-      <td class="px-3 py-2.5 text-center">${timingDot} <span class="text-[10px] text-gray-300 ml-1">${r.timing_category}</span></td>
-      <td class="px-3 py-2.5 font-mono text-white">R$ ${(Number(r.current_price) || 0).toFixed(2)}</td>
-      <td class="px-3 py-2.5 font-mono font-bold ${deltaColor}">
+      <td class="px-3 py-2.5 text-center">${timingDot} <span class="text-[11px] text-gray-300 ml-1">${r.timing_category}</span></td>
+      <td class="px-3 py-2.5 font-mono text-white text-right">R$ ${(Number(r.current_price) || 0).toFixed(2)}</td>
+      <td class="px-3 py-2.5 font-mono font-bold ${deltaColor} text-right">
         ${delta !== 0 ? `${deltaSign}${delta.toLocaleString('pt-BR')} cotas` : '0 (Manter)'}
-        <div class="text-[10px] text-gray-400 font-normal">Final: ${(Number(r.target_shares) || 0).toLocaleString('pt-BR')} cotas</div>
+        <div class="text-[11px] text-gray-400 font-normal">Final: ${(Number(r.target_shares) || 0).toLocaleString('pt-BR')} cotas</div>
       </td>
-      <td class="px-3 py-2.5 font-mono font-bold text-white">
+      <td class="px-3 py-2.5 font-mono font-bold text-white text-right">
         ${r.order_value > 0 ? `R$ ${Number(r.order_value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '-'}
       </td>
       <td class="px-3 py-2.5 font-mono text-center">
         <span class="text-gray-400">${(Number(r.current_weight_pct) || 0).toFixed(1)}%</span>
-        <span class="text-gray-500 mx-1">→</span>
+        <span class="text-gray-500 mx-1">â†’</span>
         <span class="font-bold text-cyan-300">${(Number(r.target_weight_pct) || 0).toFixed(1)}%</span>
       </td>
       <td class="px-3 py-2.5 text-gray-300 text-[11px] max-w-xs truncate" title="${r.reason_text}">${r.reason_text}</td>
@@ -3981,7 +4189,7 @@ function openPreFlightOrderModal() {
   if (cashEl) {
     const cBefore = (Number(adviseData.current_cash) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const cAfter = (Number(adviseData.projected_cash_after) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    cashEl.textContent = `R$ ${cBefore} → R$ ${cAfter}`;
+    cashEl.textContent = `R$ ${cBefore} â†’ R$ ${cAfter}`;
   }
 
   tbody.innerHTML = '';
@@ -4049,7 +4257,7 @@ function applyRecommendedPortfolioOrders() {
   renderPortfolioHoldingsEditor();
   updateUndoButtonVisibility();
   closePreFlightOrderModal();
-  showToastNotification('Ordens aplicadas com sucesso à sua carteira!', true, undoLastPortfolioApply);
+  showToastNotification('Ordens aplicadas com sucesso Ã  sua carteira!', true, undoLastPortfolioApply);
   runPortfolioAdviseAndSimulate();
 }
 
@@ -4060,7 +4268,7 @@ async function runPortfolioAdviseAndSimulate() {
     .map(s => resolveTicker(s.trim().toUpperCase()))
     .filter(Boolean);
 
-  showLoading('Otimizando estratégias campeãs por ativo e calculando rebalanceamento da carteira...');
+  showLoading('Otimizando estratÃ©gias campeÃ£s por ativo e calculando rebalanceamento da carteira...');
   try {
     const advisePayload = {
       available_cash: state.portfolioState.availableCash,
@@ -4174,9 +4382,9 @@ function renderPortfolioSimulationKPIs(m) {
     elBenchSub.textContent = `B&H Cesta: ${benchRet >= 0 ? '+' : ''}${benchRet.toFixed(1)}% (Alfa: ${alpha >= 0 ? '+' : ''}${alpha.toFixed(1)}%)`;
   }
   if (elWin) elWin.textContent = `${winRate.toFixed(1)}%`;
-  if (elExitsSub) elExitsSub.textContent = `${m.winning_exits_count || 0}W / ${m.losing_exits_count || 0}L (${m.closed_exits_count || 0} saídas)`;
+  if (elExitsSub) elExitsSub.textContent = `${m.winning_exits_count || 0}W / ${m.losing_exits_count || 0}L (${m.closed_exits_count || 0} saÃ­das)`;
   if (elPf) elPf.textContent = pf.toFixed(2);
-  if (elRotSub) elRotSub.textContent = `${m.rebalance_rotations_count || 0} rebalanceamentos/rotações`;
+  if (elRotSub) elRotSub.textContent = `${m.rebalance_rotations_count || 0} rebalanceamentos/rotaÃ§Ãµes`;
   if (elDd) elDd.textContent = `${dd.toFixed(1)}%`;
   if (elEvSub) elEvSub.textContent = `${m.total_events_count || 0} ordens executadas`;
 }
@@ -4193,7 +4401,7 @@ function renderPortfolioLedgerTable(events) {
     tbody.innerHTML = `
       <tr>
         <td colspan="13" class="px-4 py-6 text-center text-gray-500">
-          Nenhuma operação executada no período selecionado.
+          Nenhuma operaÃ§Ã£o executada no perÃ­odo selecionado.
         </td>
       </tr>
     `;
@@ -4224,13 +4432,13 @@ function renderPortfolioLedgerTable(events) {
       <td class="px-2.5 py-2 font-bold text-white">${ev.ticker}</td>
       <td class="px-2.5 py-2 text-cyan-300 font-sans">${ev.strategy_label}</td>
       <td class="px-2.5 py-2 text-center text-amber-300 font-bold">${(Number(ev.potential_score) || 0).toFixed(1)}</td>
-      <td class="px-2.5 py-2 text-white">R$ ${(Number(ev.execution_price) || 0).toFixed(2)}</td>
-      <td class="px-2.5 py-2 font-bold ${deltaColor}">${deltaSign}${delta.toLocaleString('pt-BR')}</td>
-      <td class="px-2.5 py-2 text-white">R$ ${(Number(ev.trade_value) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-      <td class="px-2.5 py-2">${pnlHtml}</td>
-      <td class="px-2.5 py-2 text-center text-gray-300">${(Number(ev.weight_before_pct) || 0).toFixed(1)}% → ${(Number(ev.weight_after_pct) || 0).toFixed(1)}%</td>
-      <td class="px-2.5 py-2 text-gray-300">R$ ${(Number(ev.cash_after) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-      <td class="px-2.5 py-2 font-bold text-white">R$ ${(Number(ev.portfolio_equity_after) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td class="px-2.5 py-2 font-mono text-right text-white">R$ ${(Number(ev.execution_price) || 0).toFixed(2)}</td>
+      <td class="px-2.5 py-2 font-mono text-right font-bold ${deltaColor}">${deltaSign}${delta.toLocaleString('pt-BR')}</td>
+      <td class="px-2.5 py-2 font-mono text-right text-white">R$ ${(Number(ev.trade_value) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td class="px-2.5 py-2 font-mono text-right">${pnlHtml}</td>
+      <td class="px-2.5 py-2 font-mono text-center text-gray-300">${(Number(ev.weight_before_pct) || 0).toFixed(1)}% â†’ ${(Number(ev.weight_after_pct) || 0).toFixed(1)}%</td>
+      <td class="px-2.5 py-2 font-mono text-right text-gray-300">R$ ${(Number(ev.cash_after) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td class="px-2.5 py-2 font-mono text-right font-bold text-white">R$ ${(Number(ev.portfolio_equity_after) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -4243,13 +4451,13 @@ function renderPortfolioEquityChart(curve) {
 
   if (!curve || curve.length === 0) {
     Plotly.purge(container);
-    container.innerHTML = '<div class="flex items-center justify-center h-full text-xs text-gray-500 font-mono">Execute a análise/simulação para gerar a curva patrimonial.</div>';
+    container.innerHTML = '<div class="flex items-center justify-center h-full text-xs text-gray-500 font-mono">Execute a anÃ¡lise/simulaÃ§Ã£o para gerar a curva patrimonial.</div>';
     return;
   }
   container.innerHTML = '';
 
   const isLight = (document.documentElement.getAttribute('data-theme') || 'dark') === 'light';
-  const bgColor = isLight ? '#FFFFFF' : '#0B0E14';
+  const bgColor = isLight ? '#FFFFFF' : '#111827';
   const textColor = isLight ? '#334155' : '#8B98A5';
   const gridColor = isLight ? 'rgba(226, 232, 240, 0.8)' : 'rgba(38, 43, 56, 0.5)';
   const borderColor = isLight ? '#E2E8F0' : '#262B38';
@@ -4269,7 +4477,7 @@ function renderPortfolioEquityChart(curve) {
       line: { color: '#00E676', width: 2.5 },
       fill: 'tozeroy',
       fillcolor: 'rgba(0, 230, 118, 0.08)',
-      hovertemplate: '<b>%{x}</b><br>Patrimônio Carteira: R$ %{y:,.2f}<extra></extra>',
+      hovertemplate: '<b>%{x}</b><br>PatrimÃ´nio Carteira: R$ %{y:,.2f}<extra></extra>',
     },
     {
       x: dates,
@@ -4320,13 +4528,13 @@ function renderPortfolioAllocationChart(adviseData) {
 
   if (!adviseData) {
     Plotly.purge(container);
-    container.innerHTML = '<div class="flex items-center justify-center h-full text-xs text-gray-500 font-mono">Execute a análise para visualizar os pesos por ativo.</div>';
+    container.innerHTML = '<div class="flex items-center justify-center h-full text-xs text-gray-500 font-mono">Execute a anÃ¡lise para visualizar os pesos por ativo.</div>';
     return;
   }
   container.innerHTML = '';
 
   const isLight = (document.documentElement.getAttribute('data-theme') || 'dark') === 'light';
-  const bgColor = isLight ? '#FFFFFF' : '#0B0E14';
+  const bgColor = isLight ? '#FFFFFF' : '#111827';
   const textColor = isLight ? '#334155' : '#8B98A5';
   const gridColor = isLight ? 'rgba(226, 232, 240, 0.8)' : 'rgba(38, 43, 56, 0.5)';
   const borderColor = isLight ? '#E2E8F0' : '#262B38';
@@ -4410,11 +4618,11 @@ function renderPortfolioOpportunityRanking(ranking) {
     const score = Number(p.potential_score) || 0;
     const scoreBarColor = score >= 75 ? 'bg-emerald-400' : (score >= 55 ? 'bg-cyan-400' : 'bg-amber-400');
 
-    let sigBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-700/50 text-gray-400">NEUTRO</span>';
+    let sigBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-gray-700/50 text-gray-400">NEUTRO</span>';
     if (p.active_direction === 'BUY') {
-      sigBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">🟢 ZONA DE COMPRA</span>';
+      sigBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">ðŸŸ¢ ZONA DE COMPRA</span>';
     } else if (p.active_direction === 'SELL') {
-      sigBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/40">🔴 ZONA DE VENDA</span>';
+      sigBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/40">ðŸ”´ ZONA DE VENDA</span>';
     }
 
     const retPct = Number(p.historical_return_pct) || 0;
@@ -4424,7 +4632,7 @@ function renderPortfolioOpportunityRanking(ranking) {
       <td class="px-3 py-2 text-center font-bold text-gray-400">#${idx + 1}</td>
       <td class="px-3 py-2">
         <span class="font-bold text-white">${stripCorporateSuffix(p.asset_name || p.ticker)}</span>
-        <span class="text-[10px] text-gray-400 ml-1">(${p.ticker})</span>
+        <span class="text-[11px] text-gray-400 ml-1">(${p.ticker})</span>
       </td>
       <td class="px-3 py-2 text-cyan-300 font-sans">${p.champion_buy_label}</td>
       <td class="px-3 py-2 text-amber-300 font-sans">${p.champion_sell_label}</td>
@@ -4436,9 +4644,9 @@ function renderPortfolioOpportunityRanking(ranking) {
       </td>
       <td class="px-3 py-2 text-center">${sigBadge}</td>
       <td class="px-3 py-2 text-center text-gray-300">${p.timing_label || p.timing_category} (${(Number(p.distance_pct) || 0).toFixed(1)}%)</td>
-      <td class="px-3 py-2 text-center font-bold text-emerald-400">${(Number(p.win_rate_pct) || 0).toFixed(1)}%</td>
-      <td class="px-3 py-2 text-center font-bold ${retColor}">${retPct >= 0 ? '+' : ''}${retPct.toFixed(1)}%</td>
-      <td class="px-3 py-2 text-center text-rose-400">${(Number(p.max_drawdown_pct) || 0).toFixed(1)}%</td>
+      <td class="px-3 py-2 text-right font-mono font-bold text-emerald-400">${(Number(p.win_rate_pct) || 0).toFixed(1)}%</td>
+      <td class="px-3 py-2 text-right font-mono font-bold ${retColor}">${retPct >= 0 ? '+' : ''}${retPct.toFixed(1)}%</td>
+      <td class="px-3 py-2 text-right font-mono text-rose-400">${(Number(p.max_drawdown_pct) || 0).toFixed(1)}%</td>
     `;
     tbody.appendChild(tr);
   });
@@ -4534,7 +4742,7 @@ function updateTradingViewAveragePriceLine() {
         title: 'PM B3: R$ ' + found.average_buy_price.toFixed(2),
       });
     } catch (e) {
-      console.warn('Erro ao criar linha de Preço Médio no gráfico:', e);
+      console.warn('Erro ao criar linha de PreÃ§o MÃ©dio no grÃ¡fico:', e);
     }
   }
 }

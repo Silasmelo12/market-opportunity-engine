@@ -1,0 +1,6 @@
+# Dependências de desenvolvimento (testes E2E de UI)
+# Uso:
+#   pip install -r requirements-dev.txt
+#   python -m playwright install chromium
+-r requirements.txt
+playwright>=1.44.0
