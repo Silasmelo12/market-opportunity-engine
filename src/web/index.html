@@ -1687,23 +1687,23 @@
       </div>
     </section>
 
-        <section id="tab-portfolio" data-legacy-id="tab-pane-posicoes" data-tab-pane="posicoes" class="tab-pane tab-view hidden h-full p-4 sm:p-6 overflow-y-auto bg-slate-50">
+        <section id="tab-portfolio" data-legacy-id="tab-pane-posicoes" data-tab-pane="posicoes" class="tab-pane tab-view hidden h-full p-4 sm:p-6 overflow-y-auto bg-slate-50 area-posicoes">
       <div class="max-w-7xl mx-auto space-y-6">
 
         <!-- Header da Seção de Posições (Investidor10 Style) -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+        <div class="section-header flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3">
           <div>
-            <h2 class="text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+            <h2 class="section-title flex items-center gap-2">
               Meus Ativos & Diagnóstico Estatístico
               <span id="pos-total-count-badge" class="text-xs bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded-full">0</span>
             </h2>
-            <p class="text-xs text-slate-500 mt-0.5">Custódia categorizada por classe com sinais em tempo real de Fundo 2x2 e nota estatística</p>
+            <p class="section-subtitle mt-0.5">Custódia categorizada por classe com sinais em tempo real de Fundo 2x2 e nota estatística</p>
           </div>
           <div class="flex items-center gap-2.5">
-            <button id="btn-pos-expand-all" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 shadow-sm transition">
+            <button id="btn-pos-expand-all" class="btn-secondary">
               Expandir Todos
             </button>
-            <button id="btn-pos-collapse-all" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 shadow-sm transition">
+            <button id="btn-pos-collapse-all" class="btn-secondary">
               Recolher Todos
             </button>
           </div>
@@ -1712,13 +1712,13 @@
         <!-- Container Dinâmico dos Acordeões por Categoria (Investidor10 Style) -->
                 <div id="investidor10-positions-categories" class="space-y-4">
           <!-- Modelo/Template de Category Card (Investidor10 Style) -->
-          <div class="category-card bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-            <div class="category-header p-4 bg-white flex items-center justify-between border-b border-slate-200 cursor-pointer">
+          <div class="card-surface category-card overflow-hidden">
+            <div class="category-header p-4 flex items-center justify-between cursor-pointer">
               <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center font-bold text-slate-700 text-xs">S</div>
                 <div>
-                  <h3 class="font-bold text-slate-900 text-sm">Ações Brasileiras</h3>
-                  <span class="text-xs text-slate-500">Custódia B3</span>
+                  <h3 class="category-title font-bold text-sm">Ações Brasileiras</h3>
+                  <span class="section-subtitle">Custódia B3</span>
                 </div>
               </div>
               <div class="flex items-center gap-6 text-xs">
