@@ -681,19 +681,19 @@ function setupDirectionSelector() {
 
       dirButtons.forEach(b => {
         b.classList.remove('active-buy', 'active-sell', 'active-both');
-        b.classList.add('text-gray-400');
-        b.classList.remove('text-gray-300');
+        b.classList.add('text-muted');
+        b.classList.remove('text-muted');
       });
 
       if (dir === 'BUY') {
         btn.classList.add('active-buy');
-        btn.classList.remove('text-gray-400');
+        btn.classList.remove('text-muted');
       } else if (dir === 'SELL') {
         btn.classList.add('active-sell');
-        btn.classList.remove('text-gray-400');
+        btn.classList.remove('text-muted');
       } else {
         btn.classList.add('active-both');
-        btn.classList.remove('text-gray-400');
+        btn.classList.remove('text-muted');
       }
 
       // Update visibility of sidebar accordions
@@ -1041,12 +1041,8 @@ function setupTimeframeButtons() {
   const buttons = document.querySelectorAll('#timeframe-buttons .tf-btn');
   buttons.forEach(btn => {
     btn.addEventListener('click', () => {
-      buttons.forEach(b => {
-        b.classList.remove('active', 'bg-fintech-cyan/20', 'text-fintech-cyan', 'border', 'border-fintech-cyan/40', 'font-bold');
-        b.classList.add('bg-fintech-bg', 'text-gray-300');
-      });
-      btn.classList.add('active', 'bg-fintech-cyan/20', 'text-fintech-cyan', 'border', 'border-fintech-cyan/40', 'font-bold');
-      btn.classList.remove('bg-fintech-bg', 'text-gray-300');
+      buttons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
 
       state.currentTimeframe = btn.getAttribute('data-tf');
       loadAnalysisData(true);
