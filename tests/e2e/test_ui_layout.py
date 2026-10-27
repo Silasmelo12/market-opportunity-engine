@@ -394,3 +394,147 @@ def test_reduced_motion_suppresses_non_essential_animation(server_url):
         assert max(values) <= 0.001, f"Movimento reduzido não suprimiu transições: {duration}"
         context.close()
         browser.close()
+
+
+def _has_visible_focus_indicator(info: dict) -> bool:
+    if info.get("outlineStyle") not in (None, "none"):
+        try:
+            if float(str(info.get("outlineWidth", "0")).replace("px", "")) > 0:
+                return True
+        except ValueError:
+            pass
+    return info.get("boxShadow") not in (None, "none")
+
+
+def test_keyboard_focus_indicator_is_visible(layout_page):
+    page, base = layout_page
+    page.goto(f"{base}/?e2e=1#quant/radar", wait_until="load")
+    page.wait_for_selector("#tab-pane-radar", state="visible")
+
+    focused = []
+    for _ in range(14):
+        page.keyboard.press("Tab")
+        info = page.evaluate(
+            """() => {
+                const el = document.activeElement;
+                if (!el || el === document.body) return null;
+                const cs = getComputedStyle(el);
+                return {
+                    tag: el.tagName,
+                    id: el.id || '',
+                    text: (el.textContent || '').trim().slice(0, 30),
+                    outlineStyle: cs.outlineStyle,
+                    outlineWidth: cs.outlineWidth,
+                    boxShadow: cs.boxShadow,
+                };
+            }"""
+        )
+        if info:
+            focused.append(info)
+
+    assert len(focused) >= 8, f"Poucos controles alcançados por Tab: {focused}"
+    missing = [item for item in focused if not _has_visible_focus_indicator(item)]
+    assert missing == [], f"Controles sem indicador de foco visível: {missing}"
+
+
+def test_scrollable_tables_support_keyboard_scrolling(layout_page):
+    page, base = layout_page
+    page.goto(f"{base}/?e2e=1#carteira/posicoes", wait_until="load")
+    page.wait_for_selector("#tab-portfolio", state="visible")
+    page.wait_for_timeout(300)
+
+    focusable = page.evaluate(
+        """() => [...document.querySelectorAll('#tab-portfolio .table-scroll')]
+            .filter(el => el.getAttribute('tabindex') === '0').length"""
+    )
+    total = page.locator("#tab-portfolio .table-scroll").count()
+    assert focusable == total and total >= 1, f"Regiões roláveis focáveis: {focusable}/{total}"
+
+    handle = page.evaluate_handle(
+        """() => [...document.querySelectorAll('#tab-portfolio .table-scroll[tabindex="0"]')]
+            .find(el => el.scrollWidth > el.clientWidth + 1) || null"""
+    )
+    element = handle.as_element()
+    assert element is not None, "Nenhuma tabela larga encontrada em Posições"
+    element.focus()
+    for _ in range(4):
+        page.keyboard.press("ArrowRight")
+    page.wait_for_timeout(150)
+    scroll_left = page.evaluate("(el) => el.scrollLeft", element)
+    assert scroll_left > 0, "A tabela focável não respondeu às setas do teclado"
+
+
+def test_live_regions_and_accessible_names(layout_page):
+    page, base = layout_page
+    page.goto(f"{base}/?e2e=1#quant/radar", wait_until="load")
+    page.wait_for_selector("#tab-pane-radar", state="visible")
+
+    assert page.get_attribute("#toast-notification", "role") == "status"
+    assert page.get_attribute("#toast-notification", "aria-live") == "polite"
+    assert page.get_attribute("#loading-spinner", "role") == "status"
+    assert page.get_attribute("#loading-spinner", "aria-live") == "polite"
+
+    unnamed = page.evaluate(
+        """() => [...document.querySelectorAll('button, [role="button"], a')]
+            .filter(el => {
+                const r = el.getBoundingClientRect();
+                if (r.width === 0 || r.height === 0) return false;
+                const name = (el.getAttribute('aria-label') || el.getAttribute('title') || el.textContent || '').trim();
+                return name === '';
+            })
+            .map(el => el.outerHTML.slice(0, 120))"""
+    )
+    assert unnamed == [], f"Controles sem nome acessível: {unnamed}"
+
+    assert page.get_attribute("#btn-theme-toggle", "aria-pressed") == "false"
+    page.click("#btn-theme-toggle")
+    page.wait_for_timeout(150)
+    assert page.get_attribute("#btn-theme-toggle", "aria-pressed") == "true"
+
+    pressed = page.evaluate(
+        """() => [...document.querySelectorAll('#global-direction-selector .dir-seg-btn')]
+            .map(b => [b.dataset.dir, b.getAttribute('aria-pressed')])"""
+    )
+    assert sum(1 for _, value in pressed if value == "true") == 1, pressed
+    page.click('#global-direction-selector .dir-seg-btn[data-dir="SELL"]')
+    page.wait_for_timeout(100)
+    assert page.get_attribute('#global-direction-selector .dir-seg-btn[data-dir="SELL"]', "aria-pressed") == "true"
+    assert page.get_attribute('#global-direction-selector .dir-seg-btn[data-dir="BUY"]', "aria-pressed") == "false"
+
+    timeframe = page.evaluate(
+        """() => [...document.querySelectorAll('#radar-timeframe-buttons .radar-tf-btn')]
+            .map(b => [b.dataset.tf, b.getAttribute('aria-pressed')])"""
+    )
+    assert sum(1 for _, value in timeframe if value == "true") == 1, timeframe
+    page.click('#radar-timeframe-buttons .radar-tf-btn[data-tf="1wk"]')
+    page.wait_for_timeout(200)
+    assert page.get_attribute('#radar-timeframe-buttons .radar-tf-btn[data-tf="1wk"]', "aria-pressed") == "true"
+
+
+def test_all_areas_respect_reference_widths(layout_page):
+    page, base = layout_page
+    for name, (route, panel, _) in AREAS.items():
+        page.goto(f"{base}/?e2e=1#{route}", wait_until="load")
+        page.wait_for_selector(f"#{panel}", state="visible", timeout=15000)
+        for width in (375, 768, 1366, 1920):
+            page.set_viewport_size({"width": width, "height": 900})
+            page.wait_for_timeout(180)
+            report = page.evaluate(
+                """() => {
+                    const tiny = [...document.querySelectorAll('body *')].filter(el => {
+                        const hasText = [...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim());
+                        if (!hasText) return false;
+                        const r = el.getBoundingClientRect();
+                        if (r.width === 0 || r.height === 0) return false;
+                        return parseFloat(getComputedStyle(el).fontSize) < 10.99;
+                    }).map(el => el.tagName + '.' + el.className).slice(0, 5);
+                    return {
+                        doc: document.documentElement.scrollWidth,
+                        win: document.documentElement.clientWidth,
+                        tiny,
+                    };
+                }"""
+            )
+            assert report["doc"] <= report["win"] + 1, f"{name}/{width}: overflow global {report}"
+            assert report["tiny"] == [], f"{name}/{width}: texto abaixo de 11px {report['tiny']}"
+        page.set_viewport_size({"width": 1366, "height": 900})
