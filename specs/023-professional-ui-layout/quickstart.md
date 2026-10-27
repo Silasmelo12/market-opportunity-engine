@@ -207,3 +207,13 @@ A feature é considerada validada quando:
 - Rotas canônicas e legadas: todas mapeadas em `src/web/modules/constants.js` (`CANONICAL_ROUTES` + `ROUTE_ALIASES`).
 - Funções globais: `window.appState` explícito; `window.applyTheme` disponível por declaração de função de topo.
 - IDs duplicados: nenhum (a checagem inicial por `grep 'id="'` gerou falsos positivos em `data-id`; a extração estrita de `id="..."` não encontrou duplicatas).
+
+### T004 — Playwright e Chromium
+
+- `requirements-dev.txt` instalado no `venv` do projeto (`playwright>=1.44.0`).
+- `python -m playwright install chromium` concluído (Chrome Headless Shell 156).
+- `pytest tests/e2e` executou de fato os cenários (sem `skip` por navegador ausente).
+
+### T005 — Backend intocado
+
+- `git diff --stat -- src/api` → saída vazia antes do início da implementação.
