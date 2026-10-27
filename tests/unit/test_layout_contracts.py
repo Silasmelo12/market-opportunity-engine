@@ -225,7 +225,12 @@ def test_navigation_accessibility_markup(index_html: str):
     nav_tabs = re.findall(r'<div class="nav-tab[^>]*>', index_html)
     assert len(nav_tabs) == 8, f"Esperadas 8 abas contextuais: {len(nav_tabs)}"
     assert all('aria-controls="' in tab for tab in nav_tabs)
-    assert index_html.count('tabindex="0"') == 2
+    # T054: além das abas, cada região de tabela rolável é focável por teclado.
+    scroll_regions = re.findall(
+        r'<div class="table-scroll(?!-hint)[^"]*" tabindex="0">', index_html
+    )
+    assert len(scroll_regions) >= 8, f"Regiões roláveis focáveis: {len(scroll_regions)}"
+    assert index_html.count('tabindex="0"') == 2 + len(scroll_regions)
     assert index_html.count('role="tab" tabindex="-1"') == 7
 
 

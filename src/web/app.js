@@ -346,7 +346,7 @@ function renderPatrimonioDetailedChart() {
   const timeline = state.portfolioState.b3Timeline || [];
   if (!Array.isArray(timeline) || timeline.length === 0) {
     container.innerHTML = `
-      <div class="p-8 text-center text-slate-400 font-mono text-xs">
+      <div class="p-8 text-center text-subtle font-mono text-xs">
         Nenhum dado de evolução patrimonial importado. Importe seus extratos da B3 para visualizar a série temporal.
       </div>
     `;
@@ -681,20 +681,19 @@ function setupDirectionSelector() {
 
       dirButtons.forEach(b => {
         b.classList.remove('active-buy', 'active-sell', 'active-both');
-        b.classList.add('text-muted');
-        b.classList.remove('text-muted');
+        b.classList.add('text-subtle');
+        b.setAttribute('aria-pressed', 'false');
       });
 
       if (dir === 'BUY') {
         btn.classList.add('active-buy');
-        btn.classList.remove('text-muted');
       } else if (dir === 'SELL') {
         btn.classList.add('active-sell');
-        btn.classList.remove('text-muted');
       } else {
         btn.classList.add('active-both');
-        btn.classList.remove('text-muted');
       }
+      btn.classList.remove('text-subtle');
+      btn.setAttribute('aria-pressed', 'true');
 
       // Update visibility of sidebar accordions
       document.querySelectorAll('.strategy-group-wrapper').forEach(wrapper => {
@@ -1041,8 +1040,12 @@ function setupTimeframeButtons() {
   const buttons = document.querySelectorAll('#timeframe-buttons .tf-btn');
   buttons.forEach(btn => {
     btn.addEventListener('click', () => {
-      buttons.forEach(b => b.classList.remove('active'));
+      buttons.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
       btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
 
       state.currentTimeframe = btn.getAttribute('data-tf');
       loadAnalysisData(true);
@@ -1055,8 +1058,12 @@ function setupRadarTimeframeButtons() {
   const buttons = document.querySelectorAll('#radar-timeframe-buttons .radar-tf-btn');
   buttons.forEach(btn => {
     btn.addEventListener('click', () => {
-      buttons.forEach(b => b.classList.remove('active'));
+      buttons.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
       btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
 
       state.radarTimeframe = btn.getAttribute('data-tf');
       state.radarCategoryCache = {}; // reset cache for new timeframe
@@ -1072,8 +1079,10 @@ function setupRadarCategoryPills() {
     pill.addEventListener('click', () => {
       pills.forEach(p => {
         p.classList.remove('active', 'active-cat');
+        p.setAttribute('aria-pressed', 'false');
       });
       pill.classList.add('active', 'active-cat');
+      pill.setAttribute('aria-pressed', 'true');
 
       const selectedCat = pill.getAttribute('data-cat') || 'featured';
       state.radarActiveCategory = selectedCat;
@@ -2319,14 +2328,16 @@ function renderRadarTable(pageOrItems) {
       const dirButtons = document.querySelectorAll('#global-direction-selector .dir-seg-btn');
       dirButtons.forEach(b => {
         b.classList.remove('active-buy', 'active-sell', 'active-both');
-        b.classList.add('text-muted');
+        b.classList.add('text-subtle');
+        b.setAttribute('aria-pressed', 'false');
       });
       const activeBtn = document.querySelector(`#global-direction-selector .dir-seg-btn[data-dir="${dir}"]`);
       if (activeBtn) {
         if (dir === 'BUY') activeBtn.classList.add('active-buy');
         else if (dir === 'SELL') activeBtn.classList.add('active-sell');
         else activeBtn.classList.add('active-both');
-        activeBtn.classList.remove('text-muted');
+        activeBtn.classList.remove('text-subtle');
+        activeBtn.setAttribute('aria-pressed', 'true');
       }
       updateSidebarDirectionFilter();
     }
@@ -2334,11 +2345,9 @@ function renderRadarTable(pageOrItems) {
     if (state.radarTimeframe && state.radarTimeframe !== state.currentTimeframe) {
       state.currentTimeframe = state.radarTimeframe;
       document.querySelectorAll('#timeframe-buttons .tf-btn').forEach(b => {
-        if (b.getAttribute('data-tf') === state.currentTimeframe) {
-          b.classList.add('active');
-        } else {
-          b.classList.remove('active');
-        }
+        const isActive = b.getAttribute('data-tf') === state.currentTimeframe;
+        b.classList.toggle('active', isActive);
+        b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
       });
     }
 

@@ -54,6 +54,7 @@ function showLoading(msg = 'Carregando...') {
 
   if (loadingText) loadingText.textContent = msg;
   if (loadingOverlay) loadingOverlay.classList.remove('hidden');
+  document.body.setAttribute('aria-busy', 'true');
 }
 
 function hideLoading() {
@@ -62,6 +63,7 @@ function hideLoading() {
     : document.getElementById('loading-spinner');
 
   if (loadingOverlay) loadingOverlay.classList.add('hidden');
+  document.body.setAttribute('aria-busy', 'false');
 }
 
 // Exposição compatível para navegador (window) e Node.js (module.exports)

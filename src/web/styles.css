@@ -34,29 +34,29 @@
   --text-main-rgb: 15 23 42;
   --text-muted: #475569;
   --text-muted-rgb: 71 85 105;
-  --text-subtle: #64748b;
-  --text-subtle-rgb: 100 116 139;
+  --text-subtle: #5b6b80;
+  --text-subtle-rgb: 91 107 128;
 
   /* Cores Semânticas de Operação & Rentabilidade */
-  --success: #059669;
-  --success-rgb: 5 150 105;
+  --success: #047857;
+  --success-rgb: 4 120 87;
   --success-soft: #ecfdf5;
   --success-border: #a7f3d0;
 
-  --danger: #e11d48;
-  --danger-rgb: 225 29 72;
+  --danger: #be123c;
+  --danger-rgb: 190 18 60;
   --danger-soft: #fff1f2;
   --danger-border: #fecdd3;
 
-  --warning: #d97706;
-  --warning-rgb: 217 119 6;
+  --warning: #b45309;
+  --warning-rgb: 180 83 9;
   --warning-soft: #fef3c7;
   --warning-border: #fde68a;
 
   /* Identidade & Acentos Quantitativos */
-  --primary: #0284c7;
-  --primary-rgb: 2 132 199;
-  --primary-hover: #0369a1;
+  --primary: #0369a1;
+  --primary-rgb: 3 105 161;
+  --primary-hover: #075985;
   --primary-soft: #e0f2fe;
   --primary-text: #ffffff;
 
@@ -158,8 +158,8 @@
   --text-main-rgb: 248 250 252;
   --text-muted: #94a3b8;
   --text-muted-rgb: 148 163 184;
-  --text-subtle: #64748b;
-  --text-subtle-rgb: 100 116 139;
+  --text-subtle: #8b98a5;
+  --text-subtle-rgb: 139 152 165;
 
   /* Cores Semânticas de Operação & Rentabilidade */
   --success: #10b981;
@@ -167,10 +167,10 @@
   --success-soft: rgba(16, 185, 129, 0.14);
   --success-border: rgba(16, 185, 129, 0.35);
 
-  --danger: #f43f5e;
-  --danger-rgb: 244 63 94;
-  --danger-soft: rgba(244, 63, 94, 0.14);
-  --danger-border: rgba(244, 63, 94, 0.35);
+  --danger: #fb7185;
+  --danger-rgb: 251 113 133;
+  --danger-soft: rgba(251, 113, 133, 0.14);
+  --danger-border: rgba(251, 113, 133, 0.35);
 
   --warning: #f59e0b;
   --warning-rgb: 245 158 11;
@@ -2753,4 +2753,19 @@ main,
   .dir-seg-btn {
     min-height: 32px;
   }
+}
+
+
+/* =========================================================================
+   Acessibilidade: foco, contraste e regiões roláveis (T054 / US5)
+   ========================================================================= */
+.border-primary { border-color: var(--primary); }
+
+.table-scroll {
+  outline-offset: 2px;
+}
+
+.table-scroll:focus-visible {
+  outline: 2px solid var(--border-focus) !important;
+  outline-offset: 2px;
 }

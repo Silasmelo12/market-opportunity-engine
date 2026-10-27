@@ -43,7 +43,7 @@
     }
   </script>
 </head>
-<body class="bg-fintech-bg text-gray-100 flex flex-col min-h-screen lg:h-screen">
+<body class="flex flex-col min-h-screen lg:h-screen">
 
   <!-- SVG Sprite Definitions for Theme Toggle and Common Icons -->
   <svg xmlns="http://www.w3.org/2000/svg" class="hidden" style="display: none;">
@@ -171,13 +171,13 @@
 
       <div class="header-actions flex items-center gap-1.5 sm:gap-2.5 shrink-0">
         <div id="global-direction-selector" class="flex hidden items-center bg-slate-100 border border-slate-200 rounded-lg p-0.5 gap-0.5" role="group" aria-label="Direção das estratégias">
-          <button class="dir-seg-btn active-buy" data-dir="BUY" type="button">Compra</button>
-          <button class="dir-seg-btn text-gray-400" data-dir="SELL" type="button">Venda</button>
-          <button class="dir-seg-btn text-gray-400" data-dir="BOTH" type="button">Ambos</button>
+          <button class="dir-seg-btn active-buy" data-dir="BUY" type="button" aria-pressed="true">Compra</button>
+          <button class="dir-seg-btn text-subtle" data-dir="SELL" type="button" aria-pressed="false">Venda</button>
+          <button class="dir-seg-btn text-subtle" data-dir="BOTH" type="button" aria-pressed="false">Ambos</button>
         </div>
         <span id="header-status-badge" class="hidden items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold font-mono"></span>
         <button id="btn-header-b3-status" class="btn-b3 bg-white text-slate-800 border border-slate-300 hover:bg-slate-50 text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition" aria-label="Gerenciar planilhas B3 importadas">
-          <span class="text-sky-600 font-extrabold" aria-hidden="true">[B]³</span> <span id="b3-import-label" class="hidden sm:inline">Planilhas Importadas</span>
+          <span class="text-info font-extrabold" aria-hidden="true">[B]³</span> <span id="b3-import-label" class="hidden sm:inline">Planilhas Importadas</span>
         </button>
         <button id="btn-header-add-trade" class="btn-primary bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition" aria-label="Adicionar lançamento">
           <svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg><span class="hidden sm:inline">Lançamento</span>
@@ -236,9 +236,9 @@
   <main class="flex-1 overflow-y-auto relative">
 
     <!-- Loading Spinner Overlay -->
-    <div id="loading-spinner" class="loading-overlay hidden">
-      <div class="w-12 h-12 border-4 border-fintech-cyan border-t-transparent rounded-full animate-spin"></div>
-      <span class="mt-3 text-sm text-fintech-cyan font-semibold tracking-wide" id="loading-text">Processando motores estatísticos bidirecionais...</span>
+    <div id="loading-spinner" class="loading-overlay hidden" role="status" aria-live="polite" aria-atomic="true">
+      <div class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" aria-hidden="true"></div>
+      <span class="mt-3 text-sm text-info font-semibold tracking-wide" id="loading-text">Processando motores estatísticos bidirecionais...</span>
     </div>
 
     <!-- ========================================== -->
@@ -343,7 +343,7 @@
                 <p class="section-subtitle">Valor aplicado acumulado versus ganho de capital</p>
               </div>
               <div class="flex items-center gap-2">
-                <a id="link-overview-ver-patrimonio" href="#carteira/patrimonio" class="touch-target text-xs text-sky-600 font-semibold hover:underline mr-1">Ver série completa →</a>
+                <a id="link-overview-ver-patrimonio" href="#carteira/patrimonio" class="touch-target text-xs text-info font-semibold hover:underline mr-1">Ver série completa →</a>
                 <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg">
                   <button class="px-2.5 py-1 text-xs font-semibold rounded bg-white text-slate-900 shadow-sm">12M</button>
                   <button class="px-2.5 py-1 text-xs font-semibold rounded text-slate-600 hover:text-slate-900">Tudo</button>
@@ -359,7 +359,7 @@
           <div class="card-surface chart-card flex flex-col justify-between">
             <div class="pb-3 border-b border-slate-100 flex items-center justify-between">
               <h3 class="section-title">Alocação por Classe</h3>
-              <button id="btn-overview-config-ideal" class="touch-target text-xs text-sky-600 font-semibold hover:underline">Configurar %</button>
+              <button id="btn-overview-config-ideal" class="touch-target text-xs text-info font-semibold hover:underline">Configurar %</button>
             </div>
             <div id="overview-donut-chart" class="w-full h-56 my-auto relative overflow-hidden block">
               Carregando alocação...
@@ -449,10 +449,10 @@
             <!-- Timeframe selector for Radar -->
             <div class="segmented" id="radar-timeframe-buttons">
               <span class="text-[11px] font-semibold text-muted px-1.5 uppercase hidden xs:inline">Tempo:</span>
-              <button class="radar-tf-btn segmented-btn active shrink-0" data-tf="1d">1D</button>
-              <button class="radar-tf-btn segmented-btn shrink-0" data-tf="1wk">1S</button>
-              <button class="radar-tf-btn segmented-btn shrink-0" data-tf="4h">4h</button>
-              <button class="radar-tf-btn segmented-btn shrink-0" data-tf="1h">1h</button>
+              <button class="radar-tf-btn segmented-btn active shrink-0" data-tf="1d" aria-pressed="true">1D</button>
+              <button class="radar-tf-btn segmented-btn shrink-0" data-tf="1wk" aria-pressed="false">1S</button>
+              <button class="radar-tf-btn segmented-btn shrink-0" data-tf="4h" aria-pressed="false">4h</button>
+              <button class="radar-tf-btn segmented-btn shrink-0" data-tf="1h" aria-pressed="false">1h</button>
             </div>
 
             <!-- Radar Strategy Multi-Select Dropdown (Starts all unchecked) -->
@@ -481,21 +481,21 @@
 
         <!-- Radar Asset Category Filter Pills -->
         <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar touch-scroll pb-1" id="radar-category-pills">
-          <button class="radar-cat-btn filter-chip active-cat active shrink-0" data-cat="featured">Destaques (14)</button>
-          <button class="radar-cat-btn filter-chip shrink-0" data-cat="Ações Brasil">Ações Brasil (31)</button>
-          <button class="radar-cat-btn filter-chip shrink-0" data-cat="FIIs Brasil">FIIs Brasil (23)</button>
-          <button class="radar-cat-btn filter-chip shrink-0" data-cat="BDRs">BDRs (41)</button>
-          <button class="radar-cat-btn filter-chip shrink-0" data-cat="Ações EUA">Ações EUA (71)</button>
-          <button class="radar-cat-btn filter-chip shrink-0" data-cat="Commodities">Commodities (14)</button>
-          <button class="radar-cat-btn filter-chip shrink-0" data-cat="Forex">Forex (11)</button>
-          <button class="radar-cat-btn filter-chip shrink-0" data-cat="Criptomoedas">Cripto (3)</button>
-          <button class="radar-cat-btn filter-chip shrink-0" data-cat="all">Todos (194)</button>
+          <button class="radar-cat-btn filter-chip active-cat active shrink-0" data-cat="featured" aria-pressed="true">Destaques (14)</button>
+          <button class="radar-cat-btn filter-chip shrink-0" data-cat="Ações Brasil" aria-pressed="false">Ações Brasil (31)</button>
+          <button class="radar-cat-btn filter-chip shrink-0" data-cat="FIIs Brasil" aria-pressed="false">FIIs Brasil (23)</button>
+          <button class="radar-cat-btn filter-chip shrink-0" data-cat="BDRs" aria-pressed="false">BDRs (41)</button>
+          <button class="radar-cat-btn filter-chip shrink-0" data-cat="Ações EUA" aria-pressed="false">Ações EUA (71)</button>
+          <button class="radar-cat-btn filter-chip shrink-0" data-cat="Commodities" aria-pressed="false">Commodities (14)</button>
+          <button class="radar-cat-btn filter-chip shrink-0" data-cat="Forex" aria-pressed="false">Forex (11)</button>
+          <button class="radar-cat-btn filter-chip shrink-0" data-cat="Criptomoedas" aria-pressed="false">Cripto (3)</button>
+          <button class="radar-cat-btn filter-chip shrink-0" data-cat="all" aria-pressed="false">Todos (194)</button>
         </div>
 
         <!-- Radar Opportunities Table -->
         <div class="card-surface overflow-hidden p-0">
           <div class="table-scroll-hint">← Deslize para os lados para ver detalhes →</div>
-          <div class="table-scroll touch-scroll">
+          <div class="table-scroll touch-scroll" tabindex="0">
             <table class="table-standard">
               <thead class="whitespace-nowrap">
                 <tr>
@@ -526,7 +526,7 @@
           </div>
           <!-- Radar Pagination Controls -->
           <div id="radar-pagination-container" class="flex items-center justify-between px-3 py-2.5 surface-subtle border-t border-default text-xs">
-            <div class="text-muted font-mono text-[11px]" id="radar-pagination-info">
+            <div class="text-muted font-mono text-[11px]" id="radar-pagination-info" aria-live="polite">
               Página 1 de 1 (0 ativos)
             </div>
             <div class="flex items-center gap-2">
@@ -1082,15 +1082,15 @@
         <div class="quant-toolbar surface px-3 sm:px-4 py-2 border-b border-default flex items-center justify-between shrink-0 gap-2">
           <div class="segmented" id="timeframe-buttons">
             <span class="text-[11px] sm:text-[11px] font-bold text-muted mr-1 uppercase shrink-0">Tempo:</span>
-            <button class="tf-btn segmented-btn shrink-0" data-tf="5m">5m</button>
-            <button class="tf-btn segmented-btn shrink-0" data-tf="15m">15m</button>
-            <button class="tf-btn segmented-btn shrink-0" data-tf="30m">30m</button>
-            <button class="tf-btn segmented-btn shrink-0" data-tf="1h">1h</button>
-            <button class="tf-btn segmented-btn shrink-0" data-tf="2h">2h</button>
-            <button class="tf-btn segmented-btn shrink-0" data-tf="4h">4h</button>
-            <button class="tf-btn segmented-btn shrink-0" data-tf="12h">12h</button>
+            <button class="tf-btn segmented-btn shrink-0" data-tf="5m" aria-pressed="false">5m</button>
+            <button class="tf-btn segmented-btn shrink-0" data-tf="15m" aria-pressed="false">15m</button>
+            <button class="tf-btn segmented-btn shrink-0" data-tf="30m" aria-pressed="false">30m</button>
+            <button class="tf-btn segmented-btn shrink-0" data-tf="1h" aria-pressed="false">1h</button>
+            <button class="tf-btn segmented-btn shrink-0" data-tf="2h" aria-pressed="false">2h</button>
+            <button class="tf-btn segmented-btn shrink-0" data-tf="4h" aria-pressed="false">4h</button>
+            <button class="tf-btn segmented-btn shrink-0" data-tf="12h" aria-pressed="false">12h</button>
             <button class="tf-btn segmented-btn active shrink-0" data-tf="1d">1D</button>
-            <button class="tf-btn segmented-btn shrink-0" data-tf="1wk">1S</button>
+            <button class="tf-btn segmented-btn shrink-0" data-tf="1wk" aria-pressed="false">1S</button>
           </div>
 
           <div class="flex items-center space-x-2 text-xs shrink-0">
@@ -1153,7 +1153,7 @@
               <div class="text-[11px] text-muted font-mono">Base: R$ 1.000</div>
             </div>
             <div class="block sm:hidden text-[11px] text-subtle text-center py-0.5 font-mono">← Deslize horizontalmente →</div>
-            <div class="table-scroll touch-scroll max-h-64">
+            <div class="table-scroll touch-scroll max-h-64" tabindex="0">
               <table class="table-standard">
                 <thead class="surface-canvas text-muted font-semibold uppercase text-[11px] sticky top-0 whitespace-nowrap">
                   <tr>
@@ -1186,7 +1186,7 @@
               <span class="text-[11px] text-muted font-mono">Mais recentes</span>
             </div>
             <div class="block sm:hidden text-[11px] text-subtle text-center py-0.5 font-mono">← Deslize horizontalmente →</div>
-            <div class="table-scroll touch-scroll max-h-72">
+            <div class="table-scroll touch-scroll max-h-72" tabindex="0">
               <table class="table-standard">
                 <thead class="surface-canvas text-muted font-semibold uppercase text-[11px] sticky top-0 whitespace-nowrap">
                   <tr>
@@ -1471,7 +1471,7 @@
               <span class="kpi-sub font-mono">Ordenado por Retorno Total (%)</span>
             </div>
             <div class="table-scroll-hint">← Deslize para os lados para ver detalhes →</div>
-            <div class="table-scroll touch-scroll max-h-72">
+            <div class="table-scroll touch-scroll max-h-72" tabindex="0">
               <table class="table-standard">
                 <thead class="surface-canvas text-muted font-semibold uppercase text-[11px] sticky top-0">
                   <tr>
@@ -1544,7 +1544,7 @@
             <span class="kpi-sub font-mono" id="sim-trades-count-badge">0 trades</span>
           </div>
           <div class="block sm:hidden text-[11px] text-subtle text-center py-0.5 font-mono">← Deslize horizontalmente →</div>
-          <div class="table-scroll touch-scroll max-h-80">
+          <div class="table-scroll touch-scroll max-h-80" tabindex="0">
             <table class="table-standard">
               <thead class="surface-canvas text-muted font-semibold uppercase text-[11px] sticky top-0 whitespace-nowrap">
                 <tr>
@@ -1679,7 +1679,7 @@
         <div class="bg-white card-surface chart-card">
           <h2 class="section-title mb-2">Evolução do Patrimônio Consolidado</h2>
           <p class="section-subtitle mb-4">Aportes acumulados versus ganho de capital em séries temporais</p>
-          <div id="chart-patrimonio-detailed" class="h-80 w-full flex items-center justify-center text-slate-400 text-sm">
+          <div id="chart-patrimonio-detailed" class="h-80 w-full flex items-center justify-center text-subtle text-sm">
             Carregando evolução patrimonial...
           </div>
         </div>
@@ -1858,7 +1858,7 @@
             </div>
 
             <!-- Current Holdings Mini Table -->
-            <div class="table-scroll max-h-36 border border-default rounded">
+            <div class="table-scroll max-h-36 border border-default rounded" tabindex="0">
               <table class="table-standard text-[11px]">
                 <thead class="surface-canvas text-muted uppercase text-[11px] sticky top-0">
                   <tr>
@@ -1906,7 +1906,7 @@
           </div>
 
           <div class="table-scroll-hint">← Deslize para os lados para ver detalhes →</div>
-          <div class="table-scroll touch-scroll">
+          <div class="table-scroll touch-scroll" tabindex="0">
             <table class="w-full text-left text-xs text-muted">
               <thead class="surface-canvas text-muted font-semibold uppercase text-[11px] border-b border-default whitespace-nowrap">
                 <tr>
@@ -2009,7 +2009,7 @@
               <span class="text-[11px] text-muted font-mono">Ordenado por Score de Potencial (0–100)</span>
             </div>
             <div class="table-scroll-hint">← Deslize para os lados para ver detalhes →</div>
-            <div class="table-scroll touch-scroll max-h-64">
+            <div class="table-scroll touch-scroll max-h-64" tabindex="0">
               <table class="w-full text-left text-xs text-muted">
                 <thead class="surface-canvas text-muted font-semibold uppercase text-[11px] sticky top-0 whitespace-nowrap">
                   <tr>
@@ -2044,7 +2044,7 @@
               <span class="text-[11px] text-muted font-mono" id="portfolio-ledger-count-badge">0 eventos</span>
             </div>
             <div class="table-scroll-hint">← Deslize para os lados para ver detalhes →</div>
-            <div class="table-scroll touch-scroll max-h-80">
+            <div class="table-scroll touch-scroll max-h-80" tabindex="0">
               <table class="w-full text-left text-xs text-muted">
                 <thead class="surface-canvas text-muted font-semibold uppercase text-[11px] sticky top-0 whitespace-nowrap">
                   <tr>
@@ -2106,7 +2106,7 @@
 
       <!-- Compact Table of orders to confirm -->
       <div class="table-scroll-hint">← Deslize para os lados para ver detalhes →</div>
-      <div class="table-scroll touch-scroll max-h-48 overflow-y-auto text-xs divide-y divide-default">
+      <div class="table-scroll touch-scroll max-h-48 overflow-y-auto text-xs divide-y divide-default" tabindex="0">
         <table class="w-full text-left text-muted">
           <thead class="surface-canvas text-muted uppercase text-[11px] sticky top-0 font-mono">
             <tr>
@@ -2139,7 +2139,7 @@
   </div>
 
   <!-- Toast Notification System for High-Stakes Actions -->
-  <div id="toast-notification" class="fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-2xl border text-xs font-medium transition-all duration-300 transform translate-y-16 opacity-0 pointer-events-none">
+  <div id="toast-notification" role="status" aria-live="polite" aria-atomic="true" class="fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-2xl border text-xs font-medium transition-all duration-300 transform translate-y-16 opacity-0 pointer-events-none">
     <span id="toast-icon" class="text-base inline-flex items-center"><svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg></span>
     <span id="toast-message" class="text-strong">Ação concluída com sucesso.</span>
     <button id="toast-action-btn" class="ml-2 font-bold underline hover:opacity-80 hidden">Desfazer</button>
