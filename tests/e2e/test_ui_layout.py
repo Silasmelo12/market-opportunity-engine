@@ -242,6 +242,58 @@ def test_both_themes_apply_to_every_area(layout_page):
             assert colors["bg"] != colors["color"], f"{name}/{theme}: texto e fundo idênticos"
 
 
+def test_portfolio_areas_share_cards_and_banner_state(layout_page):
+    page, base = layout_page
+    page.goto(f"{base}/?e2e=1#carteira/visao-geral", wait_until="load")
+    page.wait_for_selector("#tab-overview", state="visible")
+
+    assert page.locator("#investidor10-welcome-banner").is_hidden()
+    assert page.locator("#tab-overview .kpi-card").count() == 4
+    assert page.locator("#tab-overview .chart-card").count() == 2
+
+    page.goto(f"{base}/?e2e=1#carteira/posicoes", wait_until="load")
+    page.wait_for_selector("#tab-portfolio", state="visible")
+    assert page.locator("#tab-portfolio .category-card.card-surface").count() >= 1
+    page.goto(f"{base}/?e2e=1#carteira/visao-geral", wait_until="load")
+    page.wait_for_selector("#tab-overview", state="visible")
+    assert page.locator("#tab-overview table.table-standard").count() >= 1
+
+    page.goto(f"{base}/?e2e=1#carteira/proventos", wait_until="load")
+    page.wait_for_selector("#tab-pane-proventos", state="visible")
+    assert page.locator("#tab-pane-proventos .chart-card").count() == 1
+    assert page.get_attribute("#btn-proventos-view-mensal", "aria-pressed") == "true"
+    page.click("#btn-proventos-view-anual")
+    page.wait_for_timeout(150)
+    assert page.get_attribute("#btn-proventos-view-anual", "aria-pressed") == "true"
+    assert page.get_attribute("#btn-proventos-view-mensal", "aria-pressed") == "false"
+
+    page.goto(f"{base}/?e2e=1#carteira/patrimonio", wait_until="load")
+    page.wait_for_selector("#tab-pane-patrimonio", state="visible")
+    assert page.locator("#tab-pane-patrimonio .chart-card").count() == 1
+
+
+def test_portfolio_cards_adapt_to_theme_tokens(layout_page):
+    page, base = layout_page
+    page.goto(f"{base}/?e2e=1#carteira/visao-geral", wait_until="load")
+    page.wait_for_selector("#tab-overview", state="visible")
+
+    def card_colors():
+        return page.evaluate(
+            """() => {
+                const card = document.querySelector('#tab-overview .kpi-card');
+                const cs = getComputedStyle(card);
+                return {bg: cs.backgroundColor, border: cs.borderColor, color: getComputedStyle(card.querySelector('.section-title, .kpi-label')).color};
+            }"""
+        )
+
+    light = card_colors()
+    page.evaluate("() => window.applyTheme('dark', false)")
+    page.wait_for_timeout(150)
+    dark = card_colors()
+    assert light["bg"] != dark["bg"]
+    assert light["border"] != dark["border"]
+
+
 def test_reduced_motion_suppresses_non_essential_animation(server_url):
     with playwright_sync.sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True)
