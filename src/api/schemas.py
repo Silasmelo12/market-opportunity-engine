@@ -217,8 +217,8 @@ class SimulationMetricSummary(BaseModel):
     shares_accumulated: float
     average_cost_price: float
     current_market_price: float
-    dca_regular_final_value: float
-    alpha_vs_dca_pct: float
+    dca_regular_final_value: Optional[float] = None
+    alpha_vs_dca_pct: Optional[float] = None
     # Extended metrics for Cycle Trade (Buy -> Sell)
     winning_trades_count: Optional[int] = None
     losing_trades_count: Optional[int] = None

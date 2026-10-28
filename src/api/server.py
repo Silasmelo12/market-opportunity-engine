@@ -14,6 +14,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 import pandas as pd
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Query, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -78,29 +79,12 @@ from .schemas import (
 )
 
 
-app = FastAPI(
-    title="Market Opportunity & Bottom Statistical Engine",
-    version="4.0.0",
-    description="High-performance backend and 60fps trading terminal API for Top and Bottom opportunities.",
-)
-
-# Enable CORS for local dev / cross-origin if needed
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-@app.on_event("startup")
-def _prewarm_featured_radar():
+@asynccontextmanager
+async def _lifespan(app_instance: FastAPI):
     """Background pre-warm for featured basket page 1 to ensure instant UI loading."""
     import threading
     def _worker():
         try:
-            # Prewarm featured basket
             for ticker, cat in TICKERS_FEATURED[:20]:
                 _scan_single_ticker(ticker, cat, interval="1d", horizon_x=60, refresh=False)
         except Exception:
@@ -108,6 +92,29 @@ def _prewarm_featured_radar():
 
     t = threading.Thread(target=_worker, daemon=True)
     t.start()
+    yield
+
+
+app = FastAPI(
+    title="Market Opportunity & Bottom Statistical Engine",
+    version="4.0.0",
+    description="High-performance backend and 60fps trading terminal API for Top and Bottom opportunities.",
+    lifespan=_lifespan,
+)
+
+_default_origins = "http://localhost:8123,http://127.0.0.1:8123,http://localhost:8000,http://127.0.0.1:8000"
+_allowed_origins = [
+    o.strip() for o in os.environ.get("ALLOWED_ORIGINS", _default_origins).split(",") if o.strip()
+]
+_allow_credentials = os.environ.get("CORS_ALLOW_CREDENTIALS", "false").lower() == "true"
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_allowed_origins,
+    allow_credentials=_allow_credentials if "*" not in _allowed_origins else False,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["*"],
+)
 
 
 # In-memory TTL Cache
@@ -1085,9 +1092,10 @@ def simulate_accumulation_endpoint(req: SimulateRequest):
         )
 
         curve_points: List[AccumulationPoint] = []
+        ts_map = {str(pd.to_datetime(series.timestamps[idx]).strftime("%Y-%m-%d")): float(series.close[idx]) for idx in range(series.length)}
         for i, ts in enumerate(cycle_res.timeline_timestamps):
             d_str = pd.to_datetime(ts).strftime("%Y-%m-%d")
-            c_price = float(series.close[min(i, series.length - 1)])
+            c_price = ts_map.get(d_str, float(series.close[min(i, series.length - 1)]))
             curve_points.append(
                 AccumulationPoint(
                     date=d_str,
@@ -1152,7 +1160,7 @@ def simulate_accumulation_endpoint(req: SimulateRequest):
             "shares_accumulated": 0.0,
             "average_cost_price": 0.0,
             "current_market_price": cycle_res.current_market_price,
-            "dca_regular_final_value": 0.0,
+            "dca_regular_final_value": None,
             "alpha_vs_dca_pct": round(alpha_vs_bnh, 2),
             "winning_trades_count": cycle_res.winning_trades_count,
             "losing_trades_count": cycle_res.losing_trades_count,
@@ -1173,16 +1181,26 @@ def simulate_accumulation_endpoint(req: SimulateRequest):
         )
 
     # Mode 2: Acumulação Contínua de Cotas (DCA nos Fundos)
+    buy_signals_only = [s for s in signals if s.direction == "BUY"]
     sim_dict = simulate_accumulation(
         series=series,
-        signals=signals,
+        signals=buy_signals_only,
         contribution_amount=req.contribution_amount,
         start_date=req.start_date,
         end_date=req.end_date,
     )
 
+    # Compute sliced date mask for accurate current_market_price and trade list filtering
+    ts_series = pd.to_datetime(series.timestamps)
+    mask_date = np.ones(series.length, dtype=bool)
+    if req.start_date:
+        mask_date &= (ts_series >= pd.to_datetime(req.start_date))
+    if req.end_date:
+        mask_date &= (ts_series <= pd.to_datetime(req.end_date))
+    sliced_idx = np.flatnonzero(mask_date)
+    window_last_close = float(series.close[sliced_idx[-1]]) if len(sliced_idx) > 0 else 0.0
+
     # Aggregate simulation across all selected strategies (or sum them)
-    # Build curve and trades
     total_invested = sum(res.total_invested for res in sim_dict.values())
     final_equity = sum(res.current_equity for res in sim_dict.values())
     total_shares = sum(res.total_shares for res in sim_dict.values())
@@ -1191,21 +1209,28 @@ def simulate_accumulation_endpoint(req: SimulateRequest):
     ret_pct = ((final_equity / total_invested) - 1.0) * 100.0 if total_invested > 0 else 0.0
     avg_price = (total_invested / total_shares) if total_shares > 0 else 0.0
 
-    # Build timeline curve
+    # Build timeline curve and combined max drawdown
     curve_points = []
+    comb_max_dd_pct = 0.0
     if sim_dict:
-        # Use timeline of first strategy or combined
         first_res = next(iter(sim_dict.values()))
-        # Combine timeline invested and equity across all
+        window_last_close = float(first_res.current_price)
         comb_invested = np.zeros(len(first_res.timeline_timestamps), dtype=np.float64)
         comb_equity = np.zeros(len(first_res.timeline_timestamps), dtype=np.float64)
         for s_res in sim_dict.values():
             comb_invested += s_res.timeline_invested
             comb_equity += s_res.timeline_equity
 
+        if len(comb_equity) > 0:
+            peak_eq = np.maximum.accumulate(comb_equity)
+            safe_peak = np.where(peak_eq > 0, peak_eq, 1.0)
+            dd_arr = np.where(peak_eq > 0, (comb_equity - peak_eq) / safe_peak * 100.0, 0.0)
+            comb_max_dd_pct = round(float(np.min(dd_arr)), 2)
+
+        sliced_closes = series.close[sliced_idx] if len(sliced_idx) == len(first_res.timeline_timestamps) else series.close
         for i, ts in enumerate(first_res.timeline_timestamps):
             d_str = pd.to_datetime(ts).strftime("%Y-%m-%d")
-            c_price = float(series.close[min(i, series.length - 1)])
+            c_price = float(sliced_closes[min(i, len(sliced_closes) - 1)])
             curve_points.append(
                 AccumulationPoint(
                     date=d_str,
@@ -1218,15 +1243,17 @@ def simulate_accumulation_endpoint(req: SimulateRequest):
             )
 
     trades_list = []
-    for sig in signals:
-        trades_list.append({
-            "date": pd.to_datetime(series.timestamps[sig.execution_bar_index]).strftime("%Y-%m-%d") if sig.execution_bar_index < series.length else "",
-            "strategy": sig.strategy_sub_id,
-            "direction": sig.direction,
-            "execution_price": float(sig.execution_price),
-            "amount_invested": req.contribution_amount,
-            "shares": float(req.contribution_amount / sig.execution_price) if sig.execution_price > 0 else 0.0,
-        })
+    for sig in buy_signals_only:
+        idx_exec = sig.execution_bar_index
+        if 0 <= idx_exec < series.length and mask_date[idx_exec] and float(sig.execution_price) > 0:
+            trades_list.append({
+                "date": pd.to_datetime(series.timestamps[idx_exec]).strftime("%Y-%m-%d"),
+                "strategy": sig.strategy_sub_id,
+                "direction": sig.direction,
+                "execution_price": float(sig.execution_price),
+                "amount_invested": req.contribution_amount,
+                "shares": float(req.contribution_amount / sig.execution_price),
+            })
 
     metrics_obj = {
         "simulation_mode": "accumulation",
@@ -1235,13 +1262,13 @@ def simulate_accumulation_endpoint(req: SimulateRequest):
         "total_profit_loss": round(net_profit, 2),
         "total_return_pct": round(ret_pct, 2),
         "xirr_annualized_pct": None,
-        "max_drawdown_pct": 0.0,
+        "max_drawdown_pct": comb_max_dd_pct,
         "total_trades_count": total_contributions,
         "shares_accumulated": round(total_shares, 4),
         "average_cost_price": round(avg_price, 2),
-        "current_market_price": round(float(series.close[-1]), 2),
-        "dca_regular_final_value": round(final_equity, 2),
-        "alpha_vs_dca_pct": 0.0,
+        "current_market_price": round(window_last_close, 2),
+        "dca_regular_final_value": None,
+        "alpha_vs_dca_pct": None,
     }
 
     return SimulateResponse(
@@ -1808,7 +1835,7 @@ def b3_sync_local():
     if not b3_dir.exists():
         # Also check relative to workspace
         b3_dir = Path(__file__).resolve().parent.parent.parent / "B3"
-    
+
     if not b3_dir.exists():
         raise HTTPException(status_code=404, detail="Diretório B3/ não encontrado.")
 
@@ -1827,6 +1854,10 @@ def b3_sync_local():
         raise HTTPException(status_code=500, detail=f"Erro ao processar planilha B3: {str(err)}")
 
 
+MAX_B3_UPLOAD_FILES = 10
+ALLOWED_B3_EXTENSIONS = {".xlsx", ".xls", ".csv", ".txt"}
+
+
 @app.post("/api/b3/parse", response_model=B3ParseResult)
 async def b3_parse_uploaded_file(
     file: Optional[UploadFile] = File(None),
@@ -1841,17 +1872,37 @@ async def b3_parse_uploaded_file(
         upload_list.extend(files)
     if file:
         upload_list.append(file)
-    
+
     if not upload_list:
         raise HTTPException(status_code=400, detail="Nenhum arquivo enviado.")
 
+    if len(upload_list) > MAX_B3_UPLOAD_FILES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Limite de {MAX_B3_UPLOAD_FILES} arquivos por envio excedido.",
+        )
+
+    max_mb = float(os.environ.get("MAX_B3_UPLOAD_MB", "10"))
+    max_bytes = int(max_mb * 1024 * 1024)
+
+    files_data = []
+    for f in upload_list:
+        fname = f.filename or "b3_arquivo.xlsx"
+        ext = Path(fname).suffix.lower()
+        if ext not in ALLOWED_B3_EXTENSIONS:
+            raise HTTPException(
+                status_code=415,
+                detail=f"Formato de arquivo não suportado ({ext or 'sem extensão'}). Envie arquivos .xlsx, .xls ou .csv exportados da B3.",
+            )
+        content = await f.read()
+        if len(content) > max_bytes:
+            raise HTTPException(
+                status_code=413,
+                detail=f"Arquivo '{fname}' excede o tamanho máximo permitido de {int(max_mb)} MB.",
+            )
+        files_data.append((fname, content))
+
     try:
-        files_data = []
-        for f in upload_list:
-            content = await f.read()
-            fname = f.filename or "b3_arquivo.xlsx"
-            files_data.append((fname, content))
-        
         if len(files_data) == 1:
             fname, content = files_data[0]
             result = parse_b3_file(content, filename=fname)
@@ -1860,7 +1911,10 @@ async def b3_parse_uploaded_file(
         return result
     except Exception as err:
         logger.error(f"Erro ao processar planilhas B3 enviadas: {err}")
-        raise HTTPException(status_code=400, detail=f"Erro ao processar planilhas B3: {str(err)}")
+        raise HTTPException(
+            status_code=400,
+            detail="Não foi possível processar a planilha enviada. Verifique se o arquivo corresponde ao modelo oficial de Movimentação ou Negociação da B3.",
+        )
 
 
 if os.path.exists(static_dir):

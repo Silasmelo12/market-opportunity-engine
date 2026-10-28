@@ -229,7 +229,7 @@ def test_simulate_cycle_trade_multi_buy():
     1. Every buy signal executes and adds shares.
     2. Capital and shares accumulate, updating weighted average price.
     3. The subsequent SELL signal liquidates all accumulated shares in one unified exit.
-    
+
     Setup:
     - Bar 1: Buy 1 at P=10.0, capital = 1000.0 -> 100 shares (invested: 1000.0)
     - Bar 2: Buy 2 at P=12.5, capital = 500.0  -> 40 shares  (total shares: 140, total invested: 1500.0)
@@ -327,7 +327,7 @@ def test_simulate_cycle_trade_cash_reinvestment():
     Verifies that when a trade is closed at a profit:
     1. The exit capital returns to the free cash pool.
     2. The next trade uses available cash first, and does NOT increase 'total_invested' (money from pocket).
-    
+
     Setup:
     - Initial capital = 1000.0
     - Cycle 1:
@@ -426,7 +426,7 @@ def test_optimize_dca_strategies_finds_champion():
     US1 Test:
     Verifies that optimize_dca_strategies evaluates individual BUY strategies
     under DCA accumulation and returns the champion with the highest return_on_capital_pct.
-    
+
     Setup:
     - Closes: [10.0, 10.0, 12.0, 8.0, 20.0]
     - Strategy A ('strat_good'):
@@ -477,6 +477,68 @@ def test_optimize_dca_strategies_finds_champion():
     assert top_list[1].total_return_pct == pytest.approx(66.67, rel=1e-2)
 
 
+def test_simulate_accumulation_ignores_sell_signals_and_computes_drawdown():
+    """
+    US2/T015:
+    Verifies that simulate_accumulation strictly ignores SELL signals even if they share a sub_id,
+    counts only executed BUY signals in num_contributions, and computes max_drawdown_pct on the equity curve.
+    """
+    # Closes: bar 0=10, bar 1=10 (buy 10 shares), bar 2=12 (eq=120), bar 3=9 (eq=90 -> -25% dd), bar 4=15 (eq=150)
+    series = make_test_series([10.0, 10.0, 12.0, 9.0, 15.0])
+    signals = [
+        SignalRecord("prop_reversal", "t1_open", 0, 1, 10.0, None, "BUY"),
+        SignalRecord("prop_reversal", "t1_open", 1, 2, 12.0, None, "SELL"),
+        SignalRecord("prop_reversal", "sell_t1_open", 2, 3, 9.0, None, "SELL"),
+    ]
+
+    res = simulate_accumulation(series, signals, contribution_amount=100.0)
+    assert "t1_open" in res
+    assert "sell_t1_open" not in res
+    sim = res["t1_open"]
+    assert sim.num_contributions == 1
+    assert sim.total_invested == pytest.approx(100.0)
+    assert sim.total_shares == pytest.approx(10.0)
+    assert sim.current_equity == pytest.approx(150.0)
+    assert sim.max_drawdown_pct == pytest.approx(-25.0)
 
 
+def test_end_date_cutoff_prevents_future_close_leakage():
+    """
+    US2/T015:
+    Verifies that simulate_accumulation and optimize_strategy_pairs evaluate open positions
+    at the last close within [start_date, end_date], never leaking future prices after end_date.
+    """
+    # Dates: 2024-01-01 (10.0), 2024-01-02 (12.0), 2024-01-03 (12.0), 2024-01-04 (50.0 future spike!)
+    series = make_test_series([10.0, 12.0, 12.0, 50.0])
+    signals = [
+        SignalRecord("prop_reversal", "t1_open", 0, 0, 10.0, None, "BUY"),
+        SignalRecord("prop_reversal", "sell_t1_open", 0, 1, 12.0, None, "SELL"),
+        SignalRecord("prop_reversal", "t1_open", 1, 2, 12.0, None, "BUY"),
+    ]
 
+    # 1. DCA cut off at 2024-01-03 (close=12.0, NOT 50.0)
+    dca_res = simulate_accumulation(
+        series,
+        signals,
+        contribution_amount=120.0,
+        start_date="2024-01-01",
+        end_date="2024-01-03",
+    )
+    sim = dca_res["t1_open"]
+    assert sim.current_price == pytest.approx(12.0)
+    # 12 shares @ 10 + 10 shares @ 12 = 22 shares * 12.0 = 264.0
+    assert sim.current_equity == pytest.approx(264.0)
+
+    # 2. Optimizer cut off at 2024-01-03 (open trade valued at 12.0, NOT 50.0)
+    champ, _ = optimize_strategy_pairs(
+        series,
+        signals,
+        initial_capital=1000.0,
+        min_trades=1,
+        start_date="2024-01-01",
+        end_date="2024-01-03",
+    )
+    assert champ is not None
+    # Trade 1: 1000 @ 10 (bar 0) -> sold @ 12 (bar 1) = 1200. Trade 2: bought @ 12 (bar 2), valued @ 12.0 -> 1200 (+20%)
+    assert champ.final_equity == pytest.approx(1200.0)
+    assert champ.total_return_pct == pytest.approx(20.0)

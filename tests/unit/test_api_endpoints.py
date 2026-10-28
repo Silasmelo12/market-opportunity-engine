@@ -296,3 +296,70 @@ def test_portfolio_tab_dom_and_ergonomics():
     assert "renderPortfolioEquityChart" in js
     assert "renderPortfolioAllocationChart" in js
     assert "renderPortfolioOpportunityRanking" in js
+
+
+def test_api_simulate_accumulation_honest_metrics_and_end_date():
+    """
+    US2/T015:
+    Verifies POST /api/simulate in accumulation mode:
+    - Filters out SELL signals from trades list
+    - Returns None for dca_regular_final_value and alpha_vs_dca_pct (no tautological self-comparison)
+    - Computes real max_drawdown_pct
+    """
+    payload = {
+        "ticker": "PETR4.SA",
+        "interval": "1d",
+        "period": "1y",
+        "simulation_mode": "accumulation",
+        "buy_strategy": "t1_open",
+        "sell_strategy": "sell_t1_open",
+        "contribution_amount": 500.0,
+        "lookback_n": 10,
+        "retest_m": 5,
+        "retest_tol": 0.005,
+    }
+    res = client.post("/api/simulate", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    metrics = data["metrics"]
+    assert metrics["simulation_mode"] == "accumulation"
+    assert metrics["dca_regular_final_value"] is None
+    assert metrics["alpha_vs_dca_pct"] is None
+    assert metrics["max_drawdown_pct"] <= 0.0
+    for tr in data["trades"]:
+        assert tr["direction"] == "BUY"
+
+
+def test_b3_upload_security_limits_and_cors():
+    """
+    US4/T021:
+    Verifies B3 upload validation (extension 415, oversize 413, sanitized 400) and CORS preflight policy.
+    """
+    # 1. Invalid extension -> 415
+    bad_ext = [("files", ("malware.exe", b"MZ\x90\x00", "application/octet-stream"))]
+    r_415 = client.post("/api/b3/parse", files=bad_ext)
+    assert r_415.status_code == 415
+
+    # 2. Oversized payload -> 413 (using env override MAX_B3_UPLOAD_MB=0.001 ~ 1KB)
+    import os
+    old_max = os.environ.get("MAX_B3_UPLOAD_MB")
+    os.environ["MAX_B3_UPLOAD_MB"] = "0.0005"
+    try:
+        big_file = [("files", ("extrato.csv", b"A" * 2048, "text/csv"))]
+        r_413 = client.post("/api/b3/parse", files=big_file)
+        assert r_413.status_code == 413
+    finally:
+        if old_max is None:
+            os.environ.pop("MAX_B3_UPLOAD_MB", None)
+        else:
+            os.environ["MAX_B3_UPLOAD_MB"] = old_max
+
+    # 3. CORS preflight from unauthorized external origin does not return wildcard + credentials
+    r_cors = client.options(
+        "/api/health",
+        headers={
+            "Origin": "https://malicious.example.com",
+            "Access-Control-Request-Method": "GET",
+        },
+    )
+    assert r_cors.headers.get("access-control-allow-origin") != "*"

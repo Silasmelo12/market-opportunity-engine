@@ -23,11 +23,22 @@ class SimulationResult:
     net_profit: float               # Lucro líquido em moeda (current_equity - total_invested)
     return_on_capital_pct: float    # Rentabilidade sobre o capital investido (%)
     average_buy_price: float        # Preço médio ponderado das compras
-    current_price: float            # Preço da última barra da série
+    current_price: float            # Preço da última barra da série (dentro da janela avaliada)
     num_contributions: int          # Quantidade de aportes realizados
     timeline_timestamps: np.ndarray # Array de timestamps (datetime64[ns])
     timeline_invested: np.ndarray   # Série temporal do capital aportado acumulado
     timeline_equity: np.ndarray     # Série temporal do valor de mercado das cotas
+    max_drawdown_pct: float = 0.0   # Drawdown máximo percentual da curva de equity
+
+
+def _compute_max_drawdown_pct(equity_curve: np.ndarray) -> float:
+    """Computes maximum peak-to-trough drawdown percentage (<= 0.0) over an equity curve."""
+    if equity_curve is None or len(equity_curve) == 0:
+        return 0.0
+    peak = np.maximum.accumulate(equity_curve)
+    safe_peak = np.where(peak > 0, peak, 1.0)
+    drawdowns = np.where(peak > 0, (equity_curve - peak) / safe_peak * 100.0, 0.0)
+    return round(float(np.min(drawdowns)), 2)
 
 
 @dataclass
@@ -172,7 +183,26 @@ def simulate_cycle_trade(
 
     timeline_idx = np.flatnonzero(mask_date)
     if len(timeline_idx) == 0:
-        timeline_idx = np.arange(n_bars)
+        return CycleSimulationResult(
+            total_invested=initial_capital,
+            final_equity=initial_capital,
+            net_profit=0.0,
+            return_on_capital_pct=0.0,
+            total_trades_count=0,
+            closed_trades_count=0,
+            winning_trades_count=0,
+            losing_trades_count=0,
+            win_rate_pct=0.0,
+            avg_trade_return_pct=0.0,
+            avg_trade_bars=0.0,
+            max_drawdown_pct=0.0,
+            current_market_price=0.0,
+            buy_and_hold_return_pct=0.0,
+            trades=[],
+            timeline_timestamps=np.array([], dtype="datetime64[ns]"),
+            timeline_invested=np.array([], dtype=np.float64),
+            timeline_equity=np.array([], dtype=np.float64),
+        )
 
     t_stamps = series.timestamps[timeline_idx]
     close_sliced = series.close[timeline_idx]
@@ -447,23 +477,25 @@ def simulate_accumulation(
     if end_date:
         mask_date &= (ts_series <= pd.to_datetime(end_date))
 
-    # Group signals by strategy_sub_id
+    # Group BUY signals by strategy_sub_id strictly within [start_date, end_date]
     grouped_signals: Dict[str, List[SignalRecord]] = {}
     for sig in signals:
+        if getattr(sig, "direction", "BUY") == "SELL":
+            continue
         t_exec = sig.execution_bar_index
         if 0 <= t_exec < n_bars and mask_date[t_exec]:
             grouped_signals.setdefault(sig.strategy_sub_id, []).append(sig)
 
     results: Dict[str, SimulationResult] = {}
-    current_price = float(series.close[-1])
 
     # Sliced timeline within active range
     timeline_idx = np.flatnonzero(mask_date)
     if len(timeline_idx) == 0:
-        timeline_idx = np.arange(n_bars)
+        return {}
 
     t_stamps = series.timestamps[timeline_idx]
     close_sliced = series.close[timeline_idx]
+    current_price = float(close_sliced[-1])
 
     for sub_id, strat_signals in grouped_signals.items():
         # Track shares and cash invested at each bar in timeline_idx
@@ -472,6 +504,7 @@ def simulate_accumulation(
 
         shares_added = np.zeros(len(timeline_idx), dtype=np.float64)
         cash_added = np.zeros(len(timeline_idx), dtype=np.float64)
+        executed_buys = 0
 
         for sig in strat_signals:
             p_exec = float(sig.execution_price)
@@ -480,6 +513,7 @@ def simulate_accumulation(
                 shares = contribution_amount / p_exec
                 shares_added[pos] += shares
                 cash_added[pos] += contribution_amount
+                executed_buys += 1
 
         cum_shares = np.cumsum(shares_added)
         cum_invested = np.cumsum(cash_added)
@@ -491,6 +525,7 @@ def simulate_accumulation(
         net_profit = final_equity - total_invested
         ret_on_cap = ((final_equity / total_invested) - 1.0) * 100.0 if total_invested > 0 else 0.0
         avg_price = (total_invested / total_shares) if total_shares > 0 else 0.0
+        max_dd_pct = _compute_max_drawdown_pct(cum_equity)
 
         label = labels_map.get(sub_id, sub_id)
 
@@ -504,10 +539,11 @@ def simulate_accumulation(
             return_on_capital_pct=round(ret_on_cap, 2),
             average_buy_price=round(avg_price, 2),
             current_price=round(current_price, 2),
-            num_contributions=len(strat_signals),
+            num_contributions=executed_buys,
             timeline_timestamps=t_stamps,
             timeline_invested=cum_invested,
             timeline_equity=cum_equity,
+            max_drawdown_pct=max_dd_pct,
         )
 
     return results
@@ -542,6 +578,10 @@ def optimize_strategy_pairs(
     if end_date:
         mask_date &= (ts_series <= pd.to_datetime(end_date))
 
+    timeline_idx = np.flatnonzero(mask_date)
+    if len(timeline_idx) == 0:
+        return None, []
+
     valid_signals = [
         s for s in signals
         if 0 <= s.execution_bar_index < n_bars and mask_date[s.execution_bar_index]
@@ -556,7 +596,7 @@ def optimize_strategy_pairs(
         elif s.direction == "SELL":
             sells_by_id.setdefault(s.strategy_sub_id, []).append(s)
 
-    last_close = float(series.close[-1])
+    last_close = float(series.close[timeline_idx[-1]])
 
     def _eval_pair(b_sigs: List[SignalRecord], s_sigs: List[SignalRecord], req_min_trades: int):
         merged = sorted(b_sigs + s_sigs, key=lambda x: (x.execution_bar_index, 0 if x.direction == "BUY" else 1))
@@ -769,7 +809,7 @@ def optimize_dca_strategies(
                 win_rate_pct=100.0 if item.net_profit > 0 else 0.0,
                 total_return_pct=item.return_on_capital_pct,
                 net_profit=item.net_profit,
-                max_drawdown_pct=0.0,
+                max_drawdown_pct=round(item.max_drawdown_pct, 1),
                 has_open_trade=True,
                 final_equity=item.current_equity,
                 cycle_entry_mode=None,
