@@ -538,3 +538,60 @@ def test_all_areas_respect_reference_widths(layout_page):
             assert report["doc"] <= report["win"] + 1, f"{name}/{width}: overflow global {report}"
             assert report["tiny"] == [], f"{name}/{width}: texto abaixo de 11px {report['tiny']}"
         page.set_viewport_size({"width": 1366, "height": 900})
+
+
+def test_penpot_modals_playbook_evolution_and_viewports(layout_page):
+    page, base = layout_page
+    page.goto(f"{base}/?e2e=1#carteira/visao-geral", wait_until="load")
+    page.wait_for_selector("#tab-overview", state="visible")
+
+    # 1. Modal 10 (Novo Lançamento) abre via botão do header e adiciona ativo real à custódia
+    page.click("#btn-header-add-trade")
+    page.wait_for_selector("#modal-new-trade", state="visible")
+    page.fill("#modal-trade-ticker", "ITUB4.SA")
+    page.fill("#modal-trade-shares", "50")
+    page.fill("#modal-trade-price", "40.00")
+    page.click("#btn-modal-trade-save")
+    page.wait_for_timeout(250)
+    assert page.locator("#modal-new-trade").is_hidden()
+    assert "ITUB4.SA" in page.inner_text("#overview-highlights-tbody")
+
+    # 2. Posições & Custódia (Tela 02) + Modal 09 (Importação B3)
+    page.click("#subnav-tab-posicoes")
+    page.wait_for_selector("#tab-portfolio", state="visible")
+    assert "3 ativos" in page.inner_text("#custody-kpi-count")
+    page.click("#btn-open-b3-modal")
+    page.wait_for_selector("#modal-b3-import", state="visible")
+    page.keyboard.press("Escape")
+    page.wait_for_timeout(150)
+    assert page.locator("#modal-b3-import").is_hidden()
+
+    # 3. Evolução Patrimonial (Tela 04)
+    page.click("#subnav-tab-patrimonio")
+    page.wait_for_selector("#tab-pane-patrimonio", state="visible")
+    page.click("#btn-patrimonio-all")
+    page.wait_for_timeout(150)
+    assert "R$" in page.inner_text("#pat-summary-final")
+
+    # 4. Playbook Interativo (Tela 08)
+    page.click("#pillar-btn-quant")
+    page.click("#subnav-tab-playbook")
+    page.wait_for_selector("#tab-playbook", state="visible")
+    total_cards = page.locator("#playbook-cards-grid .playbook-strategy-card").count()
+    assert total_cards >= 8
+    page.click('#playbook-filter-pills .playbook-filter-btn[data-filter="SELL"]')
+    page.wait_for_timeout(100)
+    sell_cards = page.locator("#playbook-cards-grid .playbook-strategy-card").count()
+    assert 1 <= sell_cards < total_cards
+
+    # 5. Viewports obrigatórios do Penpot (1600x1000, 1024x768, 390x844)
+    for vp_w, vp_h in ((1600, 1000), (1024, 768), (390, 844)):
+        page.set_viewport_size({"width": vp_w, "height": vp_h})
+        page.wait_for_timeout(150)
+        overflow = page.evaluate(
+            "() => document.documentElement.scrollWidth - document.documentElement.clientWidth"
+        )
+        assert overflow <= 1, f"Overflow horizontal detectado em {vp_w}x{vp_h}: {overflow}px"
+        if vp_w == 390:
+            assert page.locator("#mobile-bottom-nav").is_visible()
+    page.set_viewport_size({"width": 1366, "height": 900})

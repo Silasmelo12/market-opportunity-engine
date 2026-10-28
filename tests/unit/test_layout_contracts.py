@@ -448,3 +448,45 @@ def test_theme_tokens_meet_wcag_aa_contrast(styles_css: str):
             if ratio < 4.5:
                 failures.append((selector, foreground, background, round(ratio, 2)))
     assert failures == [], f"Pares abaixo de WCAG AA (4.5:1): {failures}"
+
+
+def test_penpot_screens_modals_and_modular_scripts_contract(index_html: str):
+    """Verifica que todos os elementos estruturais das 13 telas Penpot e módulos JS estão declarados."""
+    required_ids = (
+        "overview-highlights-card",
+        "overview-highlights-tbody",
+        "proventos-kpis-grid",
+        "prov-kpi-total",
+        "prov-composition-list",
+        "prov-history-tbody",
+        "btn-patrimonio-12m",
+        "btn-patrimonio-all",
+        "pat-summary-final",
+        "pat-history-tbody",
+        "custody-kpis-grid",
+        "custody-category-pills",
+        "btn-custody-export-csv",
+        "playbook-search-input",
+        "playbook-filter-pills",
+        "playbook-cards-grid",
+        "modal-b3-import",
+        "modal-new-trade",
+        "mobile-bottom-nav",
+    )
+    for el_id in required_ids:
+        assert f'id="{el_id}"' in index_html, f"Elemento Penpot obrigatório ausente: {el_id}"
+
+    assert index_html.count('role="tabpanel"') == 8
+    assert index_html.count('role="dialog" aria-modal="true"') == 4
+
+    for mod_script in (
+        "modules/constants.js",
+        "modules/formatters.js",
+        "modules/api-client.js",
+        "modules/toast.js",
+        "modules/proventos.js",
+        "modules/evolution.js",
+        "modules/playbook.js",
+        "modules/modals.js",
+    ):
+        assert f'<script src="{mod_script}"></script>' in index_html, f"Script modular ausente: {mod_script}"
