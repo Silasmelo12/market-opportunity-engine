@@ -353,3 +353,11 @@ A feature é considerada validada quando:
 - Seção 4 documenta as relações reais de contraste (17,85:1 / 7,58:1 / 5,44:1 no claro; 16,96:1 / 6,92:1 / 6,03:1 no escuro).
 - Seção 6.7 atualizada com o comportamento responsivo final do header (480/1024/1279/1280px), alvos de toque, regiões roláveis focáveis, zoom de 200% e movimento reduzido.
 - Referências obsoletas removidas: classes legadas `fintech-*`, `gray-*`, `cyan-*`, `emerald-*`, `rose-*`, `amber-*` e overrides de tema em runtime agora estão explicitamente marcados como removidos pela Feature 023.
+
+### T061 — Backend intocado
+
+- Data: 2026-10-27.
+- `git diff --stat -- src/api` (working tree) → vazio.
+- `git diff --stat 4fd3ad5^..HEAD -- src/api` (toda a Feature 023) → vazio; `git diff --name-only 4fd3ad5^..HEAD -- src/api | wc -l` → **0 arquivos**.
+- Último commit que tocou `src/api/`: `b5a9707` (anterior à Feature 023).
+- Rotas, contratos de dados e cálculos financeiros permanecem inalterados.
