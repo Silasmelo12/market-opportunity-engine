@@ -175,7 +175,7 @@ export function StrategyCombobox({
 
   const totalCount = ALL_STRATEGY_IDS.length;
   const selectedCount = ALL_STRATEGY_IDS.filter(
-    (id) => enabledStrategies[id] !== false
+    (id) => Boolean(enabledStrategies[id])
   ).length;
 
   const toggleAll = (enable: boolean) => {
@@ -234,7 +234,9 @@ export function StrategyCombobox({
         className="select flex w-full items-center justify-between rounded-md border border-border-strong bg-surface font-medium text-foreground shadow-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus disabled:cursor-not-allowed disabled:opacity-50 min-h-[32px] px-2.5 py-1 text-xs cursor-pointer"
       >
         <span className="truncate">
-          Filtro de Estratégias ({selectedCount}/{totalCount})
+          {selectedCount === 0
+            ? `Selecionar Estratégias (0/${totalCount})`
+            : `Filtro de Estratégias (${selectedCount}/${totalCount})`}
         </span>
         <span className="ml-2 text-muted-foreground text-[11px]">▼</span>
       </button>
@@ -296,10 +298,10 @@ export function StrategyCombobox({
           <div className="flex-1 overflow-y-auto space-y-3 pr-1 max-h-[300px]">
             {filteredCategories.map((cat) => {
               const allChecked = cat.strategies.every(
-                (st) => enabledStrategies[st.id] !== false
+                (st) => Boolean(enabledStrategies[st.id])
               );
               const someChecked = cat.strategies.some(
-                (st) => enabledStrategies[st.id] !== false
+                (st) => Boolean(enabledStrategies[st.id])
               );
 
               return (
@@ -337,7 +339,7 @@ export function StrategyCombobox({
 
                   <div className="grid grid-cols-1 gap-1 pl-1 pt-1">
                     {cat.strategies.map((st) => {
-                      const isChecked = enabledStrategies[st.id] !== false;
+                      const isChecked = Boolean(enabledStrategies[st.id]);
                       return (
                         <label
                           key={st.id}

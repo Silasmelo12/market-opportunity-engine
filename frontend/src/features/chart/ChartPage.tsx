@@ -322,25 +322,19 @@ export function ChartPage() {
   const [timeframeBtn, setTimeframeBtn] = React.useState<string>("6M");
   const [strategyFilterSearch, setStrategyFilterSearch] = React.useState<string>("");
 
-  // Checkboxes de todas as 60+ estratégias do sistema
-  const [enabledStrategies, setEnabledStrategies] = React.useState<Record<string, boolean>>(() => {
-    const init: Record<string, boolean> = {};
-    ALL_STRATEGY_IDS.forEach((id) => {
-      init[id] = true;
-    });
-    return init;
-  });
+  // Checkboxes de todas as estratégias do sistema (inicia com todas desmarcadas)
+  const [enabledStrategies, setEnabledStrategies] = React.useState<Record<string, boolean>>({});
 
-  // Checkboxes dos 8 pilares da barra lateral
+  // Checkboxes dos 8 pilares da barra lateral (inicia com todos desmarcados)
   const [strategyChecks, setStrategyChecks] = React.useState<Record<string, boolean>>({
-    tendencia: true,
-    suporte_resistencia: true,
-    rsi: true,
-    medias_moveis: true,
-    volume: true,
-    macd: true,
-    bollinger: true,
-    price_action: true,
+    tendencia: false,
+    suporte_resistencia: false,
+    rsi: false,
+    medias_moveis: false,
+    volume: false,
+    macd: false,
+    bollinger: false,
+    price_action: false,
   });
 
   const handleTogglePillar = (pillarId: string, checked: boolean) => {
@@ -432,7 +426,8 @@ export function ChartPage() {
       if (activeDirection === "BUY" && sig.direction !== "BUY") return false;
       if (activeDirection === "SELL" && sig.direction !== "SELL") return false;
       const subId = sig.strategy_sub_id;
-      if (subId && enabledStrategies[subId] === false) return false;
+      // Exibe apenas se a estratégia estiver explicitamente marcada como true
+      if (!subId || !enabledStrategies[subId]) return false;
       return true;
     });
   }, [analysis, activeDirection, enabledStrategies]);
@@ -496,14 +491,22 @@ export function ChartPage() {
           series.setMarkers(markers);
         }
 
-        // Adiciona os indicadores técnicos correspondentes às estratégias ativas
+        // Adiciona os indicadores técnicos correspondentes estritamente às estratégias marcadas
         if (chart.addLineSeries && analysis.candles.length > 0) {
           // 1. Médias Móveis (SMA 20 e SMA 50)
-          const showMA =
-            enabledStrategies["medias_moveis"] !== false ||
-            enabledStrategies["tendencia"] !== false ||
-            enabledStrategies["t1_open"] !== false ||
-            enabledStrategies["supertrend_trailing"] !== false;
+          const showMA = Boolean(
+            enabledStrategies["medias_moveis"] ||
+            enabledStrategies["tendencia"] ||
+            enabledStrategies["t1_open"] ||
+            enabledStrategies["t1_retest"] ||
+            enabledStrategies["t2_open"] ||
+            enabledStrategies["t2_retest"] ||
+            enabledStrategies["sell_t1_open"] ||
+            enabledStrategies["sell_t1_retest"] ||
+            enabledStrategies["sell_t2_open"] ||
+            enabledStrategies["sell_t2_retest"] ||
+            enabledStrategies["supertrend_trailing"]
+          );
           if (showMA) {
             const sma20Data = calculateSMA(analysis.candles, 20);
             if (sma20Data.length > 0) {
@@ -528,9 +531,11 @@ export function ChartPage() {
           }
 
           // 2. Bandas de Bollinger
-          const showBollinger =
-            enabledStrategies["bollinger"] !== false ||
-            enabledStrategies["bollinger_close_in"] !== false;
+          const showBollinger = Boolean(
+            enabledStrategies["bollinger"] ||
+            enabledStrategies["bollinger_close_in"] ||
+            enabledStrategies["keltner_squeeze"]
+          );
           if (showBollinger) {
             const bb = calculateBollingerBands(analysis.candles, 20, 2);
             if (bb.upper.length > 0) {
@@ -555,9 +560,11 @@ export function ChartPage() {
           }
 
           // 3. VWAP
-          const showVWAP =
-            enabledStrategies["volume"] !== false ||
-            enabledStrategies["vwap_bands"] !== false;
+          const showVWAP = Boolean(
+            enabledStrategies["volume"] ||
+            enabledStrategies["vwap_bands"] ||
+            enabledStrategies["volume_climax_vsa"]
+          );
           if (showVWAP) {
             const vwapData = calculateVWAP(analysis.candles);
             if (vwapData.length > 0) {
@@ -572,10 +579,13 @@ export function ChartPage() {
           }
 
           // 4. Suporte e Resistência Dinâmicos
-          const showSR =
-            enabledStrategies["suporte_resistencia"] !== false ||
-            enabledStrategies["price_action_double_bottom_bos"] !== false ||
-            enabledStrategies["sell_double_top_bos"] !== false;
+          const showSR = Boolean(
+            enabledStrategies["suporte_resistencia"] ||
+            enabledStrategies["price_action_double_bottom_bos"] ||
+            enabledStrategies["buy_double_top_inverted"] ||
+            enabledStrategies["sell_double_top_bos"] ||
+            enabledStrategies["sell_double_bottom_inverted"]
+          );
           if (showSR) {
             const sr = calculateSupportResistance(analysis.candles, 30);
             if (sr.resistance.length > 0) {

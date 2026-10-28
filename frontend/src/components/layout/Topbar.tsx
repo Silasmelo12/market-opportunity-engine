@@ -127,8 +127,10 @@ export function Topbar() {
   const b3Label =
     holdingsCount > 0 ? `${holdingsCount} ativos importados` : "Importar B3";
 
+  // Mantém verificação compatível para ocultar em posicoes/carteira
   const showDirectionSelector =
-    activeRoute === "quant/radar" || activeRoute === "quant/grafico";
+    (activeRoute === "quant/radar" || activeRoute === "quant/grafico") &&
+    activeRoute !== "quant/grafico";
 
   return (
     <header
