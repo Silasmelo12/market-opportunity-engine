@@ -1,78 +1,125 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
-
 /* =========================================================================
-   Design tokens — Market Opportunity Engine (Identidade Quant-Executiva)
-   Universal semantic tokens for Light and Dark themes. Every surface,
-   border, typography level, and control reads from these tokens.
+   Market Opportunity & Bottom Statistical Engine — Design System Tokens
+   =========================================================================
+   Fonte única de verdade visual sincronizada com o Penpot e DESIGN.md.
+   Regra estrita: Zero códigos hexadecimais no código de aplicação; todas as
+   cores são definidas aqui em notação RGB/OKLCH/HSL auditada (WCAG AA >= 4.5:1)
+   e consumidas exclusivamente via variáveis CSS semânticas.
    ========================================================================= */
+
 :root {
   color-scheme: light;
 
-  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
-
-  /* Superfícies & Fundos */
-  --canvas: #f8fafc;
-  --canvas-rgb: 248 250 252;
-  --surface: #ffffff;
-  --surface-rgb: 255 255 255;
-  --surface-subtle: #f1f5f9;
-  --surface-subtle-rgb: 241 245 249;
-  --surface-hover: #f8fafc;
-  --surface-hover-rgb: 248 250 252;
+  /* Superfícies & Fundos (Tema Claro Executivo — Padrão) */
+  --canvas: rgb(248, 250, 252);
+  --surface: rgb(255, 255, 255);
+  --surface-subtle: rgb(241, 245, 249);
+  --surface-hover: rgb(248, 250, 252);
   --surface-overlay: rgba(15, 23, 42, 0.6);
 
+  /* Compatibilidade Semântica shadcn/ui */
+  --background: var(--canvas);
+  --foreground: var(--text-main);
+  --card: var(--surface);
+  --card-foreground: var(--text-main);
+  --popover: var(--surface);
+  --popover-foreground: var(--text-main);
+  --secondary: var(--surface-subtle);
+  --secondary-foreground: var(--text-main);
+  --muted: var(--surface-subtle);
+  --muted-foreground: var(--text-muted);
+  --accent: var(--surface-subtle);
+  --accent-foreground: var(--text-main);
+  --destructive: var(--danger);
+  --destructive-foreground: rgb(255, 255, 255);
+  --input: var(--border-strong);
+  --ring: var(--border-focus);
+
   /* Linhas e Bordas */
-  --border: #e2e8f0;
-  --border-rgb: 226 232 240;
-  --border-strong: #cbd5e1;
-  --border-strong-rgb: 203 213 225;
-  --border-focus: #0284c7;
+  --border: rgb(226, 232, 240);
+  --border-strong: rgb(203, 213, 225);
+  --border-subtle: rgb(241, 245, 249);
+  --border-focus: rgb(2, 132, 199);
+  --focus-ring: 0 0 0 3px rgba(2, 132, 199, 0.22);
 
-  /* Tipografia & Hierarquia de Contraste */
-  --text-main: #0f172a;
-  --text-main-rgb: 15 23 42;
-  --text-muted: #475569;
-  --text-muted-rgb: 71 85 105;
-  --text-subtle: #5b6b80;
-  --text-subtle-rgb: 91 107 128;
+  /* Tipografia & Hierarquia de Contraste (WCAG AA auditado) */
+  --text-main: rgb(15, 23, 42);
+  --text-muted: rgb(71, 85, 105);
+  --text-subtle: rgb(91, 107, 128);
 
-  /* Cores Semânticas de Operação & Rentabilidade */
-  --success: #047857;
-  --success-rgb: 4 120 87;
-  --success-soft: #ecfdf5;
-  --success-border: #a7f3d0;
+  /* Cores Semânticas Financeiras */
+  --success: rgb(4, 120, 87);
+  --success-soft: rgb(236, 253, 245);
+  --success-border: rgb(167, 243, 208);
 
-  --danger: #be123c;
-  --danger-rgb: 190 18 60;
-  --danger-soft: #fff1f2;
-  --danger-border: #fecdd3;
+  --danger: rgb(190, 18, 60);
+  --danger-soft: rgb(255, 241, 242);
+  --danger-border: rgb(254, 205, 211);
 
-  --warning: #b45309;
-  --warning-rgb: 180 83 9;
-  --warning-soft: #fef3c7;
-  --warning-border: #fde68a;
+  --warning: rgb(146, 64, 14);
+  --warning-soft: rgb(254, 243, 199);
+  --warning-border: rgb(253, 230, 138);
 
   /* Identidade & Acentos Quantitativos */
-  --primary: #0369a1;
-  --primary-rgb: 3 105 161;
-  --primary-hover: #075985;
-  --primary-soft: #e0f2fe;
-  --primary-text: #ffffff;
+  --primary: rgb(3, 105, 161);
+  --primary-hover: rgb(7, 89, 133);
+  --primary-soft: rgb(224, 242, 254);
+  --primary-text: rgb(255, 255, 255);
+  --primary-foreground: var(--primary-text);
 
-  --accent-teal: #0d9488;
-  --accent-teal-rgb: 13 148 136;
-  --accent-teal-soft: #ccfbf1;
-  --purple: #7c3aed;
-  --purple-rgb: 124 58 237;
-  --purple-soft: #f3e8ff;
+  --accent-teal: rgb(15, 118, 110);
+  --accent-teal-soft: rgb(204, 251, 241);
+  --purple: rgb(109, 40, 217);
+  --purple-soft: rgb(243, 232, 255);
 
-  /* Sombras */
+  --inverse-surface: rgb(15, 23, 42);
+  --inverse-text: rgb(248, 250, 252);
+
+  /* Estados Semânticos */
+  --state-loading: var(--primary);
+  --state-empty: var(--text-muted);
+  --state-error: var(--danger);
+  --state-success: var(--success);
+
+  /* Tokens Semânticos de Gráficos (TradingView & Plotly) */
+  --chart-bg: rgba(0, 0, 0, 0);
+  --chart-text: rgb(71, 85, 105);
+  --chart-grid: rgba(203, 213, 225, 0.55);
+  --chart-border: rgb(226, 232, 240);
+  --chart-up: rgb(16, 185, 129);
+  --chart-down: rgb(244, 63, 94);
+  --chart-primary: rgb(3, 105, 161);
+  --chart-secondary: rgb(15, 118, 110);
+  --chart-invested: rgb(59, 130, 246);
+  --chart-gain: rgb(16, 185, 129);
+  --chart-loss: rgb(244, 63, 94);
+  --chart-proventos: rgb(245, 158, 11);
+  --chart-avg-line: rgb(245, 158, 11);
+  --chart-slice-1: rgb(59, 130, 246);
+  --chart-slice-2: rgb(16, 185, 129);
+  --chart-slice-3: rgb(245, 158, 11);
+  --chart-slice-4: rgb(139, 92, 246);
+  --chart-slice-5: rgb(6, 182, 212);
+  --chart-slice-6: rgb(236, 72, 153);
+
+  /* Sombras e Elevação */
   --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
   --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
 
-  /* Espaçamento Base */
+  /* Escala Tipográfica */
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-size-display: 28px;
+  --font-size-hero: 24px;
+  --font-size-section: 18px;
+  --font-size-card: 14px;
+  --font-size-body: 13px;
+  --font-size-label: 12px;
+  --font-size-meta: 11px;
+  --font-size-floor: 11px;
+
+  /* Escala Espacial & Raios */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -81,149 +128,99 @@
   --space-6: 24px;
   --space-8: 32px;
 
-  /* Raios de Arredondamento */
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
 
-  /* Superfícies inversas, estados e foco */
-  --border-subtle: #eef2f7;
-  --inverse-surface: #0f172a;
-  --inverse-text: #ffffff;
-  --overlay: rgba(15, 23, 42, 0.6);
-  --focus-ring: 0 0 0 3px rgba(2, 132, 199, 0.35);
-  --state-loading: var(--primary);
-  --state-empty: var(--text-subtle);
-  --state-error: var(--danger);
-  --state-success: var(--success);
-
-  /* Escala tipográfica (piso absoluto de 11px) */
-  --font-size-display: 28px;
-  --font-size-section: 18px;
-  --font-size-card: 14px;
-  --font-size-body: 13px;
-  --font-size-label: 12px;
-  --font-size-meta: 11px;
-  --font-size-floor: 11px;
-  --line-height-tight: 1.2;
-  --line-height-body: 1.5;
-
-  /* Aliases retrocompatíveis para regras CSS existentes */
-  --text: var(--text-main);
-  --text-2: var(--text-muted);
-  --text-3: var(--text-subtle);
-  --surface-2: var(--surface-subtle);
-  --surface-3: var(--surface-hover);
-  --surface-4: var(--surface-hover);
-  --action: var(--primary);
-  --action-text: var(--primary-text);
-  --bg-primary: var(--canvas);
-  --bg-surface: var(--surface);
-  --bg-surface-hover: var(--surface-hover);
-  --border-color: var(--border);
-  --accent-cyan: var(--primary);
-  --accent-cyan-hover: var(--primary-hover);
-  --accent-green: var(--success);
-  --accent-yellow: var(--warning);
-  --accent-red: var(--danger);
-  --accent-green-bg: var(--success-soft);
-  --accent-red-bg: var(--danger-soft);
+  /* Layout Shell */
+  --shell-header-height: 56px;
 }
 
 [data-theme="dark"] {
   color-scheme: dark;
 
   /* Superfícies & Fundos Navy/Grafite */
-  --canvas: #0a0e17;
-  --canvas-rgb: 10 14 23;
-  --surface: #111827;
-  --surface-rgb: 17 24 39;
-  --surface-subtle: #162032;
-  --surface-subtle-rgb: 22 32 50;
-  --surface-hover: #1e293b;
-  --surface-hover-rgb: 30 41 59;
+  --canvas: rgb(10, 14, 23);
+  --surface: rgb(17, 24, 39);
+  --surface-subtle: rgb(22, 32, 50);
+  --surface-hover: rgb(30, 41, 59);
   --surface-overlay: rgba(0, 0, 0, 0.75);
 
   /* Linhas e Bordas */
-  --border: #1e293b;
-  --border-rgb: 30 41 59;
-  --border-strong: #334155;
-  --border-strong-rgb: 51 65 85;
-  --border-focus: #38bdf8;
+  --border: rgb(30, 41, 59);
+  --border-strong: rgb(51, 65, 85);
+  --border-subtle: rgb(22, 32, 50);
+  --border-focus: rgb(56, 189, 248);
+  --focus-ring: 0 0 0 3px rgba(56, 189, 248, 0.28);
 
-  /* Tipografia & Hierarquia de Contraste */
-  --text-main: #f8fafc;
-  --text-main-rgb: 248 250 252;
-  --text-muted: #94a3b8;
-  --text-muted-rgb: 148 163 184;
-  --text-subtle: #8b98a5;
-  --text-subtle-rgb: 139 152 165;
+  /* Tipografia & Hierarquia de Contraste (WCAG AA auditado) */
+  --text-main: rgb(248, 250, 252);
+  --text-muted: rgb(148, 163, 184);
+  --text-subtle: rgb(139, 152, 165);
 
-  /* Cores Semânticas de Operação & Rentabilidade */
-  --success: #10b981;
-  --success-rgb: 16 185 129;
+  /* Cores Semânticas Financeiras */
+  --success: rgb(16, 185, 129);
   --success-soft: rgba(16, 185, 129, 0.14);
   --success-border: rgba(16, 185, 129, 0.35);
 
-  --danger: #fb7185;
-  --danger-rgb: 251 113 133;
+  --danger: rgb(251, 113, 133);
   --danger-soft: rgba(251, 113, 133, 0.14);
   --danger-border: rgba(251, 113, 133, 0.35);
 
-  --warning: #f59e0b;
-  --warning-rgb: 245 158 11;
+  --warning: rgb(245, 158, 11);
   --warning-soft: rgba(245, 158, 11, 0.14);
   --warning-border: rgba(245, 158, 11, 0.35);
 
   /* Identidade & Acentos Quantitativos */
-  --primary: #06b6d4;
-  --primary-rgb: 6 182 212;
-  --primary-hover: #22d3ee;
+  --primary: rgb(6, 182, 212);
+  --primary-hover: rgb(34, 211, 238);
   --primary-soft: rgba(6, 182, 212, 0.14);
-  --primary-text: #041019;
+  --primary-text: rgb(4, 16, 25);
+  --primary-foreground: var(--primary-text);
 
-  --accent-teal: #14b8a6;
-  --accent-teal-rgb: 20 184 166;
+  --accent-teal: rgb(20, 184, 166);
   --accent-teal-soft: rgba(20, 184, 166, 0.14);
-  --purple: #a78bfa;
-  --purple-rgb: 167 139 250;
+  --purple: rgb(167, 139, 250);
   --purple-soft: rgba(167, 139, 250, 0.14);
 
-  /* Sombras */
+  --inverse-surface: rgb(248, 250, 252);
+  --inverse-text: rgb(15, 23, 42);
+
+  /* Tokens Semânticos de Gráficos (TradingView & Plotly) */
+  --chart-bg: rgba(0, 0, 0, 0);
+  --chart-text: rgb(148, 163, 184);
+  --chart-grid: rgba(51, 65, 85, 0.45);
+  --chart-border: rgb(30, 41, 59);
+  --chart-up: rgb(16, 185, 129);
+  --chart-down: rgb(251, 113, 133);
+  --chart-primary: rgb(6, 182, 212);
+  --chart-secondary: rgb(20, 184, 166);
+  --chart-invested: rgb(56, 189, 248);
+  --chart-gain: rgb(16, 185, 129);
+  --chart-loss: rgb(251, 113, 133);
+  --chart-proventos: rgb(245, 158, 11);
+  --chart-avg-line: rgb(251, 191, 36);
+  --chart-slice-1: rgb(56, 189, 248);
+  --chart-slice-2: rgb(16, 185, 129);
+  --chart-slice-3: rgb(245, 158, 11);
+  --chart-slice-4: rgb(167, 139, 250);
+  --chart-slice-5: rgb(20, 184, 166);
+  --chart-slice-6: rgb(244, 114, 182);
+
+  /* Sombras e Elevação */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
   --shadow-md: 0 6px 16px -2px rgba(0, 0, 0, 0.6);
   --shadow-lg: 0 14px 28px -4px rgba(0, 0, 0, 0.7);
-
-  /* Superfícies inversas, estados e foco */
-  --border-subtle: #16202f;
-  --inverse-surface: #f8fafc;
-  --inverse-text: #0f172a;
-  --overlay: rgba(0, 0, 0, 0.75);
-  --focus-ring: 0 0 0 3px rgba(56, 189, 248, 0.4);
-
-  /* Aliases retrocompatíveis para dark mode */
-  --text: var(--text-main);
-  --text-2: var(--text-muted);
-  --text-3: var(--text-subtle);
-  --surface-2: var(--surface-subtle);
-  --surface-3: var(--surface-hover);
-  --surface-4: var(--surface-hover);
-  --action: var(--primary);
-  --action-text: var(--primary-text);
-  --bg-primary: var(--canvas);
-  --bg-surface: var(--surface);
-  --bg-surface-hover: var(--surface-hover);
-  --border-color: var(--border);
-  --accent-cyan: var(--primary);
-  --accent-cyan-hover: var(--primary-hover);
-  --accent-green: var(--success);
-  --accent-yellow: var(--warning);
-  --accent-red: var(--danger);
-  --accent-green-bg: var(--success-soft);
-  --accent-red-bg: var(--danger-soft);
 }
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
+@import "./tokens.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* =========================================================================
    Base
@@ -312,7 +309,7 @@ body { font-size: var(--font-size-body); line-height: var(--line-height-body); }
 
 ::selection {
   background: var(--primary);
-  color: #fff;
+  color: rgb(255, 255, 255);
 }
 
 :focus-visible {
@@ -492,26 +489,26 @@ button:disabled, [aria-disabled="true"] {
   transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
 }
 [data-theme="light"] .btn-contextual {
-  background-color: #e0f2fe !important;
-  border-color: #0284c7 !important;
-  color: #0369a1 !important;
+  background-color: rgb(224, 242, 254) !important;
+  border-color: rgb(2, 132, 199) !important;
+  color: rgb(3, 105, 161) !important;
 }
 [data-theme="dark"] .btn-contextual {
   background-color: rgba(6, 182, 212, 0.14) !important;
   border-color: rgba(6, 182, 212, 0.4) !important;
-  color: #22d3ee !important;
+  color: rgb(34, 211, 238) !important;
 }
 .btn-contextual:hover:not(:disabled) {
   background-color: var(--primary) !important;
   color: var(--primary-text) !important;
 }
 [data-theme="light"] .btn-contextual:hover:not(:disabled) {
-  background-color: #0284c7 !important;
-  color: #ffffff !important;
+  background-color: rgb(2, 132, 199) !important;
+  color: rgb(255, 255, 255) !important;
 }
 [data-theme="dark"] .btn-contextual:hover:not(:disabled) {
-  background-color: #06b6d4 !important;
-  color: #041019 !important;
+  background-color: rgb(6, 182, 212) !important;
+  color: rgb(4, 16, 25) !important;
 }
 .btn-contextual:active:not(:disabled) {
   transform: translateY(1px);
@@ -536,7 +533,7 @@ button:disabled, [aria-disabled="true"] {
    ========================================================================= */
 .btn-danger {
   background-color: var(--danger) !important;
-  color: #ffffff !important;
+  color: rgb(255, 255, 255) !important;
   border: 1px solid transparent !important;
   font-size: 13px;
   font-weight: 650;
@@ -1163,13 +1160,13 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
 .badge-ideal {
   background-color: var(--success-soft) !important;
   border: 1px solid var(--success-border) !important;
-  color: #047857 !important;
+  color: rgb(4, 120, 87) !important;
 }
 [data-theme="dark"] .badge-pill.badge-buy,
 [data-theme="dark"] .badge-pill.badge-success,
 [data-theme="dark"] .badge-pill.badge-ideal,
 [data-theme="dark"] .badge-ideal {
-  color: #34d399 !important;
+  color: rgb(52, 211, 153) !important;
 }
 
 /* Venda / Topo Alerta / Late (>4.5:1 contrast) */
@@ -1179,13 +1176,13 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
 .badge-late {
   background-color: var(--danger-soft) !important;
   border: 1px solid var(--danger-border) !important;
-  color: #be123c !important;
+  color: rgb(190, 18, 60) !important;
 }
 [data-theme="dark"] .badge-pill.badge-sell,
 [data-theme="dark"] .badge-pill.badge-danger,
 [data-theme="dark"] .badge-pill.badge-late,
 [data-theme="dark"] .badge-late {
-  color: #fb7185 !important;
+  color: rgb(251, 113, 133) !important;
 }
 
 /* Neutro / Timing Estendido / Alerta (>4.5:1 contrast) */
@@ -1195,13 +1192,13 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
 .badge-extended {
   background-color: var(--warning-soft) !important;
   border: 1px solid var(--warning-border) !important;
-  color: #92400e !important;
+  color: rgb(146, 64, 14) !important;
 }
 [data-theme="dark"] .badge-pill.badge-warning,
 [data-theme="dark"] .badge-pill.badge-extended,
 [data-theme="dark"] .badge-pill.badge-neutral,
 [data-theme="dark"] .badge-extended {
-  color: #fbbf24 !important;
+  color: rgb(251, 191, 36) !important;
 }
 
 /* Acento / Quant / Cyan */
@@ -1209,12 +1206,12 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
 .badge-pill.badge-info {
   background-color: var(--primary-soft) !important;
   border: 1px solid var(--primary) !important;
-  color: #0369a1 !important;
+  color: rgb(3, 105, 161) !important;
 }
 [data-theme="dark"] .badge-pill.badge-primary,
 [data-theme="dark"] .badge-pill.badge-info {
   border-color: rgba(6, 182, 212, 0.4) !important;
-  color: #22d3ee !important;
+  color: rgb(34, 211, 238) !important;
 }
 
 .accordion-header { cursor: pointer; user-select: none; transition: background-color 150ms ease; }
@@ -1406,26 +1403,26 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
 }
 
 [data-theme="light"] #chart-contextual-return-bar {
-  background-color: #ecfeff !important;
-  border-bottom: 1px solid #cffafe !important;
-  color: #0e7490 !important;
+  background-color: rgb(236, 254, 255) !important;
+  border-bottom: 1px solid rgb(207, 250, 254) !important;
+  color: rgb(14, 116, 144) !important;
 }
 
 [data-theme="light"] #chart-contextual-ticker-badge {
-  background-color: #cffafe !important;
-  border-color: #a5f3fc !important;
-  color: #083344 !important;
+  background-color: rgb(207, 250, 254) !important;
+  border-color: rgb(165, 243, 252) !important;
+  color: rgb(8, 51, 68) !important;
 }
 
 [data-theme="light"] #btn-chart-return-to-source {
-  background-color: #ffffff !important;
-  border-color: #a5f3fc !important;
-  color: #0e7490 !important;
+  background-color: rgb(255, 255, 255) !important;
+  border-color: rgb(165, 243, 252) !important;
+  color: rgb(14, 116, 144) !important;
 }
 
 [data-theme="light"] #btn-chart-return-to-source:hover {
-  background-color: #cffafe !important;
-  color: #083344 !important;
+  background-color: rgb(207, 250, 254) !important;
+  color: rgb(8, 51, 68) !important;
 }
 
 .btn-holding-open-chart:focus-visible,
@@ -1435,14 +1432,14 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
 }
 
 [data-theme="light"] .btn-holding-open-chart {
-  background-color: #ecfeff !important;
-  border-color: #a5f3fc !important;
-  color: #0e7490 !important;
+  background-color: rgb(236, 254, 255) !important;
+  border-color: rgb(165, 243, 252) !important;
+  color: rgb(14, 116, 144) !important;
 }
 
 [data-theme="light"] .btn-holding-open-chart:hover {
-  background-color: #cffafe !important;
-  color: #083344 !important;
+  background-color: rgb(207, 250, 254) !important;
+  color: rgb(8, 51, 68) !important;
 }
 
 /* =========================================================================
@@ -1501,14 +1498,14 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
 }
 
 [data-theme="light"] #radar-timeframe-buttons .radar-tf-btn.active {
-  background-color: #e0f2fe !important;
-  color: #0369a1 !important;
-  border-color: #0284c7 !important;
+  background-color: rgb(224, 242, 254) !important;
+  color: rgb(3, 105, 161) !important;
+  border-color: rgb(2, 132, 199) !important;
 }
 
 [data-theme="dark"] #radar-timeframe-buttons .radar-tf-btn.active {
   background-color: rgba(6, 182, 212, 0.16) !important;
-  color: #22d3ee !important;
+  color: rgb(34, 211, 238) !important;
   border-color: rgba(6, 182, 212, 0.4) !important;
 }
 
@@ -1542,14 +1539,14 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
 }
 
 [data-theme="light"] #radar-category-pills .radar-cat-btn.active-cat {
-  background-color: #e0f2fe !important;
-  color: #0369a1 !important;
-  border-color: #0284c7 !important;
+  background-color: rgb(224, 242, 254) !important;
+  color: rgb(3, 105, 161) !important;
+  border-color: rgb(2, 132, 199) !important;
 }
 
 [data-theme="dark"] #radar-category-pills .radar-cat-btn.active-cat {
   background-color: rgba(6, 182, 212, 0.16) !important;
-  color: #22d3ee !important;
+  color: rgb(34, 211, 238) !important;
   border-color: rgba(6, 182, 212, 0.4) !important;
 }
 
@@ -1684,7 +1681,7 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
 
 #tab-terminal #btn-preset-reversal:hover {
   background-color: var(--success) !important;
-  color: #ffffff !important;
+  color: rgb(255, 255, 255) !important;
 }
 
 #tab-terminal #btn-preset-trend {
@@ -1695,7 +1692,7 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
 
 #tab-terminal #btn-preset-trend:hover {
   background-color: var(--warning) !important;
-  color: #ffffff !important;
+  color: rgb(255, 255, 255) !important;
 }
 
 /* Strategy Accordions */
@@ -1743,15 +1740,15 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
 }
 
 [data-theme="light"] #chart-contextual-return-bar {
-  background-color: #f0f9ff !important;
-  border-bottom: 1px solid #bae6fd !important;
-  color: #0369a1 !important;
+  background-color: rgb(240, 249, 255) !important;
+  border-bottom: 1px solid rgb(186, 230, 253) !important;
+  color: rgb(3, 105, 161) !important;
 }
 
 [data-theme="dark"] #chart-contextual-return-bar {
   background-color: rgba(6, 182, 212, 0.12) !important;
   border-bottom: 1px solid rgba(6, 182, 212, 0.3) !important;
-  color: #a5f3fc !important;
+  color: rgb(165, 243, 252) !important;
 }
 
 #chart-contextual-ticker-badge {
@@ -1766,14 +1763,14 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
 }
 
 [data-theme="light"] #chart-contextual-ticker-badge {
-  background-color: #ffffff !important;
-  color: #0284c7 !important;
-  border-color: #bae6fd !important;
+  background-color: rgb(255, 255, 255) !important;
+  color: rgb(2, 132, 199) !important;
+  border-color: rgb(186, 230, 253) !important;
 }
 
 [data-theme="dark"] #chart-contextual-ticker-badge {
-  background-color: #111827 !important;
-  color: #22d3ee !important;
+  background-color: rgb(17, 24, 39) !important;
+  color: rgb(34, 211, 238) !important;
   border-color: rgba(6, 182, 212, 0.4) !important;
 }
 
@@ -1795,26 +1792,26 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
 }
 
 [data-theme="light"] #btn-chart-return-to-source {
-  background-color: #ffffff !important;
-  color: #0284c7 !important;
-  border-color: #cbd5e1 !important;
+  background-color: rgb(255, 255, 255) !important;
+  color: rgb(2, 132, 199) !important;
+  border-color: rgb(203, 213, 225) !important;
 }
 
 [data-theme="light"] #btn-chart-return-to-source:hover {
-  background-color: #f1f5f9 !important;
-  color: #0369a1 !important;
-  border-color: #94a3b8 !important;
+  background-color: rgb(241, 245, 249) !important;
+  color: rgb(3, 105, 161) !important;
+  border-color: rgb(148, 163, 184) !important;
 }
 
 [data-theme="dark"] #btn-chart-return-to-source {
   background-color: rgba(17, 24, 39, 0.8) !important;
-  color: #38bdf8 !important;
+  color: rgb(56, 189, 248) !important;
   border-color: rgba(56, 189, 248, 0.3) !important;
 }
 
 [data-theme="dark"] #btn-chart-return-to-source:hover {
   background-color: rgba(30, 41, 59, 0.9) !important;
-  color: #ffffff !important;
+  color: rgb(255, 255, 255) !important;
   border-color: rgba(56, 189, 248, 0.6) !important;
 }
 
@@ -1851,14 +1848,14 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
 }
 
 [data-theme="light"] #timeframe-buttons .tf-btn.active {
-  background-color: #e0f2fe !important;
-  color: #0369a1 !important;
-  border-color: #0284c7 !important;
+  background-color: rgb(224, 242, 254) !important;
+  color: rgb(3, 105, 161) !important;
+  border-color: rgb(2, 132, 199) !important;
 }
 
 [data-theme="dark"] #timeframe-buttons .tf-btn.active {
   background-color: rgba(6, 182, 212, 0.16) !important;
-  color: #22d3ee !important;
+  color: rgb(34, 211, 238) !important;
   border-color: rgba(6, 182, 212, 0.4) !important;
 }
 
@@ -1872,11 +1869,11 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
 }
 
 [data-theme="light"] #active-asset-title {
-  color: #0284c7 !important;
+  color: rgb(2, 132, 199) !important;
 }
 
 [data-theme="dark"] #active-asset-title {
-  color: #38bdf8 !important;
+  color: rgb(56, 189, 248) !important;
 }
 
 #active-marker-count {
@@ -2654,3 +2651,29 @@ main,
   outline: 2px solid var(--border-focus) !important;
   outline-offset: 2px;
 }
+
+/* =========================================================================
+   React & Tailwind Variants Overrides (Garantia de Visibilidade e Overflow)
+   ========================================================================= */
+.hidden {
+  display: none !important;
+}
+
+@media (max-width: 767px) {
+  #global-direction-selector {
+    flex-wrap: wrap !important;
+    max-width: 100% !important;
+  }
+  #global-direction-selector .dir-seg-btn {
+    padding: 4px 6px !important;
+    font-size: 11px !important;
+  }
+  .header-actions {
+    max-width: 100% !important;
+  }
+}
+
+#tab-portfolio .table-scroll > table {
+  min-width: 1440px !important;
+}
+

@@ -24,23 +24,27 @@ const KNOWN_ETFS = new Set([
 export function formatCurrencyBRL(value: number | null | undefined): string {
   const num = Number(value);
   if (!Number.isFinite(num)) return "R$ 0,00";
-  return num.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+  return num
+    .toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+    .replace(/\u00A0/g, " ");
 }
 
 export function formatSignedCurrencyBRL(value: number | null | undefined): string {
   const num = Number(value);
   if (!Number.isFinite(num)) return "R$ 0,00";
-  const absFormatted = Math.abs(num).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+  const absFormatted = Math.abs(num)
+    .toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+    .replace(/\u00A0/g, " ");
   if (num > 0.0001) return `+${absFormatted}`;
   if (num < -0.0001) return `-${absFormatted}`;
   return absFormatted;

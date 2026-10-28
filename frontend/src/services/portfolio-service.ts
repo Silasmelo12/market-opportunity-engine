@@ -10,7 +10,7 @@ import type {
 export const PORTFOLIO_STORAGE_KEY = "market_engine_portfolio_v1";
 
 export const DEFAULT_PORTFOLIO_STATE: PortfolioStoragePayload = {
-  availableCash: 0,
+  availableCash: 0.0,
   holdings: [],
   universeCategory: "featured",
   interval: "1d",
@@ -26,6 +26,54 @@ export const DEFAULT_PORTFOLIO_STATE: PortfolioStoragePayload = {
     cripto: 10,
   },
 };
+
+export function applyB3ParsedResult(
+  prev: PortfolioStoragePayload,
+  data: B3ParseResponse
+): PortfolioStoragePayload {
+  return {
+    ...prev,
+    availableCash: 0.0,
+    holdings: data.holdings || prev.holdings,
+    b3TotalIncome: data.total_income ?? prev.b3TotalIncome,
+    b3MonthlyIncome: data.monthly_income || prev.b3MonthlyIncome,
+    b3Timeline: data.timeline || prev.b3Timeline,
+  };
+}
+
+export function renderPortfolioSimulationUnavailable(): {
+  unavailable: boolean;
+  reason: string;
+} {
+  return {
+    unavailable: true,
+    reason: "Informe um saldo de caixa inicial maior que R$ 0,00 para simular.",
+  };
+}
+
+export async function runPortfolioHistoricalSimulation(
+  state: PortfolioStoragePayload
+): Promise<unknown> {
+  const cash = Number(state.availableCash) || 0;
+  if (cash <= 0) {
+    renderPortfolioSimulationUnavailable();
+    return null;
+  }
+  const simPayload = {
+    initial_capital: cash,
+    holdings: state.holdings,
+    universe_category: state.universeCategory || "featured",
+    interval: state.interval || "1d",
+    period: state.period || "2y",
+    max_weight_pct: state.maxWeightPct || 25.0,
+  };
+  const res = await fetch("/api/portfolio/simulate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(simPayload),
+  });
+  return res.json();
+}
 
 export function loadPortfolioFromStorage(): PortfolioStoragePayload {
   try {

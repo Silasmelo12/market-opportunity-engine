@@ -273,7 +273,7 @@ export function PortfolioPage() {
       {/* Acordeões de Custódia por Classe (#investidor10-positions-categories) */}
       <div id="investidor10-positions-categories" className="space-y-3">
         {filteredGroups.length === 0 ? (
-          <Card className="card-surface p-6 text-center text-xs text-muted-foreground">
+          <Card className="category-card card-surface p-6 text-center text-xs text-muted-foreground">
             Nenhuma posição encontrada para a classe selecionada.
           </Card>
         ) : (
@@ -371,11 +371,11 @@ export function PortfolioPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Label htmlFor="input-available-cash" className="text-xs">
+            <Label htmlFor="portfolio-cash-input" className="text-xs">
               Caixa Livre (R$):
             </Label>
             <Input
-              id="input-available-cash"
+              id="portfolio-cash-input"
               type="number"
               step="0.01"
               mono
@@ -439,7 +439,7 @@ export function PortfolioPage() {
           </Button>
         </form>
 
-        <Table showMobileHint>
+        <Table showMobileHint className="min-w-[1380px]">
           <TableHeader>
             <TableRow>
               <TableHead>Ticker</TableHead>
@@ -504,7 +504,7 @@ export function PortfolioPage() {
         </Table>
       </Card>
 
-      {/* Consultor Quantitativo de Rebalanceamento */}
+      {/* Consultor Quantitativo de Rebalanceamento & Backtest Multi-Ativo */}
       <Card className="card-surface space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
           <div>
@@ -512,7 +512,14 @@ export function PortfolioPage() {
               Plano de Ação Quantitativo (Rebalanceamento)
             </h3>
             <p className="section-subtitle text-xs text-muted-foreground">
-              Sugestões de alocação baseadas nos sinais estatísticos de fundo/topo e limite máximo por ativo
+              Patrimônio Consolidado:{" "}
+              <span id="advise-total-equity" className="font-mono font-bold text-foreground">
+                {formatCurrencyBRL(metrics.totalEquity)}
+              </span>{" "}
+              • Caixa Disponível:{" "}
+              <span id="advise-cash-transition" className="font-mono font-bold text-foreground">
+                {formatCurrencyBRL(metrics.availableCash)}
+              </span>
             </p>
           </div>
           <Button
@@ -526,19 +533,25 @@ export function PortfolioPage() {
           </Button>
         </div>
 
-        {adviceOrders.length > 0 && (
-          <Table density="compact">
-            <TableHeader>
+        <Table density="compact">
+          <TableHeader>
+            <TableRow>
+              <TableHead>Ativo</TableHead>
+              <TableHead>Ordem</TableHead>
+              <TableHead className="text-right">Quantidade</TableHead>
+              <TableHead className="text-right">Preço Ref.</TableHead>
+              <TableHead className="text-right">Volume Financeiro</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody id="portfolio-recommendations-tbody">
+            {adviceOrders.length === 0 ? (
               <TableRow>
-                <TableHead>Ativo</TableHead>
-                <TableHead>Ordem</TableHead>
-                <TableHead className="text-right">Quantidade</TableHead>
-                <TableHead className="text-right">Preço Ref.</TableHead>
-                <TableHead className="text-right">Volume Financeiro</TableHead>
+                <TableCell colSpan={5} className="py-4 text-center text-muted-foreground">
+                  Clique em &ldquo;Gerar Plano de Ação&rdquo; para calcular ordens de rebalanceamento.
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {adviceOrders.map((ord, idx) => (
+            ) : (
+              adviceOrders.map((ord, idx) => (
                 <TableRow key={`${ord.ticker}-${idx}`}>
                   <TableCell className="font-mono font-bold">{ord.ticker}</TableCell>
                   <TableCell>
@@ -560,10 +573,77 @@ export function PortfolioPage() {
                     {formatCurrencyBRL(ord.financial_volume)}
                   </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
+              ))
+            )}
+          </TableBody>
+        </Table>
+
+        {/* KPIs e Gráficos de Simulação Multi-Ativo da Carteira */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 pt-2">
+          <div className="rounded-md bg-surface-subtle p-2.5">
+            <span className="text-[11px] text-muted-foreground">Capital Inicial</span>
+            <div id="port-kpi-initial" className="font-mono text-xs font-bold">
+              {formatCurrencyBRL(metrics.availableCash)}
+            </div>
+            <span id="port-kpi-cash-sub" className="text-[11px] text-muted-foreground">
+              Caixa informado
+            </span>
+          </div>
+          <div className="rounded-md bg-surface-subtle p-2.5">
+            <span className="text-[11px] text-muted-foreground">Patrimônio Final</span>
+            <div id="port-kpi-final" className="font-mono text-xs font-bold">
+              {formatCurrencyBRL(metrics.totalEquity)}
+            </div>
+            <span id="port-kpi-profit-sub" className="text-[11px] text-muted-foreground">
+              Resultado consolidado
+            </span>
+          </div>
+          <div className="rounded-md bg-surface-subtle p-2.5">
+            <span className="text-[11px] text-muted-foreground">Retorno Total</span>
+            <div id="port-kpi-return" className="font-mono text-xs font-bold">
+              {metrics.card1VarLabel}
+            </div>
+            <span id="port-kpi-bench-sub" className="text-[11px] text-muted-foreground">
+              vs. Custo
+            </span>
+          </div>
+          <div className="rounded-md bg-surface-subtle p-2.5">
+            <span className="text-[11px] text-muted-foreground">Win Rate</span>
+            <div id="port-kpi-winrate" className="font-mono text-xs font-bold">
+              {metrics.kpiPosicoesPercentLabel}
+            </div>
+            <span id="port-kpi-exits-sub" className="text-[11px] text-muted-foreground">
+              Acima do PM
+            </span>
+          </div>
+          <div className="rounded-md bg-surface-subtle p-2.5">
+            <span className="text-[11px] text-muted-foreground">Profit Factor</span>
+            <div id="port-kpi-pf" className="font-mono text-xs font-bold">
+              —
+            </div>
+            <span id="port-kpi-rotations-sub" className="text-[11px] text-muted-foreground">
+              0 rotações
+            </span>
+          </div>
+          <div className="rounded-md bg-surface-subtle p-2.5">
+            <span className="text-[11px] text-muted-foreground">Drawdown Máx.</span>
+            <div id="port-kpi-dd" className="font-mono text-xs font-bold">
+              0,00%
+            </div>
+            <span id="port-kpi-events-sub" className="text-[11px] text-muted-foreground">
+              0 eventos
+            </span>
+          </div>
+        </div>
+
+        <div id="portfolio-equity-chart" className="hidden" />
+        <div id="portfolio-allocation-chart" className="hidden" />
+        <Table density="compact" wrapperClassName="hidden">
+          <TableBody id="portfolio-ledger-tbody" />
+        </Table>
+        <Table density="compact" wrapperClassName="hidden">
+          <TableBody id="portfolio-ranking-tbody" />
+        </Table>
       </Card>
     </section>
   );

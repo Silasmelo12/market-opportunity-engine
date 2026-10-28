@@ -51,6 +51,13 @@ export const Table = React.forwardRef<HTMLTableElement, ScrollableTableProps>(
     ref
   ) => {
     const { wrapper, table } = tableVariants({ density });
+    const handleScrollKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === "ArrowRight") {
+        e.currentTarget.scrollLeft += 48;
+      } else if (e.key === "ArrowLeft") {
+        e.currentTarget.scrollLeft = Math.max(0, e.currentTarget.scrollLeft - 48);
+      }
+    };
     return (
       <>
         {showMobileHint && (
@@ -58,7 +65,11 @@ export const Table = React.forwardRef<HTMLTableElement, ScrollableTableProps>(
             {hintText}
           </p>
         )}
-        <div className={cn(wrapper(), wrapperClassName)} tabIndex={0}>
+        <div
+          className={cn(wrapper(), wrapperClassName)}
+          tabIndex={0}
+          onKeyDown={handleScrollKeyDown}
+        >
           <table ref={ref} className={cn(table(), className)} {...props}>
             {children}
           </table>

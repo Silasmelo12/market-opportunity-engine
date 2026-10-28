@@ -220,6 +220,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const applyHashLocation = React.useCallback(() => {
     if (typeof window === "undefined") return;
+    setPortfolioState(loadPortfolioFromStorage());
+    const savedTheme = getSavedTheme();
+    applyDomTheme(savedTheme, false);
+    setThemeState(savedTheme);
+
     const parsed = parseLocationHash(window.location.hash);
     if (parsed.isUnknownExplicitHash) {
       window.history.replaceState(null, "", "#carteira/visao-geral");

@@ -234,6 +234,13 @@ export function ChartPage() {
     chartAssetName ||
     "Análise Estatística";
 
+  const resolvedTimingStatus =
+    typeof analysis?.timing_status === "string"
+      ? analysis.timing_status
+      : analysis?.timing_status?.label ||
+        analysis?.timing_status?.category ||
+        "ANÁLISE QUANTITATIVA";
+
   const showContextualBar = Boolean(contextualFromRoute && contextualFromLabel);
   const isVisible = activeRoute === "quant/grafico";
 
@@ -425,15 +432,17 @@ export function ChartPage() {
                 </p>
               </div>
               <Badge intent="primary">
-                {analysis?.timing_status || "ANÁLISE QUANTITATIVA"}
+                {resolvedTimingStatus}
               </Badge>
             </div>
 
-            <div
-              id="tv-chart-container"
-              ref={tvContainerRef}
-              className="mt-3 h-[380px] w-full rounded-md bg-surface"
-            />
+            <div className="w-full overflow-x-auto" style={{ overflowX: "auto" }}>
+              <div
+                id="tv-chart-container"
+                ref={tvContainerRef}
+                className="mt-3 h-[380px] w-full overflow-x-auto rounded-md bg-surface"
+              />
+            </div>
           </Card>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -485,8 +494,10 @@ export function ChartPage() {
                   </TableRow>
                 ) : (
                   (analysis?.signals || []).slice(0, 30).map((sig, idx) => (
-                    <TableRow key={`${sig.time}-${idx}`}>
-                      <TableCell className="font-mono">{sig.time}</TableCell>
+                    <TableRow key={`${sig.time || sig.signal_date || idx}-${idx}`}>
+                      <TableCell className="font-mono">
+                        {sig.time || sig.signal_date || sig.execution_date || "—"}
+                      </TableCell>
                       <TableCell>
                         <Badge intent={sig.direction === "BUY" ? "success" : "danger"}>
                           {sig.direction === "BUY" ? "▲ COMPRA" : "▼ VENDA"}
@@ -496,10 +507,14 @@ export function ChartPage() {
                         {sig.strategy_label || sig.strategy_sub_id}
                       </TableCell>
                       <TableCell className="text-right font-mono">
-                        {formatCurrencyBRL(sig.price)}
+                        {formatCurrencyBRL(sig.price ?? sig.execution_price ?? 0)}
                       </TableCell>
                       <TableCell className="text-right font-mono">
-                        {formatPercentPtBr(sig.forward_return ?? 0, 2, true)}
+                        {formatPercentPtBr(
+                          sig.forward_return ?? sig.forward_return_pct ?? 0,
+                          2,
+                          true
+                        )}
                       </TableCell>
                     </TableRow>
                   ))

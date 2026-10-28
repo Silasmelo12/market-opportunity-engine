@@ -58,7 +58,7 @@ export function SubnavBar() {
     >
       <div
         id="main-subnav-pills"
-        className="mx-auto flex max-w-[1600px] items-center justify-between gap-2 overflow-x-auto"
+        className="subnav-container mx-auto flex max-w-[1600px] items-center justify-between gap-2 overflow-x-auto"
       >
         {/* Subnavegação Minha Carteira */}
         <div

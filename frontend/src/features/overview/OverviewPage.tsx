@@ -256,7 +256,8 @@ export function OverviewPage() {
           <div className="flex items-center justify-between gap-2">
             <span
               id="overview-dividends-title"
-              className="kpi-label section-title text-[11px] font-bold uppercase tracking-wider text-muted-foreground"
+              className="kpi-label section-title text-[11px] font-bold tracking-wider text-muted-foreground"
+              style={{ textTransform: "none" }}
             >
               {metrics.dividendsTitleLabel}
             </span>
@@ -349,7 +350,7 @@ export function OverviewPage() {
           <div
             id="overview-stacked-bar-chart"
             ref={stackedChartRef}
-            className="mt-3 h-[280px] w-full block"
+            className="mt-3 h-[280px] w-full block overflow-hidden"
           />
         </Card>
 
@@ -376,7 +377,7 @@ export function OverviewPage() {
           <div
             id="overview-donut-chart"
             ref={donutChartRef}
-            className="mt-3 h-[210px] w-full block"
+            className="mt-3 h-[210px] w-full block overflow-hidden"
           />
           <div id="overview-donut-legend" className="mt-3 space-y-1.5 border-t border-border pt-2.5 text-xs">
             {metrics.categoryGroups.map((grp) => (

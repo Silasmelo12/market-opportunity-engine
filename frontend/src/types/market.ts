@@ -36,13 +36,18 @@ export interface CandlePoint {
 }
 
 export interface SignalPoint {
-  time: string;
-  price: number;
+  time?: string;
+  signal_date?: string;
+  execution_date?: string;
+  price?: number;
+  execution_price?: number;
   direction: "BUY" | "SELL";
   strategy_sub_id: string;
   strategy_label: string;
-  forward_return?: number;
-  mae?: number;
+  forward_return?: number | null;
+  forward_return_pct?: number | null;
+  mae?: number | null;
+  mae_pct?: number | null;
   win?: boolean;
 }
 
@@ -65,10 +70,18 @@ export interface AnalyzeResponse {
   candles: CandlePoint[];
   signals: SignalPoint[];
   summaries?: StrategySummary[];
-  timing_status?: string;
+  timing_status?:
+    | string
+    | {
+        category?: string;
+        label?: string;
+        distance_pct?: number;
+      }
+    | null;
   reference_lines?: Array<{
-    price: number;
-    label: string;
+    price?: number;
+    price_level?: number;
+    label?: string;
     color?: string;
   }>;
 }

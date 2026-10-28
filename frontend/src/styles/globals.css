@@ -2434,3 +2434,29 @@ main,
   outline: 2px solid var(--border-focus) !important;
   outline-offset: 2px;
 }
+
+/* =========================================================================
+   React & Tailwind Variants Overrides (Garantia de Visibilidade e Overflow)
+   ========================================================================= */
+.hidden {
+  display: none !important;
+}
+
+@media (max-width: 767px) {
+  #global-direction-selector {
+    flex-wrap: wrap !important;
+    max-width: 100% !important;
+  }
+  #global-direction-selector .dir-seg-btn {
+    padding: 4px 6px !important;
+    font-size: 11px !important;
+  }
+  .header-actions {
+    max-width: 100% !important;
+  }
+}
+
+#tab-portfolio .table-scroll > table {
+  min-width: 1440px !important;
+}
+
