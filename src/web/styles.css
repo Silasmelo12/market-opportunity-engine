@@ -833,6 +833,11 @@ button[aria-busy="true"]::after {
 .progress-bar-container {
   margin-top: 8px;
   height: 7px;
+  /* O container também usa .kpi-sub em um dos cards; zera padding/borda/gap
+     para que os preenchimentos (height: 100%) tenham altura real. */
+  padding-top: 0;
+  border-top: 0;
+  gap: 0;
   background: var(--surface-3);
   border-radius: 999px;
   overflow: hidden;
@@ -2593,6 +2598,14 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
   font-weight: 700;
 }
 .segmented-btn:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 1px; }
+
+/* Em telas estreitas o seletor de tempo precisa de uma linha inteira; caso
+   contrário ele é espremido a ~38px e os botões de timeframe somem. */
+@media (max-width: 767px) {
+  .quant-toolbar { flex-wrap: wrap; }
+  .quant-toolbar .segmented { width: 100%; }
+  .quant-toolbar > :last-child { width: 100%; justify-content: space-between; }
+}
 
 .filter-chip {
   display: inline-flex;

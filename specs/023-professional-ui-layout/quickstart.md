@@ -392,3 +392,16 @@ A feature é considerada validada quando:
   - TradingView: contêiner igual ao pai e largura acompanhando o viewport (1004 → 662 → 726 → 1558 → 1004px).
 - **Long tasks**: 0 nas fases de tema, resize e nas trocas de área em regime (8/8 áreas, 0 tarefas). Apenas a primeira pintura dos gráficos Plotly no carregamento inicial gerou 2 tarefas > 100ms (máximo **384ms**, uma vez), sem afetar a resposta da troca de área (≤ 47,7ms).
 - Script de apoio: `/tmp/opencode/validate_performance.py`.
+
+### T065 — Revisão e aprovação das 64 verificações visuais
+
+- Data: 2026-10-27.
+- Matriz final recapturada em `/tmp/023-ui-us5/`: **64/64 PNGs** (8 áreas × 375/768/1366/1920 × claro/escuro), todos com conteúdo.
+- Revisão visual por área e tema (folhas de contato em `/tmp/opencode/t065_sheets/`, 4 larguras por folha): Resumo, Posições, Proventos, Patrimônio, Radar, Gráfico, Simulador e Playbook.
+- Auditoria automatizada da matriz final: 0 rolagem horizontal global, 0 texto renderizado abaixo de 11px, 0 controle visível sem nome acessível, 8 abas contextuais com exatamente 1 selecionada e todas as tabelas de conteúdo em contêineres roláveis.
+- Defeitos encontrados na revisão e corrigidos:
+  1. **Card “Posições no Lucro”** — a barra de progresso tinha altura 0px: o contêiner acumulava `.kpi-sub` (padding-top 10px + borda 1px) com `height: 7px` em `box-sizing: border-box`, zerando a área dos preenchimentos. Corrigido em `styles.css` zerando padding/borda/gap do `.progress-bar-container`; a barra passa a renderizar 7px (verde/vermelho) nos dois temas.
+  2. **Toolbar do Gráfico em ≤767px** — o seletor de tempo era espremido a 38px, cortava o rótulo (“TEMPO”) e escondia os chips de timeframe. Corrigido com `flex-wrap` no `.quant-toolbar`, seletor em largura total e linha própria para ativo/marcadores; chips visíveis e roláveis horizontalmente.
+- Após as correções: matriz recapturada (**64/64**), auditoria sem novos problemas e suíte completa **166 passed, 2 skipped** (119,59s).
+- Aprovação: **64/64 combinações aprovadas** nos dois temas e quatro larguras.
+- Exceções documentadas: ações de texto inline da sidebar do Gráfico em desktop (48×17, 31×17, 36×17) e checkbox 13×13 com rótulo clicável — cobertas pela exceção de texto inline da WCAG 2.5.8.
