@@ -1,0 +1,216 @@
+/* =========================================================================
+   Market Opportunity & Bottom Statistical Engine — Design System Tokens
+   =========================================================================
+   Fonte única de verdade visual sincronizada com o Penpot e DESIGN.md.
+   Regra estrita: Zero códigos hexadecimais no código de aplicação; todas as
+   cores são definidas aqui em notação RGB/OKLCH/HSL auditada (WCAG AA >= 4.5:1)
+   e consumidas exclusivamente via variáveis CSS semânticas.
+   ========================================================================= */
+
+:root {
+  color-scheme: light;
+
+  /* Superfícies & Fundos (Tema Claro Executivo — Padrão) */
+  --canvas: rgb(248, 250, 252);
+  --surface: rgb(255, 255, 255);
+  --surface-subtle: rgb(241, 245, 249);
+  --surface-hover: rgb(248, 250, 252);
+  --surface-overlay: rgba(15, 23, 42, 0.6);
+
+  /* Compatibilidade Semântica shadcn/ui */
+  --background: var(--canvas);
+  --foreground: var(--text-main);
+  --card: var(--surface);
+  --card-foreground: var(--text-main);
+  --popover: var(--surface);
+  --popover-foreground: var(--text-main);
+  --secondary: var(--surface-subtle);
+  --secondary-foreground: var(--text-main);
+  --muted: var(--surface-subtle);
+  --muted-foreground: var(--text-muted);
+  --accent: var(--surface-subtle);
+  --accent-foreground: var(--text-main);
+  --destructive: var(--danger);
+  --destructive-foreground: rgb(255, 255, 255);
+  --input: var(--border-strong);
+  --ring: var(--border-focus);
+
+  /* Linhas e Bordas */
+  --border: rgb(226, 232, 240);
+  --border-strong: rgb(203, 213, 225);
+  --border-subtle: rgb(241, 245, 249);
+  --border-focus: rgb(2, 132, 199);
+  --focus-ring: 0 0 0 3px rgba(2, 132, 199, 0.22);
+
+  /* Tipografia & Hierarquia de Contraste (WCAG AA auditado) */
+  --text-main: rgb(15, 23, 42);
+  --text-muted: rgb(71, 85, 105);
+  --text-subtle: rgb(91, 107, 128);
+
+  /* Cores Semânticas Financeiras */
+  --success: rgb(4, 120, 87);
+  --success-soft: rgb(236, 253, 245);
+  --success-border: rgb(167, 243, 208);
+
+  --danger: rgb(190, 18, 60);
+  --danger-soft: rgb(255, 241, 242);
+  --danger-border: rgb(254, 205, 211);
+
+  --warning: rgb(146, 64, 14);
+  --warning-soft: rgb(254, 243, 199);
+  --warning-border: rgb(253, 230, 138);
+
+  /* Identidade & Acentos Quantitativos */
+  --primary: rgb(3, 105, 161);
+  --primary-hover: rgb(7, 89, 133);
+  --primary-soft: rgb(224, 242, 254);
+  --primary-text: rgb(255, 255, 255);
+  --primary-foreground: var(--primary-text);
+
+  --accent-teal: rgb(15, 118, 110);
+  --accent-teal-soft: rgb(204, 251, 241);
+  --purple: rgb(109, 40, 217);
+  --purple-soft: rgb(243, 232, 255);
+
+  --inverse-surface: rgb(15, 23, 42);
+  --inverse-text: rgb(248, 250, 252);
+
+  /* Estados Semânticos */
+  --state-loading: var(--primary);
+  --state-empty: var(--text-muted);
+  --state-error: var(--danger);
+  --state-success: var(--success);
+
+  /* Tokens Semânticos de Gráficos (TradingView & Plotly) */
+  --chart-bg: rgba(0, 0, 0, 0);
+  --chart-text: rgb(71, 85, 105);
+  --chart-grid: rgba(203, 213, 225, 0.55);
+  --chart-border: rgb(226, 232, 240);
+  --chart-up: rgb(16, 185, 129);
+  --chart-down: rgb(244, 63, 94);
+  --chart-primary: rgb(3, 105, 161);
+  --chart-secondary: rgb(15, 118, 110);
+  --chart-invested: rgb(59, 130, 246);
+  --chart-gain: rgb(16, 185, 129);
+  --chart-loss: rgb(244, 63, 94);
+  --chart-proventos: rgb(245, 158, 11);
+  --chart-avg-line: rgb(245, 158, 11);
+  --chart-slice-1: rgb(59, 130, 246);
+  --chart-slice-2: rgb(16, 185, 129);
+  --chart-slice-3: rgb(245, 158, 11);
+  --chart-slice-4: rgb(139, 92, 246);
+  --chart-slice-5: rgb(6, 182, 212);
+  --chart-slice-6: rgb(236, 72, 153);
+
+  /* Sombras e Elevação */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+
+  /* Escala Tipográfica */
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-size-display: 28px;
+  --font-size-hero: 24px;
+  --font-size-section: 18px;
+  --font-size-card: 14px;
+  --font-size-body: 13px;
+  --font-size-label: 12px;
+  --font-size-meta: 11px;
+  --font-size-floor: 11px;
+
+  /* Escala Espacial & Raios */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* Layout Shell */
+  --shell-header-height: 56px;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Superfícies & Fundos Navy/Grafite */
+  --canvas: rgb(10, 14, 23);
+  --surface: rgb(17, 24, 39);
+  --surface-subtle: rgb(22, 32, 50);
+  --surface-hover: rgb(30, 41, 59);
+  --surface-overlay: rgba(0, 0, 0, 0.75);
+
+  /* Linhas e Bordas */
+  --border: rgb(30, 41, 59);
+  --border-strong: rgb(51, 65, 85);
+  --border-subtle: rgb(22, 32, 50);
+  --border-focus: rgb(56, 189, 248);
+  --focus-ring: 0 0 0 3px rgba(56, 189, 248, 0.28);
+
+  /* Tipografia & Hierarquia de Contraste (WCAG AA auditado) */
+  --text-main: rgb(248, 250, 252);
+  --text-muted: rgb(148, 163, 184);
+  --text-subtle: rgb(139, 152, 165);
+
+  /* Cores Semânticas Financeiras */
+  --success: rgb(16, 185, 129);
+  --success-soft: rgba(16, 185, 129, 0.14);
+  --success-border: rgba(16, 185, 129, 0.35);
+
+  --danger: rgb(251, 113, 133);
+  --danger-soft: rgba(251, 113, 133, 0.14);
+  --danger-border: rgba(251, 113, 133, 0.35);
+
+  --warning: rgb(245, 158, 11);
+  --warning-soft: rgba(245, 158, 11, 0.14);
+  --warning-border: rgba(245, 158, 11, 0.35);
+
+  /* Identidade & Acentos Quantitativos */
+  --primary: rgb(6, 182, 212);
+  --primary-hover: rgb(34, 211, 238);
+  --primary-soft: rgba(6, 182, 212, 0.14);
+  --primary-text: rgb(4, 16, 25);
+  --primary-foreground: var(--primary-text);
+
+  --accent-teal: rgb(20, 184, 166);
+  --accent-teal-soft: rgba(20, 184, 166, 0.14);
+  --purple: rgb(167, 139, 250);
+  --purple-soft: rgba(167, 139, 250, 0.14);
+
+  --inverse-surface: rgb(248, 250, 252);
+  --inverse-text: rgb(15, 23, 42);
+
+  /* Tokens Semânticos de Gráficos (TradingView & Plotly) */
+  --chart-bg: rgba(0, 0, 0, 0);
+  --chart-text: rgb(148, 163, 184);
+  --chart-grid: rgba(51, 65, 85, 0.45);
+  --chart-border: rgb(30, 41, 59);
+  --chart-up: rgb(16, 185, 129);
+  --chart-down: rgb(251, 113, 133);
+  --chart-primary: rgb(6, 182, 212);
+  --chart-secondary: rgb(20, 184, 166);
+  --chart-invested: rgb(56, 189, 248);
+  --chart-gain: rgb(16, 185, 129);
+  --chart-loss: rgb(251, 113, 133);
+  --chart-proventos: rgb(245, 158, 11);
+  --chart-avg-line: rgb(251, 191, 36);
+  --chart-slice-1: rgb(56, 189, 248);
+  --chart-slice-2: rgb(16, 185, 129);
+  --chart-slice-3: rgb(245, 158, 11);
+  --chart-slice-4: rgb(167, 139, 250);
+  --chart-slice-5: rgb(20, 184, 166);
+  --chart-slice-6: rgb(244, 114, 182);
+
+  /* Sombras e Elevação */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 6px 16px -2px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 14px 28px -4px rgba(0, 0, 0, 0.7);
+}
