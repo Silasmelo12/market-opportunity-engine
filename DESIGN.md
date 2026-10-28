@@ -345,8 +345,31 @@ Emojis não são permitidos como ícones de ação ou navegação.
 
 ### 6.7 Responsividade e acessibilidade
 
-- Larguras de referência: 375, 768, 1366 e 1920px.
+- Larguras de referência: 375, 390, 768, 1024, 1366, 1600 e 1920px.
+- Navegação móvel inferior (`#mobile-bottom-nav`): exibida automaticamente abaixo de 768px (`md:hidden`) para acesso imediato a **Resumo**, **Carteira**, **Radar** e **Gráfico** (Penpot Screens 11, 12 e 13).
 - Grid de KPIs: 1 coluna em mobile, 2 em tablet e 4 em desktop (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-4`).
+
+---
+
+## 7. Mapeamento das 13 Telas do Penpot (`Market Opportunity — Complete System Redesign`)
+
+O arquivo Penpot `bfddaaba-4180-81d4-8008-db61527024e2` (página `01 · Design System & Telas`, `bfddaaba-4180-81d4-8008-db61527024e3`) especifica 13 pranchas oficiais implementadas na SPA:
+
+| # | Prancha Penpot | Dimensão Ref. | Seção / Elemento DOM | Módulo JS Responsável |
+| :--- | :--- | :--- | :--- | :--- |
+| **01** | `01 · Minha Carteira — Visão Geral` | `1600×1020` | `#tab-overview` (`#investidor10-hero-kpis`, `#overview-stacked-bar-chart`, `#overview-donut-chart`, `#overview-highlights-card`) | `app.js` + `modules/modals.js` |
+| **02** | `02 · Minha Carteira — Posições & Custódia` | `1600×1020` | `#tab-portfolio` (`#custody-kpis-grid`, `#custody-category-pills`, `#investidor10-positions-categories`) | `modules/modals.js` + `app.js` |
+| **03** | `03 · Minha Carteira — Proventos` | `1600×980` | `#tab-pane-proventos` (`#proventos-kpis-grid`, `#chart-proventos-detailed`, `#prov-composition-list`, `#prov-history-tbody`) | `modules/proventos.js` |
+| **04** | `04 · Minha Carteira — Evolução Patrimonial` | `1600×980` | `#tab-pane-patrimonio` (`#chart-patrimonio-detailed`, `#pat-summary-final`, `#pat-history-tbody`) | `modules/evolution.js` |
+| **05** | `05 · Quant — Radar de Oportunidades (Fundo 2x2)` | `1600×1020` | `#tab-pane-radar` (`#radar-executive-deck`, `#radar-category-pills`, `#radar-table-body`) | `app.js` |
+| **06** | `06 · Quant — Gráfico TradingView & Sinais` | `1600×1060` | `#tab-terminal` (`#tv-chart-container`, `#plot-ranking`, `#plot-scatter`, `#signals-table-body`) | `app.js` |
+| **07** | `07 · Quant — Simulador & Backtest` | `1600×1060` | `#tab-simulator` (`#sim-kpi-container`, `#plot-simulation-curve`, `#sim-trades-table-body`) | `app.js` |
+| **08** | `08 · Quant — Playbook de Estratégias` | `1600×980` | `#tab-playbook` (`#playbook-search-input`, `#playbook-filter-pills`, `#playbook-cards-grid`) | `modules/playbook.js` |
+| **09** | `09 · Modal — Importação de Extratos B3` | `760×640` | `#modal-b3-import` (`#modal-b3-dropzone`, `#modal-b3-files-list`, `#btn-modal-b3-process`) | `modules/modals.js` |
+| **10** | `10 · Modal — Novo Lançamento Manual` | `760×640` | `#modal-new-trade` (`.modal-trade-type-btn`, `#modal-trade-ticker`, `#modal-trade-total-preview`) | `modules/modals.js` |
+| **11** | `11 · Mobile — Visão Geral` | `390×844` | `#tab-overview` + `#mobile-bottom-nav` | `app.js` + `modules/modals.js` |
+| **12** | `12 · Mobile — Posições & Custódia` | `390×844` | `#tab-portfolio` + `#mobile-bottom-nav` | `modules/modals.js` |
+| **13** | `13 · Mobile — Radar Quant` | `390×844` | `#tab-pane-radar` + `#mobile-bottom-nav` | `app.js` + `modules/modals.js` |
 - Header responsivo:
   - abaixo de 480px a marca pode truncar com reticências e as ações quebram em linhas próprias;
   - a partir de 480px o bloco da marca tem largura mínima de 196px e as ações quebram em vez de espremê-la;
