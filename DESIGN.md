@@ -12,7 +12,7 @@ O **Market Opportunity & Bottom Statistical Engine** combina o melhor de dois mu
 ### Princípios Fundamentais de Design:
 - **Bimodalidade Harmônica com Tokens Únicos:** Ambos os temas (Claro e Escuro) consomem exatamente a mesma nomenclatura semântica de tokens CSS (`--canvas`, `--surface`, `--border`, `--text`, `--primary`, `--success`, etc.). O tema claro oferece uma estética corporativa limpa (Investidor10 clean), enquanto o tema escuro oferece um terminal noturno de alta performance (Navy/Grafite Fintech).
 - **Semântica Financeira Não Dependente Apenas de Cor:** Ganhos/Compras e Perdas/Vendas utilizam sempre reforço textual e ícones de direção (`▲`, `▼`, `↗`, `↘`) em conjunto com as cores de contraste auditadas (WCAG AA > 4.5:1).
-- **Piso Tipográfico Estrito (Mínimo 11px):** Nenhum texto funcional, cabeçalho de tabela, label de formulário ou metadado possui tamanho inferior a 11px (`text-[10px]` banido para elementos legíveis).
+- **Piso Tipográfico Estrito (Mínimo 11px):** Nenhum texto funcional, cabeçalho de tabela, label de formulário ou metadado renderiza abaixo de 11px. A classe `text-[10px]` é normalizada para `--font-size-floor` (11px) e os contratos unitários barram qualquer declaração menor.
 - **Hierarquia Plana e Limpa:** Eliminação de cartões aninhados (*nested cards*) redundantes; agrupamento estruturado por espaçamento rítmico, divisórias sutis e tipografia bem balanceada.
 - **Gráficos Integrados e Transparentes:** Plotly e TradingView utilizam fundos transparentes, herdando as cores de eixos, grid e tipografia diretamente dos tokens de tema ativos.
 
@@ -45,24 +45,24 @@ O **Market Opportunity & Bottom Statistical Engine** combina o melhor de dois mu
   /* Tipografia & Hierarquia de Contraste */
   --text-main: #0f172a;              /* Títulos, números grandes e textos de alta ênfase (Slate 900, >13:1) */
   --text-muted: #475569;             /* Labels, cabeçalhos de coluna e legendas (Slate 600, >6.5:1) */
-  --text-subtle: #64748b;            /* Metadados, notas explicativas e placeholders (Slate 500, >4.5:1) */
+  --text-subtle: #5b6b80;            /* Metadados, notas explicativas e placeholders (>5.4:1 sobre surface) */
 
   /* Cores Semânticas de Operação & Rentabilidade */
-  --success: #059669;                /* Verde institucional para lucros e sinais de Compra (Fundo) */
+  --success: #047857;                /* Verde institucional para lucros e sinais de Compra (Fundo) */
   --success-soft: #ecfdf5;           /* Fundo suave para badges de Compra/Lucro */
   --success-border: #a7f3d0;         /* Borda de badge de sucesso */
 
-  --danger: #e11d48;                 /* Rose/Vermelho para prejuízos e sinais de Venda (Topo) */
+  --danger: #be123c;                 /* Rose/Vermelho para prejuízos e sinais de Venda (Topo) */
   --danger-soft: #fff1f2;            /* Fundo suave para badges de Venda/Prejuízo */
   --danger-border: #fecdd3;          /* Borda de badge de perigo */
 
-  --warning: #d97706;                /* Âmbar institucional para alertas e timing neutro */
+  --warning: #b45309;                /* Âmbar institucional para alertas e timing neutro */
   --warning-soft: #fef3c7;           /* Fundo suave para avisos */
   --warning-border: #fde68a;         /* Borda de aviso */
 
   /* Identidade & Acentos Quantitativos */
-  --primary: #0284c7;                /* Azul institucional ciano (B3 / Ação Primária) */
-  --primary-hover: #0369a1;          /* Hover de ação primária */
+  --primary: #0369a1;                /* Azul institucional ciano (B3 / Ação Primária) */
+  --primary-hover: #075985;          /* Hover de ação primária */
   --primary-soft: #e0f2fe;           /* Fundo suave de destaque e seleção de abas */
   --primary-text: #ffffff;           /* Texto sobre botões primários */
 
@@ -95,16 +95,16 @@ O **Market Opportunity & Bottom Statistical Engine** combina o melhor de dois mu
   /* Tipografia & Hierarquia de Contraste */
   --text-main: #f8fafc;              /* Títulos e valores primários (Slate 50, >14:1) */
   --text-muted: #94a3b8;             /* Labels e cabeçalhos de coluna (Slate 400, >7:1) */
-  --text-subtle: #64748b;            /* Metadados e legendas (Slate 500, >4.5:1) */
+  --text-subtle: #8b98a5;            /* Metadados e legendas (>6:1 sobre surface) */
 
   /* Cores Semânticas de Operação & Rentabilidade */
   --success: #10b981;                /* Esmeralda vibrante para Compra / Lucro */
   --success-soft: rgba(16, 185, 129, 0.14);
   --success-border: rgba(16, 185, 129, 0.35);
 
-  --danger: #f43f5e;                 /* Rose vibrante para Venda / Risco de reversão */
-  --danger-soft: rgba(244, 63, 94, 0.14);
-  --danger-border: rgba(244, 63, 94, 0.35);
+  --danger: #fb7185;                 /* Rose vibrante para Venda / Risco de reversão */
+  --danger-soft: rgba(251, 113, 133, 0.14);
+  --danger-border: rgba(251, 113, 133, 0.35);
 
   --warning: #f59e0b;                /* Âmbar para alertas e regime neutro */
   --warning-soft: rgba(245, 158, 11, 0.14);
@@ -220,9 +220,10 @@ O **Market Opportunity & Bottom Statistical Engine** combina o melhor de dois mu
 ## 4. Diretrizes de Acessibilidade & Contraste (a11y)
 
 1. **Relação de Contraste Auditada (WCAG AA):**
-   - Todos os textos primários sobre seus fundos possuem relação > `13:1` (tema claro) e > `14:1` (tema escuro).
-   - Textos secundários (`--text-muted`) possuem relação mínima > `6.5:1` sobre `--surface` e `--canvas`.
-   - Badges e textos coloridos (verde, vermelho, ciano) possuem contraste de texto > `4.5:1` garantido sobre seus respectivos fundos suaves.
+   - Textos primários: `17.85:1` (claro) e `16.96:1` (escuro) sobre `--surface`.
+   - Textos secundários (`--text-muted`): `7.58:1` (claro) e `6.92:1` (escuro) sobre `--surface`.
+   - Textos terciários (`--text-subtle`): `5.44:1` (claro) e `6.03:1` (escuro) sobre `--surface`; mínimo de `4.97:1`/`5.54:1` sobre `--surface-subtle`.
+   - Badges e textos coloridos (verde, vermelho, âmbar, ciano) mantêm ≥ `4.5:1` sobre `--surface`, `--canvas` e `--surface-subtle`. O contrato `test_theme_tokens_meet_wcag_aa_contrast` audita os pares nos dois temas.
 2. **Dupla Codificação Semântica:**
    - Todo indicador de variação percentual ou direção é acompanhado de texto explícito ou glifo (`▲` / `▼`).
 3. **Navegabilidade por Teclado:**
@@ -251,6 +252,11 @@ O **Market Opportunity & Bottom Statistical Engine** combina o melhor de dois mu
 Esta seção é a referência única para implementar qualquer área da SPA. Toda
 tela deve consumir os tokens abaixo, sem cores hardcoded fora de `:root` e
 `[data-theme="dark"]`.
+
+Desde a Feature 023, as áreas não usam mais as classes legadas
+`fintech-*`, `gray-*`, `cyan-*`, `emerald-*`, `rose-*` ou `amber-*`, nem os
+blocos de override de tema em tempo de execução. A migração é verificada por
+`test_quant_areas_use_shared_semantic_system`.
 
 ### 6.1 Tokens semânticos
 
@@ -340,9 +346,15 @@ Emojis não são permitidos como ícones de ação ou navegação.
 ### 6.7 Responsividade e acessibilidade
 
 - Larguras de referência: 375, 768, 1366 e 1920px.
-- Header quebra em duas linhas abaixo de 1024px; ações permanecem acessíveis.
-- Grid de KPIs: 4 colunas em desktop, 2 em tablet, 1 em mobile.
-- Tabelas largas usam `.table-scroll`; a página nunca rola horizontalmente.
-- Foco visível em todos os controles; ativação por Enter/Espaço.
-- `prefers-reduced-motion: reduce` suprime animações não essenciais.
-- Zoom de 200% preserva conteúdo e controles.
+- Grid de KPIs: 1 coluna em mobile, 2 em tablet e 4 em desktop (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-4`).
+- Header responsivo:
+  - abaixo de 480px a marca pode truncar com reticências e as ações quebram em linhas próprias;
+  - a partir de 480px o bloco da marca tem largura mínima de 196px e as ações quebram em vez de espremê-la;
+  - até 1023px o seletor de direção ocupa uma linha própria;
+  - entre 1024px e 1279px os rótulos secundários (B3/Lançamento) viram ícones com `aria-label`;
+  - o selo “Quantitative Pro” só aparece a partir de 1280px e fica oculto quando o seletor de direção está visível (Radar/Gráfico).
+- Tabelas largas usam `.table-scroll` (com `tabindex="0"` e dica visual em mobile); a página nunca rola horizontalmente.
+- Alvos de toque: 32px para ações inline e 28px para ações de linha de tabela.
+- Foco visível em todos os controles, incluindo regiões roláveis; ativação por Enter/Espaço.
+- `prefers-reduced-motion: reduce` suprime animações e transições não essenciais (`≤ 0.001s`) e força `scroll-behavior: auto`.
+- Zoom de 200% preserva conteúdo, controles e navegação por teclado (validado nas 8 áreas).

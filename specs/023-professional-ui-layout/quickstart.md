@@ -344,3 +344,12 @@ A feature é considerada validada quando:
 - **Teclado em 200%** (683px, Radar): 16 controles alcançados por `Tab`, todos com indicador de foco visível e totalmente dentro do viewport (`left ≥ 0`, `right ≤ 683`), sem controles cortados.
 - **Movimento reduzido** (`reduced_motion="reduce"`, tema escuro, 8 áreas): `transition-duration` e `animation-duration` ≤ 0,001s em header, abas, botão de tema, cartões, KPIs, toast e subnavegação; `scroll-behavior: auto`. **8/8 áreas OK**, zero falhas.
 - Script de apoio: `/tmp/opencode/validate_zoom_motion.py`.
+
+### T060 — Consolidação do DESIGN.md
+
+- Data: 2026-10-27.
+- Tokens do `DESIGN.md` sincronizados com `src/web/styles.css`: **31 tokens no tema claro + 31 no escuro, 0 divergências** (script de paridade sobre os blocos `:root` e `[data-theme="dark"]`).
+- Valores atualizados para o padrão final: `--primary #0369a1`, `--success #047857`, `--warning #b45309`, `--danger #be123c`, `--text-subtle #5b6b80` (claro); `--text-subtle #8b98a5`, `--danger #fb7185` (escuro).
+- Seção 4 documenta as relações reais de contraste (17,85:1 / 7,58:1 / 5,44:1 no claro; 16,96:1 / 6,92:1 / 6,03:1 no escuro).
+- Seção 6.7 atualizada com o comportamento responsivo final do header (480/1024/1279/1280px), alvos de toque, regiões roláveis focáveis, zoom de 200% e movimento reduzido.
+- Referências obsoletas removidas: classes legadas `fintech-*`, `gray-*`, `cyan-*`, `emerald-*`, `rose-*`, `amber-*` e overrides de tema em runtime agora estão explicitamente marcados como removidos pela Feature 023.
