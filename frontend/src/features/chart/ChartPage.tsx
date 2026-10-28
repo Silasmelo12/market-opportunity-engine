@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/table";
 import { formatCurrencyBRL, formatPercentPtBr } from "@/lib/formatters";
 import { KNOWN_ASSET_NAMES, ALL_ASSET_GROUPS } from "@/lib/constants";
-import { StrategyCombobox, ALL_STRATEGY_IDS } from "./StrategyCombobox";
+import { StrategyCombobox, ALL_STRATEGY_IDS, isStrategyActive } from "./StrategyCombobox";
 import { fetchAssetAnalysis } from "@/services/market-service";
 import type { AnalyzeResponse, CandlePoint } from "@/types/market";
 import { renderPlotlySafely } from "@/hooks/use-plotly-chart";
@@ -319,11 +319,47 @@ export function ChartPage() {
 
   const [period, setPeriod] = React.useState<string>("6m");
   const [interval, setIntervalState] = React.useState<string>("1d");
-  const [timeframeBtn, setTimeframeBtn] = React.useState<string>("6M");
+  const [timeframeBtn, setTimeframeBtn] = React.useState<string>("1D");
   const [strategyFilterSearch, setStrategyFilterSearch] = React.useState<string>("");
+
+  const handleTimeframeChange = (tf: string) => {
+    setTimeframeBtn(tf);
+    if (tf === "1h") {
+      setIntervalState("1h");
+      setPeriod("1m");
+    } else if (tf === "4h") {
+      setIntervalState("4h");
+      setPeriod("3m");
+    } else if (tf === "12h") {
+      setIntervalState("12h");
+      setPeriod("6m");
+    } else if (tf === "1D") {
+      setIntervalState("1d");
+      setPeriod("6m");
+    } else if (tf === "1S") {
+      setIntervalState("1d");
+      setPeriod("1m");
+    } else if (tf === "1M") {
+      setIntervalState("1d");
+      setPeriod("1m");
+    } else if (tf === "3M") {
+      setIntervalState("1d");
+      setPeriod("3m");
+    } else if (tf === "6M") {
+      setIntervalState("1d");
+      setPeriod("6m");
+    } else if (tf === "1A") {
+      setIntervalState("1d");
+      setPeriod("1y");
+    }
+  };
 
   // Checkboxes de todas as estratégias do sistema (inicia com todas desmarcadas)
   const [enabledStrategies, setEnabledStrategies] = React.useState<Record<string, boolean>>({});
+
+  const hasSelectedStrategies = React.useMemo(() => {
+    return Object.values(enabledStrategies).some(Boolean);
+  }, [enabledStrategies]);
 
   // Checkboxes dos 8 pilares da barra lateral (inicia com todos desmarcados)
   const [strategyChecks, setStrategyChecks] = React.useState<Record<string, boolean>>({
@@ -425,12 +461,84 @@ export function ChartPage() {
     return all.filter((sig) => {
       if (activeDirection === "BUY" && sig.direction !== "BUY") return false;
       if (activeDirection === "SELL" && sig.direction !== "SELL") return false;
-      const subId = sig.strategy_sub_id;
-      // Exibe apenas se a estratégia estiver explicitamente marcada como true
-      if (!subId || !enabledStrategies[subId]) return false;
-      return true;
+      return isStrategyActive(sig.strategy_sub_id, enabledStrategies);
     });
   }, [analysis, activeDirection, enabledStrategies]);
+
+  // Resumos e métricas filtradas conforme estratégias selecionadas no combobox
+  const displayedSummaries = React.useMemo(() => {
+    if (!hasSelectedStrategies) return [];
+    const all = analysis?.summaries || [];
+    return all.filter((sum) => {
+      if (activeDirection === "BUY" && sum.direction !== "BUY") return false;
+      if (activeDirection === "SELL" && sum.direction !== "SELL") return false;
+      return isStrategyActive(sum.strategy_sub_id, enabledStrategies);
+    });
+  }, [analysis, activeDirection, enabledStrategies, hasSelectedStrategies]);
+
+  // KPIs dinâmicos calculados em tempo real
+  const dynamicKpis = React.useMemo(() => {
+    if (!hasSelectedStrategies) {
+      return {
+        totalSignals: "—",
+        hasSignals: false,
+        winRate: "—",
+        meanReturn: "—",
+        meanMae: "—",
+      };
+    }
+    const count = displayedSignals.length;
+    if (count === 0) {
+      return {
+        totalSignals: "0",
+        hasSignals: false,
+        winRate: "0,0%",
+        meanReturn: "0,00%",
+        meanMae: "0,00%",
+      };
+    }
+
+    // Calcula a partir dos resumos das estratégias selecionadas ou diretamente dos sinais
+    if (displayedSummaries.length > 0) {
+      const avgWinRate =
+        displayedSummaries.reduce((acc, s) => acc + (s.win_rate ?? 0), 0) /
+        displayedSummaries.length;
+      const avgReturn =
+        displayedSummaries.reduce((acc, s) => acc + (s.mean_forward_return ?? 0), 0) /
+        displayedSummaries.length;
+      const avgMae =
+        displayedSummaries.reduce((acc, s) => acc + (s.mean_mae ?? 0), 0) /
+        displayedSummaries.length;
+
+      return {
+        totalSignals: String(count),
+        hasSignals: true,
+        winRate: `${avgWinRate.toFixed(1).replace(".", ",")}%`,
+        meanReturn: `${avgReturn >= 0 ? "+" : ""}${avgReturn.toFixed(2).replace(".", ",")}%`,
+        meanMae: `${avgMae.toFixed(2).replace(".", ",")}%`,
+      };
+    }
+
+    const returns = displayedSignals
+      .map((s) => s.forward_return_pct)
+      .filter((v): v is number => typeof v === "number" && !isNaN(v));
+    const maes = displayedSignals
+      .map((s) => s.mae_pct)
+      .filter((v): v is number => typeof v === "number" && !isNaN(v));
+
+    const winCount = returns.filter((r) => r > 0).length;
+    const winRateVal = returns.length > 0 ? (winCount / returns.length) * 100 : 0;
+    const avgReturnVal = returns.length > 0 ? returns.reduce((a, b) => a + b, 0) / returns.length : 0;
+    const avgMaeVal = maes.length > 0 ? maes.reduce((a, b) => a + b, 0) / maes.length : 0;
+
+    return {
+      totalSignals: String(count),
+      hasSignals: true,
+      winRate: `${winRateVal.toFixed(1).replace(".", ",")}%`,
+      meanReturn: `${avgReturnVal >= 0 ? "+" : ""}${avgReturnVal.toFixed(2).replace(".", ",")}%`,
+      meanMae: `${avgMaeVal.toFixed(2).replace(".", ",")}%`,
+    };
+  }, [hasSelectedStrategies, displayedSignals, displayedSummaries]);
 
   // Render TradingView e Plotly Scatter
   React.useEffect(() => {
@@ -474,37 +582,71 @@ export function ChartPage() {
         series.setData(analysis.candles);
 
         if (series.setMarkers && displayedSignals.length > 0) {
-          const markers = displayedSignals
-            .map((sig) => {
-              const isBuy = sig.direction === "BUY";
-              const timeVal = sig.time || sig.signal_date || sig.execution_date;
-              if (!timeVal) return null;
-              return {
-                time: timeVal,
-                position: isBuy ? "belowBar" : "aboveBar",
-                color: isBuy ? tokens.up : tokens.down,
-                shape: isBuy ? "arrowUp" : "arrowDown",
-                text: isBuy ? "▲" : "▼",
-              };
-            })
-            .filter(Boolean);
+          // Agrupa sinais por barra de tempo para não sobrepor marcadores
+          const candleTimes = new Set((analysis.candles || []).map((c) => String(c.time)));
+          const timeToIdx = new Map((analysis.candles || []).map((c, i) => [String(c.time), i]));
+          const signalsByTime = new Map<string, typeof displayedSignals>();
+
+          for (const sig of displayedSignals) {
+            let t: string | null = null;
+            const barIdx = sig.execution_bar_index;
+            if (barIdx !== undefined && barIdx !== null && analysis.candles[barIdx]) {
+              t = String(analysis.candles[barIdx].time);
+            } else if (sig.time && candleTimes.has(String(sig.time))) {
+              t = String(sig.time);
+            } else if (sig.execution_date && candleTimes.has(String(sig.execution_date))) {
+              t = String(sig.execution_date);
+            } else if (sig.signal_date && candleTimes.has(String(sig.signal_date))) {
+              t = String(sig.signal_date);
+            }
+            if (!t) continue;
+            const existing = signalsByTime.get(t) || [];
+            existing.push(sig);
+            signalsByTime.set(t, existing);
+          }
+
+          const markers: Array<{
+            time: string;
+            position: "belowBar" | "aboveBar";
+            color: string;
+            shape: "arrowUp" | "arrowDown";
+            text: string;
+          }> = [];
+
+          for (const [timeVal, group] of signalsByTime.entries()) {
+            const hasBuy = group.some((s) => s.direction === "BUY");
+            const hasSell = group.some((s) => s.direction === "SELL");
+            const isBuy = hasBuy && !hasSell ? true : hasSell && !hasBuy ? false : group[0].direction === "BUY";
+            const count = group.length;
+            const markerText = isBuy
+              ? count > 1 ? `▲ (${count})` : "▲"
+              : count > 1 ? `▼ (${count})` : "▼";
+
+            markers.push({
+              time: timeVal,
+              position: isBuy ? "belowBar" : "aboveBar",
+              color: isBuy ? tokens.up : tokens.down,
+              shape: isBuy ? "arrowUp" : "arrowDown",
+              text: markerText,
+            });
+          }
+
+          // Ordena estritamente por tempo de barra para compatibilidade com LightweightCharts
+          markers.sort((a, b) => {
+            const idxA = timeToIdx.get(a.time) ?? 0;
+            const idxB = timeToIdx.get(b.time) ?? 0;
+            return idxA - idxB;
+          });
+
           series.setMarkers(markers);
         }
 
         // Adiciona os indicadores técnicos correspondentes estritamente às estratégias marcadas
         if (chart.addLineSeries && analysis.candles.length > 0) {
-          // 1. Médias Móveis (SMA 20 e SMA 50)
+          // 1. Médias Móveis (SMA 20 e SMA 50): apenas quando o usuário marcar uma estratégia que utilize médias/tendência
           const showMA = Boolean(
             enabledStrategies["medias_moveis"] ||
             enabledStrategies["tendencia"] ||
-            enabledStrategies["t1_open"] ||
-            enabledStrategies["t1_retest"] ||
-            enabledStrategies["t2_open"] ||
-            enabledStrategies["t2_retest"] ||
-            enabledStrategies["sell_t1_open"] ||
-            enabledStrategies["sell_t1_retest"] ||
-            enabledStrategies["sell_t2_open"] ||
-            enabledStrategies["sell_t2_retest"] ||
             enabledStrategies["supertrend_trailing"]
           );
           if (showMA) {
@@ -530,7 +672,7 @@ export function ChartPage() {
             }
           }
 
-          // 2. Bandas de Bollinger
+          // 2. Bandas de Bollinger: apenas para estratégias de Bollinger ou Keltner
           const showBollinger = Boolean(
             enabledStrategies["bollinger"] ||
             enabledStrategies["bollinger_close_in"] ||
@@ -559,11 +701,10 @@ export function ChartPage() {
             }
           }
 
-          // 3. VWAP
+          // 3. VWAP: apenas para estratégias de fluxo e VWAP
           const showVWAP = Boolean(
             enabledStrategies["volume"] ||
-            enabledStrategies["vwap_bands"] ||
-            enabledStrategies["volume_climax_vsa"]
+            enabledStrategies["vwap_bands"]
           );
           if (showVWAP) {
             const vwapData = calculateVWAP(analysis.candles);
@@ -578,7 +719,7 @@ export function ChartPage() {
             }
           }
 
-          // 4. Suporte e Resistência Dinâmicos
+          // 4. Suporte e Resistência Dinâmicos: apenas para estratégias de suporte e resistência/BOS
           const showSR = Boolean(
             enabledStrategies["suporte_resistencia"] ||
             enabledStrategies["price_action_double_bottom_bos"] ||
@@ -806,11 +947,10 @@ export function ChartPage() {
               Total de Sinais
             </span>
             <div className="mt-1 font-mono text-2xl font-extrabold text-foreground tabular-nums">
-              248
+              {dynamicKpis.totalSignals}
             </div>
-            <div className="mt-1 text-[11px] font-bold text-success flex items-center gap-1">
-              <span>▲ +12%</span>
-              <span className="font-normal text-muted-foreground">vs. período anterior</span>
+            <div className="mt-1 text-[11px] font-bold text-muted-foreground flex items-center gap-1">
+              <span>{hasSelectedStrategies ? "estratégias selecionadas" : "nenhuma estratégia marcada"}</span>
             </div>
           </div>
         </Card>
@@ -825,11 +965,10 @@ export function ChartPage() {
               Taxa de Acerto
             </span>
             <div className="mt-1 font-mono text-2xl font-extrabold text-foreground tabular-nums">
-              68,5%
+              {dynamicKpis.winRate}
             </div>
-            <div className="mt-1 text-[11px] font-bold text-success flex items-center gap-1">
-              <span>▲ +5,2%</span>
-              <span className="font-normal text-muted-foreground">vs. período anterior</span>
+            <div className="mt-1 text-[11px] font-bold text-muted-foreground flex items-center gap-1">
+              <span>{hasSelectedStrategies ? "média ponderada" : "aguardando seleção"}</span>
             </div>
           </div>
         </Card>
@@ -844,11 +983,10 @@ export function ChartPage() {
               Retorno Médio
             </span>
             <div className="mt-1 font-mono text-2xl font-extrabold text-foreground tabular-nums">
-              12,34%
+              {dynamicKpis.meanReturn}
             </div>
-            <div className="mt-1 text-[11px] font-bold text-success flex items-center gap-1">
-              <span>▲ +3,8%</span>
-              <span className="font-normal text-muted-foreground">vs. período anterior</span>
+            <div className="mt-1 text-[11px] font-bold text-muted-foreground flex items-center gap-1">
+              <span>{hasSelectedStrategies ? "horizonte analítico" : "aguardando seleção"}</span>
             </div>
           </div>
         </Card>
@@ -863,11 +1001,10 @@ export function ChartPage() {
               MAE Médio
             </span>
             <div className="mt-1 font-mono text-2xl font-extrabold text-foreground tabular-nums">
-              -4,21%
+              {dynamicKpis.meanMae}
             </div>
-            <div className="mt-1 text-[11px] font-bold text-danger flex items-center gap-1">
-              <span>▼ -1,7%</span>
-              <span className="font-normal text-muted-foreground">vs. período anterior</span>
+            <div className="mt-1 text-[11px] font-bold text-muted-foreground flex items-center gap-1">
+              <span>{hasSelectedStrategies ? "excursão adversa máx." : "aguardando seleção"}</span>
             </div>
           </div>
         </Card>
@@ -899,11 +1036,11 @@ export function ChartPage() {
                   </div>
                   {/* Seletor de Timeframe */}
                   <div className="segmented inline-flex items-center rounded-md border border-border bg-surface-subtle p-0.5 text-xs font-bold">
-                    {["1D", "1S", "1M", "3M", "6M", "1A"].map((tf) => (
+                    {["1h", "4h", "12h", "1D", "1S", "1M", "3M", "6M", "1A"].map((tf) => (
                       <button
                         key={tf}
                         type="button"
-                        onClick={() => setTimeframeBtn(tf)}
+                        onClick={() => handleTimeframeChange(tf)}
                         className={`rounded px-1.5 py-0.5 text-[11px] transition-colors ${
                           timeframeBtn === tf
                             ? "bg-primary text-primary-foreground font-bold shadow-sm"
@@ -947,20 +1084,22 @@ export function ChartPage() {
             </Card>
 
             {/* Card: Ranking de Eficiência por Estratégia */}
-            <Card kind="chart" className="card-surface chart-card xl:col-span-5 p-4 flex flex-col justify-between shadow-sm">
-              <div className="flex items-center justify-between border-b border-border pb-2.5">
+            <Card kind="chart" className="card-surface chart-card xl:col-span-5 p-4 flex flex-col justify-start shadow-sm">
+              <div className="flex items-center justify-between border-b border-border pb-1">
                 <div>
                   <h3 className="section-title font-sans text-sm font-bold text-foreground">
                     Ranking de Eficiência por Estratégia
                   </h3>
                 </div>
                 <span className="text-[11px] font-mono text-muted-foreground">
-                  30 estratégias avaliadas (BUY)
+                  {hasSelectedStrategies
+                    ? `${displayedSummaries.length} estratégias avaliadas`
+                    : "0 estratégias avaliadas"}
                 </span>
               </div>
 
               {/* Tabela Formatada de Ranking com Badges Coloridos */}
-              <div className="mt-2 overflow-y-auto max-h-[340px]">
+              <div className="mt-1 overflow-y-auto max-h-[340px]">
                 <Table density="compact">
                   <TableHeader>
                     <TableRow>
@@ -971,30 +1110,44 @@ export function ChartPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {RANKING_ITEMS.map((item) => (
-                      <TableRow key={item.rank}>
-                        <TableCell className="text-center">
-                          <span
-                            className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold ${item.badgeColor}`}
-                          >
-                            {item.rank}
-                          </span>
-                        </TableCell>
-                        <TableCell>
-                          <span
-                            className={`inline-block rounded px-2 py-0.5 text-[11px] font-bold ${item.pill}`}
-                          >
-                            {item.label}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-right font-mono font-bold text-foreground">
-                          {item.winRate}
-                        </TableCell>
-                        <TableCell className="text-right font-mono font-bold text-success">
-                          {item.returnPct}
+                    {displayedSummaries.length > 0 ? (
+                      displayedSummaries.map((item, idx) => (
+                        <TableRow key={item.strategy_sub_id || idx}>
+                          <TableCell className="text-center">
+                            <span
+                              className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold ${
+                                idx === 0
+                                  ? "bg-success text-primary-foreground"
+                                  : "bg-surface-subtle text-foreground"
+                              }`}
+                            >
+                              {idx + 1}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <span className="inline-block rounded px-2 py-0.5 text-[11px] font-bold bg-primary-soft text-primary truncate max-w-[170px]" title={item.strategy_label}>
+                              {item.strategy_label || item.strategy_sub_id}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right font-mono font-bold text-foreground">
+                            {typeof item.win_rate === "number" ? `${item.win_rate.toFixed(1).replace(".", ",")}%` : "—"}
+                          </TableCell>
+                          <TableCell className={`text-right font-mono font-bold ${(item.mean_forward_return ?? 0) >= 0 ? "text-success" : "text-danger"}`}>
+                            {typeof item.mean_forward_return === "number"
+                              ? `${item.mean_forward_return >= 0 ? "+" : ""}${item.mean_forward_return.toFixed(1).replace(".", ",")}%`
+                              : "—"}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center py-6 text-xs text-muted-foreground">
+                          {hasSelectedStrategies
+                            ? "Nenhum sinal detectado para as estratégias selecionadas no período."
+                            : "Selecione uma ou mais estratégias no filtro acima para visualizar o ranking."}
                         </TableCell>
                       </TableRow>
-                    ))}
+                    )}
                   </TableBody>
                 </Table>
               </div>

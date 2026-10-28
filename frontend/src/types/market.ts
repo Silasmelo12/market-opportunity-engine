@@ -39,6 +39,8 @@ export interface SignalPoint {
   time?: string;
   signal_date?: string;
   execution_date?: string;
+  signal_bar_index?: number | null;
+  execution_bar_index?: number | null;
   price?: number;
   execution_price?: number;
   direction: "BUY" | "SELL";
