@@ -238,7 +238,7 @@ export function ChartPage() {
         },
       ],
       {
-        margin: { t: 12, r: 16, b: 28, l: 140 },
+        margin: { t: 16, r: 24, b: 32, l: 240 },
         paper_bgcolor: tokens.bg,
         plot_bgcolor: tokens.bg,
         font: { family: "Plus Jakarta Sans, sans-serif", size: 11, color: tokens.text },
@@ -260,7 +260,7 @@ export function ChartPage() {
         },
       ],
       {
-        margin: { t: 12, r: 16, b: 32, l: 48 },
+        margin: { t: 16, r: 24, b: 36, l: 60 },
         paper_bgcolor: tokens.bg,
         plot_bgcolor: tokens.bg,
         font: { family: "Plus Jakarta Sans, sans-serif", size: 11, color: tokens.text },
@@ -436,99 +436,102 @@ export function ChartPage() {
               />
             </div>
           </Card>
+        </div>
+      </div>
 
-          {/* Gráfico 1: Ranking de Eficiência por Estratégia - Ocupa 100% da largura */}
-          <Card kind="chart" className="card-surface chart-card bg-white w-full">
-            <div className="flex items-center justify-between border-b border-border pb-2 mb-1">
-              <h3 className="section-title font-sans text-sm font-bold text-foreground">
-                Ranking de Eficiência por Estratégia
-              </h3>
-              <span className="text-xs text-muted-foreground font-mono">
-                {displayedSummaries.length} estratégias avaliadas ({activeDirection})
-              </span>
-            </div>
-            <div
-              id="plot-ranking"
-              ref={rankingPlotRef}
-              className="mt-2 h-[260px] w-full block"
-            />
-          </Card>
+      {/* Gráficos em 100% da Largura: Ocupam toda a largura respeitando as margens das bordas */}
+      <div className="space-y-4 w-full">
+        {/* Gráfico 1: Ranking de Eficiência por Estratégia - Ocupa 100% da largura */}
+        <Card kind="chart" className="card-surface chart-card bg-white w-full">
+          <div className="flex items-center justify-between border-b border-border pb-2 mb-1">
+            <h3 className="section-title font-sans text-sm font-bold text-foreground">
+              Ranking de Eficiência por Estratégia
+            </h3>
+            <span className="text-xs text-muted-foreground font-mono">
+              {displayedSummaries.length} estratégias avaliadas ({activeDirection})
+            </span>
+          </div>
+          <div
+            id="plot-ranking"
+            ref={rankingPlotRef}
+            className="mt-2 h-[280px] w-full block"
+          />
+        </Card>
 
-          {/* Gráfico 2: Matriz Risco (MAE) x Retorno Esperado - Ocupa 100% da largura */}
-          <Card kind="chart" className="card-surface chart-card bg-white w-full">
-            <div className="flex items-center justify-between border-b border-border pb-2 mb-1">
-              <h3 className="section-title font-sans text-sm font-bold text-foreground">
-                Matriz Risco (MAE) x Retorno Esperado
-              </h3>
-              <span className="text-xs text-muted-foreground font-mono">
-                Retorno Médio vs Drawdown Máximo Adverso ({activeDirection})
-              </span>
-            </div>
-            <div
-              id="plot-scatter"
-              ref={scatterPlotRef}
-              className="mt-2 h-[260px] w-full block"
-            />
-          </Card>
+        {/* Gráfico 2: Matriz Risco (MAE) x Retorno Esperado - Ocupa 100% da largura */}
+        <Card kind="chart" className="card-surface chart-card bg-white w-full">
+          <div className="flex items-center justify-between border-b border-border pb-2 mb-1">
+            <h3 className="section-title font-sans text-sm font-bold text-foreground">
+              Matriz Risco (MAE) x Retorno Esperado
+            </h3>
+            <span className="text-xs text-muted-foreground font-mono">
+              Retorno Médio vs Drawdown Máximo Adverso ({activeDirection})
+            </span>
+          </div>
+          <div
+            id="plot-scatter"
+            ref={scatterPlotRef}
+            className="mt-2 h-[280px] w-full block"
+          />
+        </Card>
 
-          {/* Tabela de Sinais Filtrados */}
-          <Card className="card-surface">
-            <div className="mb-3 flex items-center justify-between border-b border-border pb-2.5">
-              <h3 className="section-title font-sans text-sm font-bold text-foreground">
-                Histórico Cronológico de Sinais Detectados
-              </h3>
-              <Badge intent="neutral">
-                {displayedSignals.length} sinais filtrados
-              </Badge>
-            </div>
-            <Table density="compact" showMobileHint>
-              <TableHeader>
+        {/* Tabela de Sinais Filtrados - Ocupa 100% da largura */}
+        <Card className="card-surface w-full">
+          <div className="mb-3 flex items-center justify-between border-b border-border pb-2.5">
+            <h3 className="section-title font-sans text-sm font-bold text-foreground">
+              Histórico Cronológico de Sinais Detectados
+            </h3>
+            <Badge intent="neutral">
+              {displayedSignals.length} sinais filtrados
+            </Badge>
+          </div>
+          <Table density="compact" showMobileHint>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Data</TableHead>
+                <TableHead>Direção</TableHead>
+                <TableHead>Estratégia</TableHead>
+                <TableHead className="text-right">Preço no Sinal</TableHead>
+                <TableHead className="text-right">Retorno Forward</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody id="signals-table-body">
+              {displayedSignals.length === 0 ? (
                 <TableRow>
-                  <TableHead>Data</TableHead>
-                  <TableHead>Direção</TableHead>
-                  <TableHead>Estratégia</TableHead>
-                  <TableHead className="text-right">Preço no Sinal</TableHead>
-                  <TableHead className="text-right">Retorno Forward</TableHead>
+                  <TableCell colSpan={5} className="py-6 text-center text-muted-foreground">
+                    Nenhum sinal filtrado para os critérios selecionados ({activeDirection}).
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody id="signals-table-body">
-                {displayedSignals.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="py-6 text-center text-muted-foreground">
-                      Nenhum sinal filtrado para os critérios selecionados ({activeDirection}).
+              ) : (
+                displayedSignals.slice(0, 40).map((sig, idx) => (
+                  <TableRow key={`${sig.time || sig.signal_date || idx}-${idx}`}>
+                    <TableCell className="font-mono">
+                      {sig.time || sig.signal_date || sig.execution_date || "—"}
+                    </TableCell>
+                    <TableCell>
+                      <Badge intent={sig.direction === "BUY" ? "success" : "danger"}>
+                        {sig.direction === "BUY" ? "▲ COMPRA" : "▼ VENDA"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="font-semibold">
+                      {sig.strategy_label || sig.strategy_sub_id}
+                    </TableCell>
+                    <TableCell className="text-right font-mono">
+                      {formatCurrencyBRL(sig.price ?? sig.execution_price ?? 0)}
+                    </TableCell>
+                    <TableCell className="text-right font-mono">
+                      {formatPercentPtBr(
+                        sig.forward_return ?? sig.forward_return_pct ?? 0,
+                        2,
+                        true
+                      )}
                     </TableCell>
                   </TableRow>
-                ) : (
-                  displayedSignals.slice(0, 40).map((sig, idx) => (
-                    <TableRow key={`${sig.time || sig.signal_date || idx}-${idx}`}>
-                      <TableCell className="font-mono">
-                        {sig.time || sig.signal_date || sig.execution_date || "—"}
-                      </TableCell>
-                      <TableCell>
-                        <Badge intent={sig.direction === "BUY" ? "success" : "danger"}>
-                          {sig.direction === "BUY" ? "▲ COMPRA" : "▼ VENDA"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="font-semibold">
-                        {sig.strategy_label || sig.strategy_sub_id}
-                      </TableCell>
-                      <TableCell className="text-right font-mono">
-                        {formatCurrencyBRL(sig.price ?? sig.execution_price ?? 0)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono">
-                        {formatPercentPtBr(
-                          sig.forward_return ?? sig.forward_return_pct ?? 0,
-                          2,
-                          true
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </Card>
-        </div>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </Card>
       </div>
     </section>
   );
