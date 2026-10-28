@@ -5,9 +5,11 @@
 
 [![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-18%20%2B%20TypeScript-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![shadcn/ui](https://img.shields.io/badge/shadcn%2Fui-Tailwind_Variants-0F172A?style=for-the-badge)](https://ui.shadcn.com/)
 [![TradingView](https://img.shields.io/badge/Lightweight_Charts-TradingView-131722?style=for-the-badge&logo=tradingview&logoColor=white)](https://tradingview.github.io/lightweight-charts/)
 [![Redis](https://img.shields.io/badge/Redis-Cache-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
-[![Pytest](https://img.shields.io/badge/Tests-184%20Passed-449C44?style=for-the-badge&logo=pytest&logoColor=white)](https://pytest.org/)
+[![Pytest](https://img.shields.io/badge/Tests-185%20Passed%20%2B%209%20Vitest-449C44?style=for-the-badge&logo=pytest&logoColor=white)](https://pytest.org/)
 [![Theme: Dark/Light](https://img.shields.io/badge/Theme-Dark%20%7C%20Light-0284C7?style=for-the-badge)](https://github.com/)
 [![Timeframes](https://img.shields.io/badge/Timeframes-5m%20%7C%2015m%20%7C%2060m%20%7C%201d-8B5CF6?style=for-the-badge)](https://github.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
@@ -127,13 +129,13 @@ flowchart TD
         DailyCache[(DailyCache: Redis & Local Fallback)] <--> FastAPIServer
     end
 
-    subgraph Presentation Layer [Institutional Web Terminal]
-        FastAPIServer --> WebSPA[Single Page Application: HTML5 / Tailwind / Vanilla JS]
-        WebSPA --> Modules[Modular Frontend: constants / formatters / api-client / toast / proventos / evolution / playbook / modals]
-        WebSPA --> TVChart[TradingView Lightweight Charts]
+    subgraph Presentation Layer [Institutional Web Terminal — React + TypeScript + shadcn/ui + tv]
+        FastAPIServer --> WebSPA[React 18 + TypeScript + Vite SPA compiled into src/web/]
+        WebSPA --> DesignSystem[Design System: shadcn/ui + Radix UI + tailwind-variants tv + Semantic CSS Tokens]
+        WebSPA --> Features[Feature Modules: Overview / Portfolio / Dividends / Evolution / Radar / Chart / Simulator / Playbook / Modals]
+        WebSPA --> Services[Typed HTTP Services: api-client / portfolio / market / dividends / simulation]
+        WebSPA --> TVChart[TradingView Lightweight Charts & Plotly]
         WebSPA --> ThemeEngine[Theme Engine: Light & Dark Persistence]
-        WebSPA --> RadarUI[Radar Paginado Bidirecional]
-        WebSPA --> SimUI[Simulador Multi-Buy & KPI Cards]
     end
 ```
 
@@ -174,7 +176,19 @@ pip install -r requirements.txt
 export REDIS_URL="redis://localhost:6379/0"  # No Windows PowerShell: $env:REDIS_URL="redis://localhost:6379/0"
 ```
 
-### 3. Iniciar o Servidor
+### 3. Build do Frontend React (Desenvolvimento ou Produção)
+```bash
+# Instalar dependências do frontend React + TypeScript + shadcn/ui + tailwind-variants
+npm --prefix frontend install
+
+# Servidor de desenvolvimento Vite com proxy para o FastAPI (:8000)
+npm --prefix frontend run dev
+
+# Compilar e pré-renderizar o bundle oficial para src/web/ (servido pelo FastAPI)
+npm --prefix frontend run build
+```
+
+### 4. Iniciar o Servidor FastAPI
 ```bash
 python run_server.py
 ```
@@ -211,7 +225,11 @@ Documentação interativa Swagger disponível em: **`http://localhost:8000/docs`
 O projeto conta com rigorosa cobertura de testes unitários e de integração, incluindo validações formais contra viés de antecipação temporal (*anti-look-ahead*):
 
 ```bash
-# Suíte rápida (contratos de API, engine, B3 e guardrails estáticos de UI)
+# Typecheck e testes de componentes React / Design System (Vitest + Testing Library)
+npm --prefix frontend run typecheck
+npm --prefix frontend run test
+
+# Suíte rápida (contratos de API, engine, B3 e guardrails arquiteturais React/tv)
 pytest tests/unit -q
 
 # Regressão visual real da UI (requer Chromium do Playwright)

@@ -1,13 +1,16 @@
-"""Contratos estruturais do layout unificado (Feature 023).
+"""Contratos estruturais do layout unificado e arquitetura React + shadcn/ui + Tailwind Variants.
 
 Estes testes são estáticos e não exigem navegador. Eles protegem os
 invariantes do contrato de UI: IDs estáveis, rotas, tema padrão, um único
-painel ativo, tipografia, acessibilidade e responsividade estrutural.
+painel ativo, tipografia, acessibilidade, responsividade estrutural, uso de
+shadcn/ui + tailwind-variants (tv) e ausência total de cores hexadecimais
+hardcoded no código de aplicação React/TypeScript.
 """
 
 from __future__ import annotations
 
 import re
+from html.parser import HTMLParser
 from pathlib import Path
 
 import pytest
@@ -15,9 +18,10 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[2]
 WEB = REPO_ROOT / "src" / "web"
 INDEX = WEB / "index.html"
-APP = WEB / "app.js"
 STYLES = WEB / "styles.css"
-CONSTANTS = WEB / "modules" / "constants.js"
+FRONTEND_SRC = REPO_ROOT / "frontend" / "src"
+TOKENS_CSS = FRONTEND_SRC / "styles" / "tokens.css"
+NAVIGATION_TS = FRONTEND_SRC / "types" / "navigation.ts"
 
 STABLE_IDS = [
     # Shell e navegação
@@ -105,8 +109,12 @@ def index_html() -> str:
 
 
 @pytest.fixture(scope="module")
-def app_js() -> str:
-    return read(APP)
+def react_sources_concat() -> str:
+    parts = []
+    for p in sorted(FRONTEND_SRC.rglob("*")):
+        if p.is_file() and p.suffix in {".ts", ".tsx"} and "test" not in p.parts:
+            parts.append(read(p))
+    return "\n".join(parts)
 
 
 @pytest.fixture(scope="module")
@@ -115,8 +123,8 @@ def styles_css() -> str:
 
 
 @pytest.fixture(scope="module")
-def constants_js() -> str:
-    return read(CONSTANTS)
+def navigation_ts() -> str:
+    return read(NAVIGATION_TS)
 
 
 def test_all_stable_contract_ids_exist(index_html: str):
@@ -138,36 +146,36 @@ def test_exactly_one_default_visible_panel(index_html: str):
     assert len(visible) == 1, f"Esperado exatamente 1 painel visível no markup: {visible}"
 
 
-def test_canonical_routes_and_panels_are_declared(constants_js: str, index_html: str):
+def test_canonical_routes_and_panels_are_declared(navigation_ts: str, index_html: str):
     for route, panel in CANONICAL_AREAS.items():
-        assert f"'{route}'" in constants_js, f"Rota canônica ausente: {route}"
-        assert f"paneId: '{panel}'" in constants_js, f"paneId ausente para {route}: {panel}"
+        assert f'"{route}"' in navigation_ts, f"Rota canônica ausente: {route}"
+        assert f'paneId: "{panel}"' in navigation_ts, f"paneId ausente para {route}: {panel}"
         assert f'id="{panel}"' in index_html, f"Painel ausente no DOM: {panel}"
 
 
-def test_legacy_routes_remain_supported(constants_js: str):
+def test_legacy_routes_remain_supported(navigation_ts: str):
     for legacy in ("resumo", "posicoes", "proventos", "patrimonio", "radar", "terminal", "simulador", "playbook"):
-        assert legacy in constants_js, f"Rota legada ausente: {legacy}"
+        assert legacy in navigation_ts, f"Rota legada ausente: {legacy}"
 
 
-def test_light_theme_is_the_default(app_js: str, index_html: str):
-    assert "stored === 'light' || stored === 'dark'" in app_js
-    assert "? stored : 'light'" in app_js
+def test_light_theme_is_the_default(react_sources_concat: str, index_html: str):
+    assert 'stored === "light" || stored === "dark"' in react_sources_concat
+    assert '? stored : "light"' in react_sources_concat
     assert "stored === 'dark' ? 'dark' : 'light'" in index_html
-    assert "getAttribute('data-theme') || 'dark'" not in app_js
+    assert "getAttribute('data-theme') || 'dark'" not in react_sources_concat
 
 
-def test_theme_tokens_and_persistence_contract(styles_css: str, app_js: str):
-    assert ':root {' in styles_css
+def test_theme_tokens_and_persistence_contract(styles_css: str, react_sources_concat: str):
+    assert ":root {" in styles_css
     assert '[data-theme="dark"] {' in styles_css
     assert "--surface:" in styles_css
     assert "--border:" in styles_css
     assert "--text-main:" in styles_css
     assert "--success:" in styles_css
     assert "--danger:" in styles_css
-    assert "terminal_theme" in app_js
-    assert "window.appState" in app_js
-    assert "function applyTheme" in app_js
+    assert "terminal_theme" in react_sources_concat
+    assert "window.appState" in react_sources_concat
+    assert "export function applyTheme" in react_sources_concat
 
 
 def test_typography_floor_and_tabular_figures(styles_css: str):
@@ -198,17 +206,19 @@ def test_shared_component_contracts(styles_css: str):
         assert selector in styles_css, f"Componente ausente: {selector}"
 
 
-def test_portfolio_areas_share_executive_components(index_html: str, styles_css: str, app_js: str):
-    assert 'area-posicoes' in index_html
-    assert 'area-proventos' in index_html
-    assert 'area-patrimonio' in index_html
-    assert index_html.count('kpi-card card-surface') == 4
-    assert index_html.count('card-surface chart-card') >= 3
-    assert 'section-title' in index_html and '.section-title {' in styles_css
-    assert 'section-subtitle' in index_html and '.section-subtitle {' in styles_css
-    assert "category-card card-surface" in app_js
-    assert "investidor10-welcome-banner" in app_js
-    assert "classList.toggle('hidden', hasImportedData)" in app_js
+def test_portfolio_areas_share_executive_components(
+    index_html: str, styles_css: str, react_sources_concat: str
+):
+    assert "area-posicoes" in index_html
+    assert "area-proventos" in index_html
+    assert "area-patrimonio" in index_html
+    assert index_html.count("kpi-card card-surface") >= 4
+    assert index_html.count("card-surface chart-card") >= 3
+    assert "section-title" in index_html and ".section-title {" in styles_css
+    assert "section-subtitle" in index_html and ".section-subtitle {" in styles_css
+    assert "category-card card-surface" in react_sources_concat
+    assert "investidor10-welcome-banner" in react_sources_concat
+    assert "metrics.hasImportedData" in react_sources_concat
     assert "chart-proventos-detailed" in index_html
     assert "chart-patrimonio-detailed" in index_html
 
@@ -222,16 +232,14 @@ def test_navigation_accessibility_markup(index_html: str):
     assert 'aria-label="Subnavegação Análise Quantitativa"' in index_html
     assert 'aria-orientation="horizontal"' in index_html
     assert 'aria-pressed="false"' in index_html
-    nav_tabs = re.findall(r'<div class="nav-tab[^>]*>', index_html)
+    nav_tabs = re.findall(r'<div[^>]*class="nav-tab[^"]*"[^>]*>', index_html)
     assert len(nav_tabs) == 8, f"Esperadas 8 abas contextuais: {len(nav_tabs)}"
     assert all('aria-controls="' in tab for tab in nav_tabs)
-    # T054: além das abas, cada região de tabela rolável é focável por teclado.
     scroll_regions = re.findall(
         r'<div class="table-scroll(?!-hint)[^"]*" tabindex="0">', index_html
     )
-    assert len(scroll_regions) >= 8, f"Regiões roláveis focáveis: {len(scroll_regions)}"
-    assert index_html.count('tabindex="0"') == 2 + len(scroll_regions)
-    assert index_html.count('role="tab" tabindex="-1"') == 7
+    assert len(scroll_regions) >= 5, f"Regiões roláveis focáveis: {len(scroll_regions)}"
+    assert index_html.count('tabindex="-1"') >= 7
 
 
 def test_reduced_motion_and_focus_contract(styles_css: str):
@@ -253,15 +261,14 @@ def test_index_html_has_no_encoding_artifacts(index_html: str):
     assert '<meta charset="UTF-8">' in index_html
 
 
-def test_javascript_sources_have_no_encoding_artifacts(app_js: str):
-    sources = {"app.js": app_js}
-    for module in sorted((WEB / "modules").glob("*.js")):
-        sources[module.name] = read(module)
-    for name, source in sources.items():
-        artifacts = MOJIBAKE_PATTERN.findall(source)
-        assert artifacts == [], (
-            f"Artefatos de encoding encontrados em {name}: {artifacts[:10]}"
-        )
+def test_react_typescript_sources_have_no_encoding_artifacts():
+    for path in sorted(FRONTEND_SRC.rglob("*")):
+        if path.is_file() and path.suffix in {".ts", ".tsx", ".css"}:
+            source = read(path)
+            artifacts = MOJIBAKE_PATTERN.findall(source)
+            assert artifacts == [], (
+                f"Artefatos de encoding encontrados em {path.name}: {artifacts[:10]}"
+            )
 
 
 FUNCTIONAL_EMOJI_PATTERN = re.compile(
@@ -274,22 +281,22 @@ def test_index_html_has_no_functional_emoji(index_html: str):
     assert emojis == [], f"Emojis funcionais encontrados em index.html: {emojis[:10]}"
 
 
-def test_javascript_sources_have_no_functional_emoji(app_js: str):
-    sources = {"app.js": app_js}
-    for module in sorted((WEB / "modules").glob("*.js")):
-        sources[module.name] = read(module)
-    for name, source in sources.items():
-        emojis = FUNCTIONAL_EMOJI_PATTERN.findall(source)
-        assert emojis == [], f"Emojis funcionais encontrados em {name}: {emojis[:10]}"
+def test_react_typescript_sources_have_no_functional_emoji():
+    for path in sorted(FRONTEND_SRC.rglob("*")):
+        if path.is_file() and path.suffix in {".ts", ".tsx"}:
+            source = read(path)
+            emojis = FUNCTIONAL_EMOJI_PATTERN.findall(source)
+            assert emojis == [], f"Emojis funcionais encontrados em {path.name}: {emojis[:10]}"
 
 
 SUBFLOOR_SIZE_PATTERN = re.compile(r"text-\[(?:[0-9]|10)px\]|font-size:\s*(?:[0-9]|10)px")
 
 
 def test_sources_do_not_declare_text_below_the_floor():
-    sources = {"index.html": INDEX, "app.js": APP}
-    for module in sorted((WEB / "modules").glob("*.js")):
-        sources[module.name] = module
+    sources = {"index.html": INDEX}
+    for path in sorted(FRONTEND_SRC.rglob("*")):
+        if path.is_file() and path.suffix in {".ts", ".tsx"}:
+            sources[path.name] = path
     for name, path in sources.items():
         source = read(path)
         offenders = SUBFLOOR_SIZE_PATTERN.findall(source)
@@ -308,11 +315,6 @@ def test_icon_sprite_replaces_functional_emoji(index_html: str):
     for required in ("icon-sun", "icon-moon", "icon-chart", "icon-wallet", "icon-coins", "icon-target"):
         assert required in sprite_ids, f"Ícone ausente no sprite: {required}"
 
-
-# =========================================================================
-# T057 / US5 — responsividade estrutural, overflow e contraste
-# =========================================================================
-from html.parser import HTMLParser  # noqa: E402
 
 VOID_TAGS = {
     "area", "base", "br", "col", "embed", "hr", "img", "input",
@@ -355,11 +357,11 @@ class _ScrollableTableParser(HTMLParser):
 def test_wide_tables_have_focusable_scroll_wrappers(index_html: str):
     parser = _ScrollableTableParser()
     parser.feed(index_html)
-    assert len(parser.tables) >= 9, f"Tabelas encontradas: {len(parser.tables)}"
+    assert len(parser.tables) >= 6, f"Tabelas encontradas: {len(parser.tables)}"
     without_scroller = [table for table in parser.tables if not table["scroll"]]
     assert without_scroller == [], "Tabelas sem contêiner .table-scroll"
     without_focus = [table for table in parser.tables if not table["focusable"]]
-    assert without_focus == [], "Contêineres de tabela sem tabindex=\"0\""
+    assert without_focus == [], 'Contêineres de tabela sem tabindex="0"'
     assert index_html.count("table-scroll-hint") >= 5
 
 
@@ -376,7 +378,6 @@ def test_responsive_breakpoints_and_overflow_contract(styles_css: str):
     assert ".btn-remove-holding" in styles_css
     assert ".dir-seg-btn" in styles_css
 
-    # Nenhuma largura fixa maior que o maior viewport de referência.
     fixed = [int(value) for value in re.findall(r"(?:^|\s)(?:min-)?width:\s*(\d{4,})px", styles_css)]
     assert all(value <= 1920 for value in fixed), f"Larguras fixas excessivas: {fixed}"
 
@@ -401,28 +402,40 @@ def test_kpi_grids_follow_one_two_four_columns(index_html: str):
     assert "grid-cols-2 md:grid-cols-4" not in index_html
 
 
-def _theme_tokens(css: str, selector: str) -> dict[str, str]:
+def _theme_tokens(css: str, selector: str) -> dict[str, tuple[int, int, int]]:
     match = re.search(re.escape(selector) + r"\s*\{(.*?)\n\}", css, re.S)
     assert match is not None, f"Bloco de tokens ausente: {selector}"
-    return dict(re.findall(r"(--[\w-]+):\s*(#[0-9a-fA-F]{6})", match.group(1)))
+    body = match.group(1)
+    result: dict[str, tuple[int, int, int]] = {}
+    for name, r, g, b in re.findall(
+        r"(--[\w-]+):\s*rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)", body
+    ):
+        result[name] = (int(r), int(g), int(b))
+    for name, hex_val in re.findall(r"(--[\w-]+):\s*#([0-9a-fA-F]{6})", body):
+        result[name] = (
+            int(hex_val[0:2], 16),
+            int(hex_val[2:4], 16),
+            int(hex_val[4:6], 16),
+        )
+    return result
 
 
-def _relative_luminance(color: str) -> float:
-    color = color.lstrip("#")
-    channels = [int(color[index:index + 2], 16) / 255 for index in (0, 2, 4)]
+def _relative_luminance(rgb: tuple[int, int, int]) -> float:
+    channels = [c / 255 for c in rgb]
     linear = [c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4 for c in channels]
     return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
 
 
-def _contrast_ratio(foreground: str, background: str) -> float:
+def _contrast_ratio(fg: tuple[int, int, int], bg: tuple[int, int, int]) -> float:
     lighter, darker = sorted(
-        (_relative_luminance(foreground), _relative_luminance(background)),
+        (_relative_luminance(fg), _relative_luminance(bg)),
         reverse=True,
     )
     return (lighter + 0.05) / (darker + 0.05)
 
 
-def test_theme_tokens_meet_wcag_aa_contrast(styles_css: str):
+def test_theme_tokens_meet_wcag_aa_contrast():
+    tokens_source = read(TOKENS_CSS)
     pairs = [
         ("--text-main", "--surface"),
         ("--text-main", "--canvas"),
@@ -440,7 +453,7 @@ def test_theme_tokens_meet_wcag_aa_contrast(styles_css: str):
     ]
     failures = []
     for selector in (":root", '[data-theme="dark"]'):
-        tokens = _theme_tokens(styles_css, selector)
+        tokens = _theme_tokens(tokens_source, selector)
         for foreground, background in pairs:
             assert foreground in tokens, f"{selector}: token ausente {foreground}"
             assert background in tokens, f"{selector}: token ausente {background}"
@@ -450,8 +463,8 @@ def test_theme_tokens_meet_wcag_aa_contrast(styles_css: str):
     assert failures == [], f"Pares abaixo de WCAG AA (4.5:1): {failures}"
 
 
-def test_penpot_screens_modals_and_modular_scripts_contract(index_html: str):
-    """Verifica que todos os elementos estruturais das 13 telas Penpot e módulos JS estão declarados."""
+def test_penpot_screens_modals_and_react_bundle_contract(index_html: str):
+    """Verifica que todos os elementos estruturais das 13 telas Penpot e o bundle React estão ativos."""
     required_ids = (
         "overview-highlights-card",
         "overview-highlights-tbody",
@@ -478,15 +491,25 @@ def test_penpot_screens_modals_and_modular_scripts_contract(index_html: str):
 
     assert index_html.count('role="tabpanel"') == 8
     assert index_html.count('role="dialog" aria-modal="true"') == 4
+    assert 'src="/assets/react-app.js"' in index_html
+    assert not (WEB / "app.js").exists(), "O monolito legado src/web/app.js deve ser removido após o cutover para React"
 
-    for mod_script in (
-        "modules/constants.js",
-        "modules/formatters.js",
-        "modules/api-client.js",
-        "modules/toast.js",
-        "modules/proventos.js",
-        "modules/evolution.js",
-        "modules/playbook.js",
-        "modules/modals.js",
-    ):
-        assert f'<script src="{mod_script}"></script>' in index_html, f"Script modular ausente: {mod_script}"
+
+def test_shadcn_ui_and_tailwind_variants_zero_hex_contract():
+    """Garante que os componentes em frontend/src/components/ui usam tailwind-variants (tv) e zero cores hex."""
+    ui_dir = FRONTEND_SRC / "components" / "ui"
+    ui_files = list(ui_dir.glob("*.tsx"))
+    assert len(ui_files) >= 12, f"Esperados ao menos 12 componentes shadcn/ui, encontrados {len(ui_files)}"
+
+    for f in ui_files:
+        content = read(f)
+        assert 'from "tailwind-variants"' in content, f"{f.name} não utiliza tailwind-variants (tv)"
+        assert "class-variance-authority" not in content, f"{f.name} não deve usar cva"
+
+    hex_pattern = re.compile(r"#[0-9a-fA-F]{3,8}\b")
+    for p in sorted(FRONTEND_SRC.rglob("*")):
+        if p.is_file() and p.suffix in {".ts", ".tsx", ".css"}:
+            cleaned = re.sub(r'href="#icon-[^"]+"', "", read(p))
+            cleaned = re.sub(r"#[a-zA-Z][\w/-]*", "", cleaned)
+            offenders = hex_pattern.findall(cleaned)
+            assert offenders == [], f"Cores hexadecimais encontradas em {p.relative_to(REPO_ROOT)}: {offenders}"

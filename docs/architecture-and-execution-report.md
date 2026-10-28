@@ -1,69 +1,63 @@
-# Relatório de Arquitetura, Auditoria e Execução — Market Opportunity & Bottom Statistical Engine (`feat/023-penpot-full-ui`)
+# Relatório de Arquitetura, Auditoria e Execução — Market Opportunity & Bottom Statistical Engine (`feat/react-shadcn-frontend`)
 
 ## 1. Resumo Executivo
 
-Este documento consolida a transformação arquitetural, correção de integridade financeira, modularização incremental do frontend, implementação integral das **13 pranchas do Penpot** (`Market Opportunity — Complete System Redesign`) e validação automatizada (unitária, contratual e E2E Playwright) executada na branch `feat/023-penpot-full-ui`.
+Este documento consolida a migração completa e definitiva do frontend do **Market Opportunity & Bottom Statistical Engine** para **React 18 + TypeScript + Vite + Tailwind CSS + shadcn/ui + Tailwind Variants (`tv`)**, com fidelidade visual às **13 pranchas do Penpot** (`Market Opportunity — Complete System Redesign`), governança estrita de tokens CSS semânticos (zero códigos hexadecimais no código da aplicação) e eliminação do monolito legado `src/web/app.js` / `src/web/modules/`.
 
 ### Principais entregas concluídas:
-1. **Integridade Financeira e Conciliação B3**:
-   - Eliminação de caixa fictício inicial (`availableCash = 0.0` por padrão em vez de `R$ 10.000,00`).
-   - Eliminação da rampa sintética de 12 meses (`0.65 + idx * 0.032`) na Visão Geral; exibição estrita de séries reais importadas ou ponto único real (`Posição Atual`).
-   - Conciliação e deduplicação determinística de múltiplos extratos B3 (`.xlsx`, `.xls`, `.csv`, `.txt`) cobrindo Negociação e Movimentação (Dividendos, JCP e Rendimentos FII).
-2. **Rigor Matemático no Backend e Simulador (`/api/simulate` & `/api/simulate/optimize`)**:
-   - No modo Acumulação (`accumulation`), filtragem estrita de sinais `BUY` confirmados (sinais `SELL` jamais disparam compras em DCA).
-   - Respeito estrito ao corte temporal `end_date` na avaliação de `current_price` / `last_close` (`close_sliced[-1]`), eliminando *look-ahead bias* fora da janela selecionada.
-   - Cálculo real de `max_drawdown_pct` sobre a curva patrimonial no modo DCA (`_compute_max_drawdown_pct`).
-   - Retorno honesto `None` para `dca_regular_final_value` e `alpha_vs_dca_pct` quando o benchmark DCA mensal fixo não é computado separadamente.
-3. **Segurança e Ciclo de Vida da API FastAPI (`src/api/server.py`)**:
-   - Migração do hook depreciado `@app.on_event("startup")` para `@asynccontextmanager async def _lifespan(app: FastAPI)`.
-   - Configuração segura de `CORSMiddleware` via variável de ambiente `ALLOWED_ORIGINS` sem combinação insegura de `allow_origins=["*"]` com `allow_credentials=True`.
-   - Limites de segurança no endpoint `POST /api/b3/parse`: máximo de 10 arquivos por requisição (`HTTP 400`), validação de extensões permitidas (`HTTP 415`), limite de tamanho por arquivo (`MAX_B3_UPLOAD_MB`, padrão 10MB, `HTTP 413`) e sanitização de mensagens de erro.
-4. **Arquitetura Modular do Frontend (`src/web/modules/`)**:
-   - `constants.js`: rotas canônicas, aliases de rotas, mapeamento de nomes institucionais e aliases de tickers.
-   - `formatters.js`: formatação monetária BRL, percentuais, números tabulares, datas e sanitização de tickers.
-   - `api-client.js`: cliente HTTP centralizado com tratamento padronizado de erros para todos os endpoints REST.
-   - `toast.js`: sistema de notificações (`role="status" aria-live="polite"`) e overlay de processamento.
-   - `proventos.js`: 4 KPIs de Proventos, gráfico empilhado Mensal/Anual, barras de `Composição da renda` e tabela `Últimos proventos`.
-   - `evolution.js`: controle temporal `12 meses` / `Tudo`, gráfico `Patrimônio x aportes`, card `Resumo do período` e tabela `Histórico de aportes e eventos`.
-   - `playbook.js`: busca em tempo real (`#playbook-search-input`), filtros por direção/risco (`Todas`, `Compra`, `Venda`, `Risco`) e grid de cards das estratégias (`#playbook-cards-grid`).
-   - `modals.js`: widgets da Visão Geral (`#overview-highlights-tbody` e `#overview-donut-legend`), tela de Posições & Custódia (`#custody-kpis-grid`, filtros por classe, expandir/recolher e exportação CSV), Modal 09 (`#modal-b3-import`), Modal 10 (`#modal-new-trade`) e barra de navegação móvel (`#mobile-bottom-nav`).
-5. **Correções de Bugs Visuais e de Runtime no Frontend**:
-   - Correção do `ReferenceError: chartFontColor is not defined` em `renderPlotlyRanking()`, restaurando a renderização do gráfico horizontal `#plot-ranking` na tela de Gráfico Interativo.
-   - Correção do card executivo `Maior Assimetria Hoje` no Radar (`updateRadarExecutiveDeck`), passando a ler `historical_win_rate ?? win_rate`.
-   - Conectividade de todos os botões de ação anteriormente inertes (`Configurar %`, `12M`/`Tudo`, `+ Novo lançamento`, `Importar B3`, `Exportar CSV`).
+1. **Migração Integral para React 18 + TypeScript + Vite (`frontend/`)**:
+   - Criação da arquitetura modular em `frontend/src/` com separação limpa entre `app/`, `components/ui/`, `components/layout/`, `components/shared/`, `features/`, `services/`, `state/`, `styles/`, `types/` e `lib/`.
+   - Pipeline de build + pré-renderização (`npm --prefix frontend run build`) que gera `src/web/index.html`, `src/web/styles.css` e `src/web/assets/react-app.js`, servidos diretamente pelo FastAPI (`src/api/server.py`) sem necessidade de servidor separado em produção.
+   - Remoção definitiva do monolito legado `src/web/app.js` e dos scripts globais `src/web/modules/*.js`.
+2. **Design System em `shadcn/ui` + Radix UI + `tailwind-variants` (`tv`)**:
+   - Implementação padronizada de 15 componentes de base em `frontend/src/components/ui/` (`button.tsx`, `card.tsx`, `badge.tsx`, `input.tsx`, `label.tsx`, `select.tsx`, `tabs.tsx`, `dialog.tsx`, `table.tsx`, `checkbox.tsx`, `switch.tsx`, `skeleton.tsx`, `separator.tsx`, `scroll-area.tsx` e `financial-metric.tsx`) utilizando exclusivamente `import { tv, type VariantProps } from "tailwind-variants"`.
+   - Zero uso de `class-variance-authority` (`cva`) ou códigos de cor hexadecimais (`#...`) nos arquivos `.ts`, `.tsx` e `.css`.
+   - Centralização de todos os tokens visuais em `frontend/src/styles/tokens.css` usando notação funcional CSS (`rgb(...)` / `rgba(...)`) auditada para contraste WCAG AA (`>= 4.5:1`) nos temas Claro (`:root`) e Escuro (`[data-theme="dark"]`).
+3. **Implementação das 13 Telas do Penpot em Módulos React de Funcionalidade**:
+   - `OverviewPage.tsx` (Telas 01 e 11): 4 Hero KPIs, Evolução do Patrimônio, Alocação por Classe, Maiores Posições / Destaques, Composição por Ativo e Resumo Operacional B3.
+   - `PortfolioPage.tsx` (Telas 02 e 12): 4 KPIs de Custódia, filtros por classe (`Todas`, `Ações`, `FIIs`, `ETFs`, `BDRs`, `Cripto`, `Renda Fixa`), busca por ticker, expandir/recolher grupos, exportação CSV e acordeões com tabelas roláveis por teclado.
+   - `DividendsPage.tsx` (Tela 03): 4 KPIs de Proventos, gráfico empilhado Mensal/Anual por classe, barras de `Composição da renda` e tabela `Últimos proventos`.
+   - `EvolutionPage.tsx` (Tela 04): seletor temporal `12 meses` / `Tudo`, gráfico de área dupla `Patrimônio x aportes`, card lateral `Resumo do período` e tabela `Histórico de aportes e eventos`.
+   - `RadarPage.tsx` (Telas 05 e 13): 4 KPIs executivos, busca instantânea, pílulas de categoria, paginação sincronizada com `/api/radar` e tabela com semáforo de Timing e ação `Analisar`.
+   - `ChartPage.tsx` (Tela 06): sidebar técnica com seletor de ativo, período, timeframe e 4 grupos de estratégias, canvas `TradingView Lightweight Charts` (`#tv-chart-container`), gráficos Plotly (`#plot-ranking` e `#plot-scatter`) e tabela de histórico de sinais.
+   - `SimulatorPage.tsx` (Tela 07): formulário completo de backtest (`Ciclo de Trade` e `Acumulação DCA`), otimizador automático (`Mais Lucrativa` + `Aplicar e Simular`), 4 KPIs, curva patrimonial Plotly e tabela expansível de ciclos.
+   - `PlaybookPage.tsx` (Tela 08): busca em tempo real, pílulas de direção/risco (`Todas`, `Compra`, `Venda`, `Risco`) e grid de cards das estratégias quantitativas.
+   - `B3ImportDialog.tsx` (Tela 09) e `NewTransactionDialog.tsx` (Tela 10): modais acessíveis baseados em Radix Dialog / `shadcn/ui` para conciliação multi-arquivo B3 e lançamento manual com cálculo em tempo real.
+   - `MobileNavigation.tsx` (Telas 11, 12 e 13): barra inferior responsiva (`#mobile-bottom-nav`) para viewports móveis (`390×844` e `375×900`).
 
 ---
 
-## 2. Mapa de Dependências da Arquitetura Modular
+## 2. Mapa de Dependências da Arquitetura Modular React + TypeScript
 
 ```mermaid
 flowchart TD
-    IndexHTML["src/web/index.html"] --> StylesCSS["src/web/styles.css (Design Tokens Light/Dark)"]
-    IndexHTML --> ConstantsJS["modules/constants.js"]
-    IndexHTML --> FormattersJS["modules/formatters.js"]
-    IndexHTML --> ApiClientJS["modules/api-client.js"]
-    IndexHTML --> ToastJS["modules/toast.js"]
-    IndexHTML --> ProventosJS["modules/proventos.js"]
-    IndexHTML --> EvolutionJS["modules/evolution.js"]
-    IndexHTML --> PlaybookJS["modules/playbook.js"]
-    IndexHTML --> ModalsJS["modules/modals.js"]
-    IndexHTML --> AppJS["src/web/app.js (Shell, Router, Radar, TVChart, Simulator)"]
+    MainTSX["frontend/src/main.tsx"] --> AppTSX["frontend/src/app/App.tsx"]
+    EntryServer["frontend/src/entry-server.tsx"] --> AppTSX
+    AppTSX --> Providers["frontend/src/app/providers.tsx (AppProvider)"]
+    AppTSX --> AppShell["frontend/src/components/layout/AppShell.tsx"]
 
-    ApiClientJS --> FastAPI["src/api/server.py"]
-    AppJS --> FastAPI
-    FastAPI --> B3Parser["src/data_loader/b3_parser.py"]
-    FastAPI --> Evaluator["src/evaluator/accumulation_simulator.py"]
-    FastAPI --> PortfolioEngine["src/evaluator/portfolio_engine.py"]
-    FastAPI --> Catalog["src/strategies/catalog.py (50 Estratégias)"]
+    AppShell --> Topbar["components/layout/Topbar.tsx"]
+    AppShell --> SubnavBar["components/layout/SubnavBar.tsx"]
+    AppShell --> MobileNav["components/layout/MobileNavigation.tsx"]
+    AppShell --> Features["features/* (8 Páginas + 2 Modais Penpot)"]
+
+    Features --> ShadcnUI["components/ui/* (15 Componentes shadcn/ui + tailwind-variants tv)"]
+    Features --> SharedUI["components/shared/index.tsx"]
+    Features --> Services["services/* (api-client, portfolio, market, dividends, simulation)"]
+    Services --> FastAPI["src/api/server.py (FastAPI REST & Static Hosting)"]
+    ShadcnUI --> TokensCSS["styles/tokens.css & globals.css (Semantic Tokens Light/Dark)"]
 ```
 
 ---
 
 ## 3. Verificação e Evidências de Testes
 
-- **Suíte Unitária, Financeira e de Contratos Estáticos**:
-  - Comando: `./venv/bin/python -m pytest tests/unit tests/test_double_patterns.py tests/test_normalizer_suffix.py tests/test_radar_pagination.py -q`
-  - Resultado: **150 passed, 0 failed, 0 skipped**.
-- **Suíte End-to-End (Playwright Chromium)**:
-  - Comando: `./venv/bin/python -m pytest tests/e2e -v`
-  - Resultado: **34 passed, 0 failed, 0 skipped** (incluindo validação nos viewports `1600×1000`, `1024×768`, `390×844`, `375×900`, `768×900`, `1366×900` e `1920×900` nos temas Claro e Escuro).
+- **Typecheck TypeScript (`tsc --noEmit`)**:
+  - Comando: `npm --prefix frontend run typecheck`
+  - Resultado: **0 erros**.
+- **Suíte Frontend React & Design System (Vitest + Testing Library)**:
+  - Comando: `npm --prefix frontend run test`
+  - Resultado: **9 passed (2 test files)** (`design-system.test.tsx` e `app-features.test.tsx`).
+- **Suíte Completa Backend, Contratos Arquiteturais e E2E Playwright Chromium**:
+  - Comando: `./venv/bin/python -m pytest tests -q`
+  - Resultado: **185 passed, 0 failed, 0 skipped** (`151` testes unitários/contratos + `34` testes E2E Playwright nos viewports `1600×1000`, `1024×768`, `390×844`, `375×900`, `768×900`, `1366×900` e `1920×900` nos temas Claro e Escuro).

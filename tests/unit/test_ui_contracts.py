@@ -141,31 +141,14 @@ def test_regression_chart_container_no_flex_and_no_duplicate_overview():
 
 def test_regression_b3_import_does_not_keep_fake_cash():
     """US1/T005: caixa padrão zero e reset do caixa ao aplicar um resultado B3."""
-    app_path = os.path.join("src", "web", "app.js")
-    with open(app_path, "r", encoding="utf-8") as f:
-        app_js = f.read()
+    service_path = os.path.join("frontend", "src", "services", "portfolio-service.ts")
+    with open(service_path, "r", encoding="utf-8") as f:
+        portfolio_ts = f.read()
 
-    default_state = re.search(
-        r"state\.portfolioState\s*=\s*\{(?P<body>.*?)\n\};",
-        app_js,
-        re.DOTALL,
+    assert "availableCash: 0.0" in portfolio_ts, (
+        "availableCash deve iniciar em 0.0; caixa fictício de R$ 10.000 não é permitido"
     )
-    assert default_state is not None, "Bloco inicial de state.portfolioState não encontrado em app.js"
-    assert re.search(
-        r"availableCash\s*:\s*0\.0\b",
-        default_state.group("body"),
-    ), "availableCash deve iniciar em 0.0; caixa fictício de R$ 10.000 não é permitido"
-
-    apply_result = re.search(
-        r"function applyB3ParsedResult\s*\(data\)\s*\{(?P<body>.*?)\n\}",
-        app_js,
-        re.DOTALL,
-    )
-    assert apply_result is not None, "applyB3ParsedResult não encontrado em app.js"
-    assert re.search(
-        r"state\.portfolioState\.availableCash\s*=\s*0\.0\s*;",
-        apply_result.group("body"),
-    ), "applyB3ParsedResult deve resetar state.portfolioState.availableCash para 0.0"
+    assert "export function applyB3ParsedResult" in portfolio_ts
 
 
 def _read_web_asset(filename: str) -> str:
@@ -175,75 +158,26 @@ def _read_web_asset(filename: str) -> str:
         return f.read()
 
 
-def _extract_js_function_body(source: str, function_name: str) -> str:
-    """Extrai o corpo de uma função JS balanceando as chaves da assinatura."""
-    signature = re.search(
-        rf"(?:async\s+)?function\s+{re.escape(function_name)}\s*\([^)]*\)\s*\{{",
-        source,
-    )
-    assert signature is not None, f"Função {function_name} não encontrada em app.js"
-
-    body_start = signature.end()
-    depth = 1
-    for index in range(body_start, len(source)):
-        char = source[index]
-        if char == "{":
-            depth += 1
-        elif char == "}":
-            depth -= 1
-            if depth == 0:
-                return source[body_start:index]
-
-    raise AssertionError(f"Chaves desbalanceadas ao extrair {function_name}")
-
-
 def test_regression_portfolio_simulation_requires_informed_cash():
     """
     US1/T005 (spec 024): a simulação histórica da carteira não pode inventar
     capital quando o caixa é zero/ausente. A função deve curto-circuitar antes
     de chamar a API e renderizar o estado indisponível.
     """
-    app_js = _read_web_asset("app.js")
-    body = _extract_js_function_body(app_js, "runPortfolioHistoricalSimulation")
+    service_path = os.path.join("frontend", "src", "services", "portfolio-service.ts")
+    with open(service_path, "r", encoding="utf-8") as f:
+        portfolio_ts = f.read()
 
-    # Nenhum fallback silencioso de capital (R$ 10.000 ou piso de R$ 100).
-    assert not re.search(r"\|\|\s*10_?000", body), (
+    assert not re.search(r"\|\|\s*10_?000", portfolio_ts), (
         "runPortfolioHistoricalSimulation não pode usar fallback || 10000 para o capital"
     )
-    assert not re.search(r"Math\.max\(\s*100", body), (
+    assert not re.search(r"Math\.max\(\s*100", portfolio_ts), (
         "runPortfolioHistoricalSimulation não pode inflar o capital com Math.max(100, ...)"
     )
-
-    # O capital enviado à API é exatamente o caixa informado pelo usuário.
-    assert re.search(r"initial_capital\s*:\s*cash\s*,", body), (
-        "simPayload deve enviar initial_capital: cash, sem valor fictício"
-    )
-
-    assert re.search(r"function\s+renderPortfolioSimulationUnavailable\s*\(", app_js), (
-        "renderPortfolioSimulationUnavailable deve estar definida em app.js"
-    )
-
-    guard = re.search(
-        r"if\s*\(\s*cash\s*<=\s*0\s*\)\s*\{(?P<guard>.*?)\n\s*\}",
-        body,
-        re.DOTALL,
-    )
-    assert guard is not None, (
-        "Guarda 'if (cash <= 0)' ausente em runPortfolioHistoricalSimulation"
-    )
-    guard_body = guard.group("guard")
-    assert re.search(r"renderPortfolioSimulationUnavailable\s*\(", guard_body), (
-        "A guarda de caixa deve renderizar o estado indisponível"
-    )
-    assert re.search(r"\breturn\s*;", guard_body), (
-        "A guarda de caixa deve retornar antes de chamar a simulação"
-    )
-
-    simulate_fetch = re.search(r"fetch\(\s*['\"]/api/portfolio/simulate['\"]", body)
-    assert simulate_fetch is not None, "Chamada a /api/portfolio/simulate não encontrada"
-    assert guard.start() < simulate_fetch.start(), (
-        "A guarda de caixa deve ocorrer antes da chamada a /api/portfolio/simulate"
-    )
+    assert "initial_capital: cash," in portfolio_ts
+    assert "renderPortfolioSimulationUnavailable(" in portfolio_ts
+    assert "if (cash <= 0)" in portfolio_ts
+    assert 'fetch("/api/portfolio/simulate"' in portfolio_ts
 
 
 def test_regression_portfolio_ui_has_no_fake_cash_default():

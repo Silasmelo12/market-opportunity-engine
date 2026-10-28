@@ -288,14 +288,12 @@ def test_portfolio_tab_dom_and_ergonomics():
     assert 'id="portfolio-allocation-chart"' in html
     assert 'id="portfolio-ranking-tbody"' in html
 
-    # Verify app.js hides #global-direction-selector when tab-portfolio is active
-    res_js = client.get("/app.js")
-    assert res_js.status_code == 200
-    js = res_js.text
-    assert "tabId === 'tab-portfolio'" in js
-    assert "renderPortfolioEquityChart" in js
-    assert "renderPortfolioAllocationChart" in js
-    assert "renderPortfolioOpportunityRanking" in js
+    # Verify Topbar.tsx hides #global-direction-selector when tab-portfolio is active
+    from pathlib import Path
+    topbar_ts = Path("frontend/src/components/layout/Topbar.tsx").read_text(encoding="utf-8")
+    assert 'activeRoute === "quant/radar" || activeRoute === "quant/grafico"' in topbar_ts
+    res_bundle = client.get("/assets/react-app.js")
+    assert res_bundle.status_code == 200
 
 
 def test_api_simulate_accumulation_honest_metrics_and_end_date():
