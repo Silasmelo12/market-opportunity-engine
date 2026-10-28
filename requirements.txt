@@ -3,6 +3,9 @@ uvicorn[standard]>=0.28.0
 pydantic>=2.6.0
 yfinance>=0.2.36
 pandas>=2.1.0
+# Leitores do pandas.read_excel para planilhas B3 (.xlsx/.xls)
+openpyxl>=3.1.0
+xlrd>=2.0.1
 numpy>=1.24.0
 plotly>=5.18.0
 pyarrow>=14.0.0

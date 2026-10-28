@@ -3709,7 +3709,7 @@ function updateRadarStratCheckboxes() {
 const PORTFOLIO_STORAGE_KEY = 'market_engine_portfolio_v1';
 
 state.portfolioState = {
-  availableCash: 10000.0,
+  availableCash: 0.0,
   holdings: [],
   universeCategory: 'featured',
   customTickers: '',
@@ -4021,7 +4021,7 @@ async function uploadMultipleB3Spreadsheets(files) {
 
     const data = await res.json();
     applyB3ParsedResult(data);
-    showToastNotification(`${count} ${count === 1 ? 'planilha processada' : 'planilhas combinadas'} com sucesso! (${data.holdings.length} ativos em custódia)`, false);
+    showToastNotification(`${count} ${count === 1 ? 'planilha processada' : 'planilhas combinadas'} com sucesso! (${data.holdings.length} ativos em custódia). O caixa não vem da B3; informe-o manualmente na carteira.`, false);
   } catch (err) {
     console.error('Erro ao enviar planilhas B3:', err);
     alert('Erro ao processar arquivos da B3.');
@@ -4050,6 +4050,10 @@ function applyB3ParsedResult(data) {
   state.portfolioState.b3MonthlyIncome = Array.isArray(data.monthly_income) ? data.monthly_income : [];
   state.portfolioState.b3Timeline = Array.isArray(data.timeline) ? data.timeline : [];
   state.portfolioState.b3Filename = data.filename || null;
+
+  // A B3 não informa saldo em caixa; zera para o usuário informar manualmente na carteira.
+  state.portfolioState.availableCash = 0.0;
+  syncPortfolioInputsFromState();
 
   savePortfolioStorage();
   renderPortfolioHoldingsEditor();
@@ -4406,9 +4410,15 @@ async function runPortfolioAdviseAndSimulate() {
 
 
 async function runPortfolioHistoricalSimulation(customList = []) {
-  const initialCap = Math.max(100, Number(state.portfolioState.availableCash) || 10000);
+  const cash = Number(state.portfolioState.availableCash) || 0;
+  if (cash <= 0) {
+    state.portfolioState.lastSimulateResponse = null;
+    renderPortfolioSimulationUnavailable();
+    return;
+  }
+
   const simPayload = {
-    initial_capital: initialCap,
+    initial_capital: cash,
     universe_category: state.portfolioState.universeCategory,
     custom_tickers: customList,
     interval: state.portfolioState.interval,
@@ -4433,6 +4443,31 @@ async function runPortfolioHistoricalSimulation(customList = []) {
   if (typeof renderPortfolioEquityChart === 'function') {
     renderPortfolioEquityChart(simData.curve || []);
   }
+}
+
+function renderPortfolioSimulationUnavailable() {
+  const neutralContent = {
+    'port-kpi-initial': '—',
+    'port-kpi-cash-sub': 'Caixa não informado',
+    'port-kpi-final': '—',
+    'port-kpi-profit-sub': 'Simulação não executada',
+    'port-kpi-return': '—',
+    'port-kpi-bench-sub': 'Informe o caixa da carteira para simular',
+    'port-kpi-winrate': '—',
+    'port-kpi-exits-sub': 'Sem dados',
+    'port-kpi-pf': '—',
+    'port-kpi-rotations-sub': 'Sem dados',
+    'port-kpi-dd': '—',
+    'port-kpi-events-sub': 'Sem dados',
+  };
+
+  Object.entries(neutralContent).forEach(([id, text]) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  });
+
+  if (typeof renderPortfolioLedgerTable === 'function') renderPortfolioLedgerTable([]);
+  if (typeof renderPortfolioEquityChart === 'function') renderPortfolioEquityChart([]);
 }
 
 function renderPortfolioSimulationKPIs(m) {

@@ -20,12 +20,12 @@
 
 **Independent Test**: importar fixture `.xlsx`; repetir o mesmo arquivo; verificar holdings, caixa e renda.
 
-- [ ] T004 [US1] Adicionar `openpyxl` e `xlrd` ao `requirements.txt` com justificativa.
-- [ ] T005 [US1] Alterar o default de `availableCash` para 0 e resetar o caixa em `applyB3ParsedResult` (`src/web/app.js`).
-- [ ] T006 [US1] Deduplicar arquivos B3 idênticos por conteúdo em `parse_multiple_b3_files` (`src/data_loader/b3_parser.py`).
-- [ ] T007 [US1] Atualizar a UI/toast para explicar que o caixa não veio da B3 e pode ser informado manualmente.
-- [ ] T008 [US1] Adicionar testes de importação `.xlsx`, caixa zero e deduplicação de arquivo idêntico.
-- [ ] T009 [US1] Executar testes unitários/E2E afetados e revisar o diff.
+- [X] T004 [US1] Adicionar `openpyxl` e `xlrd` ao `requirements.txt` com justificativa.
+- [X] T005 [US1] Alterar o default de `availableCash` para 0 e resetar o caixa em `applyB3ParsedResult` (`src/web/app.js`); alinhar o default de `PortfolioAdviseRequest.available_cash` e remover capital fictício do backtest da carteira.
+- [X] T006 [US1] Deduplicar arquivos B3 idênticos por conteúdo em `parse_multiple_b3_files` (`src/data_loader/b3_parser.py`).
+- [X] T007 [US1] Atualizar a UI/toast para explicar que o caixa não veio da B3 e pode ser informado manualmente.
+- [X] T008 [US1] Adicionar testes de importação `.xlsx`, caixa zero e deduplicação de arquivo idêntico.
+- [X] T009 [US1] Executar testes unitários/E2E afetados e revisar o diff.
 
 **Checkpoint**: importação B3 confiável e testada.
 

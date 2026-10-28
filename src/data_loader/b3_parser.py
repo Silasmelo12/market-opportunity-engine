@@ -9,6 +9,7 @@ Processes official .xlsx and .csv files from B3 Investor Portal:
 
 import os
 import io
+import hashlib
 import unicodedata
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple, Union
@@ -51,7 +52,7 @@ def _clean_ticker_from_product(product_val: Any) -> Tuple[str, str, str]:
     # Strip fractional 'F' suffix if it is a standard 4-character equity (e.g. AZTE3F -> AZTE3)
     if len(clean) >= 5 and clean.endswith("F") and clean[:-1][-1].isdigit():
         clean = clean[:-1]
-    
+
     sa = f"{clean}.SA" if clean and not clean.endswith(".SA") else clean
     return raw, clean, sa
 
@@ -93,7 +94,7 @@ def _parse_date(date_val: Any) -> Optional[pd.Timestamp]:
 def _detect_b3_sheet_type(df: pd.DataFrame) -> str:
     """Detects whether a DataFrame represents 'movimentacao', 'negociacao_detalhada', 'negociacao_resumo', or 'csv_legado'."""
     normalized_cols = [_normalize_str(c).lower() for c in df.columns]
-    
+
     if any("data do negocio" in c for c in normalized_cols):
         return "negociacao_detalhada"
     if any("quantidade (liquida)" in c for c in normalized_cols) or any("preco medio (compra)" in c for c in normalized_cols):
@@ -102,7 +103,7 @@ def _detect_b3_sheet_type(df: pd.DataFrame) -> str:
         return "movimentacao"
     if len(df.columns) >= 2 and any("ticker" in c or "ativo" in c or "papel" in c for c in normalized_cols):
         return "csv_legado"
-    
+
     col_str = " ".join(normalized_cols)
     if "negocio" in col_str or "codigo de negociacao" in col_str:
         return "negociacao_detalhada"
@@ -867,12 +868,19 @@ def parse_multiple_b3_files(files_data: List[Tuple[str, bytes]]) -> B3ParseResul
 
     This implementation extracts every custody event from every file, removes
     settlement duplicates, sorts by date and replays one single ledger.
+    Files with identical content are processed only once so that a re-upload
+    cannot duplicate holdings, timeline, or income.
     """
     if not files_data:
         return _empty_result("nenhum_arquivo")
 
     loaded: List[Tuple[str, pd.DataFrame, str, B3ParseResult]] = []
+    seen_content_hashes = set()
     for fname, content in files_data:
+        content_hash = hashlib.sha256(content).hexdigest()
+        if content_hash in seen_content_hashes:
+            continue
+        seen_content_hashes.add(content_hash)
         try:
             df = _read_b3_dataframe(content, fname)
             if df.empty:

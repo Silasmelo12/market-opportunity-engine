@@ -352,7 +352,7 @@ class PortfolioActionRecommendationModel(BaseModel):
 
 
 class PortfolioAdviseRequest(BaseModel):
-    available_cash: float = Field(10000.0, ge=0.0)
+    available_cash: float = Field(0.0, ge=0.0)
     holdings: List[PortfolioHoldingInput] = []
     universe_category: str = "featured"
     custom_tickers: List[str] = []
