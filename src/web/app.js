@@ -2223,13 +2223,13 @@ function updateRadarExecutiveDeck(items) {
   if (regimeEl) {
     if (buys.length > sells.length * 1.5) {
       regimeEl.textContent = 'Sobrevendido (Alta Assimetria)';
-      regimeEl.className = 'text-base sm:text-lg font-bold text-positive truncate';
+      regimeEl.className = 'text-sm lg:text-lg font-bold text-positive leading-tight';
     } else if (sells.length > buys.length * 1.5) {
       regimeEl.textContent = 'Sobrecomprado (Alerta Topo)';
-      regimeEl.className = 'text-base sm:text-lg font-bold text-negative truncate';
+      regimeEl.className = 'text-sm lg:text-lg font-bold text-negative leading-tight';
     } else {
       regimeEl.textContent = 'Equilibrado / Rotação';
-      regimeEl.className = 'text-base sm:text-lg font-bold text-warning truncate';
+      regimeEl.className = 'text-sm lg:text-lg font-bold text-warning leading-tight';
     }
   }
 

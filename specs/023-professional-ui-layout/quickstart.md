@@ -305,3 +305,31 @@ A feature é considerada validada quando:
   - Piso tipográfico mantido em 11px também nos KPIs do Radar (o contrato `test_sources_do_not_declare_text_below_the_floor` barra `text-[10px]`).
 - Testes: `tests/unit/test_layout_contracts.py` + `tests/e2e/test_ui_layout.py` + `tests/e2e/test_dashboard_navigation.py` → **45 passed** (19 unitários + 10 de layout + 16 de navegação).
 - Novos E2E: `test_quant_areas_use_shared_semantic_system` (presença dos componentes compartilhados e ausência de classes legadas nas 4 áreas) e `test_quant_areas_adapt_to_theme_tokens` (fundo do painel e dos cartões muda entre claro/escuro).
+
+### T052–T057 — Responsividade, acessibilidade e resize (US5)
+
+- Data: 2026-10-27.
+- **T052** — wrappers padronizados como `.table-scroll touch-scroll` com dica visual em Radar, Simulador, Posições (3 tabelas) e modal de ordens; deck de KPIs do Radar em `grid-cols-1 sm:grid-cols-2 lg:grid-cols-4`; `touch-target` nas ações inline do Resumo.
+- **T053** — contenção de overflow em `styles.css`: `min-width: 0` em `main`/painéis/grids, `.table-scroll > table { min-width: 100% }`, `scrollbar-gutter: stable`, alvos de toque (`.touch-target`, `.btn-remove-holding`, `.dir-seg-btn`), largura máxima do toast e de plots Plotly.
+- **T054** — acessibilidade: regiões vivas (`#toast-notification`, `#loading-spinner`, `#radar-pagination-info`), `aria-pressed` em direção/timeframes/categorias, `aria-busy` no `body` durante carregamento, regiões roláveis focáveis (`tabindex="0"`) com anel de foco, contraste AA nos tokens (claro: `--primary #0369a1`, `--success #047857`, `--warning #b45309`, `--danger #be123c`, `--text-subtle #5b6b80`; escuro: `--text-subtle #8b98a5`, `--danger #fb7185`) e bloco `prefers-reduced-motion`.
+- **T055** — `resizeAllCharts()` unificado (TradingView + 9 gráficos Plotly), listener global com `requestAnimationFrame`, remoção do listener duplicado e resize na abertura de área e na troca de tema.
+- **T056** — 4 E2E: indicador de foco visível, rolagem de tabela por teclado, regiões vivas/nomes acessíveis e larguras de referência (sem overflow global e sem texto abaixo de 11px).
+- **T057** — 4 contratos unitários: wrappers focáveis, breakpoints/overflow, grid de KPIs 1/2/4 colunas e contraste WCAG AA dos tokens.
+- Testes: `test_layout_contracts.py` → **23 passed**; `test_ui_layout.py` → **14 passed**; `test_dashboard_navigation.py` → **16 passed**.
+
+### T058 — 64 verificações visuais finais (US5)
+
+- Data: 2026-10-27.
+- Matriz capturada em `/tmp/023-ui-us5/`: **64/64 PNGs** (8 áreas × 375/768/1366/1920 × claro/escuro), todos com conteúdo.
+- Auditoria automatizada sobre as 64 combinações:
+  - `docOverflow = 0` em todas (sem rolagem horizontal global);
+  - nenhum texto renderizado abaixo de 11px;
+  - nenhum controle visível sem nome acessível;
+  - 8 abas contextuais e exatamente 1 selecionada em todas as combinações;
+  - todas as tabelas de conteúdo dentro de contêineres roláveis (o canvas interno do TradingView não é tabela e foi ignorado).
+- Revisão visual por área nos dois temas (1366px como referência, com checagem em 375/768/1920px): Resumo, Posições, Proventos, Patrimônio, Radar, Gráfico, Simulador e Playbook.
+- Correções aplicadas durante a revisão:
+  - **Radar** — o rótulo de regime não é mais truncado: `updateRadarExecutiveDeck` deixou de aplicar `truncate` e usa `leading-tight`, exibindo “Sobrevendido (Alta Assimetria)” por inteiro em 375px e 1366px.
+  - **Cabeçalho** — em 768–1023px o selo “Quantitative Pro” espremia o nome da marca até largura zero. O selo agora só aparece a partir de 1280px e quando o seletor de direção não está visível (`:has`), o bloco da marca tem largura mínima de 196px acima de 480px e, entre 1024–1279px, os rótulos secundários (B3/Lançamento) viram ícones com `aria-label`. Resultado: marca legível em 375/768/1024/1280/1366/1920, sem sobreposição.
+- Alvos pequenos remanescentes: apenas ações de texto inline da sidebar do Gráfico em desktop (48×17, 31×17, 36×17) e checkbox 13×13 com rótulo clicável — cobertos pela exceção de texto inline da WCAG 2.5.8; em 375/768 não há alvos pequenos.
+- Testes após as correções: `test_layout_contracts.py` → **23 passed**; `test_ui_layout.py` + `test_dashboard_navigation.py` → **30 passed**.

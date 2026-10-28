@@ -134,13 +134,13 @@
 
 **Independent Test**: Executar a matriz de 64 verificações e os cenários de teclado, zoom e movimento reduzido sem falhas.
 
-- [ ] T052 [US5] Adicionar wrappers roláveis e classes responsivas para tabelas/grids largos em `src/web/index.html`
-- [ ] T053 [US5] Implementar breakpoints, gutters, grids e contenção de overflow em `src/web/styles.css`
-- [ ] T054 [US5] Implementar foco visível, ARIA, contraste e `prefers-reduced-motion` em `src/web/index.html`, `src/web/styles.css` e `src/web/app.js`
-- [ ] T055 [US5] Garantir resize de Plotly/TradingView na abertura de área, troca de tema e redimensionamento em `src/web/app.js`
-- [ ] T056 [P] [US5] Adicionar testes E2E de teclado, foco e acessibilidade em `tests/e2e/test_ui_layout.py`
-- [ ] T057 [P] [US5] Adicionar testes de responsividade estrutural e overflow em `tests/unit/test_layout_contracts.py`
-- [ ] T058 [US5] Executar e registrar as 64 verificações visuais em `specs/023-professional-ui-layout/quickstart.md`
+- [X] T052 [US5] Adicionar wrappers roláveis e classes responsivas para tabelas/grids largos em `src/web/index.html`
+- [X] T053 [US5] Implementar breakpoints, gutters, grids e contenção de overflow em `src/web/styles.css`
+- [X] T054 [US5] Implementar foco visível, ARIA, contraste e `prefers-reduced-motion` em `src/web/index.html`, `src/web/styles.css` e `src/web/app.js`
+- [X] T055 [US5] Garantir resize de Plotly/TradingView na abertura de área, troca de tema e redimensionamento em `src/web/app.js`
+- [X] T056 [P] [US5] Adicionar testes E2E de teclado, foco e acessibilidade em `tests/e2e/test_ui_layout.py`
+- [X] T057 [P] [US5] Adicionar testes de responsividade estrutural e overflow em `tests/unit/test_layout_contracts.py`
+- [X] T058 [US5] Executar e registrar as 64 verificações visuais em `specs/023-professional-ui-layout/quickstart.md`
 - [ ] T059 [US5] Validar zoom de 200% e movimento reduzido e registrar o resultado em `specs/023-professional-ui-layout/quickstart.md`
 
 **Checkpoint**: As 8 áreas estão responsivas e acessíveis nos dois temas.

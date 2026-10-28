@@ -365,6 +365,12 @@ button:disabled, [aria-disabled="true"] {
   border-color: var(--border) !important;
   color: var(--text-2) !important;
 }
+/* O selo "Quantitative Pro" só aparece quando sobra espaço no cabeçalho:
+   em Radar/Gráfico o seletor de direção ocupa a mesma linha e o selo
+   espremeria o nome da marca até largura zero. */
+.app-header:has(#global-direction-selector:not(.hidden)) .brand-tag {
+  display: none !important;
+}
 .header-actions .btn-b3 {
   background: var(--surface) !important;
   border-color: var(--border-strong) !important;
@@ -2314,6 +2320,9 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
     gap: 8px;
   }
   .brand-group { flex: 1 1 auto; min-width: 0; }
+  /* Em telas intermediárias o selo "Quantitative Pro" espremeria o nome da
+     marca até largura zero; ele volta a aparecer apenas a partir de 1280px. */
+  .brand-title { min-width: 0; }
   .pillar-nav-group {
     order: 3;
     width: 100%;
@@ -2412,6 +2421,22 @@ input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; }
   .header-actions { gap: 6px; }
   #global-direction-selector { order: 4; width: 100%; justify-content: center; }
   #global-direction-selector .dir-seg-btn { flex: 1 1 0; }
+}
+
+/* Acima de 480px garante uma largura mínima para o bloco da marca: se não
+   couber na primeira linha, as ações quebram para a linha seguinte em vez de
+   espremer o nome até quase zero. */
+@media (min-width: 480px) {
+  .app-header .brand-group { min-width: 196px; }
+}
+
+/* Entre 1024px e 1279px o cabeçalho fica estreito para marca + pilares +
+   ações; os rótulos secundários viram ícones (com aria-label) para preservar
+   o nome da marca e o seletor de direção. */
+@media (max-width: 1279px) {
+  .brand-tag { display: none !important; }
+  #b3-import-label { display: none; }
+  #btn-header-add-trade span { display: none !important; }
 }
 
 @media (max-width: 640px) {
