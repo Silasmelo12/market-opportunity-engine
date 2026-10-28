@@ -224,7 +224,7 @@ export function StrategyCombobox({
   }).filter((cat) => cat.strategies.length > 0);
 
   return (
-    <div className="strategy-group segmented relative w-full" ref={popoverRef}>
+    <div className="relative w-full" ref={popoverRef}>
       <button
         type="button"
         id="btn-strategy-combobox"
@@ -240,7 +240,7 @@ export function StrategyCombobox({
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 top-full z-50 mt-1 max-h-[440px] w-full min-w-[320px] rounded-lg border border-border bg-surface p-3 shadow-xl flex flex-col gap-2">
+        <div className="absolute left-0 top-full z-50 mt-1 max-h-[440px] w-full min-w-[340px] rounded-lg border border-border bg-surface p-3 shadow-xl flex flex-col gap-2 !overflow-visible">
           {/* Campo de Busca Rápida */}
           <div>
             <Input

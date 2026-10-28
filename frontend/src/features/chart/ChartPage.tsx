@@ -714,7 +714,7 @@ export function ChartPage() {
       </div>
 
       {/* 2. Barra de Filtros Globais Superiores */}
-      <Card className="card-surface p-3.5 shadow-sm">
+      <Card className="card-surface p-3.5 shadow-sm !overflow-visible z-20">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div>
             <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">
