@@ -199,32 +199,32 @@
     <div class="subnav-container max-w-7xl mx-auto px-4 flex gap-2 overflow-x-auto" id="main-subnav-pills">
       <!-- Subnavegação Contextual: Minha Carteira -->
       <div id="subnav-group-carteira" class="subnav-group flex gap-2 w-full" role="tablist" aria-label="Subnavegação Minha Carteira" aria-orientation="horizontal">
-        <div class="nav-tab active flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-slate-900 text-slate-900 whitespace-nowrap transition" data-tab="resumo" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-overview">
+        <div class="nav-tab active flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-slate-900 text-slate-900 whitespace-nowrap transition" id="subnav-tab-resumo" data-tab="resumo" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-overview">
           <svg class="icon" aria-hidden="true"><use href="#icon-chart"></use></svg> Resumo
         </div>
-        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="posicoes" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-portfolio">
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" id="subnav-tab-posicoes" data-tab="posicoes" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-portfolio">
           <svg class="icon" aria-hidden="true"><use href="#icon-wallet"></use></svg> Posições &amp; Ativos
         </div>
-        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="proventos" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-pane-proventos">
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" id="subnav-tab-proventos" data-tab="proventos" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-pane-proventos">
           <svg class="icon" aria-hidden="true"><use href="#icon-coins"></use></svg> Proventos
         </div>
-        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="patrimonio" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-pane-patrimonio">
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" id="subnav-tab-patrimonio" data-tab="patrimonio" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-pane-patrimonio">
           <svg class="icon" aria-hidden="true"><use href="#icon-trending-up"></use></svg> Evolução Patrimonial
         </div>
       </div>
 
       <!-- Subnavegação Contextual: Análise Quantitativa -->
       <div id="subnav-group-quant" class="subnav-group hidden flex gap-2 w-full" role="tablist" aria-label="Subnavegação Análise Quantitativa" aria-orientation="horizontal">
-        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="radar" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-pane-radar">
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" id="subnav-tab-radar" data-tab="radar" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-pane-radar">
           <svg class="icon" aria-hidden="true"><use href="#icon-target"></use></svg> Radar Estatístico (Fundo 2x2)
         </div>
-        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="tradingview" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-terminal">
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" id="subnav-tab-tradingview" data-tab="tradingview" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-terminal">
           <svg class="icon" aria-hidden="true"><use href="#icon-candlestick"></use></svg> Gráfico TradingView
         </div>
-        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="simulador" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-simulator">
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" id="subnav-tab-simulador" data-tab="simulador" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-simulator">
           <svg class="icon" aria-hidden="true"><use href="#icon-bolt"></use></svg> Simulador &amp; Backtest
         </div>
-        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" data-tab="playbook" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-playbook">
+        <div class="nav-tab flex items-center gap-2 py-3 px-3.5 text-xs sm:text-sm font-semibold cursor-pointer border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition" id="subnav-tab-playbook" data-tab="playbook" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-playbook">
           <svg class="icon" aria-hidden="true"><use href="#icon-book"></use></svg> Playbook de Estratégias
         </div>
       </div>
@@ -244,7 +244,7 @@
     <!-- ========================================== -->
     <!-- TAB 0: VISÃO GERAL / EXECUTIVO (INVESTIDOR10 STYLE) -->
     <!-- ========================================== -->
-        <section id="tab-overview" data-legacy-id="tab-pane-resumo" data-tab-pane="resumo" class="tab-pane tab-view h-full p-4 sm:p-6 overflow-y-auto bg-slate-50">
+        <section id="tab-overview" data-legacy-id="tab-pane-resumo" data-tab-pane="resumo" role="tabpanel" aria-labelledby="subnav-tab-resumo" class="tab-pane tab-view h-full p-4 sm:p-6 overflow-y-auto bg-slate-50">
       <div class="max-w-7xl mx-auto space-y-6">
 
         <!-- 4 Hero KPI Cards (Investidor10 Style) -->
@@ -345,8 +345,8 @@
               <div class="flex items-center gap-2">
                 <a id="link-overview-ver-patrimonio" href="#carteira/patrimonio" class="touch-target text-xs text-info font-semibold hover:underline mr-1">Ver série completa →</a>
                 <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg">
-                  <button class="px-2.5 py-1 text-xs font-semibold rounded bg-white text-slate-900 shadow-sm">12M</button>
-                  <button class="px-2.5 py-1 text-xs font-semibold rounded text-slate-600 hover:text-slate-900">Tudo</button>
+                  <button id="btn-overview-chart-12m" type="button" class="px-2.5 py-1 text-xs font-semibold rounded bg-white text-slate-900 shadow-sm">12M</button>
+                  <button id="btn-overview-chart-all" type="button" class="px-2.5 py-1 text-xs font-semibold rounded text-slate-600 hover:text-slate-900">Tudo</button>
                 </div>
               </div>
             </div>
@@ -367,6 +367,38 @@
             <div id="overview-donut-legend" class="mt-3 pt-3 border-t border-slate-100 space-y-2 text-xs">
               <!-- Legenda dinâmica injetada pelo app.js -->
             </div>
+          </div>
+        </div>
+
+        <!-- Ativos em Destaque (Penpot Screen 01) -->
+        <div id="overview-highlights-card" class="card-surface p-4 rounded-xl border border-default space-y-3">
+          <div class="flex items-center justify-between pb-2 border-b border-default">
+            <div>
+              <h3 class="section-title text-sm font-bold text-strong">Ativos em destaque</h3>
+              <p class="section-subtitle text-xs text-muted">Maiores posições da custódia ordenadas por participação patrimonial</p>
+            </div>
+            <a href="#carteira/posicoes" class="text-xs text-info font-semibold hover:underline">Ver todas as posições →</a>
+          </div>
+          <div class="table-scroll touch-scroll" tabindex="0">
+            <table class="table-standard w-full text-xs">
+              <thead class="surface-canvas text-muted uppercase text-[11px]">
+                <tr>
+                  <th class="px-3 py-2 text-left">Ticker</th>
+                  <th class="px-3 py-2 text-left">Classe</th>
+                  <th class="px-3 py-2 text-right">Qtd</th>
+                  <th class="px-3 py-2 text-right">Preço Médio</th>
+                  <th class="px-3 py-2 text-right">Preço Atual</th>
+                  <th class="px-3 py-2 text-right">P&amp;L</th>
+                  <th class="px-3 py-2 text-right">Peso</th>
+                  <th class="px-3 py-2 text-right">Ação</th>
+                </tr>
+              </thead>
+              <tbody id="overview-highlights-tbody" class="divide-y divide-default">
+                <tr>
+                  <td colspan="8" class="px-4 py-6 text-center text-muted text-xs">Nenhum ativo cadastrado. Importe seus extratos B3 ou adicione um lançamento manual.</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -396,7 +428,7 @@
     </section>
 
     <!-- ========================================== -->
-    <section id="tab-pane-radar" data-tab-pane="radar" class="tab-pane tab-view hidden h-full p-2.5 sm:p-4 overflow-y-auto quant-area">
+    <section id="tab-pane-radar" data-tab-pane="radar" role="tabpanel" aria-labelledby="subnav-tab-radar" class="tab-pane tab-view hidden h-full p-2.5 sm:p-4 overflow-y-auto quant-area">
       <div class="max-w-7xl mx-auto space-y-3 sm:space-y-4">
 
         <!-- Executive Command Deck / Macro KPI Summary -->
@@ -545,7 +577,7 @@
     <!-- ========================================== -->
     <!-- TAB 2: TERMINAL DE ANÁLISE (TRADINGVIEW)   -->
     <!-- ========================================== -->
-    <section id="tab-terminal" data-tab-pane="tradingview" class="tab-pane tab-view hidden h-full flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden quant-area">
+    <section id="tab-terminal" data-tab-pane="tradingview" role="tabpanel" aria-labelledby="subnav-tab-tradingview" class="tab-pane tab-view hidden h-full flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden quant-area">
       <!-- Left Sidebar: Asset Controls & 48 Granular Strategy Toggles -->
       <aside class="chart-sidebar w-full lg:w-80 border-b lg:border-b-0 lg:border-r flex flex-col shrink-0 lg:h-full lg:min-h-0">
         <!-- Banner de Retorno Contextual (Fase 2B) -->
@@ -1220,7 +1252,7 @@
     <!-- ========================================== -->
     <!-- TAB 3: SIMULADOR FINANCEIRO & BACKTEST     -->
     <!-- ========================================== -->
-    <section id="tab-simulator" class="tab-view hidden h-full p-4 overflow-y-auto quant-area">
+    <section id="tab-simulator" role="tabpanel" aria-labelledby="subnav-tab-simulador" class="tab-view hidden h-full p-4 overflow-y-auto quant-area">
       <div class="max-w-7xl mx-auto space-y-4">
         <div>
           <h2 class="section-title flex items-center gap-2">
@@ -1574,16 +1606,32 @@
     <!-- ========================================== -->
     <!-- TAB 4: PLAYBOOK & GUIA EXECUTIVO           -->
     <!-- ========================================== -->
-    <section id="tab-playbook" class="tab-view hidden h-full p-3 sm:p-4 overflow-y-auto quant-area">
-      <div class="max-w-5xl mx-auto space-y-4 sm:space-y-6">
-        <div>
-          <h2 class="section-title flex items-center gap-2">
-            <span></span>Playbook: Catálogo das 48 Estratégias
-          </h2>
-          <p class="section-subtitle">Diretrizes quantitativas, lógica matemática de entrada e gestão de risco para compras e vendas.</p>
+    <section id="tab-playbook" role="tabpanel" aria-labelledby="subnav-tab-playbook" class="tab-view hidden h-full p-3 sm:p-4 overflow-y-auto quant-area">
+      <div class="max-w-6xl mx-auto space-y-4 sm:space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div>
+            <h2 class="section-title flex items-center gap-2">
+              <span></span>Playbook: Catálogo das 48 Estratégias
+            </h2>
+            <p class="section-subtitle">Diretrizes quantitativas, lógica matemática de entrada e gestão de risco para compras e vendas.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <input id="playbook-search-input" type="search" placeholder="Buscar estratégia ou regra..." class="input text-xs w-56">
+            <div id="playbook-filter-pills" class="flex items-center gap-1">
+              <button type="button" class="playbook-filter-btn filter-chip active text-xs" data-filter="ALL" aria-pressed="true">Todas</button>
+              <button type="button" class="playbook-filter-btn filter-chip text-xs" data-filter="BUY" aria-pressed="false">Compra</button>
+              <button type="button" class="playbook-filter-btn filter-chip text-xs" data-filter="SELL" aria-pressed="false">Venda</button>
+              <button type="button" class="playbook-filter-btn filter-chip text-xs" data-filter="RISK" aria-pressed="false">Risco</button>
+            </div>
+          </div>
         </div>
 
-        <div class="card-surface p-4 space-y-4">
+        <!-- Penpot Interactive Strategy Cards Grid -->
+        <div id="playbook-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Populated by modules/playbook.js -->
+        </div>
+
+        <div class="card-surface p-4 space-y-4 playbook-group-card">
           <h3 class="playbook-group-title is-info">
             <span></span>Grupo 1: Estratégias Proprietárias de Rompimento e Negação (2x2 Compra & Venda)
           </h3>
@@ -1602,7 +1650,7 @@
           </div>
         </div>
 
-        <div class="card-surface p-4 space-y-4">
+        <div class="card-surface p-4 space-y-4 playbook-group-card">
           <h3 class="playbook-group-title is-accent">
             <span></span>Grupo 2: Price Action Institucional (BOS & Wyckoff)
           </h3>
@@ -1622,7 +1670,7 @@
           </div>
         </div>
 
-        <div class="card-surface p-4 space-y-4">
+        <div class="card-surface p-4 space-y-4 playbook-group-card">
           <h3 class="playbook-group-title is-info">
             <span></span>Grupo 3: Alocação Quantitativa & Rebalanceamento
           </h3>
@@ -1638,7 +1686,7 @@
           </div>
         </div>
 
-        <div class="card-surface p-4 space-y-4">
+        <div class="card-surface p-4 space-y-4 playbook-group-card">
           <h3 class="playbook-group-title is-buy">
             <span></span>Grupo 4: 28 Padrões Clássicos de Velas (MQL5 Vectorized)
           </h3>
@@ -1652,9 +1700,34 @@
     <!-- ========================================== -->
     <!-- TAB 5: GESTOR E SIMULADOR DE CARTEIRA      -->
     <!-- ========================================== -->
-        <!-- TAB: PROVENTOS (INVESTIDOR10 STYLE) -->
-    <section id="tab-pane-proventos" data-tab-pane="proventos" class="tab-pane tab-view hidden h-full p-2.5 sm:p-5 overflow-y-auto area-proventos">
+        <!-- TAB: PROVENTOS (INVESTIDOR10 STYLE - PENPOT SCREEN 03) -->
+    <section id="tab-pane-proventos" data-tab-pane="proventos" role="tabpanel" aria-labelledby="subnav-tab-proventos" class="tab-pane tab-view hidden h-full p-2.5 sm:p-5 overflow-y-auto area-proventos">
       <div class="max-w-7xl mx-auto space-y-4 sm:space-y-5">
+
+        <!-- 4 KPIs de Proventos (Penpot Screen 03) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="proventos-kpis-grid">
+          <div class="card-surface p-4 rounded-xl border border-default">
+            <span class="text-xs font-semibold text-muted block">Total registrado</span>
+            <span id="prov-kpi-total" class="text-xl sm:text-2xl font-extrabold text-strong font-mono mt-1 block">R$ 0,00</span>
+            <span id="prov-kpi-total-sub" class="text-[11px] text-subtle mt-1 block">Aguardando importação</span>
+          </div>
+          <div class="card-surface p-4 rounded-xl border border-default">
+            <span class="text-xs font-semibold text-muted block">Dividendos</span>
+            <span id="prov-kpi-dividendos" class="text-xl sm:text-2xl font-extrabold text-positive font-mono mt-1 block">R$ 0,00</span>
+            <span id="prov-kpi-dividendos-sub" class="text-[11px] text-subtle mt-1 block">Isentos de IR</span>
+          </div>
+          <div class="card-surface p-4 rounded-xl border border-default">
+            <span class="text-xs font-semibold text-muted block">JCP</span>
+            <span id="prov-kpi-jcp" class="text-xl sm:text-2xl font-extrabold text-info font-mono mt-1 block">R$ 0,00</span>
+            <span id="prov-kpi-jcp-sub" class="text-[11px] text-subtle mt-1 block">Juros sobre Capital Próprio</span>
+          </div>
+          <div class="card-surface p-4 rounded-xl border border-default">
+            <span class="text-xs font-semibold text-muted block">Outros rendimentos</span>
+            <span id="prov-kpi-rendimentos" class="text-xl sm:text-2xl font-extrabold text-warning font-mono mt-1 block">R$ 0,00</span>
+            <span id="prov-kpi-rendimentos-sub" class="text-[11px] text-subtle mt-1 block">FIIs e restituições</span>
+          </div>
+        </div>
+
         <div class="bg-white card-surface chart-card">
           <div class="section-header flex flex-col sm:flex-row sm:items-center justify-between pb-4 gap-3">
             <div>
@@ -1670,26 +1743,137 @@
             Carregando proventos...
           </div>
         </div>
+
+        <!-- Composição da Renda & Últimos Proventos (Penpot Screen 03) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div class="card-surface p-4 rounded-xl border border-default space-y-3">
+            <div>
+              <h3 class="section-title text-sm font-bold text-strong">Composição da renda</h3>
+              <p class="section-subtitle text-xs text-muted">Proporção por tipo de provento registrado</p>
+            </div>
+            <div id="prov-composition-list" class="space-y-3 pt-2">
+              <div class="text-xs text-muted py-4 text-center">Importe extratos de movimentação B3 para visualizar a composição.</div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-2 card-surface p-4 rounded-xl border border-default space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="section-title text-sm font-bold text-strong">Últimos proventos</h3>
+                <p class="section-subtitle text-xs text-muted">Eventos financeiros consolidados por período</p>
+              </div>
+              <span class="text-[11px] font-mono text-subtle">Extrato B3</span>
+            </div>
+            <div class="table-scroll touch-scroll" tabindex="0">
+              <table class="table-standard w-full text-xs">
+                <thead class="surface-canvas text-muted uppercase text-[11px]">
+                  <tr>
+                    <th class="px-3 py-2 text-left">Período</th>
+                    <th class="px-3 py-2 text-left">Tipo Predominante</th>
+                    <th class="px-3 py-2 text-right">Dividendos</th>
+                    <th class="px-3 py-2 text-right">JCP / Rend.</th>
+                    <th class="px-3 py-2 text-right">Total Recebido</th>
+                  </tr>
+                </thead>
+                <tbody id="prov-history-tbody" class="divide-y divide-default">
+                  <tr>
+                    <td colspan="5" class="px-4 py-6 text-center text-muted text-xs">Nenhum provento registrado no histórico importado.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
       </div>
     </section>
 
-    <!-- TAB: PATRIMÔNIO (INVESTIDOR10 STYLE) -->
-    <section id="tab-pane-patrimonio" data-tab-pane="patrimonio" class="tab-pane tab-view hidden h-full p-2.5 sm:p-5 overflow-y-auto area-patrimonio">
+    <!-- TAB: PATRIMÔNIO (INVESTIDOR10 STYLE - PENPOT SCREEN 04) -->
+    <section id="tab-pane-patrimonio" data-tab-pane="patrimonio" role="tabpanel" aria-labelledby="subnav-tab-patrimonio" class="tab-pane tab-view hidden h-full p-2.5 sm:p-5 overflow-y-auto area-patrimonio">
       <div class="max-w-7xl mx-auto space-y-4 sm:space-y-5">
         <div class="bg-white card-surface chart-card">
-          <h2 class="section-title mb-2">Evolução do Patrimônio Consolidado</h2>
-          <p class="section-subtitle mb-4">Aportes acumulados versus ganho de capital em séries temporais</p>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <div>
+              <h2 class="section-title">Patrimônio x aportes</h2>
+              <p class="section-subtitle">Aportes acumulados versus ganho de capital em séries temporais</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="btn-patrimonio-12m" type="button" class="btn-primary text-xs px-3 py-1.5 rounded-lg">12 meses</button>
+              <button id="btn-patrimonio-all" type="button" class="btn-secondary text-xs px-3 py-1.5 rounded-lg">Tudo</button>
+            </div>
+          </div>
           <div id="chart-patrimonio-detailed" class="h-80 w-full flex items-center justify-center text-subtle text-sm">
             Carregando evolução patrimonial...
           </div>
         </div>
+
+        <!-- Resumo do Período & Histórico de Aportes e Eventos (Penpot Screen 04) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div class="card-surface p-4 rounded-xl border border-default space-y-3">
+            <div>
+              <h3 class="section-title text-sm font-bold text-strong">Resumo do período</h3>
+              <p class="section-subtitle text-xs text-muted">Indicadores consolidados da janela selecionada</p>
+            </div>
+            <div class="space-y-2.5 pt-2 text-xs">
+              <div class="flex items-center justify-between py-1.5 border-b border-default">
+                <span class="text-muted">Patrimônio final</span>
+                <span id="pat-summary-final" class="font-bold font-mono text-strong">R$ 0,00</span>
+              </div>
+              <div class="flex items-center justify-between py-1.5 border-b border-default">
+                <span class="text-muted">Capital aportado</span>
+                <span id="pat-summary-invested" class="font-bold font-mono text-strong">R$ 0,00</span>
+              </div>
+              <div class="flex items-center justify-between py-1.5 border-b border-default">
+                <span class="text-muted">Variação absoluta</span>
+                <span id="pat-summary-var" class="font-bold font-mono text-strong">R$ 0,00</span>
+              </div>
+              <div class="flex items-center justify-between py-1.5 border-b border-default">
+                <span class="text-muted">Rentabilidade</span>
+                <span id="pat-summary-return" class="font-bold font-mono text-info">0,00%</span>
+              </div>
+              <div class="flex items-center justify-between py-1.5">
+                <span class="text-muted">Maior retração</span>
+                <span id="pat-summary-dd" class="font-bold font-mono text-negative">0,00%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-2 card-surface p-4 rounded-xl border border-default space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="section-title text-sm font-bold text-strong">Histórico de aportes e eventos</h3>
+                <p class="section-subtitle text-xs text-muted">Evolução mensal do capital investido e resultado</p>
+              </div>
+              <span class="text-[11px] font-mono text-subtle">Série Temporal</span>
+            </div>
+            <div class="table-scroll touch-scroll" tabindex="0">
+              <table class="table-standard w-full text-xs">
+                <thead class="surface-canvas text-muted uppercase text-[11px]">
+                  <tr>
+                    <th class="px-3 py-2 text-left">Mês</th>
+                    <th class="px-3 py-2 text-left">Evento</th>
+                    <th class="px-3 py-2 text-right">Capital Aplicado</th>
+                    <th class="px-3 py-2 text-right">Resultado Acum.</th>
+                    <th class="px-3 py-2 text-right">Patrimônio Total</th>
+                  </tr>
+                </thead>
+                <tbody id="pat-history-tbody" class="divide-y divide-default">
+                  <tr>
+                    <td colspan="5" class="px-4 py-6 text-center text-muted text-xs">Nenhuma série histórica importada.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
       </div>
     </section>
 
-        <section id="tab-portfolio" data-legacy-id="tab-pane-posicoes" data-tab-pane="posicoes" class="tab-pane tab-view hidden h-full p-4 sm:p-6 overflow-y-auto area-posicoes">
+        <section id="tab-portfolio" data-legacy-id="tab-pane-posicoes" data-tab-pane="posicoes" role="tabpanel" aria-labelledby="subnav-tab-posicoes" class="tab-pane tab-view hidden h-full p-4 sm:p-6 overflow-y-auto area-posicoes">
       <div class="max-w-7xl mx-auto space-y-6">
 
-        <!-- Header da Seção de Posições (Investidor10 Style) -->
+        <!-- Header da Seção de Posições (Investidor10 Style - Penpot Screen 02) -->
         <div class="section-header flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3">
           <div>
             <h2 class="section-title flex items-center gap-2">
@@ -1698,7 +1882,13 @@
             </h2>
             <p class="section-subtitle mt-0.5">Custódia categorizada por classe com sinais em tempo real de Fundo 2x2 e nota estatística</p>
           </div>
-          <div class="flex items-center gap-2.5">
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="btn-open-b3-modal" type="button" class="btn-secondary text-xs">
+              Importar B3
+            </button>
+            <button id="btn-pos-new-trade" type="button" class="btn-primary text-xs">
+              + Novo lançamento
+            </button>
             <button id="btn-pos-expand-all" class="btn-secondary">
               Expandir Todos
             </button>
@@ -1706,6 +1896,44 @@
               Recolher Todos
             </button>
           </div>
+        </div>
+
+        <!-- 4 KPIs de Posições & Custódia (Penpot Screen 02) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="custody-kpis-grid">
+          <div class="card-surface p-4 rounded-xl border border-default">
+            <span class="text-xs font-semibold text-muted block">Valor de Mercado</span>
+            <span id="custody-kpi-invested" class="text-xl sm:text-2xl font-extrabold text-strong font-mono mt-1 block">R$ 0,00</span>
+            <span class="text-[11px] text-subtle mt-1 block">Cotação atualizada</span>
+          </div>
+          <div class="card-surface p-4 rounded-xl border border-default">
+            <span class="text-xs font-semibold text-muted block">Custo de Aquisição</span>
+            <span id="custody-kpi-cost" class="text-xl sm:text-2xl font-extrabold text-strong font-mono mt-1 block">R$ 0,00</span>
+            <span class="text-[11px] text-subtle mt-1 block">Soma dos preços médios</span>
+          </div>
+          <div class="card-surface p-4 rounded-xl border border-default">
+            <span class="text-xs font-semibold text-muted block">Resultado Latente</span>
+            <span id="custody-kpi-pnl" class="text-xl sm:text-2xl font-extrabold text-positive font-mono mt-1 block">R$ 0,00</span>
+            <span id="custody-kpi-pnl-sub" class="text-[11px] text-subtle mt-1 block">0,00% sobre o custo</span>
+          </div>
+          <div class="card-surface p-4 rounded-xl border border-default">
+            <span class="text-xs font-semibold text-muted block">Ativos em Custódia</span>
+            <span id="custody-kpi-count" class="text-xl sm:text-2xl font-extrabold text-info font-mono mt-1 block">0 ativos</span>
+            <span class="text-[11px] text-subtle mt-1 block">Distribuídos por classe</span>
+          </div>
+        </div>
+
+        <!-- Barra de Filtros por Classe e Exportação CSV (Penpot Screen 02) -->
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div id="custody-category-pills" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+            <button type="button" class="custody-cat-filter-btn filter-chip active text-xs" data-cat="ALL" aria-pressed="true">Todos</button>
+            <button type="button" class="custody-cat-filter-btn filter-chip text-xs" data-cat="Ações" aria-pressed="false">Ações</button>
+            <button type="button" class="custody-cat-filter-btn filter-chip text-xs" data-cat="FIIs" aria-pressed="false">FIIs</button>
+            <button type="button" class="custody-cat-filter-btn filter-chip text-xs" data-cat="BDRs" aria-pressed="false">BDRs</button>
+            <button type="button" class="custody-cat-filter-btn filter-chip text-xs" data-cat="Cripto" aria-pressed="false">Cripto</button>
+          </div>
+          <button id="btn-custody-export-csv" type="button" class="btn-secondary text-xs">
+            Exportar CSV
+          </button>
         </div>
 
         <!-- Container Dinâmico dos Acordeões por Categoria (Investidor10 Style) -->
@@ -2080,13 +2308,13 @@
   </main>
 
   <!-- Confirmation Pre-flight Modal for Applying Orders -->
-  <div id="modal-apply-orders" class="fixed inset-0 z-50 surface-canvas/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden">
+  <div id="modal-apply-orders" role="dialog" aria-modal="true" aria-labelledby="modal-apply-orders-title" class="fixed inset-0 z-50 surface-canvas/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden">
     <div class="surface max-w-lg w-full p-4 sm:p-6 space-y-4 border border-default shadow-2xl rounded-lg">
       <div class="flex items-center justify-between border-b border-default pb-3">
         <div class="flex items-center gap-2">
           <div class="w-8 h-8 rounded surface-subtle text-positive flex items-center justify-center font-bold text-sm"><svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg></div>
           <div>
-            <h3 class="text-sm sm:text-base font-bold text-strong">Revisão Prévia de Execução de Ordens</h3>
+            <h3 id="modal-apply-orders-title" class="text-sm sm:text-base font-bold text-strong">Revisão Prévia de Execução de Ordens</h3>
             <p class="text-[11px] text-muted">Confirme a aplicação das ordens recomendadas na sua carteira.</p>
           </div>
         </div>
@@ -2138,6 +2366,139 @@
     </div>
   </div>
 
+  <!-- Penpot Screen 09: Modal de Importação B3 -->
+  <div id="modal-b3-import" role="dialog" aria-modal="true" aria-labelledby="modal-b3-import-title" class="fixed inset-0 z-50 surface-canvas/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="surface max-w-xl w-full p-4 sm:p-6 space-y-4 border border-default shadow-2xl rounded-xl">
+      <div class="flex items-center justify-between border-b border-default pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-lg surface-subtle text-info flex items-center justify-center font-extrabold text-xs">[B]³</div>
+          <div>
+            <h3 id="modal-b3-import-title" class="text-sm sm:text-base font-bold text-strong">Importação de Extratos Oficiais B3</h3>
+            <p class="text-[11px] text-muted">Envie arquivos de Negociação e Movimentação (.xlsx, .xls, .csv) com deduplicação automática.</p>
+          </div>
+        </div>
+        <button id="btn-modal-b3-close" type="button" class="text-muted hover:text-strong text-lg font-bold p-1" aria-label="Fechar importação B3"><svg class="icon" aria-hidden="true"><use href="#icon-x"></use></svg></button>
+      </div>
+
+      <!-- Dropzone -->
+      <div id="modal-b3-dropzone" class="border-2 border-dashed border-default rounded-xl p-6 text-center space-y-2 cursor-pointer hover:surface-subtle transition">
+        <div class="w-10 h-10 rounded-full surface-subtle text-info mx-auto flex items-center justify-center">
+          <svg class="icon w-5 h-5" aria-hidden="true"><use href="#icon-import"></use></svg>
+        </div>
+        <div class="text-xs font-bold text-strong">Arraste e solte suas planilhas da B3 aqui ou clique para selecionar</div>
+        <div class="text-[11px] text-muted">Suporta múltiplos arquivos simultâneos (Negociação + Movimentação / Proventos · máx. 10MB por arquivo)</div>
+      </div>
+
+      <!-- Resumo de Arquivos Selecionados -->
+      <div class="space-y-1.5">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-muted block">Arquivos selecionados</span>
+        <div id="modal-b3-files-list" class="max-h-36 overflow-y-auto space-y-1.5 text-xs">
+          <div class="text-xs text-muted py-2 text-center">Nenhum arquivo selecionado no momento.</div>
+        </div>
+      </div>
+
+      <!-- Regras de Conciliação -->
+      <div class="surface-subtle p-3 rounded-lg border border-default text-[11px] text-muted space-y-1">
+        <div class="font-bold text-strong">Garantias de Integridade Financeira:</div>
+        <ul class="list-disc list-inside space-y-0.5">
+          <li>Deduplicação determinística por ativo, data, quantidade e valor entre arquivos sobrepostos.</li>
+          <li>Cálculo exato de preço médio ponderado sem criação de caixa fictício inicial.</li>
+          <li>Proventos reais (Dividendos, JCP e Rendimentos FII) conciliados a partir do extrato de Movimentação.</li>
+        </ul>
+      </div>
+
+      <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-default">
+        <button id="btn-modal-b3-cancel" type="button" class="btn-secondary text-xs">
+          Cancelar
+        </button>
+        <button id="btn-modal-b3-process" type="button" class="btn-primary text-xs">
+          Processar importação
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Penpot Screen 10: Modal de Novo Lançamento Manual -->
+  <div id="modal-new-trade" role="dialog" aria-modal="true" aria-labelledby="modal-new-trade-title" class="fixed inset-0 z-50 surface-canvas/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="surface max-w-lg w-full p-4 sm:p-6 space-y-4 border border-default shadow-2xl rounded-xl">
+      <div class="flex items-center justify-between border-b border-default pb-3">
+        <div>
+          <h3 id="modal-new-trade-title" class="text-sm sm:text-base font-bold text-strong">Novo Lançamento Manual</h3>
+          <p class="text-[11px] text-muted">Registre compras, vendas ou proventos diretamente na sua custódia.</p>
+        </div>
+        <button id="btn-modal-trade-close" type="button" class="text-muted hover:text-strong text-lg font-bold p-1" aria-label="Fechar novo lançamento"><svg class="icon" aria-hidden="true"><use href="#icon-x"></use></svg></button>
+      </div>
+
+      <!-- Segmented Type Selector -->
+      <div class="grid grid-cols-3 gap-1.5 surface-subtle p-1 rounded-lg border border-default">
+        <button type="button" class="modal-trade-type-btn btn-primary text-xs py-1.5 rounded-md font-bold" data-type="BUY" aria-pressed="true">Compra</button>
+        <button type="button" class="modal-trade-type-btn btn-secondary text-xs py-1.5 rounded-md font-semibold" data-type="SELL" aria-pressed="false">Venda</button>
+        <button type="button" class="modal-trade-type-btn btn-secondary text-xs py-1.5 rounded-md font-semibold" data-type="DIVIDEND" aria-pressed="false">Provento</button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+        <div>
+          <label for="modal-trade-ticker" class="field-label">Ativo (Ticker)</label>
+          <input id="modal-trade-ticker" list="asset-datalist" type="text" placeholder="Ex: PETR4.SA" class="input font-mono uppercase">
+        </div>
+        <div>
+          <label for="modal-trade-date" class="field-label">Data da Operação</label>
+          <input id="modal-trade-date" type="date" class="input font-mono">
+        </div>
+        <div>
+          <label for="modal-trade-shares" class="field-label">Quantidade (Cotas)</label>
+          <input id="modal-trade-shares" type="number" step="any" min="0.0001" value="100" class="input font-mono">
+        </div>
+        <div>
+          <label for="modal-trade-price" class="field-label">Preço Unitário / Valor (R$)</label>
+          <input id="modal-trade-price" type="number" step="0.01" min="0.01" placeholder="Ex: 36.50" class="input font-mono">
+        </div>
+        <div>
+          <label for="modal-trade-fees" class="field-label">Taxas &amp; Corretagem (R$)</label>
+          <input id="modal-trade-fees" type="number" step="0.01" min="0" value="0" class="input font-mono">
+        </div>
+        <div>
+          <label for="modal-trade-notes" class="field-label">Observações (Opcional)</label>
+          <input id="modal-trade-notes" type="text" placeholder="Ex: Aporte mensal" class="input">
+        </div>
+      </div>
+
+      <div class="surface-subtle p-3 rounded-lg border border-default flex items-center justify-between text-xs">
+        <span class="text-muted font-semibold">Impacto financeiro estimado:</span>
+        <span id="modal-trade-total-preview" class="text-base font-extrabold font-mono text-strong">R$ 0,00</span>
+      </div>
+
+      <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-default">
+        <button id="btn-modal-trade-cancel" type="button" class="btn-secondary text-xs">
+          Cancelar
+        </button>
+        <button id="btn-modal-trade-save" type="button" class="btn-primary text-xs">
+          Salvar lançamento
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Navigation Bar (Penpot Screens 11, 12, 13) -->
+  <nav id="mobile-bottom-nav" aria-label="Navegação rápida móvel" class="md:hidden fixed bottom-0 left-0 right-0 z-40 surface border-t border-default px-2 py-1.5 grid grid-cols-4 gap-1 shadow-lg">
+    <button type="button" class="mobile-nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-[11px] font-bold text-info" data-route="carteira/resumo" aria-current="page">
+      <svg class="icon w-4 h-4 mb-0.5" aria-hidden="true"><use href="#icon-chart"></use></svg>
+      <span>Resumo</span>
+    </button>
+    <button type="button" class="mobile-nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-[11px] font-medium text-muted" data-route="carteira/posicoes">
+      <svg class="icon w-4 h-4 mb-0.5" aria-hidden="true"><use href="#icon-wallet"></use></svg>
+      <span>Carteira</span>
+    </button>
+    <button type="button" class="mobile-nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-[11px] font-medium text-muted" data-route="quant/radar">
+      <svg class="icon w-4 h-4 mb-0.5" aria-hidden="true"><use href="#icon-target"></use></svg>
+      <span>Radar</span>
+    </button>
+    <button type="button" class="mobile-nav-btn flex flex-col items-center justify-center py-1 rounded-lg text-[11px] font-medium text-muted" data-route="quant/grafico">
+      <svg class="icon w-4 h-4 mb-0.5" aria-hidden="true"><use href="#icon-candlestick"></use></svg>
+      <span>Gráfico</span>
+    </button>
+  </nav>
+
   <!-- Toast Notification System for High-Stakes Actions -->
   <div id="toast-notification" role="status" aria-live="polite" aria-atomic="true" class="fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-2xl border text-xs font-medium transition-all duration-300 transform translate-y-16 opacity-0 pointer-events-none">
     <span id="toast-icon" class="text-base inline-flex items-center"><svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg></span>
@@ -2148,16 +2509,20 @@
   <!-- Application Logic -->
   <script src="modules/constants.js"></script>
   <script src="modules/formatters.js"></script>
+  <script src="modules/api-client.js"></script>
   <script src="modules/toast.js"></script>
   <script src="modules/proventos.js"></script>
+  <script src="modules/evolution.js"></script>
+  <script src="modules/playbook.js"></script>
+  <script src="modules/modals.js"></script>
   <script src="app.js"></script>
 
   <!-- Modal de Configuração de Metas -->
-  <div id="modal-overview-metas" class="fixed inset-0 z-50 surface-canvas/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden">
+  <div id="modal-overview-metas" role="dialog" aria-modal="true" aria-labelledby="modal-overview-metas-title" class="fixed inset-0 z-50 surface-canvas/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden">
     <div class="surface max-w-md w-full p-4 sm:p-6 space-y-4 border border-default shadow-2xl rounded-lg">
       <div class="flex items-center justify-between border-b border-default pb-3">
         <div>
-          <h3 class="text-sm sm:text-base font-bold text-strong">Configurar Metas de Longo Prazo</h3>
+          <h3 id="modal-overview-metas-title" class="text-sm sm:text-base font-bold text-strong">Configurar Metas de Longo Prazo</h3>
           <p class="text-[11px] text-muted">Defina seus objetivos financeiros patrimoniais e de proventos.</p>
         </div>
         <button id="btn-modal-metas-close" class="text-muted hover:text-strong text-lg font-bold p-1" aria-label="Fechar metas"><svg class="icon" aria-hidden="true"><use href="#icon-x"></use></svg></button>

@@ -97,6 +97,10 @@ document.addEventListener('DOMContentLoaded', () => {
   setupOverviewSubNav();
   setupOverviewMetasModal();
   setupProventosControls();
+  if (typeof setupPatrimonioControls === 'function') setupPatrimonioControls();
+  if (typeof setupPlaybookControls === 'function') setupPlaybookControls();
+  if (typeof setupCustodyControls === 'function') setupCustodyControls();
+  if (typeof setupPenpotModals === 'function') setupPenpotModals();
 
   // Holdings are loaded purely from storage or user uploads
 
@@ -197,7 +201,34 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnOverviewConfig = document.getElementById('btn-overview-config-ideal');
   if (btnOverviewConfig) {
     btnOverviewConfig.addEventListener('click', () => {
-      switchTab('tab-portfolio');
+      const modal = document.getElementById('modal-overview-metas');
+      const inPat = document.getElementById('input-meta-patrimonio');
+      const inRenda = document.getElementById('input-meta-renda');
+      if (modal) {
+        const m = getUserMetas();
+        if (inPat) inPat.value = m.metaTotal;
+        if (inRenda) inRenda.value = m.metaFII;
+        modal.classList.remove('hidden');
+      } else {
+        switchTab('tab-portfolio');
+      }
+    });
+  }
+
+  const btnOverviewChart12m = document.getElementById('btn-overview-chart-12m');
+  const btnOverviewChartAll = document.getElementById('btn-overview-chart-all');
+  if (btnOverviewChart12m && btnOverviewChartAll) {
+    btnOverviewChart12m.addEventListener('click', () => {
+      state.overviewChartFilter = '12m';
+      btnOverviewChart12m.className = 'px-2.5 py-1 text-xs font-semibold rounded bg-white text-slate-900 shadow-sm';
+      btnOverviewChartAll.className = 'px-2.5 py-1 text-xs font-semibold rounded text-slate-600 hover:text-slate-900';
+      renderOverviewDashboard();
+    });
+    btnOverviewChartAll.addEventListener('click', () => {
+      state.overviewChartFilter = 'all';
+      btnOverviewChartAll.className = 'px-2.5 py-1 text-xs font-semibold rounded bg-white text-slate-900 shadow-sm';
+      btnOverviewChart12m.className = 'px-2.5 py-1 text-xs font-semibold rounded text-slate-600 hover:text-slate-900';
+      renderOverviewDashboard();
     });
   }
 
@@ -339,51 +370,7 @@ function determineActiveRoute() {
 
 let _isNavigating = false;
 
-function renderPatrimonioDetailedChart() {
-  const container = document.getElementById('chart-patrimonio-detailed');
-  if (!container || !window.Plotly) return;
-
-  const timeline = state.portfolioState.b3Timeline || [];
-  if (!Array.isArray(timeline) || timeline.length === 0) {
-    container.innerHTML = `
-      <div class="p-8 text-center text-subtle font-mono text-xs">
-        Nenhum dado de evolução patrimonial importado. Importe seus extratos da B3 para visualizar a série temporal.
-      </div>
-    `;
-    return;
-  }
-
-  const isDark = (document.documentElement.getAttribute('data-theme') || 'light') === 'dark';
-  const bgColor = isDark ? '#151924' : '#FFFFFF';
-  const textColor = isDark ? '#8B98A5' : '#0F172A';
-  const gridColor = isDark ? 'rgba(38, 43, 56, 0.5)' : '#F1F5F9';
-
-  const xDates = timeline.map(pt => pt.label || pt.date);
-  const yInvested = timeline.map(pt => Number(pt.invested) || 0);
-
-  const trace = {
-    x: xDates,
-    y: yInvested,
-    name: 'Total Aplicado',
-    type: 'bar',
-    marker: { color: '#059669' },
-    hovertemplate: '<b>%{x}</b><br>Aplicado: R$ %{y:,.2f}<extra></extra>'
-  };
-
-  const layout = {
-    autosize: true,
-    height: 320,
-    paper_bgcolor: bgColor,
-    plot_bgcolor: bgColor,
-    font: { family: 'Plus Jakarta Sans, sans-serif', size: 11, color: textColor },
-    margin: { t: 20, r: 20, b: 40, l: 65 },
-    xaxis: { gridcolor: gridColor },
-    yaxis: { gridcolor: gridColor, tickprefix: 'R$ ' }
-  };
-
-  container.innerHTML = '';
-  Plotly.newPlot(container, [trace], layout, { responsive: true, displayModeBar: false });
-}
+// renderPatrimonioDetailedChart extraído para modules/evolution.js
 
 function navigateToRoute(targetKey, options = {}) {
   const { updateUrl = true, replaceHistory = false, params: explicitParams = null, historyState = null } = options;
@@ -607,7 +594,14 @@ function navigateToRoute(targetKey, options = {}) {
       const p3 = document.getElementById('plot-simulation-curve');
       if (p3 && window.Plotly && p3.data) Plotly.Plots.resize(p3);
     }, 60);
+  } else if (canonical === 'quant/playbook') {
+    if (typeof renderPlaybookPenpotCards === 'function') {
+      renderPlaybookPenpotCards();
+    }
   } else if (canonical === 'carteira/posicoes') {
+    if (typeof renderCustodyPenpotView === 'function') {
+      renderCustodyPenpotView();
+    }
     if (state.portfolioScrollTop != null) {
       setTimeout(() => {
         const portEl = document.getElementById('tab-portfolio');
@@ -620,6 +614,10 @@ function navigateToRoute(targetKey, options = {}) {
         if (cEl && cEl.data && window.Plotly) Plotly.Plots.resize(cEl);
       });
     }, 60);
+  }
+
+  if (typeof syncMobileBottomNav === 'function') {
+    syncMobileBottomNav(canonical);
   }
 
   requestAnimationFrame(() => setTimeout(resizeAllCharts, 60));
@@ -1585,8 +1583,14 @@ async function renderOverviewDashboard() {
   renderOverviewStackedBarChart(totalInvested, totalProfit);
   renderOverviewDonutChart(holdings, cash, totalEquity);
 
-  // 7. Render Grouped Positions Accordions (Meus Ativos)
+  // 7. Render Grouped Positions Accordions (Meus Ativos) & Penpot Widgets
   renderOverviewGroupedHoldings(holdings, adviseData, totalEquity);
+  if (typeof renderOverviewPenpotWidgets === 'function') {
+    renderOverviewPenpotWidgets(holdings, quotesMap, totalEquity);
+  }
+  if (typeof renderCustodyPenpotView === 'function') {
+    renderCustodyPenpotView();
+  }
 
   // 8. Update Metas Progress
   updateOverviewMetasProgress(totalEquity);
@@ -1601,29 +1605,34 @@ function renderOverviewStackedBarChart(totalInvested, totalProfit) {
   const textColor = isDark ? '#8B98A5' : '#0F172A';
   const gridColor = isDark ? 'rgba(38, 43, 56, 0.5)' : '#F1F5F9';
 
-  const timeline = state.portfolioState.b3Timeline || [];
+  const rawTimeline = state.portfolioState.b3Timeline || [];
+  const holdings = state.portfolioState.holdings || [];
+  const timeline = (state.overviewChartFilter === 'all') ? rawTimeline : rawTimeline.slice(-12);
+
   let months = [];
   let investedSteps = [];
   let profitSteps = [];
 
-  if (Array.isArray(timeline) && timeline.length >= 2) {
-    // Real B3 chronological data
+  if (Array.isArray(timeline) && timeline.length >= 1) {
+    // Real B3 chronological data only — zero synthetic ramp
     months = timeline.map(pt => pt.label || pt.date);
     investedSteps = timeline.map(pt => Number(pt.invested) || 0);
 
     const profitVal = Math.max(0, totalProfit);
-    profitSteps = months.map((m, idx) => Number((profitVal * (idx / Math.max(1, months.length - 1))).toFixed(2)));
-    profitSteps[profitSteps.length - 1] = profitVal;
+    profitSteps = months.map((_, idx) => (idx === months.length - 1 ? profitVal : 0));
+  } else if (holdings.length > 0 || totalInvested > 0) {
+    // Single real point for current position when manual holdings exist without B3 timeline
+    months = ['Posição Atual'];
+    investedSteps = [Number(totalInvested.toFixed(2))];
+    profitSteps = [Number(Math.max(0, totalProfit).toFixed(2))];
   } else {
-    // Default 12 checkpoints ending at current total
-    months = ['11/25', '12/25', '01/26', '02/26', '03/26', '04/26', '05/26', '06/26', '07/26', '08/26', '09/26', '10/26'];
-    const baseInv = Math.max(100, totalInvested);
-    investedSteps = months.map((m, idx) => Number((baseInv * (0.65 + (idx * 0.032))).toFixed(2)));
-    investedSteps[investedSteps.length - 1] = totalInvested;
-
-    const profitVal = Math.max(0, totalProfit);
-    profitSteps = months.map((m, idx) => Number((profitVal * (idx / (months.length - 1))).toFixed(2)));
-    profitSteps[profitSteps.length - 1] = profitVal;
+    try { Plotly.purge(container); } catch (e) {}
+    container.innerHTML = `
+      <div class="h-full flex items-center justify-center p-6 text-center text-subtle font-mono text-xs">
+        Importe seus extratos da B3 ou cadastre posições para visualizar a evolução patrimonial.
+      </div>
+    `;
+    return;
   }
 
   const trace1 = {
@@ -1826,7 +1835,7 @@ function renderOverviewGroupedHoldings(holdings, adviseData, totalEquity) {
         </div>
       </div>
 
-      <div id="${accordionId}" class="table-scroll overflow-x-auto touch-scroll hidden">
+      <div id="${accordionId}" class="table-scroll overflow-x-auto touch-scroll hidden" tabindex="0">
         <table class="table-standard w-full text-left text-xs text-muted">
           <thead class="surface-canvas text-muted font-semibold uppercase text-[11px] border-b border-default whitespace-nowrap font-mono">
             <tr>
@@ -1987,7 +1996,7 @@ function setupOverviewMetasModal() {
   const inPat = document.getElementById('input-meta-patrimonio');
   const inRenda = document.getElementById('input-meta-renda');
 
-  if (!btnEdit || !modal) return;
+  if (!modal) return;
 
   const openModal = () => {
     const m = getUserMetas();
@@ -2000,7 +2009,7 @@ function setupOverviewMetasModal() {
     modal.classList.add('hidden');
   };
 
-  btnEdit.addEventListener('click', openModal);
+  if (btnEdit) btnEdit.addEventListener('click', openModal);
   if (btnClose) btnClose.addEventListener('click', closeModal);
   if (btnCancel) btnCancel.addEventListener('click', closeModal);
 
@@ -2212,11 +2221,12 @@ function updateRadarExecutiveDeck(items) {
   if (sellsSub) sellsSub.textContent = `${sells.filter(s => s.timing_category === 'EXTENDED' || s.timing_category === 'LATE').length} em zona estendida`;
 
   // Find asset with highest win rate / score
-  const sorted = [...items].sort((a, b) => (Number(b.win_rate) || 0) - (Number(a.win_rate) || 0));
+  const getWr = (x) => Number(x.historical_win_rate ?? x.win_rate) || 0;
+  const sorted = [...items].sort((a, b) => getWr(b) - getWr(a));
   if (sorted.length > 0 && topAssetEl && topScoreEl) {
     const top = sorted[0];
     topAssetEl.textContent = top.ticker;
-    topScoreEl.textContent = `${(Number(top.win_rate) || 0).toFixed(1)}% WR`;
+    topScoreEl.textContent = `${getWr(top).toFixed(1)}% WR`;
     if (topStratEl) topStratEl.textContent = top.strategy_label || top.strategy_name || 'Estratégia campeã';
   }
 
@@ -2651,8 +2661,24 @@ function renderPlotlyRanking(summaries = null) {
     const labels = sorted.map(s =>s.strategy_label || s.strategy_sub_id);
     const winRates = sorted.map(s =>Number(s.win_rate) || 0);
     const texts = sorted.map(s => `${(Number(s.win_rate) || 0).toFixed(1)}% (${s.executed_buys || s.total_signals || 0} operadas)`);
+    const isLight = (document.documentElement.getAttribute('data-theme') || 'light') === 'light';
+    const chartFontColor = isLight ? '#0F172A' : '#F8FAFC';
+    const chartGridColor = isLight ? 'rgba(203, 213, 225, 0.5)' : 'rgba(51, 65, 85, 0.4)';
+    const buyColor = isLight ? '#059669' : '#10B981';
+    const sellColor = isLight ? '#E11D48' : '#F43F5E';
+    const colors = sorted.map(s => (s.direction === 'SELL' ? sellColor : buyColor));
     const isMobile = window.innerWidth < 768;
     const leftMargin = isMobile ? 140 : 220;
+
+    const trace = {
+      type: 'bar',
+      orientation: 'h',
+      x: winRates,
+      y: labels,
+      text: texts,
+      textposition: 'outside',
+      marker: { color: colors }
+    };
 
     const layout = {
       margin: { l: leftMargin, r: 60, t: 20, b: 40 },
@@ -3155,8 +3181,9 @@ async function runSimulation() {
         auxEl.className = `text-base sm:text-lg font-bold font-mono ${wr >= 50 ? 'text-positive' : 'text-warning'}`;
         if (tradesSub) tradesSub.textContent = `${wins}W / ${m.losing_trades_count || 0}L (${m.total_trades_count || 0} ciclos)`;
       } else {
-        auxEl.textContent = formatPercent(m.alpha_vs_dca_pct, 1, true);
-        auxEl.className = `text-base sm:text-lg font-bold font-mono ${m.alpha_vs_dca_pct >= 0 ? 'text-positive' : 'text-negative'}`;
+        const hasAlpha = m.alpha_vs_dca_pct != null && !Number.isNaN(Number(m.alpha_vs_dca_pct));
+        auxEl.textContent = hasAlpha ? formatPercent(m.alpha_vs_dca_pct, 1, true) : '—';
+        auxEl.className = `text-base sm:text-lg font-bold font-mono ${!hasAlpha ? 'text-muted' : (m.alpha_vs_dca_pct >= 0 ? 'text-positive' : 'text-negative')}`;
         if (tradesSub) tradesSub.textContent = `Aportes: ${m.total_trades_count || 0}`;
       }
     }
