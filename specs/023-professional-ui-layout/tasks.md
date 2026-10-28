@@ -151,10 +151,10 @@
 
 **Purpose**: Auditoria final, limpeza e aprovação da entrega.
 
-- [ ] T060 [P] Consolidar `DESIGN.md` com os padrões finais e remover referências obsoletas
-- [ ] T061 [P] Confirmar que `src/api/` permanece intocado com `git diff --stat -- src/api`
-- [ ] T062 [P] Auditar encoding, piso tipográfico e IDs duplicados em `src/web/index.html`, `src/web/app.js` e `src/web/modules/*.js`
-- [ ] T063 Executar a suíte completa `PYTHONPATH=. python -m pytest tests/ -v` e registrar o resultado final em `specs/023-professional-ui-layout/quickstart.md`
+- [X] T060 [P] Consolidar `DESIGN.md` com os padrões finais e remover referências obsoletas
+- [X] T061 [P] Confirmar que `src/api/` permanece intocado com `git diff --stat -- src/api`
+- [X] T062 [P] Auditar encoding, piso tipográfico e IDs duplicados em `src/web/index.html`, `src/web/app.js` e `src/web/modules/*.js`
+- [X] T063 Executar a suíte completa `PYTHONPATH=. python -m pytest tests/ -v` e registrar o resultado final em `specs/023-professional-ui-layout/quickstart.md`
 - [ ] T064 Validar desempenho percebido em troca de área, troca de tema e resize de gráficos em `src/web/app.js` e `src/web/styles.css`
 - [ ] T065 Revisar e aprovar as 64 verificações visuais finais em `specs/023-professional-ui-layout/quickstart.md`
 - [ ] T066 Revisar o diff final de `src/web/`, remover CSS/classes mortas e executar `git diff --check`

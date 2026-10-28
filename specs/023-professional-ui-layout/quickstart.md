@@ -370,3 +370,11 @@ A feature é considerada validada quando:
 - **Piso tipográfico:** 0 declarações `text-[Npx]`/`font-size: Npx` com N < 11px; `test_sources_do_not_declare_text_below_the_floor` e `test_typography_floor_contract_is_active` passam.
 - **IDs:** 266 `id` no markup, **0 duplicados**; `test_no_duplicate_element_ids` passa.
 - Observação: 40 `getElementById` no `app.js` apontam para IDs que não existem mais no markup (resíduos guardados por `if (el)`); não geram erro e ficam fora do escopo de limpeza de CSS/classes do T066.
+
+### T063 — Suíte completa final
+
+- Data: 2026-10-27.
+- Comando: `PYTHONPATH=. venv/bin/python -m pytest tests/ -v`.
+- Resultado: **166 passed, 2 skipped** em 122,74s (exit 0).
+- Os 2 skips são os fixtures opcionais de planilha real da B3 (`test_real_b3_spreadsheet` e `test_negociacao_and_multi_file_parsing`), que dependem de arquivos locais não versionados.
+- Ajuste de contrato necessário: `test_portfolio_tab_dom_and_ergonomics` ainda procurava o header legado removido no T025 (`data-tab="tab-portfolio"`). A asserção foi atualizada para o controle canônico `data-tab="posicoes"` + `aria-controls="tab-portfolio"`, preservando a verificação do painel `id="tab-portfolio"` e dos bindings de `app.js`.
