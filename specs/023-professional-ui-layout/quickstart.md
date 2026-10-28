@@ -405,3 +405,16 @@ A feature é considerada validada quando:
 - Após as correções: matriz recapturada (**64/64**), auditoria sem novos problemas e suíte completa **166 passed, 2 skipped** (119,59s).
 - Aprovação: **64/64 combinações aprovadas** nos dois temas e quatro larguras.
 - Exceções documentadas: ações de texto inline da sidebar do Gráfico em desktop (48×17, 31×17, 36×17) e checkbox 13×13 com rótulo clicável — cobertas pela exceção de texto inline da WCAG 2.5.8.
+
+### T066 — Revisão do diff final e limpeza de CSS morto
+
+- Data: 2026-10-27.
+- Diff final de `src/web/` revisado: 6 arquivos (`app.js`, `index.html`, `modules/formatters.js`, `modules/proventos.js`, `modules/toast.js`, `styles.css`), **+2294/−1326** no acumulado da feature.
+- Removidas **160 linhas de CSS morto** (28 blocos/seletores sem nenhuma referência no markup ou nos scripts):
+  - shell legado: `.nav-tab-btn`, `#tab-terminal .chart-toolbar`, `.chart-zoom-controls`;
+  - componentes substituídos: `#tab-simulator .btn-amber`, `.radar-tag`/`.radar-bottom`/`.radar-hold`, `.portfolio-action-badge`, `.portfolio-score-bar-track`, `.quant-empty`, `.section-heading`, `.is-scrollable`, `.playbook-group-title.is-sell`, `.divider`, `.cell-mono`, `.card-surface-subtle`;
+  - aliases/utilitários sem uso: `.metric-value`, `.bg-primary-strong`, `.bg-primary-soft`, `.border-danger`, `.primary-soft`, `.badge-pill.badge-accent`, `.header-actions .btn-b3 .text-sky-600`;
+  - overrides escuros legados de `.text-gray-*`, `.text-sky-600`, `.text-emerald-*` e `.text-rose-*`.
+- Classes restantes sem referência direta: **22**, todas mantidas de propósito por serem primitivas documentadas no `DESIGN.md` (`.type-*`, `.card-*`, `.field-*`, `.state-*`, `.metric-card`, `.btn-danger`, `.accordion-body`) ou classes injetadas em runtime pelo Plotly (`.js-plotly-plot`, `.plotly`).
+- Verificações: `git diff --check` sem erros; `node --check` em `app.js` e nos 4 módulos OK; 455 abre/fecha chaves no CSS; nenhum `console.log`/`debugger`/`TODO`/`FIXME` adicionado.
+- Suíte após a limpeza: **166 passed, 2 skipped** (147,37s).
