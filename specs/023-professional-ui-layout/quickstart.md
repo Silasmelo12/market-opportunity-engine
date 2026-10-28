@@ -361,3 +361,12 @@ A feature é considerada validada quando:
 - `git diff --stat 4fd3ad5^..HEAD -- src/api` (toda a Feature 023) → vazio; `git diff --name-only 4fd3ad5^..HEAD -- src/api | wc -l` → **0 arquivos**.
 - Último commit que tocou `src/api/`: `b5a9707` (anterior à Feature 023).
 - Rotas, contratos de dados e cálculos financeiros permanecem inalterados.
+
+### T062 — Encoding, piso tipográfico e IDs duplicados
+
+- Data: 2026-10-27.
+- Arquivos auditados: `src/web/index.html`, `src/web/app.js`, `src/web/styles.css` e `src/web/modules/*.js`.
+- **Encoding:** 0 ocorrências de `U+FFFD` ou sequências de mojibake (`Ã©`, `Ã£`, `â€`, `Âº`, etc.); todos os arquivos decodificam como UTF-8.
+- **Piso tipográfico:** 0 declarações `text-[Npx]`/`font-size: Npx` com N < 11px; `test_sources_do_not_declare_text_below_the_floor` e `test_typography_floor_contract_is_active` passam.
+- **IDs:** 266 `id` no markup, **0 duplicados**; `test_no_duplicate_element_ids` passa.
+- Observação: 40 `getElementById` no `app.js` apontam para IDs que não existem mais no markup (resíduos guardados por `if (el)`); não geram erro e ficam fora do escopo de limpeza de CSS/classes do T066.
