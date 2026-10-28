@@ -333,3 +333,14 @@ A feature é considerada validada quando:
   - **Cabeçalho** — em 768–1023px o selo “Quantitative Pro” espremia o nome da marca até largura zero. O selo agora só aparece a partir de 1280px e quando o seletor de direção não está visível (`:has`), o bloco da marca tem largura mínima de 196px acima de 480px e, entre 1024–1279px, os rótulos secundários (B3/Lançamento) viram ícones com `aria-label`. Resultado: marca legível em 375/768/1024/1280/1366/1920, sem sobreposição.
 - Alvos pequenos remanescentes: apenas ações de texto inline da sidebar do Gráfico em desktop (48×17, 31×17, 36×17) e checkbox 13×13 com rótulo clicável — cobertos pela exceção de texto inline da WCAG 2.5.8; em 375/768 não há alvos pequenos.
 - Testes após as correções: `test_layout_contracts.py` → **23 passed**; `test_ui_layout.py` + `test_dashboard_navigation.py` → **30 passed**.
+
+### T059 — Zoom de 200% e movimento reduzido (US5)
+
+- Data: 2026-10-27.
+- **Zoom de 200%** — simulado pelo viewport CSS efetivo (1366→683px e 1920→960px, com `device_scale_factor=2`), nas 8 áreas em tema claro:
+  - `docOverflow = 0` em **16/16** combinações;
+  - nenhum texto abaixo de 11px;
+  - exatamente 1 painel `.tab-view` visível, com cabeçalho e subnavegação presentes.
+- **Teclado em 200%** (683px, Radar): 16 controles alcançados por `Tab`, todos com indicador de foco visível e totalmente dentro do viewport (`left ≥ 0`, `right ≤ 683`), sem controles cortados.
+- **Movimento reduzido** (`reduced_motion="reduce"`, tema escuro, 8 áreas): `transition-duration` e `animation-duration` ≤ 0,001s em header, abas, botão de tema, cartões, KPIs, toast e subnavegação; `scroll-behavior: auto`. **8/8 áreas OK**, zero falhas.
+- Script de apoio: `/tmp/opencode/validate_zoom_motion.py`.

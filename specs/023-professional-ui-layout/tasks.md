@@ -141,7 +141,7 @@
 - [X] T056 [P] [US5] Adicionar testes E2E de teclado, foco e acessibilidade em `tests/e2e/test_ui_layout.py`
 - [X] T057 [P] [US5] Adicionar testes de responsividade estrutural e overflow em `tests/unit/test_layout_contracts.py`
 - [X] T058 [US5] Executar e registrar as 64 verificações visuais em `specs/023-professional-ui-layout/quickstart.md`
-- [ ] T059 [US5] Validar zoom de 200% e movimento reduzido e registrar o resultado em `specs/023-professional-ui-layout/quickstart.md`
+- [X] T059 [US5] Validar zoom de 200% e movimento reduzido e registrar o resultado em `specs/023-professional-ui-layout/quickstart.md`
 
 **Checkpoint**: As 8 áreas estão responsivas e acessíveis nos dois temas.
 
