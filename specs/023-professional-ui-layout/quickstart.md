@@ -418,3 +418,13 @@ A feature é considerada validada quando:
 - Classes restantes sem referência direta: **22**, todas mantidas de propósito por serem primitivas documentadas no `DESIGN.md` (`.type-*`, `.card-*`, `.field-*`, `.state-*`, `.metric-card`, `.btn-danger`, `.accordion-body`) ou classes injetadas em runtime pelo Plotly (`.js-plotly-plot`, `.plotly`).
 - Verificações: `git diff --check` sem erros; `node --check` em `app.js` e nos 4 módulos OK; 455 abre/fecha chaves no CSS; nenhum `console.log`/`debugger`/`TODO`/`FIXME` adicionado.
 - Suíte após a limpeza: **166 passed, 2 skipped** (147,37s).
+
+### T067 — Auditoria dos commits por tarefa
+
+- Data: 2026-10-27.
+- Script de auditoria sobre `git log 4fd3ad5^..HEAD`:
+  - **66/66 tarefas concluídas (T001–T066)** possuem pelo menos um commit cujo assunto casa com `^(feat|fix|docs|test|chore|refactor|perf|style|build)\(023\): T\d{3} .+`;
+  - **67 commits** no intervalo, todos com prefixo de tipo válido e TaskID;
+  - **0 tarefas sem commit**, **0 commits órfãos** e **0 assuntos malformados**;
+  - T063 possui 2 commits (ajuste de contrato + registro da suíte); as demais tarefas têm 1 commit cada.
+- O commit desta auditoria (`docs(023): T067 auditar commits das tarefas`) completa a série; a mesma verificação, refeita após ele, resulta em **67/67 tarefas**.

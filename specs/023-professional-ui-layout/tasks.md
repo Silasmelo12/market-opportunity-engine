@@ -158,7 +158,7 @@
 - [X] T064 Validar desempenho percebido em troca de área, troca de tema e resize de gráficos em `src/web/app.js` e `src/web/styles.css`
 - [X] T065 Revisar e aprovar as 64 verificações visuais finais em `specs/023-professional-ui-layout/quickstart.md`
 - [X] T066 Revisar o diff final de `src/web/`, remover CSS/classes mortas e executar `git diff --check`
-- [ ] T067 Auditar que cada tarefa concluída gerou um commit próprio no formato `<tipo>(023): <TaskID> <descrição>` em `specs/023-professional-ui-layout/tasks.md`
+- [X] T067 Auditar que cada tarefa concluída gerou um commit próprio no formato `<tipo>(023): <TaskID> <descrição>` em `specs/023-professional-ui-layout/tasks.md`
 
 ---
 
