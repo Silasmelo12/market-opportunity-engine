@@ -378,3 +378,17 @@ A feature é considerada validada quando:
 - Resultado: **166 passed, 2 skipped** em 122,74s (exit 0).
 - Os 2 skips são os fixtures opcionais de planilha real da B3 (`test_real_b3_spreadsheet` e `test_negociacao_and_multi_file_parsing`), que dependem de arquivos locais não versionados.
 - Ajuste de contrato necessário: `test_portfolio_tab_dom_and_ergonomics` ainda procurava o header legado removido no T025 (`data-tab="tab-portfolio"`). A asserção foi atualizada para o controle canônico `data-tab="posicoes"` + `aria-controls="tab-portfolio"`, preservando a verificação do painel `id="tab-portfolio"` e dos bindings de `app.js`.
+
+### T064 — Desempenho percebido
+
+- Data: 2026-10-27.
+- Metodologia: Chromium headless (Playwright) em 1366×900, APIs mockadas, medição com `performance.now()` até dois `requestAnimationFrame` após a mudança visual e `PerformanceObserver` para `longtask`.
+- **Troca de área** (3 ciclos × 8 áreas = 24 amostras, clique real na subnavegação): p50 **26,4ms**, p95 **37,9ms**, máximo **47,7ms**; todas as áreas ficaram visíveis, zero erros.
+- **Troca de pilar** (8 amostras): p50 **31,3ms**, máximo **33,8ms**.
+- **Troca de tema** (4 alternâncias × Resumo/Gráfico/Simulador = 12 amostras): p50 **29,6ms**, p95 **40ms**, máximo **45,8ms**; `data-theme`, rótulo e `aria-pressed` sincronizados em todas.
+- **Resize de gráficos** (1366→1024→768→1920→1366px):
+  - parte síncrona de `resizeAllCharts()` ≤ **0,2ms**; do evento `resize` até o frame seguinte: **2,3–11,5ms**;
+  - Plotly: `svg.main-svg` com a mesma largura do contêiner (diferença 0px) em Resumo (barras e rosca);
+  - TradingView: contêiner igual ao pai e largura acompanhando o viewport (1004 → 662 → 726 → 1558 → 1004px).
+- **Long tasks**: 0 nas fases de tema, resize e nas trocas de área em regime (8/8 áreas, 0 tarefas). Apenas a primeira pintura dos gráficos Plotly no carregamento inicial gerou 2 tarefas > 100ms (máximo **384ms**, uma vez), sem afetar a resposta da troca de área (≤ 47,7ms).
+- Script de apoio: `/tmp/opencode/validate_performance.py`.
