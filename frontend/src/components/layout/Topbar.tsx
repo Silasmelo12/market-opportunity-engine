@@ -6,6 +6,8 @@ import type { PillarId } from "@/types/navigation";
 
 export function Topbar() {
   const {
+    isSidebarOpen,
+    toggleSidebar,
     theme,
     toggleTheme,
     activePillar,
@@ -134,10 +136,17 @@ export function Topbar() {
       className="app-header sticky top-0 z-40 border-b border-border bg-surface px-4 py-2.5"
     >
       <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-3">
-        <div className="brand-group flex min-w-0 items-center gap-3">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
+        <div className="brand-group flex min-w-0 items-center gap-2.5">
+          <button
+            type="button"
+            id="btn-sidebar-toggle"
+            aria-label={isSidebarOpen ? "Ocultar barra lateral" : "Exibir barra lateral"}
+            title={isSidebarOpen ? "Ocultar barra lateral" : "Exibir barra lateral"}
+            onClick={toggleSidebar}
+            className="btn-icon flex h-8 w-8 items-center justify-center rounded-md border border-border bg-surface text-muted-foreground hover:bg-surface-subtle hover:text-foreground transition-colors shadow-sm"
+          >
             <AppIcon name="icon-layers" className="h-4 w-4" />
-          </div>
+          </button>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <span className="brand-title truncate font-sans text-sm font-extrabold tracking-tight text-foreground">
@@ -148,55 +157,6 @@ export function Topbar() {
               </span>
             </div>
           </div>
-        </div>
-
-        {/* Seletor de Ambientes (Pilares) */}
-        <div
-          id="global-pillar-selector"
-          role="tablist"
-          aria-label="Ambientes da Plataforma"
-          aria-orientation="horizontal"
-          className="segmented inline-flex items-center rounded-lg border border-border bg-surface-subtle p-1"
-        >
-          <button
-            type="button"
-            id="pillar-btn-carteira"
-            role="tab"
-            data-pillar="carteira"
-            aria-selected={activePillar === "carteira"}
-            aria-controls="subnav-group-carteira"
-            tabIndex={activePillar === "carteira" ? 0 : -1}
-            onClick={() => switchPillar("carteira")}
-            onKeyDown={(e) => handlePillarKeyDown(e, "carteira")}
-            className={`pillar-tab inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 font-sans text-xs font-bold transition-all ${
-              activePillar === "carteira"
-                ? "active bg-surface text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <AppIcon name="icon-wallet" className="h-3.5 w-3.5" />
-            <span>Minha Carteira</span>
-          </button>
-
-          <button
-            type="button"
-            id="pillar-btn-quant"
-            role="tab"
-            data-pillar="quant"
-            aria-selected={activePillar === "quant"}
-            aria-controls="subnav-group-quant"
-            tabIndex={activePillar === "quant" ? 0 : -1}
-            onClick={() => switchPillar("quant")}
-            onKeyDown={(e) => handlePillarKeyDown(e, "quant")}
-            className={`pillar-tab inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 font-sans text-xs font-bold transition-all ${
-              activePillar === "quant"
-                ? "active bg-surface text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <AppIcon name="icon-target" className="h-3.5 w-3.5" />
-            <span>Análise Quantitativa</span>
-          </button>
         </div>
 
         {/* Ações Globais & Direção */}

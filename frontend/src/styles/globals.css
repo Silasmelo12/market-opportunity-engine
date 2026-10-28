@@ -2442,6 +2442,12 @@ main,
   display: none !important;
 }
 
+@media (max-width: 1023px) {
+  .app-sidebar {
+    display: none !important;
+  }
+}
+
 @media (max-width: 767px) {
   #global-direction-selector {
     flex-wrap: wrap !important;

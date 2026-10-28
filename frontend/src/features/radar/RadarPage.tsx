@@ -15,6 +15,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { AppIcon } from "@/components/layout/SvgSprite";
+import { ALL_STRATEGY_CATEGORIES } from "../chart/StrategyCombobox";
 
 const RADAR_CATEGORIES = [
   { id: "featured", label: "Destaques" },
@@ -207,15 +208,23 @@ export function RadarPage() {
               <select
                 id="radar-strategy-select"
                 value={selectedStrategy}
-                onChange={(e) => setSelectedStrategy(e.target.value)}
-                className="select rounded-md border border-border-strong bg-surface px-3 py-1.5 text-xs font-semibold text-foreground"
+                onChange={(e) => {
+                  setSelectedStrategy(e.target.value);
+                  setRadarPage(1);
+                }}
+                className="select rounded-md border border-border-strong bg-surface px-3 py-1.5 text-xs font-semibold text-foreground max-w-[280px]"
               >
-                <option value="ALL">Todas as Estratégias (48)</option>
-                <option value="t1_open">Negação Anterior (Abertura)</option>
-                <option value="double_bottom">Fundo Duplo Institucional</option>
-                <option value="spring_wyckoff">Spring Wyckoff</option>
-                <option value="shooting_star">Estrela Cadente (Topo)</option>
-                <option value="bearish_engulfing">Engolfo de Baixa</option>
+                <option value="ALL">Todas as Estratégias (50)</option>
+                {ALL_STRATEGY_CATEGORIES.map((cat) => (
+                  <optgroup key={cat.id} label={cat.name}>
+                    {cat.strategies.map((st) => (
+                      <option key={st.id} value={st.id}>
+                        {st.direction === "BUY" ? "▲ " : "▼ "}
+                        {st.label}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
               </select>
             </div>
 

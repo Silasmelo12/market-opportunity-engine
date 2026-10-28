@@ -100,6 +100,10 @@ export interface AppContextValue {
   loadingText: string | null;
   setLoadingText: (text: string | null) => void;
 
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  toggleSidebar: () => void;
+
   triggerSharedCsvImport: () => void;
   sharedCsvInputRef: React.RefObject<HTMLInputElement>;
 }
@@ -175,6 +179,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [toast, setToast] = React.useState<ToastNotice | null>(null);
   const [loadingText, setLoadingText] = React.useState<string | null>(null);
   const sharedCsvInputRef = React.useRef<HTMLInputElement | null>(null);
+
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const saved = window.localStorage.getItem("app_sidebar_open");
+      if (saved !== null) return saved === "true";
+    }
+    return true;
+  });
+
+  const toggleSidebar = React.useCallback(() => {
+    setIsSidebarOpen((prev) => {
+      const next = !prev;
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("app_sidebar_open", String(next));
+      }
+      return next;
+    });
+  }, []);
 
   const showToast = React.useCallback(
     (
@@ -535,8 +557,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const setActiveDirection = React.useCallback((dir: DirectionMode) => {
     setActiveDirectionState(dir);
+    setRadarPageState(1);
     if (typeof window !== "undefined" && window.appState) {
       window.appState.activeDirection = dir;
+      window.appState.radarPage = 1;
     }
   }, []);
 
@@ -612,6 +636,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       showToast,
       loadingText,
       setLoadingText,
+      isSidebarOpen,
+      setIsSidebarOpen,
+      toggleSidebar,
       triggerSharedCsvImport,
       sharedCsvInputRef,
     }),
@@ -654,6 +681,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       toast,
       showToast,
       loadingText,
+      isSidebarOpen,
+      toggleSidebar,
       triggerSharedCsvImport,
     ]
   );

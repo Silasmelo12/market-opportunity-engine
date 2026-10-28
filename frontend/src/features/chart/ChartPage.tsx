@@ -1,17 +1,11 @@
 import * as React from "react";
 import { useAppContext } from "@/state/app-context";
-import { fetchAssetAnalysis } from "@/services/market-service";
-import type { AnalyzeResponse } from "@/types/market";
-import { renderPlotlySafely } from "@/hooks/use-plotly-chart";
-import { getChartThemeTokens } from "@/lib/theme";
-import { formatCurrencyBRL, formatPercentPtBr } from "@/lib/formatters";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableHeader,
@@ -20,41 +14,50 @@ import {
   TableHead,
   TableCell,
 } from "@/components/ui/table";
+import { formatCurrencyBRL, formatPercentPtBr } from "@/lib/formatters";
+import { KNOWN_ASSET_NAMES } from "@/lib/constants";
+import { fetchAssetAnalysis } from "@/services/market-service";
+import type { AnalyzeResponse } from "@/types/market";
+import { renderPlotlySafely } from "@/hooks/use-plotly-chart";
+import {
+  StrategyCombobox,
+  ALL_STRATEGY_IDS,
+} from "./StrategyCombobox";
 
-const KNOWN_ASSET_NAMES: Record<string, string> = {
-  "PETR4.SA": "Petrobras PN",
-  "VALE3.SA": "Vale ON",
-  "WEGE3.SA": "WEG ON",
-  "ITUB4.SA": "Itaú Unibanco PN",
-  "BBAS3.SA": "Banco do Brasil ON",
-  "TGAR11.SA": "TG Ativo Real FII",
-  "HGLG11.SA": "CSHG Logística FII",
-  "CL=F": "Crude Oil WTI (Petróleo)",
-  "GC=F": "Gold Futures (Ouro)",
-  "BTC-USD": "Bitcoin USD",
-};
+interface ChartThemeTokens {
+  bg: string;
+  grid: string;
+  text: string;
+  up: string;
+  down: string;
+  primary: string;
+  secondary: string;
+}
 
-const STRATEGY_GROUPS = [
-  {
-    id: "group_reversal",
-    title: "Reversão & Negação 2x2",
-    strategies: [
-      { id: "t1_open", label: "Negação Anterior (Abertura)" },
-      { id: "t1_close", label: "Negação Anterior (Fechamento)" },
-      { id: "spring_wyckoff", label: "Spring Institucional Wyckoff" },
-    ],
-  },
-  {
-    id: "group_patterns",
-    title: "Padrões Duplos & Estruturais",
-    strategies: [
-      { id: "double_bottom", label: "Fundo Duplo Confirmado" },
-      { id: "double_top", label: "Topo Duplo de Exaustão" },
-      { id: "bearish_engulfing", label: "Engolfo de Baixa" },
-      { id: "shooting_star", label: "Estrela Cadente" },
-    ],
-  },
-] as const;
+function getChartThemeTokens(): ChartThemeTokens {
+  if (typeof document === "undefined") {
+    return {
+      bg: "rgb(255, 255, 255)",
+      grid: "rgba(226, 232, 240, 0.6)",
+      text: "rgb(71, 85, 105)",
+      up: "rgb(4, 120, 87)",
+      down: "rgb(190, 18, 60)",
+      primary: "rgb(3, 105, 161)",
+      secondary: "rgb(13, 148, 136)",
+    };
+  }
+  const root = document.documentElement;
+  const cs = getComputedStyle(root);
+  return {
+    bg: cs.getPropertyValue("--surface").trim() || "rgb(255, 255, 255)",
+    grid: cs.getPropertyValue("--chart-grid").trim() || "rgba(226, 232, 240, 0.6)",
+    text: cs.getPropertyValue("--chart-axis").trim() || "rgb(71, 85, 105)",
+    up: cs.getPropertyValue("--chart-positive").trim() || "rgb(4, 120, 87)",
+    down: cs.getPropertyValue("--chart-negative").trim() || "rgb(190, 18, 60)",
+    primary: cs.getPropertyValue("--chart-primary").trim() || "rgb(3, 105, 161)",
+    secondary: cs.getPropertyValue("--chart-secondary").trim() || "rgb(13, 148, 136)",
+  };
+}
 
 declare global {
   interface Window {
@@ -63,10 +66,8 @@ declare global {
         container: HTMLElement,
         options: Record<string, unknown>
       ) => {
-        addCandlestickSeries: (
-          opts: Record<string, unknown>
-        ) => {
-          setData: (data: unknown[]) => void;
+        addCandlestickSeries: (options: Record<string, unknown>) => {
+          setData: (candles: unknown[]) => void;
           setMarkers?: (markers: unknown[]) => void;
         };
         timeScale: () => { fitContent: () => void };
@@ -92,17 +93,16 @@ export function ChartPage() {
 
   const [period, setPeriod] = React.useState<string>("2y");
   const [interval, setIntervalState] = React.useState<string>("1d");
-  const [preset, setPreset] = React.useState<"essencial" | "all">("essencial");
+
+  // Initialize all 50 strategies as enabled by default
   const [enabledStrategies, setEnabledStrategies] = React.useState<
     Record<string, boolean>
-  >({
-    t1_open: true,
-    t1_close: true,
-    spring_wyckoff: true,
-    double_bottom: true,
-    double_top: true,
-    bearish_engulfing: true,
-    shooting_star: true,
+  >(() => {
+    const initial: Record<string, boolean> = {};
+    ALL_STRATEGY_IDS.forEach((id) => {
+      initial[id] = true;
+    });
+    return initial;
   });
 
   const [analysis, setAnalysis] = React.useState<AnalyzeResponse | null>(null);
@@ -145,6 +145,30 @@ export function ChartPage() {
     }
   }, [activeRoute, chartTicker, loadAnalysis]);
 
+  // Filter signals strictly by activeDirection and enabledStrategies
+  const displayedSignals = React.useMemo(() => {
+    const all = analysis?.signals || [];
+    return all.filter((sig) => {
+      if (activeDirection === "BUY" && sig.direction !== "BUY") return false;
+      if (activeDirection === "SELL" && sig.direction !== "SELL") return false;
+      const stratId = sig.strategy_sub_id;
+      if (stratId && enabledStrategies[stratId] === false) return false;
+      return true;
+    });
+  }, [analysis, activeDirection, enabledStrategies]);
+
+  // Filter summaries strictly by activeDirection and enabledStrategies
+  const displayedSummaries = React.useMemo(() => {
+    const all = analysis?.summaries || [];
+    return all.filter((s) => {
+      if (activeDirection === "BUY" && s.direction !== "BUY") return false;
+      if (activeDirection === "SELL" && s.direction !== "SELL") return false;
+      const stratId = s.strategy_sub_id;
+      if (stratId && enabledStrategies[stratId] === false) return false;
+      return true;
+    });
+  }, [analysis, activeDirection, enabledStrategies]);
+
   React.useEffect(() => {
     const tokens = getChartThemeTokens();
     const container = tvContainerRef.current;
@@ -177,31 +201,49 @@ export function ChartPage() {
           wickDownColor: tokens.down,
         });
         series.setData(analysis.candles);
+
+        if (series.setMarkers && displayedSignals.length > 0) {
+          const markers = displayedSignals
+            .map((sig) => {
+              const isBuy = sig.direction === "BUY";
+              const timeVal = sig.time || sig.signal_date || sig.execution_date;
+              if (!timeVal) return null;
+              return {
+                time: timeVal,
+                position: isBuy ? "belowBar" : "aboveBar",
+                color: isBuy ? tokens.up : tokens.down,
+                shape: isBuy ? "arrowUp" : "arrowDown",
+                text: `${isBuy ? "▲" : "▼"} ${sig.strategy_label || sig.strategy_sub_id}`,
+              };
+            })
+            .filter(Boolean);
+          series.setMarkers(markers);
+        }
+
         chart.timeScale().fitContent();
       } catch {
         // Fallback safely if canvas unavailable in headless unit test
       }
     }
 
-    const summaries = analysis?.summaries || [];
     renderPlotlySafely(
       rankingPlotRef.current,
       [
         {
           type: "bar",
           orientation: "h",
-          x: summaries.map((s) => s.win_rate),
-          y: summaries.map((s) => s.strategy_label || s.strategy_sub_id),
+          x: displayedSummaries.map((s) => s.win_rate),
+          y: displayedSummaries.map((s) => s.strategy_label || s.strategy_sub_id),
           marker: { color: tokens.primary, cornerradius: 4 },
         },
       ],
       {
-        margin: { t: 12, r: 16, b: 28, l: 120 },
+        margin: { t: 12, r: 16, b: 28, l: 140 },
         paper_bgcolor: tokens.bg,
         plot_bgcolor: tokens.bg,
         font: { family: "Plus Jakarta Sans, sans-serif", size: 11, color: tokens.text },
         xaxis: { gridcolor: tokens.grid, ticksuffix: "%" },
-        yaxis: { gridcolor: "rgba(0,0,0,0)" },
+        yaxis: { gridcolor: "rgba(0,0,0,0)", automargin: true },
       }
     );
 
@@ -211,9 +253,9 @@ export function ChartPage() {
         {
           type: "scatter",
           mode: "markers",
-          x: summaries.map((s) => Math.abs(s.mean_mae || 1)),
-          y: summaries.map((s) => s.mean_forward_return || 0),
-          text: summaries.map((s) => s.strategy_label),
+          x: displayedSummaries.map((s) => Math.abs(s.mean_mae || 1)),
+          y: displayedSummaries.map((s) => s.mean_forward_return || 0),
+          text: displayedSummaries.map((s) => s.strategy_label || s.strategy_sub_id),
           marker: { color: tokens.secondary, size: 10 },
         },
       ],
@@ -226,7 +268,7 @@ export function ChartPage() {
         yaxis: { title: "Retorno Médio (%)", gridcolor: tokens.grid },
       }
     );
-  }, [theme, analysis]);
+  }, [theme, analysis, displayedSignals, displayedSummaries]);
 
   const resolvedTitleName =
     analysis?.asset_name ||
@@ -280,9 +322,16 @@ export function ChartPage() {
         </div>
       </div>
 
-      {/* Layout Principal: Sidebar de Estratégias + Shell do Gráfico */}
+      {/* Layout Principal: Sidebar compacta de Controles + Shell do Gráfico */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        <aside className="chart-sidebar card-surface lg:col-span-3 space-y-4 rounded-lg border border-border bg-surface p-4 shadow-sm">
+        {/* Barra Lateral do Gráfico: Mais curta na vertical */}
+        <aside className="chart-sidebar card-surface lg:col-span-3 h-fit self-start space-y-3 rounded-lg border border-border bg-surface p-4 shadow-sm">
+          <div className="border-b border-border pb-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+              Configurações do Ativo
+            </span>
+          </div>
+
           <div className="space-y-3">
             <div>
               <Label htmlFor="input-ticker">Ticker do Ativo</Label>
@@ -325,7 +374,16 @@ export function ChartPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div>
+              <Label>Filtro de Estratégias</Label>
+              <StrategyCombobox
+                enabledStrategies={enabledStrategies}
+                onChange={setEnabledStrategies}
+                activeDirection={activeDirection}
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-1">
               <Button
                 type="button"
                 id="btn-load-analysis"
@@ -348,75 +406,9 @@ export function ChartPage() {
               </Button>
             </div>
           </div>
-
-          {/* Presets de Estratégias */}
-          <div className="space-y-2 border-t border-border pt-3">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-              Filtro Rápido de Sinais
-            </span>
-            <div className="segmented flex rounded-md border border-border bg-surface-subtle p-0.5">
-              <button
-                type="button"
-                aria-pressed={preset === "essencial"}
-                onClick={() => setPreset("essencial")}
-                className={`flex-1 rounded-sm py-1 text-[11px] font-semibold ${
-                  preset === "essencial"
-                    ? "bg-surface text-foreground shadow-sm"
-                    : "text-muted-foreground"
-                }`}
-              >
-                Essencial
-              </button>
-              <button
-                type="button"
-                aria-pressed={preset === "all"}
-                onClick={() => setPreset("all")}
-                className={`flex-1 rounded-sm py-1 text-[11px] font-semibold ${
-                  preset === "all"
-                    ? "bg-surface text-foreground shadow-sm"
-                    : "text-muted-foreground"
-                }`}
-              >
-                Todas (48)
-              </button>
-            </div>
-          </div>
-
-          {/* Grupos de Estratégias */}
-          <div className="space-y-3 border-t border-border pt-3">
-            {STRATEGY_GROUPS.map((grp) => (
-              <div
-                key={grp.id}
-                className="strategy-group rounded-md border border-border bg-surface-subtle p-2.5 space-y-2"
-              >
-                <div className="font-sans text-xs font-bold text-foreground">
-                  {grp.title}
-                </div>
-                <div className="space-y-1.5">
-                  {grp.strategies.map((st) => (
-                    <label
-                      key={st.id}
-                      className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer hover:text-foreground"
-                    >
-                      <Checkbox
-                        checked={Boolean(enabledStrategies[st.id])}
-                        onCheckedChange={(checked) =>
-                          setEnabledStrategies((prev) => ({
-                            ...prev,
-                            [st.id]: Boolean(checked),
-                          }))
-                        }
-                      />
-                      <span>{st.label}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
         </aside>
 
-        {/* Área Principal do Gráfico e Métricas */}
+        {/* Área Principal: Candlesticks TradingView */}
         <div className="chart-shell lg:col-span-9 space-y-4">
           <Card className="card-surface p-4">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
@@ -445,35 +437,49 @@ export function ChartPage() {
             </div>
           </Card>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card kind="chart" className="card-surface chart-card bg-white">
+          {/* Gráfico 1: Ranking de Eficiência por Estratégia - Ocupa 100% da largura */}
+          <Card kind="chart" className="card-surface chart-card bg-white w-full">
+            <div className="flex items-center justify-between border-b border-border pb-2 mb-1">
               <h3 className="section-title font-sans text-sm font-bold text-foreground">
                 Ranking de Eficiência por Estratégia
               </h3>
-              <div
-                id="plot-ranking"
-                ref={rankingPlotRef}
-                className="mt-2 h-[220px] w-full block"
-              />
-            </Card>
+              <span className="text-xs text-muted-foreground font-mono">
+                {displayedSummaries.length} estratégias avaliadas ({activeDirection})
+              </span>
+            </div>
+            <div
+              id="plot-ranking"
+              ref={rankingPlotRef}
+              className="mt-2 h-[260px] w-full block"
+            />
+          </Card>
 
-            <Card kind="chart" className="card-surface chart-card bg-white">
+          {/* Gráfico 2: Matriz Risco (MAE) x Retorno Esperado - Ocupa 100% da largura */}
+          <Card kind="chart" className="card-surface chart-card bg-white w-full">
+            <div className="flex items-center justify-between border-b border-border pb-2 mb-1">
               <h3 className="section-title font-sans text-sm font-bold text-foreground">
                 Matriz Risco (MAE) x Retorno Esperado
               </h3>
-              <div
-                id="plot-scatter"
-                ref={scatterPlotRef}
-                className="mt-2 h-[220px] w-full block"
-              />
-            </Card>
-          </div>
+              <span className="text-xs text-muted-foreground font-mono">
+                Retorno Médio vs Drawdown Máximo Adverso ({activeDirection})
+              </span>
+            </div>
+            <div
+              id="plot-scatter"
+              ref={scatterPlotRef}
+              className="mt-2 h-[260px] w-full block"
+            />
+          </Card>
 
+          {/* Tabela de Sinais Filtrados */}
           <Card className="card-surface">
-            <div className="mb-3 border-b border-border pb-2.5">
+            <div className="mb-3 flex items-center justify-between border-b border-border pb-2.5">
               <h3 className="section-title font-sans text-sm font-bold text-foreground">
                 Histórico Cronológico de Sinais Detectados
               </h3>
+              <Badge intent="neutral">
+                {displayedSignals.length} sinais filtrados
+              </Badge>
             </div>
             <Table density="compact" showMobileHint>
               <TableHeader>
@@ -486,14 +492,14 @@ export function ChartPage() {
                 </TableRow>
               </TableHeader>
               <TableBody id="signals-table-body">
-                {(analysis?.signals || []).length === 0 ? (
+                {displayedSignals.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} className="py-6 text-center text-muted-foreground">
-                      Nenhum sinal filtrado no período selecionado.
+                      Nenhum sinal filtrado para os critérios selecionados ({activeDirection}).
                     </TableCell>
                   </TableRow>
                 ) : (
-                  (analysis?.signals || []).slice(0, 30).map((sig, idx) => (
+                  displayedSignals.slice(0, 40).map((sig, idx) => (
                     <TableRow key={`${sig.time || sig.signal_date || idx}-${idx}`}>
                       <TableCell className="font-mono">
                         {sig.time || sig.signal_date || sig.execution_date || "—"}
