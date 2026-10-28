@@ -272,8 +272,11 @@ def test_portfolio_tab_dom_and_ergonomics():
     assert res_html.status_code == 200
     html = res_html.text
 
-    # Verify navigation button and tab view container
-    assert 'data-tab="tab-portfolio"' in html
+    # Verify navigation button and tab view container.
+    # A Feature 023 removeu o header legado (T025); o controle canônico da
+    # carteira passou a ser o pilar "posicoes", que aponta para o mesmo painel.
+    assert 'data-tab="posicoes"' in html
+    assert 'aria-controls="tab-portfolio"' in html
     assert 'id="tab-portfolio"' in html
     assert "Carteira" in html
 
