@@ -231,7 +231,7 @@ export function StrategyCombobox({
         aria-haspopup="true"
         aria-expanded={isOpen}
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex w-full items-center justify-between rounded-md border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-surface-subtle transition-colors shadow-sm"
+        className="select flex w-full items-center justify-between rounded-md border border-border-strong bg-surface font-medium text-foreground shadow-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-focus disabled:cursor-not-allowed disabled:opacity-50 min-h-[32px] px-2.5 py-1 text-xs cursor-pointer"
       >
         <span className="truncate">
           Filtro de Estratégias ({selectedCount}/{totalCount})

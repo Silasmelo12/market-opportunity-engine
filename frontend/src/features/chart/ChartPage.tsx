@@ -15,9 +15,10 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { formatCurrencyBRL, formatPercentPtBr } from "@/lib/formatters";
-import { KNOWN_ASSET_NAMES } from "@/lib/constants";
+import { KNOWN_ASSET_NAMES, ALL_ASSET_GROUPS } from "@/lib/constants";
+import { StrategyCombobox, ALL_STRATEGY_IDS } from "./StrategyCombobox";
 import { fetchAssetAnalysis } from "@/services/market-service";
-import type { AnalyzeResponse } from "@/types/market";
+import type { AnalyzeResponse, CandlePoint } from "@/types/market";
 import { renderPlotlySafely } from "@/hooks/use-plotly-chart";
 import { AppIcon } from "@/components/layout/SvgSprite";
 
@@ -56,6 +57,73 @@ function getChartThemeTokens(): ChartThemeTokens {
   };
 }
 
+// Funções de Cálculo dos Indicadores Técnicos
+function calculateSMA(candles: CandlePoint[], period: number) {
+  const result: { time: string; value: number }[] = [];
+  if (candles.length < period) return result;
+  let sum = 0;
+  for (let i = 0; i < candles.length; i++) {
+    sum += candles[i].close;
+    if (i >= period) {
+      sum -= candles[i - period].close;
+    }
+    if (i >= period - 1) {
+      result.push({
+        time: candles[i].time,
+        value: Number((sum / period).toFixed(2)),
+      });
+    }
+  }
+  return result;
+}
+
+function calculateBollingerBands(candles: CandlePoint[], period = 20, multiplier = 2) {
+  const upper: { time: string; value: number }[] = [];
+  const lower: { time: string; value: number }[] = [];
+  if (candles.length < period) return { upper, lower };
+  for (let i = period - 1; i < candles.length; i++) {
+    const slice = candles.slice(i - period + 1, i + 1);
+    const mean = slice.reduce((acc, c) => acc + c.close, 0) / period;
+    const variance = slice.reduce((acc, c) => acc + Math.pow(c.close - mean, 2), 0) / period;
+    const stdDev = Math.sqrt(variance);
+    upper.push({ time: candles[i].time, value: Number((mean + multiplier * stdDev).toFixed(2)) });
+    lower.push({ time: candles[i].time, value: Number((mean - multiplier * stdDev).toFixed(2)) });
+  }
+  return { upper, lower };
+}
+
+function calculateVWAP(candles: CandlePoint[]) {
+  const result: { time: string; value: number }[] = [];
+  let cumVol = 0;
+  let cumTypicalVol = 0;
+  for (const c of candles) {
+    const typical = (c.high + c.low + c.close) / 3;
+    const vol = c.volume || 1;
+    cumVol += vol;
+    cumTypicalVol += typical * vol;
+    result.push({
+      time: c.time,
+      value: Number((cumTypicalVol / (cumVol || 1)).toFixed(2)),
+    });
+  }
+  return result;
+}
+
+function calculateSupportResistance(candles: CandlePoint[], lookback = 30) {
+  const support: { time: string; value: number }[] = [];
+  const resistance: { time: string; value: number }[] = [];
+  if (candles.length < 5) return { support, resistance };
+  for (let i = 0; i < candles.length; i++) {
+    const start = Math.max(0, i - lookback);
+    const slice = candles.slice(start, i + 1);
+    const minLow = Math.min(...slice.map((c) => c.low));
+    const maxHigh = Math.max(...slice.map((c) => c.high));
+    support.push({ time: candles[i].time, value: Number(minLow.toFixed(2)) });
+    resistance.push({ time: candles[i].time, value: Number(maxHigh.toFixed(2)) });
+  }
+  return { support, resistance };
+}
+
 declare global {
   interface Window {
     LightweightCharts?: {
@@ -67,7 +135,10 @@ declare global {
           setData: (candles: unknown[]) => void;
           setMarkers?: (markers: unknown[]) => void;
         };
-        addHistogramSeries: (options: Record<string, unknown>) => {
+        addLineSeries?: (options: Record<string, unknown>) => {
+          setData: (data: unknown[]) => void;
+        };
+        addHistogramSeries?: (options: Record<string, unknown>) => {
           setData: (data: unknown[]) => void;
         };
         timeScale: () => { fitContent: () => void };
@@ -251,7 +322,16 @@ export function ChartPage() {
   const [timeframeBtn, setTimeframeBtn] = React.useState<string>("6M");
   const [strategyFilterSearch, setStrategyFilterSearch] = React.useState<string>("");
 
-  // Checkboxes das 8 estratégias
+  // Checkboxes de todas as 60+ estratégias do sistema
+  const [enabledStrategies, setEnabledStrategies] = React.useState<Record<string, boolean>>(() => {
+    const init: Record<string, boolean> = {};
+    ALL_STRATEGY_IDS.forEach((id) => {
+      init[id] = true;
+    });
+    return init;
+  });
+
+  // Checkboxes dos 8 pilares da barra lateral
   const [strategyChecks, setStrategyChecks] = React.useState<Record<string, boolean>>({
     tendencia: true,
     suporte_resistencia: true,
@@ -260,8 +340,51 @@ export function ChartPage() {
     volume: true,
     macd: true,
     bollinger: true,
-    priceAction: true,
+    price_action: true,
   });
+
+  const handleTogglePillar = (pillarId: string, checked: boolean) => {
+    setStrategyChecks((prev) => ({ ...prev, [pillarId]: checked }));
+    const subIdsToToggle: string[] = [];
+    if (pillarId === "tendencia") {
+      subIdsToToggle.push(
+        "t1_open", "t1_retest", "t2_open", "t2_retest",
+        "sell_t1_open", "sell_t1_retest", "sell_t2_open", "sell_t2_retest"
+      );
+    } else if (pillarId === "suporte_resistencia") {
+      subIdsToToggle.push(
+        "price_action_double_bottom_bos", "buy_double_top_inverted",
+        "sell_double_top_bos", "sell_double_bottom_inverted"
+      );
+    } else if (pillarId === "rsi") {
+      subIdsToToggle.push("rsi_divergence", "stochastic_extreme");
+    } else if (pillarId === "medias_moveis") {
+      subIdsToToggle.push("supertrend_trailing", "zscore_extreme");
+    } else if (pillarId === "volume") {
+      subIdsToToggle.push("volume_climax_vsa", "mfi_extreme", "vwap_bands");
+    } else if (pillarId === "macd") {
+      subIdsToToggle.push("macd_momentum");
+    } else if (pillarId === "bollinger") {
+      subIdsToToggle.push("bollinger_close_in", "keltner_squeeze");
+    } else if (pillarId === "price_action") {
+      subIdsToToggle.push(
+        "hammer", "inverted_hammer", "bullish_engulfing", "piercing_line", "morning_star",
+        "bullish_harami", "three_inside_up", "three_outside_up", "three_white_soldiers",
+        "tweezer_bottom", "dragonfly_doji", "abandoned_baby_bullish", "bullish_kicker",
+        "climactic_pinbar", "shooting_star", "hanging_man", "bearish_engulfing",
+        "dark_cloud_cover", "evening_star", "bearish_harami", "three_inside_down",
+        "three_outside_down", "three_black_crows", "tweezer_top", "gravestone_doji",
+        "abandoned_baby_bearish", "bearish_kicker", "climactic_bearish_pinbar"
+      );
+    }
+    setEnabledStrategies((prev) => {
+      const next = { ...prev };
+      subIdsToToggle.forEach((id) => {
+        next[id] = checked;
+      });
+      return next;
+    });
+  };
 
   const [analysis, setAnalysis] = React.useState<AnalyzeResponse | null>(null);
   const [loading, setLoading] = React.useState<boolean>(false);
@@ -302,15 +425,17 @@ export function ChartPage() {
     }
   }, [activeRoute, chartTicker, loadAnalysis]);
 
-  // Sinais filtrados
+  // Sinais filtrados pela direção e pelas estratégias selecionadas no Combobox
   const displayedSignals = React.useMemo(() => {
     const all = analysis?.signals || [];
     return all.filter((sig) => {
       if (activeDirection === "BUY" && sig.direction !== "BUY") return false;
       if (activeDirection === "SELL" && sig.direction !== "SELL") return false;
+      const subId = sig.strategy_sub_id;
+      if (subId && enabledStrategies[subId] === false) return false;
       return true;
     });
-  }, [analysis, activeDirection]);
+  }, [analysis, activeDirection, enabledStrategies]);
 
   // Render TradingView e Plotly Scatter
   React.useEffect(() => {
@@ -371,19 +496,108 @@ export function ChartPage() {
           series.setMarkers(markers);
         }
 
-        // Adiciona volume histograma embaixo se a API suportar
-        if (chart.addHistogramSeries) {
-          const volumeSeries = chart.addHistogramSeries({
-            color: tokens.primary,
-            priceFormat: { type: "volume" },
-            priceScaleId: "",
-          });
-          const volumeData = analysis.candles.map((c) => ({
-            time: c.time,
-            value: c.volume || 1000,
-            color: c.close >= c.open ? "rgba(16, 185, 129, 0.4)" : "rgba(244, 63, 94, 0.4)",
-          }));
-          volumeSeries.setData(volumeData);
+        // Adiciona os indicadores técnicos correspondentes às estratégias ativas
+        if (chart.addLineSeries && analysis.candles.length > 0) {
+          // 1. Médias Móveis (SMA 20 e SMA 50)
+          const showMA =
+            enabledStrategies["medias_moveis"] !== false ||
+            enabledStrategies["tendencia"] !== false ||
+            enabledStrategies["t1_open"] !== false ||
+            enabledStrategies["supertrend_trailing"] !== false;
+          if (showMA) {
+            const sma20Data = calculateSMA(analysis.candles, 20);
+            if (sma20Data.length > 0) {
+              const sma20Series = chart.addLineSeries({
+                color: tokens.primary,
+                lineWidth: 2,
+                title: "SMA 20",
+                priceLineVisible: false,
+              });
+              sma20Series.setData(sma20Data);
+            }
+            const sma50Data = calculateSMA(analysis.candles, 50);
+            if (sma50Data.length > 0) {
+              const sma50Series = chart.addLineSeries({
+                color: "rgb(234, 179, 8)",
+                lineWidth: 1,
+                title: "SMA 50",
+                priceLineVisible: false,
+              });
+              sma50Series.setData(sma50Data);
+            }
+          }
+
+          // 2. Bandas de Bollinger
+          const showBollinger =
+            enabledStrategies["bollinger"] !== false ||
+            enabledStrategies["bollinger_close_in"] !== false;
+          if (showBollinger) {
+            const bb = calculateBollingerBands(analysis.candles, 20, 2);
+            if (bb.upper.length > 0) {
+              const bbUpper = chart.addLineSeries({
+                color: "rgba(168, 85, 247, 0.75)",
+                lineWidth: 1,
+                lineStyle: 2,
+                title: "Bollinger Sup",
+                priceLineVisible: false,
+              });
+              bbUpper.setData(bb.upper);
+
+              const bbLower = chart.addLineSeries({
+                color: "rgba(168, 85, 247, 0.75)",
+                lineWidth: 1,
+                lineStyle: 2,
+                title: "Bollinger Inf",
+                priceLineVisible: false,
+              });
+              bbLower.setData(bb.lower);
+            }
+          }
+
+          // 3. VWAP
+          const showVWAP =
+            enabledStrategies["volume"] !== false ||
+            enabledStrategies["vwap_bands"] !== false;
+          if (showVWAP) {
+            const vwapData = calculateVWAP(analysis.candles);
+            if (vwapData.length > 0) {
+              const vwapSeries = chart.addLineSeries({
+                color: "rgb(14, 165, 233)",
+                lineWidth: 1,
+                title: "VWAP",
+                priceLineVisible: false,
+              });
+              vwapSeries.setData(vwapData);
+            }
+          }
+
+          // 4. Suporte e Resistência Dinâmicos
+          const showSR =
+            enabledStrategies["suporte_resistencia"] !== false ||
+            enabledStrategies["price_action_double_bottom_bos"] !== false ||
+            enabledStrategies["sell_double_top_bos"] !== false;
+          if (showSR) {
+            const sr = calculateSupportResistance(analysis.candles, 30);
+            if (sr.resistance.length > 0) {
+              const resSeries = chart.addLineSeries({
+                color: tokens.down,
+                lineWidth: 1,
+                lineStyle: 1,
+                title: "Resistência",
+                priceLineVisible: false,
+              });
+              resSeries.setData(sr.resistance);
+
+              const supSeries = chart.addLineSeries({
+                color: tokens.up,
+                lineWidth: 1,
+                lineStyle: 1,
+                title: "Suporte",
+                priceLineVisible: false,
+              });
+              supSeries.setData(sr.support);
+            }
+          }
         }
 
         chart.timeScale().fitContent();
@@ -434,7 +648,7 @@ export function ChartPage() {
         showlegend: false,
       }
     );
-  }, [theme, analysis, displayedSignals]);
+  }, [theme, analysis, displayedSignals, enabledStrategies]);
 
   const cleanTicker = chartTicker.replace(".SA", "");
   const resolvedTitleName =
@@ -511,11 +725,15 @@ export function ChartPage() {
               value={chartTicker}
               onChange={(e) => setChartTicker(e.target.value)}
             >
-              <option value="PETR4.SA">PETR4 (Petrobras PN)</option>
-              <option value="VALE3.SA">VALE3 (Vale ON)</option>
-              <option value="ITUB4.SA">ITUB4 (Itaú Unibanco PN)</option>
-              <option value="BBAS3.SA">BBAS3 (Banco do Brasil ON)</option>
-              <option value="WEGE3.SA">WEGE3 (WEG ON)</option>
+              {ALL_ASSET_GROUPS.map((group) => (
+                <optgroup key={group.category} label={group.category}>
+                  {group.assets.map((asset) => (
+                    <option key={asset.symbol} value={asset.symbol}>
+                      {asset.symbol} - {asset.name}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
             </Select>
           </div>
 
@@ -523,11 +741,14 @@ export function ChartPage() {
             <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">
               Categoria de Operação
             </label>
-            <Select selectSize="sm" defaultValue="ALL">
-              <option value="ALL">Todos</option>
-              <option value="tendencia">Tendência</option>
-              <option value="price_action">Price Action</option>
-              <option value="indicadores">Indicadores</option>
+            <Select
+              selectSize="sm"
+              value={activeDirection}
+              onChange={(e) => setActiveDirection(e.target.value as "BUY" | "SELL" | "BOTH")}
+            >
+              <option value="BOTH">Todas as categorias (Ambos)</option>
+              <option value="BUY">▲ Compra (Fundo)</option>
+              <option value="SELL">▼ Venda (Topo)</option>
             </Select>
           </div>
 
@@ -535,12 +756,11 @@ export function ChartPage() {
             <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">
               Estratégia
             </label>
-            <Select selectSize="sm" defaultValue="ALL">
-              <option value="ALL">Todas as estratégias</option>
-              <option value="t1_open">Negação Barra Anterior</option>
-              <option value="double_bottom">Fundo Duplo Institucional</option>
-              <option value="spring_wyckoff">Spring Wyckoff</option>
-            </Select>
+            <StrategyCombobox
+              enabledStrategies={enabledStrategies}
+              onChange={setEnabledStrategies}
+              activeDirection={activeDirection}
+            />
           </div>
 
           <div>
@@ -689,8 +909,8 @@ export function ChartPage() {
                 </div>
               </div>
 
-              {/* Legenda de Compra / Venda / Sinal */}
-              <div className="mt-2 flex items-center justify-end gap-3 text-[11px] font-semibold text-muted-foreground">
+              {/* Legenda de Compra / Venda / Sinal / Indicadores */}
+              <div className="mt-2 flex flex-wrap items-center justify-end gap-3 text-[11px] font-semibold text-muted-foreground">
                 <span className="flex items-center gap-1 text-success font-bold">
                   ▲ Compra
                 </span>
@@ -699,6 +919,12 @@ export function ChartPage() {
                 </span>
                 <span className="flex items-center gap-1 text-primary font-bold">
                   ● Sinal
+                </span>
+                <span className="flex items-center gap-1 text-primary">
+                  — SMA 20
+                </span>
+                <span className="flex items-center gap-1 text-warning">
+                  — SMA 50
                 </span>
               </div>
 
@@ -967,7 +1193,7 @@ export function ChartPage() {
           {/* Card do Ativo Selecionado */}
           <div className="rounded-lg border border-border bg-surface-subtle p-3 flex items-center justify-between">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-emerald-600 text-[11px] font-extrabold text-white">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary text-[11px] font-extrabold text-primary-foreground">
                 BR
               </div>
               <div className="min-w-0">
@@ -1054,10 +1280,7 @@ export function ChartPage() {
                     type="checkbox"
                     checked={strategyChecks[st.id] !== false}
                     onChange={(e) =>
-                      setStrategyChecks((prev) => ({
-                        ...prev,
-                        [st.id]: e.target.checked,
-                      }))
+                      handleTogglePillar(st.id, e.target.checked)
                     }
                     className="h-3.5 w-3.5 rounded border-border-strong text-primary accent-primary"
                   />
@@ -1116,6 +1339,11 @@ export function ChartPage() {
                   reset[s.id] = true;
                 });
                 setStrategyChecks(reset);
+                const allReset: Record<string, boolean> = {};
+                ALL_STRATEGY_IDS.forEach((id) => {
+                  allReset[id] = true;
+                });
+                setEnabledStrategies(allReset);
                 void loadAnalysis(chartTicker, true);
               }}
             >
@@ -1126,7 +1354,7 @@ export function ChartPage() {
               id="btn-load-analysis"
               variant="primary"
               size="sm"
-              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold"
+              className="w-full font-bold"
               disabled={loading}
               onClick={() => void loadAnalysis(chartTicker, false)}
             >
