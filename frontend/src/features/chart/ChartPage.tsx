@@ -302,6 +302,46 @@ function StatusPill({ status }: { status: "Compra" | "Venda" | "Neutro" }) {
   );
 }
 
+type RankingSortField = "position" | "strategy" | "signals" | "efficiency" | "return";
+type RankingSortDirection = "asc" | "desc";
+
+function TableSortIcon({ active, direction }: { active: boolean; direction: RankingSortDirection }) {
+  if (!active) {
+    return (
+      <svg
+        className="h-3 w-3 opacity-30 group-hover:opacity-80 transition-opacity shrink-0"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
+        <path d="M7 15l5 5 5-5M7 9l5-5 5 5" />
+      </svg>
+    );
+  }
+  return direction === "asc" ? (
+    <svg
+      className="h-3 w-3 text-primary shrink-0 transition-transform"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+    >
+      <path d="M12 19V5M5 12l7-7 7 7" />
+    </svg>
+  ) : (
+    <svg
+      className="h-3 w-3 text-primary shrink-0 transition-transform"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+    >
+      <path d="M12 5v14M19 12l-7 7-7-7" />
+    </svg>
+  );
+}
+
 export function ChartPage() {
   const {
     activeRoute,
@@ -477,6 +517,72 @@ export function ChartPage() {
       return isStrategyActive(sum.strategy_sub_id, enabledStrategies);
     });
   }, [analysis, activeDirection, enabledStrategies, hasSelectedStrategies]);
+
+  // Estado e lógica de ordenação do Ranking de Eficiência por Estratégia
+  const [rankingSortField, setRankingSortField] = React.useState<RankingSortField>("position");
+  const [rankingSortDirection, setRankingSortDirection] = React.useState<RankingSortDirection>("asc");
+
+  const handleRankingSort = React.useCallback(
+    (field: RankingSortField) => {
+      if (rankingSortField === field) {
+        setRankingSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+      } else {
+        setRankingSortField(field);
+        if (field === "efficiency" || field === "return" || field === "signals") {
+          setRankingSortDirection("desc");
+        } else {
+          setRankingSortDirection("asc");
+        }
+      }
+    },
+    [rankingSortField]
+  );
+
+  const sortedSummaries = React.useMemo(() => {
+    const withRank = displayedSummaries.map((item, idx) => ({
+      ...item,
+      originalRank: idx + 1,
+    }));
+
+    return [...withRank].sort((a, b) => {
+      let comparison = 0;
+      switch (rankingSortField) {
+        case "position":
+          comparison = a.originalRank - b.originalRank;
+          break;
+        case "strategy": {
+          const nameA = a.strategy_label || a.strategy_sub_id || "";
+          const nameB = b.strategy_label || b.strategy_sub_id || "";
+          comparison = nameA.localeCompare(nameB, "pt-BR", { sensitivity: "base" });
+          break;
+        }
+        case "signals": {
+          const countA = a.executed_buys ?? a.total_signals ?? 0;
+          const countB = b.executed_buys ?? b.total_signals ?? 0;
+          comparison = countA - countB;
+          break;
+        }
+        case "efficiency": {
+          const rateA = a.win_rate ?? 0;
+          const rateB = b.win_rate ?? 0;
+          comparison = rateA - rateB;
+          break;
+        }
+        case "return": {
+          const retA = a.mean_forward_return ?? 0;
+          const retB = b.mean_forward_return ?? 0;
+          comparison = retA - retB;
+          break;
+        }
+      }
+
+      if (comparison === 0) {
+        comparison = a.originalRank - b.originalRank;
+      }
+
+      return rankingSortDirection === "asc" ? comparison : -comparison;
+    });
+  }, [displayedSummaries, rankingSortField, rankingSortDirection]);
 
   // KPIs dinâmicos calculados em tempo real
   const dynamicKpis = React.useMemo(() => {
@@ -1137,21 +1243,74 @@ export function ChartPage() {
                 </span>
               </div>
 
-              {/* Tabela Formatada de Ranking com Badges Coloridos */}
-              <div className="mt-1 overflow-y-auto max-h-[340px]">
-                <Table density="compact">
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-12 text-center">Posição</TableHead>
-                      <TableHead>Estratégia</TableHead>
-                      <TableHead className="text-right">Sinais</TableHead>
-                      <TableHead className="text-right">Eficiência</TableHead>
-                      <TableHead className="text-right">Retorno Médio</TableHead>
+              {/* Tabela Formatada de Ranking com Badges Coloridos e Cabeçalho Fixo */}
+              <div className="mt-1">
+                <Table
+                  density="compact"
+                  wrapperClassName="max-h-[340px] overflow-y-auto overflow-x-auto relative rounded-md border border-border"
+                >
+                  <TableHeader className="sticky top-0 z-20 bg-surface-subtle shadow-xs border-b border-border">
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="w-16 text-center sticky top-0 z-20 bg-surface-subtle p-0">
+                        <button
+                          type="button"
+                          onClick={() => handleRankingSort("position")}
+                          className="flex items-center justify-center gap-1 font-semibold hover:text-foreground transition-colors group cursor-pointer w-full py-2 px-2 text-[11px] uppercase tracking-wider"
+                          title="Ordenar por Posição"
+                        >
+                          <span>Posição</span>
+                          <TableSortIcon active={rankingSortField === "position"} direction={rankingSortDirection} />
+                        </button>
+                      </TableHead>
+                      <TableHead className="sticky top-0 z-20 bg-surface-subtle p-0">
+                        <button
+                          type="button"
+                          onClick={() => handleRankingSort("strategy")}
+                          className="flex items-center gap-1 font-semibold hover:text-foreground transition-colors group cursor-pointer w-full py-2 px-2 text-[11px] uppercase tracking-wider"
+                          title="Ordenar por Nome da Estratégia"
+                        >
+                          <span>Estratégia</span>
+                          <TableSortIcon active={rankingSortField === "strategy"} direction={rankingSortDirection} />
+                        </button>
+                      </TableHead>
+                      <TableHead className="text-right sticky top-0 z-20 bg-surface-subtle p-0">
+                        <button
+                          type="button"
+                          onClick={() => handleRankingSort("signals")}
+                          className="flex items-center justify-end gap-1 font-semibold hover:text-foreground transition-colors group cursor-pointer w-full py-2 px-2 text-[11px] uppercase tracking-wider"
+                          title="Ordenar por Quantidade de Sinais"
+                        >
+                          <span>Sinais</span>
+                          <TableSortIcon active={rankingSortField === "signals"} direction={rankingSortDirection} />
+                        </button>
+                      </TableHead>
+                      <TableHead className="text-right sticky top-0 z-20 bg-surface-subtle p-0">
+                        <button
+                          type="button"
+                          onClick={() => handleRankingSort("efficiency")}
+                          className="flex items-center justify-end gap-1 font-semibold hover:text-foreground transition-colors group cursor-pointer w-full py-2 px-2 text-[11px] uppercase tracking-wider"
+                          title="Ordenar por Eficiência (Win Rate)"
+                        >
+                          <span>Eficiência</span>
+                          <TableSortIcon active={rankingSortField === "efficiency"} direction={rankingSortDirection} />
+                        </button>
+                      </TableHead>
+                      <TableHead className="text-right sticky top-0 z-20 bg-surface-subtle p-0">
+                        <button
+                          type="button"
+                          onClick={() => handleRankingSort("return")}
+                          className="flex items-center justify-end gap-1 font-semibold hover:text-foreground transition-colors group cursor-pointer w-full py-2 px-2 text-[11px] uppercase tracking-wider"
+                          title="Ordenar por Retorno Médio"
+                        >
+                          <span>Retorno Médio</span>
+                          <TableSortIcon active={rankingSortField === "return"} direction={rankingSortDirection} />
+                        </button>
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {displayedSummaries.length > 0 ? (
-                      displayedSummaries.map((item, idx) => {
+                    {sortedSummaries.length > 0 ? (
+                      sortedSummaries.map((item, idx) => {
                         const executedCount = item.executed_buys ?? item.total_signals ?? 0;
                         const totalCount = item.total_signals ?? executedCount;
                         const signalsDisplay =
@@ -1168,12 +1327,12 @@ export function ChartPage() {
                             <TableCell className="text-center">
                               <span
                                 className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold ${
-                                  idx === 0
+                                  item.originalRank === 1
                                     ? "bg-success text-primary-foreground"
                                     : "bg-surface-subtle text-foreground"
                                 }`}
                               >
-                                {idx + 1}
+                                {item.originalRank}
                               </span>
                             </TableCell>
                             <TableCell>
