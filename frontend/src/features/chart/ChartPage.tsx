@@ -759,49 +759,66 @@ export function ChartPage() {
       }
     }
 
-    // Matriz Risco x Retorno Esperado (Plotly Scatter)
-    const scatterData = [
-      { x: [5], y: [16], name: "Tendência", color: "rgb(16, 185, 129)", size: 18 },
-      { x: [8], y: [14], name: "Suporte e Resistência", color: "rgb(14, 165, 233)", size: 14 },
-      { x: [6], y: [12], name: "IFR (RSI)", color: "rgb(168, 85, 247)", size: 14 },
-      { x: [10], y: [9], name: "Médias Móveis", color: "rgb(244, 63, 94)", size: 12 },
-      { x: [4], y: [22], name: "Volume", color: "rgb(56, 189, 248)", size: 22 },
-      { x: [7], y: [8], name: "MACD", color: "rgb(234, 179, 8)", size: 10 },
-      { x: [12], y: [12], name: "Bandas de Bollinger", color: "rgb(217, 119, 6)", size: 16 },
-      { x: [3], y: [6], name: "Price Action", color: "rgb(225, 29, 72)", size: 12 },
-    ];
+    // Matriz Risco x Retorno Esperado (Plotly Scatter) baseada nas estratégias selecionadas
+    const scatterData = hasSelectedStrategies && displayedSummaries.length > 0
+      ? displayedSummaries.map((s, idx) => {
+          const colors = [
+            "rgb(16, 185, 129)",
+            "rgb(14, 165, 233)",
+            "rgb(168, 85, 247)",
+            "rgb(244, 63, 94)",
+            "rgb(56, 189, 248)",
+            "rgb(234, 179, 8)",
+            "rgb(217, 119, 6)",
+            "rgb(225, 29, 72)",
+          ];
+          const color = colors[idx % colors.length];
+          const maeVal = Math.abs(Number(s.mean_mae ?? 0));
+          const retVal = Number(s.mean_forward_return ?? 0);
+          return {
+            x: [Number(maeVal.toFixed(2))],
+            y: [Number(retVal.toFixed(2))],
+            name: s.strategy_label || s.strategy_sub_id,
+            color,
+            size: Math.min(22, Math.max(12, Math.round(10 + Math.sqrt(s.total_signals ?? 1) * 2))),
+          };
+        })
+      : [];
 
     renderPlotlySafely(
       scatterPlotRef.current,
       scatterData.map((d) => ({
         type: "scatter",
-        mode: "markers",
+        mode: "markers+text",
         name: d.name,
+        text: [d.name],
+        textposition: "top center",
+        textfont: { size: 10, color: tokens.text },
         x: d.x,
         y: d.y,
         marker: { color: d.color, size: d.size, opacity: 0.85 },
       })),
       {
-        margin: { t: 16, r: 16, b: 36, l: 48 },
+        margin: { t: 20, r: 20, b: 40, l: 48 },
         paper_bgcolor: tokens.bg,
         plot_bgcolor: tokens.bg,
         font: { family: "Plus Jakarta Sans, sans-serif", size: 11, color: tokens.text },
         xaxis: {
-          title: "MAE (Risco)",
+          title: "MAE (Risco Máx %)",
           gridcolor: tokens.grid,
           ticksuffix: "%",
-          range: [0, 25],
+          rangemode: "tozero",
         },
         yaxis: {
-          title: "Retorno Esperado",
+          title: "Retorno Médio (%)",
           gridcolor: tokens.grid,
           ticksuffix: "%",
-          range: [0, 28],
+          zerolinecolor: tokens.grid,
         },
         showlegend: false,
       }
     );
-  }, [theme, analysis, displayedSignals, enabledStrategies]);
+  }, [theme, analysis, displayedSignals, displayedSummaries, enabledStrategies, hasSelectedStrategies]);
 
   const cleanTicker = chartTicker.replace(".SA", "");
   const resolvedTitleName =
@@ -1200,70 +1217,132 @@ export function ChartPage() {
                 </div>
 
                 {/* Legenda Lateral das Estratégias */}
-                <div className="w-44 shrink-0 space-y-1.5 border-l border-border pl-3 text-xs">
-                  {STRATEGY_PILLARS.map((st) => (
-                    <div key={st.id} className="flex items-center gap-2">
-                      <span className={`h-2.5 w-2.5 rounded-full ${st.dotColor} shrink-0`} />
-                      <span className="truncate text-[11px] font-medium text-muted-foreground">
-                        {st.label}
-                      </span>
+                <div className="w-48 shrink-0 space-y-1.5 border-l border-border pl-3 text-xs overflow-y-auto max-h-[250px]">
+                  {hasSelectedStrategies && displayedSummaries.length > 0 ? (
+                    displayedSummaries.map((st, idx) => {
+                      const colors = [
+                        "bg-success",
+                        "bg-primary",
+                        "bg-primary-hover",
+                        "bg-danger",
+                        "bg-warning",
+                        "bg-success-border",
+                        "bg-danger-border",
+                      ];
+                      const dot = colors[idx % colors.length];
+                      return (
+                        <div key={st.strategy_sub_id} className="flex items-center gap-2">
+                          <span className={`h-2.5 w-2.5 rounded-full ${dot} shrink-0`} />
+                          <span className="truncate text-[11px] font-medium text-muted-foreground" title={st.strategy_label}>
+                            {st.strategy_label || st.strategy_sub_id}
+                          </span>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="text-[11px] text-muted-foreground py-2">
+                      Nenhuma estratégia selecionada
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             </Card>
 
             {/* Card: Histórico Cronológico de Sinais Detectados */}
-            <Card className="card-surface xl:col-span-6 p-4 flex flex-col justify-between shadow-sm">
-              <div className="border-b border-border pb-2.5">
+            <Card className="card-surface xl:col-span-6 p-4 flex flex-col justify-start shadow-sm">
+              <div className="flex items-center justify-between border-b border-border pb-2.5">
                 <h3 className="section-title font-sans text-sm font-bold text-foreground">
                   Histórico Cronológico de Sinais Detectados
                 </h3>
+                <span className="text-[11px] font-mono text-muted-foreground">
+                  {hasSelectedStrategies
+                    ? `${displayedSignals.length} sinais encontrados`
+                    : "0 sinais"}
+                </span>
               </div>
 
               {/* Lista Cronológica com Linhas de Timeline */}
-              <div className="mt-3 space-y-3">
-                {TIMELINE_SIGNALS.map((sig, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-start gap-3 border-b border-border/50 pb-2 last:border-b-0"
-                  >
-                    <div className="mt-0.5">
-                      <span
-                        className={`inline-block h-2 w-2 rounded-full ${
-                          sig.type === "BUY" ? "bg-success" : "bg-danger"
-                        }`}
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs text-muted-foreground">
-                          {sig.date}
-                        </span>
-                        {sig.type === "BUY" ? (
-                          <span className="rounded bg-success-soft border border-success-border px-2 py-0.5 text-[11px] font-bold text-success">
-                            ● Compra
-                          </span>
-                        ) : (
-                          <span className="rounded bg-danger-soft border border-danger-border px-2 py-0.5 text-[11px] font-bold text-danger">
-                            ● Venda
-                          </span>
-                        )}
-                      </div>
-                      <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                        <span className="font-bold text-foreground">{sig.asset}</span>
-                        <span>·</span>
-                        <span>{sig.strategy}</span>
-                        <span>·</span>
-                        <span className="font-mono">Preço: {sig.price}</span>
-                        <span>·</span>
-                        <span className="font-mono">MAE: {sig.mae}</span>
-                        <span>·</span>
-                        <span className="font-mono text-success">Retorno Est.: {sig.retorno}</span>
-                      </div>
-                    </div>
+              <div className="mt-3 space-y-3 overflow-y-auto max-h-[300px] pr-1">
+                {hasSelectedStrategies && displayedSignals.length > 0 ? (
+                  [...displayedSignals]
+                    .sort((a, b) => {
+                      const da = a.execution_date || a.signal_date || a.time || "";
+                      const db = b.execution_date || b.signal_date || b.time || "";
+                      return db.localeCompare(da);
+                    })
+                    .slice(0, 50)
+                    .map((sig, idx) => {
+                      const isBuy = sig.direction === "BUY";
+                      const dateDisplay = sig.execution_date || sig.signal_date || sig.time || "—";
+                      const priceDisplay = sig.execution_price
+                        ? formatCurrencyBRL(sig.execution_price)
+                        : sig.price
+                          ? formatCurrencyBRL(sig.price)
+                          : "—";
+                      const maeDisplay = typeof sig.mae_pct === "number"
+                        ? `${sig.mae_pct.toFixed(2).replace(".", ",")}%`
+                        : "—";
+                      const retDisplay = typeof sig.forward_return_pct === "number"
+                        ? `${sig.forward_return_pct >= 0 ? "+" : ""}${sig.forward_return_pct.toFixed(2).replace(".", ",")}%`
+                        : "—";
+
+                      return (
+                        <div
+                          key={`${sig.strategy_sub_id}-${dateDisplay}-${idx}`}
+                          className="flex items-start gap-3 border-b border-border/50 pb-2 last:border-b-0"
+                        >
+                          <div className="mt-0.5">
+                            <span
+                              className={`inline-block h-2 w-2 rounded-full ${
+                                isBuy ? "bg-success" : "bg-danger"
+                              }`}
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-xs text-muted-foreground">
+                                {dateDisplay}
+                              </span>
+                              {isBuy ? (
+                                <span className="rounded bg-success-soft border border-success-border px-2 py-0.5 text-[11px] font-bold text-success">
+                                  ● Compra
+                                </span>
+                              ) : (
+                                <span className="rounded bg-danger-soft border border-danger-border px-2 py-0.5 text-[11px] font-bold text-danger">
+                                  ● Venda
+                                </span>
+                              )}
+                            </div>
+                            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                              <span className="font-bold text-foreground">{cleanTicker}</span>
+                              <span>·</span>
+                              <span className="truncate max-w-[200px]" title={sig.strategy_label}>
+                                {sig.strategy_label || sig.strategy_sub_id}
+                              </span>
+                              <span>·</span>
+                              <span className="font-mono">Preço: {priceDisplay}</span>
+                              <span>·</span>
+                              <span className="font-mono">MAE: {maeDisplay}</span>
+                              <span>·</span>
+                              <span
+                                className={`font-mono font-bold ${
+                                  (sig.forward_return_pct ?? 0) >= 0 ? "text-success" : "text-danger"
+                                }`}
+                              >
+                                Retorno: {retDisplay}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                ) : (
+                  <div className="py-8 text-center text-xs text-muted-foreground">
+                    {hasSelectedStrategies
+                      ? "Nenhum sinal detectado para as estratégias selecionadas no período."
+                      : "Selecione uma ou mais estratégias no filtro acima para visualizar o histórico."}
                   </div>
-                ))}
+                )}
               </div>
 
               <div className="mt-3 flex items-center justify-end border-t border-border pt-2">
