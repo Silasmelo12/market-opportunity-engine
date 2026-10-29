@@ -40,6 +40,7 @@ export interface AnalyzeAssetParams {
   mBars?: number;
   minReturnPct?: number;
   direction?: string;
+  horizonX?: number;
   forceRefresh?: boolean;
 }
 
@@ -55,6 +56,7 @@ export async function fetchAssetAnalysis(
   search.set("m_bars", String(params.mBars ?? 5));
   search.set("min_return_pct", String(params.minReturnPct ?? 3.0));
   if (params.direction) search.set("direction", params.direction);
+  if (typeof params.horizonX === "number") search.set("horizon_x", String(params.horizonX));
   if (params.forceRefresh) search.set("force_refresh", "true");
 
   return fetchJson<AnalyzeResponse>(`/api/analyze?${search.toString()}`, {

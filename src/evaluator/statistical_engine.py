@@ -36,8 +36,8 @@ def evaluate_strategy_performance(
     Evaluates prospective performance over `horizon_bars` (X) for a list of SignalRecords
     belonging to a strategy or sub-variation, respecting BUY and SELL semantics.
     """
-    if horizon_bars < 1:
-        raise ValueError("horizon_bars (X) must be >= 1")
+    if horizon_bars < 0:
+        raise ValueError("horizon_bars (X) must be >= 0")
 
     n_bars = series.length
     inferred_strat_id = strategy_id or (signals[0].strategy_id if signals else "unknown")

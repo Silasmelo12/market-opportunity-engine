@@ -319,6 +319,7 @@ export function ChartPage() {
 
   const [period, setPeriod] = React.useState<string>("6m");
   const [interval, setIntervalState] = React.useState<string>("1d");
+  const [horizonX, setHorizonX] = React.useState<number>(60);
   const [timeframeBtn, setTimeframeBtn] = React.useState<string>("1D");
   const [strategyFilterSearch, setStrategyFilterSearch] = React.useState<string>("");
 
@@ -432,6 +433,7 @@ export function ChartPage() {
           period,
           interval,
           direction: activeDirection,
+          horizonX,
           forceRefresh,
         });
         setAnalysis(resp);
@@ -446,7 +448,7 @@ export function ChartPage() {
         setLoading(false);
       }
     },
-    [period, interval, activeDirection]
+    [period, interval, activeDirection, horizonX]
   );
 
   React.useEffect(() => {
@@ -866,7 +868,7 @@ export function ChartPage() {
 
       {/* 2. Barra de Filtros Globais Superiores */}
       <Card className="card-surface p-3.5 shadow-sm !overflow-visible z-20">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           <div>
             <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">
               Ativo
@@ -916,7 +918,7 @@ export function ChartPage() {
 
           <div>
             <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">
-              Período
+              Período Histórico
             </label>
             <Select
               id="select-period"
@@ -930,6 +932,26 @@ export function ChartPage() {
               <option value="1y">Último ano</option>
               <option value="2y">2 anos</option>
               <option value="max">Máximo</option>
+            </Select>
+          </div>
+
+          <div>
+            <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">
+              Saída (Horizonte X)
+            </label>
+            <Select
+              id="select-horizon-x"
+              selectSize="sm"
+              value={String(horizonX)}
+              onChange={(e) => setHorizonX(Number(e.target.value))}
+            >
+              <option value="0">0 barras (Mesma barra - Close)</option>
+              <option value="1">1 barra (+1 período)</option>
+              <option value="5">5 barras (+5 períodos)</option>
+              <option value="15">15 barras (+15 períodos)</option>
+              <option value="30">30 barras (+30 períodos)</option>
+              <option value="60">60 barras (Padrão Swing)</option>
+              <option value="120">120 barras (Longo prazo)</option>
             </Select>
           </div>
         </div>
