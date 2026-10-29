@@ -1144,7 +1144,7 @@ export function ChartPage() {
                     <TableRow>
                       <TableHead className="w-12 text-center">Posição</TableHead>
                       <TableHead>Estratégia</TableHead>
-                      <TableHead className="text-right">Entradas / Sinais</TableHead>
+                      <TableHead className="text-right">Sinais</TableHead>
                       <TableHead className="text-right">Eficiência</TableHead>
                       <TableHead className="text-right">Retorno Médio</TableHead>
                     </TableRow>
@@ -1160,8 +1160,8 @@ export function ChartPage() {
                             : `${executedCount}`;
                         const signalsTooltip =
                           totalCount !== executedCount
-                            ? `${executedCount} entradas executadas de ${totalCount} sinais gerados`
-                            : `${executedCount} entradas/sinais`;
+                            ? `${executedCount} de ${totalCount} sinais gerados`
+                            : `${executedCount} sinais`;
 
                         return (
                           <TableRow key={item.strategy_sub_id || idx}>
