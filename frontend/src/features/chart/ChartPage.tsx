@@ -342,6 +342,23 @@ function TableSortIcon({ active, direction }: { active: boolean; direction: Rank
   );
 }
 
+const ENABLED_STRATEGIES_STORAGE_KEY = "market_moe_chart_enabled_strategies";
+
+function loadSavedEnabledStrategies(): Record<string, boolean> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(ENABLED_STRATEGIES_STORAGE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+      return parsed;
+    }
+  } catch (err) {
+    console.error("Falha ao recuperar estratégias salvas:", err);
+  }
+  return {};
+}
+
 export function ChartPage() {
   const {
     activeRoute,
@@ -395,8 +412,22 @@ export function ChartPage() {
     }
   };
 
-  // Checkboxes de todas as estratégias do sistema (inicia com todas desmarcadas)
-  const [enabledStrategies, setEnabledStrategies] = React.useState<Record<string, boolean>>({});
+  // Checkboxes de todas as estratégias do sistema (restaura do localStorage se salvo)
+  const [enabledStrategies, setEnabledStrategies] = React.useState<Record<string, boolean>>(
+    () => loadSavedEnabledStrategies()
+  );
+
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(
+        ENABLED_STRATEGIES_STORAGE_KEY,
+        JSON.stringify(enabledStrategies)
+      );
+    } catch (err) {
+      console.error("Falha ao persistir estratégias:", err);
+    }
+  }, [enabledStrategies]);
 
   const hasSelectedStrategies = React.useMemo(() => {
     return Object.values(enabledStrategies).some(Boolean);
