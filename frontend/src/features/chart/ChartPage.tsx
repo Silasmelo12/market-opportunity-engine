@@ -1144,43 +1144,60 @@ export function ChartPage() {
                     <TableRow>
                       <TableHead className="w-12 text-center">Posição</TableHead>
                       <TableHead>Estratégia</TableHead>
+                      <TableHead className="text-right">Entradas / Sinais</TableHead>
                       <TableHead className="text-right">Eficiência</TableHead>
                       <TableHead className="text-right">Retorno Médio</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {displayedSummaries.length > 0 ? (
-                      displayedSummaries.map((item, idx) => (
-                        <TableRow key={item.strategy_sub_id || idx}>
-                          <TableCell className="text-center">
-                            <span
-                              className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold ${
-                                idx === 0
-                                  ? "bg-success text-primary-foreground"
-                                  : "bg-surface-subtle text-foreground"
-                              }`}
-                            >
-                              {idx + 1}
-                            </span>
-                          </TableCell>
-                          <TableCell>
-                            <span className="inline-block rounded px-2 py-0.5 text-[11px] font-bold bg-primary-soft text-primary truncate max-w-[170px]" title={item.strategy_label}>
-                              {item.strategy_label || item.strategy_sub_id}
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-right font-mono font-bold text-foreground">
-                            {typeof item.win_rate === "number" ? `${item.win_rate.toFixed(1).replace(".", ",")}%` : "—"}
-                          </TableCell>
-                          <TableCell className={`text-right font-mono font-bold ${(item.mean_forward_return ?? 0) >= 0 ? "text-success" : "text-danger"}`}>
-                            {typeof item.mean_forward_return === "number"
-                              ? `${item.mean_forward_return >= 0 ? "+" : ""}${item.mean_forward_return.toFixed(1).replace(".", ",")}%`
-                              : "—"}
-                          </TableCell>
-                        </TableRow>
-                      ))
+                      displayedSummaries.map((item, idx) => {
+                        const executedCount = item.executed_buys ?? item.total_signals ?? 0;
+                        const totalCount = item.total_signals ?? executedCount;
+                        const signalsDisplay =
+                          totalCount !== executedCount
+                            ? `${executedCount} / ${totalCount}`
+                            : `${executedCount}`;
+                        const signalsTooltip =
+                          totalCount !== executedCount
+                            ? `${executedCount} entradas executadas de ${totalCount} sinais gerados`
+                            : `${executedCount} entradas/sinais`;
+
+                        return (
+                          <TableRow key={item.strategy_sub_id || idx}>
+                            <TableCell className="text-center">
+                              <span
+                                className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold ${
+                                  idx === 0
+                                    ? "bg-success text-primary-foreground"
+                                    : "bg-surface-subtle text-foreground"
+                                }`}
+                              >
+                                {idx + 1}
+                              </span>
+                            </TableCell>
+                            <TableCell>
+                              <span className="inline-block rounded px-2 py-0.5 text-[11px] font-bold bg-primary-soft text-primary truncate max-w-[150px]" title={item.strategy_label}>
+                                {item.strategy_label || item.strategy_sub_id}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-right font-mono font-medium text-foreground text-xs" title={signalsTooltip}>
+                              {signalsDisplay}
+                            </TableCell>
+                            <TableCell className="text-right font-mono font-bold text-foreground">
+                              {typeof item.win_rate === "number" ? `${item.win_rate.toFixed(1).replace(".", ",")}%` : "—"}
+                            </TableCell>
+                            <TableCell className={`text-right font-mono font-bold ${(item.mean_forward_return ?? 0) >= 0 ? "text-success" : "text-danger"}`}>
+                              {typeof item.mean_forward_return === "number"
+                                ? `${item.mean_forward_return >= 0 ? "+" : ""}${item.mean_forward_return.toFixed(1).replace(".", ",")}%`
+                                : "—"}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={4} className="text-center py-6 text-xs text-muted-foreground">
+                        <TableCell colSpan={5} className="text-center py-6 text-xs text-muted-foreground">
                           {hasSelectedStrategies
                             ? "Nenhum sinal detectado para as estratégias selecionadas no período."
                             : "Selecione uma ou mais estratégias no filtro acima para visualizar o ranking."}
