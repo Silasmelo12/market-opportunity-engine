@@ -302,7 +302,7 @@ function StatusPill({ status }: { status: "Compra" | "Venda" | "Neutro" }) {
   );
 }
 
-type RankingSortField = "position" | "strategy" | "signals" | "efficiency" | "return";
+type RankingSortField = "strategy" | "signals" | "efficiency" | "return";
 type RankingSortDirection = "asc" | "desc";
 
 function TableSortIcon({ active, direction }: { active: boolean; direction: RankingSortDirection }) {
@@ -519,8 +519,8 @@ export function ChartPage() {
   }, [analysis, activeDirection, enabledStrategies, hasSelectedStrategies]);
 
   // Estado e lógica de ordenação do Ranking de Eficiência por Estratégia
-  const [rankingSortField, setRankingSortField] = React.useState<RankingSortField>("position");
-  const [rankingSortDirection, setRankingSortDirection] = React.useState<RankingSortDirection>("asc");
+  const [rankingSortField, setRankingSortField] = React.useState<RankingSortField>("efficiency");
+  const [rankingSortDirection, setRankingSortDirection] = React.useState<RankingSortDirection>("desc");
 
   const handleRankingSort = React.useCallback(
     (field: RankingSortField) => {
@@ -547,9 +547,6 @@ export function ChartPage() {
     return [...withRank].sort((a, b) => {
       let comparison = 0;
       switch (rankingSortField) {
-        case "position":
-          comparison = a.originalRank - b.originalRank;
-          break;
         case "strategy": {
           const nameA = a.strategy_label || a.strategy_sub_id || "";
           const nameB = b.strategy_label || b.strategy_sub_id || "";
@@ -1251,17 +1248,6 @@ export function ChartPage() {
                 >
                   <TableHeader className="sticky top-0 z-20 bg-surface-subtle shadow-xs border-b border-border">
                     <TableRow className="hover:bg-transparent">
-                      <TableHead className="w-16 text-center sticky top-0 z-20 bg-surface-subtle p-0">
-                        <button
-                          type="button"
-                          onClick={() => handleRankingSort("position")}
-                          className="flex items-center justify-center gap-1 font-semibold hover:text-foreground transition-colors group cursor-pointer w-full py-2 px-2 text-[11px] uppercase tracking-wider"
-                          title="Ordenar por Posição"
-                        >
-                          <span>Posição</span>
-                          <TableSortIcon active={rankingSortField === "position"} direction={rankingSortDirection} />
-                        </button>
-                      </TableHead>
                       <TableHead className="sticky top-0 z-20 bg-surface-subtle p-0">
                         <button
                           type="button"
@@ -1324,17 +1310,6 @@ export function ChartPage() {
 
                         return (
                           <TableRow key={item.strategy_sub_id || idx}>
-                            <TableCell className="text-center">
-                              <span
-                                className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold ${
-                                  item.originalRank === 1
-                                    ? "bg-success text-primary-foreground"
-                                    : "bg-surface-subtle text-foreground"
-                                }`}
-                              >
-                                {item.originalRank}
-                              </span>
-                            </TableCell>
                             <TableCell>
                               <span className="inline-block rounded px-2 py-0.5 text-[11px] font-bold bg-primary-soft text-primary truncate max-w-[150px]" title={item.strategy_label}>
                                 {item.strategy_label || item.strategy_sub_id}
@@ -1356,7 +1331,7 @@ export function ChartPage() {
                       })
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center py-6 text-xs text-muted-foreground">
+                        <TableCell colSpan={4} className="text-center py-6 text-xs text-muted-foreground">
                           {hasSelectedStrategies
                             ? "Nenhum sinal detectado para as estratégias selecionadas no período."
                             : "Selecione uma ou mais estratégias no filtro acima para visualizar o ranking."}
