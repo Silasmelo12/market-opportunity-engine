@@ -59,7 +59,7 @@ function getChartThemeTokens(): ChartThemeTokens {
 
 // Funções de Cálculo dos Indicadores Técnicos
 function calculateSMA(candles: CandlePoint[], period: number) {
-  const result: { time: string; value: number }[] = [];
+  const result: { time: string | number; value: number }[] = [];
   if (candles.length < period) return result;
   let sum = 0;
   for (let i = 0; i < candles.length; i++) {
@@ -78,8 +78,8 @@ function calculateSMA(candles: CandlePoint[], period: number) {
 }
 
 function calculateBollingerBands(candles: CandlePoint[], period = 20, multiplier = 2) {
-  const upper: { time: string; value: number }[] = [];
-  const lower: { time: string; value: number }[] = [];
+  const upper: { time: string | number; value: number }[] = [];
+  const lower: { time: string | number; value: number }[] = [];
   if (candles.length < period) return { upper, lower };
   for (let i = period - 1; i < candles.length; i++) {
     const slice = candles.slice(i - period + 1, i + 1);
@@ -93,7 +93,7 @@ function calculateBollingerBands(candles: CandlePoint[], period = 20, multiplier
 }
 
 function calculateVWAP(candles: CandlePoint[]) {
-  const result: { time: string; value: number }[] = [];
+  const result: { time: string | number; value: number }[] = [];
   let cumVol = 0;
   let cumTypicalVol = 0;
   for (const c of candles) {
@@ -110,8 +110,8 @@ function calculateVWAP(candles: CandlePoint[]) {
 }
 
 function calculateSupportResistance(candles: CandlePoint[], lookback = 30) {
-  const support: { time: string; value: number }[] = [];
-  const resistance: { time: string; value: number }[] = [];
+  const support: { time: string | number; value: number }[] = [];
+  const resistance: { time: string | number; value: number }[] = [];
   if (candles.length < 5) return { support, resistance };
   for (let i = 0; i < candles.length; i++) {
     const start = Math.max(0, i - lookback);
@@ -704,6 +704,8 @@ export function ChartPage() {
           },
           timeScale: {
             borderColor: tokens.grid,
+            timeVisible: interval === "1h" || interval === "4h" || interval === "12h" || interval.includes("m"),
+            secondsVisible: false,
           },
         });
 
@@ -742,7 +744,7 @@ export function ChartPage() {
           }
 
           const markers: Array<{
-            time: string;
+            time: string | number;
             position: "belowBar" | "aboveBar";
             color: string;
             shape: "arrowUp" | "arrowDown";
@@ -754,12 +756,11 @@ export function ChartPage() {
             const hasSell = group.some((s) => s.direction === "SELL");
             const isBuy = hasBuy && !hasSell ? true : hasSell && !hasBuy ? false : group[0].direction === "BUY";
             const count = group.length;
-            const markerText = isBuy
-              ? count > 1 ? `▲ (${count})` : "▲"
-              : count > 1 ? `▼ (${count})` : "▼";
+            const markerText = count > 1 ? `(${count})` : "";
+            const isNumericTime = /^\d+$/.test(timeVal);
 
             markers.push({
-              time: timeVal,
+              time: isNumericTime ? Number(timeVal) : timeVal,
               position: isBuy ? "belowBar" : "aboveBar",
               color: isBuy ? tokens.up : tokens.down,
               shape: isBuy ? "arrowUp" : "arrowDown",
@@ -769,8 +770,8 @@ export function ChartPage() {
 
           // Ordena estritamente por tempo de barra para compatibilidade com LightweightCharts
           markers.sort((a, b) => {
-            const idxA = timeToIdx.get(a.time) ?? 0;
-            const idxB = timeToIdx.get(b.time) ?? 0;
+            const idxA = timeToIdx.get(String(a.time)) ?? 0;
+            const idxB = timeToIdx.get(String(b.time)) ?? 0;
             return idxA - idxB;
           });
 

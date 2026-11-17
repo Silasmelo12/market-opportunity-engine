@@ -70,6 +70,7 @@ export const KNOWN_ASSET_NAMES: Record<string, string> = {
   "SUZB3.SA": "Suzano ON",
   "GGBR4.SA": "Gerdau PN",
   "CSNA3.SA": "Siderúrgica Nacional ON",
+  "GRND3.SA": "Grendene ON",
   "HGLG11.SA": "CSHG Logística",
   "KNRI11.SA": "Kinea Renda Imob.",
   "MXRF11.SA": "Maxi Renda",
@@ -401,6 +402,10 @@ export const ALL_ASSET_GROUPS: AssetCategoryGroup[] = [
       {
         "symbol": "LREN3.SA",
         "name": "LREN3.SA"
+      },
+      {
+        "symbol": "GRND3.SA",
+        "name": "Grendene ON"
       }
     ]
   },

@@ -27,7 +27,7 @@ export interface RadarResponse {
 }
 
 export interface CandlePoint {
-  time: string;
+  time: string | number;
   open: number;
   high: number;
   low: number;

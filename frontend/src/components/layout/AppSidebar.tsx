@@ -92,43 +92,53 @@ export function AppSidebar() {
     }
   };
 
-  if (!isSidebarOpen) {
-    return null;
-  }
-
   const holdingsCount = (portfolio.holdings || []).length;
 
   return (
     <aside
       id="app-sidebar-nav"
       aria-label="Barra Lateral de Navegação"
-      className="app-sidebar flex flex-col w-64 shrink-0 border-r border-border bg-surface z-30 sticky top-[var(--shell-header-height,56px)] h-[calc(100vh-var(--shell-header-height,56px))] overflow-hidden transition-all duration-200"
+      className={`app-sidebar flex flex-col shrink-0 border-r border-border bg-surface z-30 sticky top-[var(--shell-header-height,56px)] h-[calc(100vh-var(--shell-header-height,56px))] overflow-hidden transition-all duration-200 ${
+        isSidebarOpen ? "w-64" : "w-14 items-center"
+      }`}
     >
       {/* Cabeçalho da Barra Lateral */}
-      <div className="flex items-center justify-between border-b border-border px-3 py-2.5">
-        <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-          Navegação Principal
-        </span>
+      <div
+        className={`flex items-center border-b border-border py-2.5 transition-all w-full ${
+          isSidebarOpen ? "justify-between px-3" : "justify-center px-1"
+        }`}
+      >
+        {isSidebarOpen && (
+          <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground truncate">
+            Navegação Principal
+          </span>
+        )}
         <button
           type="button"
           id="btn-sidebar-collapse"
-          aria-label="Ocultar barra lateral"
-          title="Ocultar barra lateral"
+          aria-label={isSidebarOpen ? "Recolher barra lateral" : "Expandir barra lateral"}
+          title={isSidebarOpen ? "Recolher barra lateral" : "Expandir barra lateral"}
           onClick={toggleSidebar}
-          className="btn-icon flex h-6 w-6 items-center justify-center rounded-md border border-border bg-surface text-muted-foreground hover:bg-surface-subtle hover:text-foreground transition-colors"
+          className="btn-icon flex h-7 w-7 items-center justify-center rounded-md border border-border bg-surface text-muted-foreground hover:bg-surface-subtle hover:text-foreground transition-colors"
         >
-          <AppIcon name="icon-arrow-left" className="h-3.5 w-3.5" />
+          <AppIcon name="icon-menu" className="h-4 w-4" />
         </button>
       </div>
 
       {/* Seletor de Pilares */}
-      <div className="p-3 pb-2 border-b border-border bg-surface-subtle/50">
+      <div
+        className={`border-b border-border bg-surface-subtle/50 transition-all w-full ${
+          isSidebarOpen ? "p-3 pb-2" : "p-1.5 pb-1.5 flex flex-col items-center"
+        }`}
+      >
         <div
           id="global-pillar-selector"
           role="tablist"
           aria-label="Ambientes da Plataforma"
-          aria-orientation="horizontal"
-          className="segmented flex w-full items-center rounded-lg border border-border bg-surface-subtle p-1"
+          aria-orientation={isSidebarOpen ? "horizontal" : "vertical"}
+          className={`segmented flex rounded-lg border border-border bg-surface-subtle p-1 transition-all ${
+            isSidebarOpen ? "w-full items-center" : "flex-col items-center w-full gap-1 p-0.5"
+          }`}
         >
           <button
             type="button"
@@ -140,14 +150,17 @@ export function AppSidebar() {
             tabIndex={activePillar === "carteira" ? 0 : -1}
             onClick={() => switchPillar("carteira")}
             onKeyDown={(e) => handlePillarKeyDown(e, "carteira")}
-            className={`pillar-tab flex-1 inline-flex items-center justify-center gap-1.5 rounded-md px-2.5 py-1.5 font-sans text-xs font-bold transition-all ${
+            title="Carteira"
+            className={`pillar-tab inline-flex items-center justify-center rounded-md font-sans text-xs font-bold transition-all ${
+              isSidebarOpen ? "flex-1 gap-1.5 px-2.5 py-1.5" : "w-8 h-8 p-0"
+            } ${
               activePillar === "carteira"
                 ? "active bg-surface text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            <AppIcon name="icon-wallet" className="h-3.5 w-3.5" />
-            <span>Carteira</span>
+            <AppIcon name="icon-wallet" className="h-4 w-4 shrink-0" />
+            {isSidebarOpen && <span>Carteira</span>}
           </button>
 
           <button
@@ -160,14 +173,17 @@ export function AppSidebar() {
             tabIndex={activePillar === "quant" ? 0 : -1}
             onClick={() => switchPillar("quant")}
             onKeyDown={(e) => handlePillarKeyDown(e, "quant")}
-            className={`pillar-tab flex-1 inline-flex items-center justify-center gap-1.5 rounded-md px-2.5 py-1.5 font-sans text-xs font-bold transition-all ${
+            title="Quant"
+            className={`pillar-tab inline-flex items-center justify-center rounded-md font-sans text-xs font-bold transition-all ${
+              isSidebarOpen ? "flex-1 gap-1.5 px-2.5 py-1.5" : "w-8 h-8 p-0"
+            } ${
               activePillar === "quant"
                 ? "active bg-surface text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            <AppIcon name="icon-target" className="h-3.5 w-3.5" />
-            <span>Quant</span>
+            <AppIcon name="icon-target" className="h-4 w-4 shrink-0" />
+            {isSidebarOpen && <span>Quant</span>}
           </button>
         </div>
       </div>
@@ -176,22 +192,26 @@ export function AppSidebar() {
       <nav
         aria-label="Subnavegação Contextual"
         style={{ top: "var(--shell-header-height, 56px)" }}
-        className="subnav-bar flex-1 overflow-y-auto p-3"
+        className={`subnav-bar flex-1 overflow-y-auto overflow-x-hidden w-full transition-all ${
+          isSidebarOpen ? "p-3" : "p-1.5 flex flex-col items-center"
+        }`}
       >
-        <div id="main-subnav-pills" className="subnav-container flex flex-col gap-1">
+        <div id="main-subnav-pills" className="subnav-container flex flex-col gap-1 w-full">
           {/* Subnavegação Minha Carteira */}
           <div
             id="subnav-group-carteira"
             role="tablist"
             aria-label="Subnavegação Minha Carteira"
             aria-orientation="vertical"
-            className={`flex flex-col gap-1 ${
+            className={`flex flex-col gap-1 w-full ${
               activePillar === "carteira" ? "" : "hidden"
             }`}
           >
-            <span className="px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-              Módulos da Carteira
-            </span>
+            {isSidebarOpen && (
+              <span className="px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground truncate">
+                Módulos da Carteira
+              </span>
+            )}
             {CARTEIRA_ITEMS.map((routeKey, idx) => {
               const def = ROUTE_CATALOG[routeKey];
               const isSelected = activeRoute === def.route;
@@ -206,14 +226,19 @@ export function AppSidebar() {
                   tabIndex={isSelected ? 0 : -1}
                   onClick={() => navigateToRoute(def.route)}
                   onKeyDown={(e) => handleTabKeyDown(e, CARTEIRA_ITEMS, idx)}
-                  className={`nav-tab flex cursor-pointer items-center gap-2.5 rounded-md px-3 py-2 font-sans text-xs font-semibold transition-all ${
+                  title={def.label}
+                  className={`nav-tab flex cursor-pointer items-center rounded-md font-sans text-xs font-semibold transition-all ${
+                    isSidebarOpen
+                      ? "gap-2.5 px-3 py-2"
+                      : "justify-center w-9 h-9 p-0 mx-auto"
+                  } ${
                     isSelected
                       ? "active bg-primary-soft text-primary font-bold shadow-sm"
                       : "text-muted-foreground hover:bg-surface-subtle hover:text-foreground"
                   }`}
                 >
                   <AppIcon name={def.icon} className="h-4 w-4 shrink-0" />
-                  <span className="truncate">{def.label}</span>
+                  {isSidebarOpen && <span className="truncate">{def.label}</span>}
                 </div>
               );
             })}
@@ -225,13 +250,15 @@ export function AppSidebar() {
             role="tablist"
             aria-label="Subnavegação Análise Quantitativa"
             aria-orientation="vertical"
-            className={`flex flex-col gap-1 ${
+            className={`flex flex-col gap-1 w-full ${
               activePillar === "quant" ? "" : "hidden"
             }`}
           >
-            <span className="px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-              Módulos Quantitativos
-            </span>
+            {isSidebarOpen && (
+              <span className="px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground truncate">
+                Módulos Quantitativos
+              </span>
+            )}
             {QUANT_ITEMS.map((routeKey, idx) => {
               const def = ROUTE_CATALOG[routeKey];
               const isSelected = activeRoute === def.route;
@@ -246,14 +273,19 @@ export function AppSidebar() {
                   tabIndex={isSelected ? 0 : -1}
                   onClick={() => navigateToRoute(def.route)}
                   onKeyDown={(e) => handleTabKeyDown(e, QUANT_ITEMS, idx)}
-                  className={`nav-tab flex cursor-pointer items-center gap-2.5 rounded-md px-3 py-2 font-sans text-xs font-semibold transition-all ${
+                  title={def.label}
+                  className={`nav-tab flex cursor-pointer items-center rounded-md font-sans text-xs font-semibold transition-all ${
+                    isSidebarOpen
+                      ? "gap-2.5 px-3 py-2"
+                      : "justify-center w-9 h-9 p-0 mx-auto"
+                  } ${
                     isSelected
                       ? "active bg-primary-soft text-primary font-bold shadow-sm"
                       : "text-muted-foreground hover:bg-surface-subtle hover:text-foreground"
                   }`}
                 >
                   <AppIcon name={def.icon} className="h-4 w-4 shrink-0" />
-                  <span className="truncate">{def.label}</span>
+                  {isSidebarOpen && <span className="truncate">{def.label}</span>}
                 </div>
               );
             })}
@@ -262,13 +294,26 @@ export function AppSidebar() {
       </nav>
 
       {/* Rodapé da Barra Lateral */}
-      <div className="border-t border-border bg-surface-subtle/40 p-3 text-xs text-muted-foreground">
-        <div className="flex items-center justify-between">
-          <span>Ativos monitorados:</span>
-          <span className="font-mono font-bold text-foreground">
+      <div
+        className={`border-t border-border bg-surface-subtle/40 text-xs text-muted-foreground w-full transition-all ${
+          isSidebarOpen ? "p-3" : "p-2 flex justify-center"
+        }`}
+      >
+        {isSidebarOpen ? (
+          <div className="flex items-center justify-between">
+            <span className="truncate">Ativos monitorados:</span>
+            <span className="font-mono font-bold text-foreground">
+              {holdingsCount}
+            </span>
+          </div>
+        ) : (
+          <span
+            className="font-mono font-bold text-foreground text-[11px]"
+            title={`Ativos monitorados: ${holdingsCount}`}
+          >
             {holdingsCount}
           </span>
-        </div>
+        )}
       </div>
     </aside>
   );

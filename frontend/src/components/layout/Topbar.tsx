@@ -139,16 +139,6 @@ export function Topbar() {
     >
       <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-3">
         <div className="brand-group flex min-w-0 items-center gap-2.5">
-          <button
-            type="button"
-            id="btn-sidebar-toggle"
-            aria-label={isSidebarOpen ? "Ocultar barra lateral" : "Exibir barra lateral"}
-            title={isSidebarOpen ? "Ocultar barra lateral" : "Exibir barra lateral"}
-            onClick={toggleSidebar}
-            className="btn-icon flex h-8 w-8 items-center justify-center rounded-md border border-border bg-surface text-muted-foreground hover:bg-surface-subtle hover:text-foreground transition-colors shadow-sm"
-          >
-            <AppIcon name="icon-layers" className="h-4 w-4" />
-          </button>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <span className="brand-title truncate font-sans text-sm font-extrabold tracking-tight text-foreground">

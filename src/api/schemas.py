@@ -31,7 +31,7 @@ def sanitize_val(v: Any) -> Any:
 # 1. Models for /api/analyze
 
 class CandleBar(BaseModel):
-    time: str
+    time: Any
     open: float
     high: float
     low: float

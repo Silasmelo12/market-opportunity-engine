@@ -409,7 +409,7 @@ def analyze_asset(
     # Build candles for Lightweight Charts
     candles: List[CandleBar] = []
     for i in range(series.length):
-        time_val = str(ts_seconds[i]) if is_intraday else date_strs[i]
+        time_val = ts_seconds[i] if is_intraday else date_strs[i]
         candles.append(
             CandleBar(
                 time=time_val,
@@ -594,6 +594,7 @@ TICKERS_BR_ACOES = [
     'TASA4.SA', 'PMAM3.SA', 'CMIG4.SA', 'CPFE3.SA', 'POMO4.SA',
     'TAEE11.SA', 'BBSE3.SA', 'SUZB3.SA', 'GGBR4.SA', 'CSNA3.SA',
     'USIM5.SA', 'VIVT3.SA', 'TIMS3.SA', 'HAPV3.SA', 'LREN3.SA',
+    'GRND3.SA',
 ]
 
 TICKERS_FIIS = [
@@ -700,7 +701,7 @@ def _normalize_category(cat: Optional[str]) -> str:
 def _scan_single_ticker(ticker: str, category: str, interval: str = "1d", horizon_x: int = 60, refresh: bool = False) -> List[RadarItem]:
     items: List[RadarItem] = []
     try:
-        series = DataLoader.load_asset_data(ticker=ticker, interval=interval, period="2y", use_cache=True)
+        series = DataLoader.load_asset_data(ticker=ticker, interval=interval, period="2y", use_cache=not refresh)
     except Exception:
         return items
 

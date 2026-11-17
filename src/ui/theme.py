@@ -170,6 +170,7 @@ ASSET_NAMES_PT: Dict[str, str] = {
     "SUZB3.SA": "Suzano ON",
     "GGBR4.SA": "Gerdau PN",
     "CSNA3.SA": "Siderúrgica Nacional ON",
+    "GRND3.SA": "Grendene ON",
     # FIIs Brasil
     "HGLG11.SA": "CSHG Logística",
     "KNRI11.SA": "Kinea Renda Imob.",
